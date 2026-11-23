@@ -11,7 +11,8 @@ New repository pushable: yes (no fallback to the slot 7 repository needed).
 | P3 compliance matrix, test plan | done ([NEW] docs/RULES_COMPLIANCE.md, docs/TEST_PLAN.md) |
 | P3 port plan | table done; sky130 results pending |
 | P3 sign-off data ([S7] signoff/) | done (14 reports; none for the taped-out slot_7.gds with art) |
-| P3b sky130 simulations | halted by the user (stashed); replaced by IHP gap simulations |
+| P3b sky130 simulations | halted by the user (stashed) |
+| P3c IHP gap simulations (D2S PEX; ss / −40 °C modes and bandgap; replica-bias PEX + MC, bias_dist) | running, due 22:15 UTC |
 | P4 consistency pass | open |
 
 Needs the user's decision: custom-pad approval request; the selectable options within 24 controls; what is sent separately (equipment availability list, CVs); submission channel per the Challenge #4 page: e-mail to chipalooza@opencircuitdesign.com; license choice (organizers).
