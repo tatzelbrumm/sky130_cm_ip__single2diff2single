@@ -175,7 +175,7 @@ ratings (the 3.3 V devices are the 5 V-class `g5v0d10v5` devices; exact rated va
 | 16 | D2S INL | `vdda` 3.3 … 3.6 V | | 0.5 mV | 10 mV | | 0.12 … 7.4 mV; post-layout 0.12 … 7.5 mV; at 3.0 V 10.9 … 87.4 mV (headroom limit, schematic) | TBD; at 3.0 V: TBD |
 | 17 | D2S −3 dB bandwidth | 10 … 300 pF | 1 MHz | 2 MHz | | | 1.58 … 3.01 MHz; post-layout 1.43 … 2.71 MHz | TBD |
 | 18 | D2S gain peaking | ≤ 300 pF | | 0 dB | 4 dB | | ≤ 2.9 dB; post-layout ≤ 2.5 dB | TBD |
-| 19 | D2S slew rate | 10 … 300 pF | 1 V/µs | 2.4 V/µs | | | 1.76 … 3.17 V/µs | TBD |
+| 19 | D2S slew rate | 10 … 300 pF | 1 V/µs | 2.4 V/µs | | | 1.76 … 3.17 V/µs; post-layout 1.59 … 2.79 V/µs (settling 0.35 … 0.55 µs, overshoot ≤ 8 %) | TBD |
 | 20 | D2S THD | 0.5 V output amplitude | | −58 dB | −50 dB | | −73.2 / −57.8 / −38.9 dB at 0.25 / 0.5 / 0.75 V output amplitude (`thd_params.csv`) | TBD |
 | 21 | D2S output swing | `vdda` 3.3 V | ≤ 0.9 V low | | ≥ 3.0 V high | | 0.64 … 0.74 V / 3.27 … 3.28 V | TBD |
 | 22 | D2S short-circuit current | | 20 mA | | | TBC (pad metal / ESD) | 49.7 … 120.3 mA | TBD |
