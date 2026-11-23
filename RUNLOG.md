@@ -20,3 +20,13 @@
 - 19:58 Template `simi1505/sg13cmos5l_chipalooza_analog_project` read at `c72f665b` (directory layout, Makefile targets) for the compliance matrix.
 - 19:59 [S7] branch `chipalooza2-documentation` created from `158afc5` (local); P2 content being written by a background job, committed by me after review.
 - 20:00 [NEW] `docs/RULES_COMPLIANCE.md` (35 rows + template comparison), `docs/TEST_PLAN.md` (detailed), `.gitignore`; pushed. `docs/PROPOSAL.pdf` rendered by `scripts/render_proposal_pdf.sh` (pandoc 3.1.3 → HTML → Playwright Chromium PDF; no LaTeX engine installed), 9 pages A4.
+- 20:10 [S7] `chipalooza2-documentation` pushed (`9d3e441`, from `158afc5`): `docs/chipalooza2_as_taped_out/` (slot 7 set from `sg13cmos5l_ocd_chipalooza` `sudel_buecher` `sudelbuecher/slots/slot_7/`, links adapted, "this session" → "on 2026-11-22", `oa_core_pd` statement at the top), `TEST_PLAN.md` (fabricated chip), `signoff/` (14 reports copied byte-identical from the design repository at `9052bd35` / `91a7da8b`, sha256 in `signoff/README.md`; largest 1.2 MB KLayout lvsdb), `docs/AI_ASSISTANCE.md`, `docs/RULES_COMPLIANCE_chipalooza2.md`; `README.md` only appended. `final/ pads/ netlist/ art/ macros/` unchanged (empty diff).
+- Source conflicts found while writing [S7] (recorded, not "fixed"):
+  1. delivery README says both cores are in `slot_7.gds`; the taped-out GDS has no `oa_core_pd` / `oa_*` cell.
+  2. `tapeout_nov_2026` tip gitlink `c072679` (stage B) vs `config.txt` and tapeout commit `7eeb3cb`: `158afc5`.
+  3. `en_ctrl_3v3` README says CACE suite v2; its file list says "v1 suite … to be rewritten for v2".
+  4. magic / netgen LVS reports of `bg_core_pd` and both pads contain property errors (`mm_ok`; W/L swapped on antenna diodes) that the READMEs do not mention.
+  5. floating `vdd_3v3`: PLAN.md 0.6–0.67 V vs SUMMARY data 0.5–0.665 V.
+  6. FOR_TIM: `0x0D` / `0x0E` are route codes written into `0x20…0x37`, not register addresses (checked against the harness RTL).
+  7. delivery README: harness flow "not yet run"; design-repository RUNLOG row 129: passed for v2 on the fork with four patches.
+- No sign-off report exists for the taped-out `final/gds/slot_7.gds` with the art; `slot_7_checks.txt` covers v3 without the art. No DRC / LVS reports committed for `pad_ref_rb` or `bias_dist_pd` at the cited commits.

@@ -12,3 +12,7 @@
 10. Anonymity: PROPOSAL.md has no names, institutions, personal URLs (checked by grep at each push).
 
 Items needing an organizer's approval: custom pads; license (Apache-2.0 or SHL-2.1).
+
+[S7] branch `chipalooza2-documentation`:
+11. `signoff/README.md`: magic LVS property errors (`mm_ok`, antenna-diode W/L) in `bg_core_pd` and pad reports, not mentioned in their READMEs: accept or note?
+12. `docs/chipalooza2_as_taped_out/TEST_PLAN.md`: SPI sequence and expected intervals for the chip measurement.
