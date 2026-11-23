@@ -1,18 +1,17 @@
-# Status (updated at every push)
+# Status (22:00 UTC, 2026-11-23)
 
-New repository pushable: yes (no fallback to the slot 7 repository needed).
+New repository pushable: yes (no fallback needed).
 
 | item | state |
 |---|---|
-| P0 setup ([NEW] main, [SB] worktree) | done |
-| P1 `docs/PROPOSAL.md` (+ PROPOSAL.pdf) | complete in structure, pushed; sky130 column TBD (simulations running) |
-| P1 `docs/EQUIPMENT_NEEDED.md` | done |
-| P2 [S7] `chipalooza2-documentation` | done, pushed (`9d3e441`); no plots yet |
-| P3 compliance matrix, test plan | done ([NEW] docs/RULES_COMPLIANCE.md, docs/TEST_PLAN.md) |
-| P3 port plan | table done; sky130 results pending |
-| P3 sign-off data ([S7] signoff/) | done (14 reports; none for the taped-out slot_7.gds with art) |
-| P3b sky130 simulations | halted by the user (stashed) |
-| P3c IHP gap simulations (D2S PEX; ss / −40 °C modes and bandgap; replica-bias PEX + MC, bias_dist) | running, due 22:15 UTC |
-| P4 consistency pass | open |
+| P0 setup ([NEW] `main`, [SB] worktree, [S7] branch) | done |
+| P1 [NEW] `docs/PROPOSAL.md` + `PROPOSAL.pdf`, `EQUIPMENT_NEEDED.md` | done; submittable. sky130 column TBD by decision; absolute limits TBC from the sky130 PDK |
+| P2 [S7] `chipalooza2-documentation` | done: description set, chip TEST_PLAN, signoff/, AI_ASSISTANCE, rules-2 compliance, README section appended |
+| P3 [NEW] compliance matrix, test plan, port plan | done (port plan without sky130 results, by decision) |
+| P3b sky130 simulations | halted by the user; files stashed on `sudel_buecher` (`stash/`) |
+| P3c IHP gap simulations ([S7] `verification/c2_gaps/`) | done: D2S PEX (complete), replica bias PEX + MC, bias distribution, ss / −40 °C verdict, bandgap alone |
+| P4 consistency | PROPOSAL.md anonymity checked by grep at every push |
 
-Needs the user's decision: custom-pad approval request; the selectable options within 24 controls; what is sent separately (equipment availability list, CVs); submission channel per the Challenge #4 page: e-mail to chipalooza@opencircuitdesign.com; license choice (organizers).
+Open (IHP): mode × corner points that still abort in the simulator (tt / sf −40 °C, ss 125 °C swap); `dpantenna` parameters in the converted pad netlists; full-RC PEX; D2S mismatch; whole-slot PEX; no sign-off report for `slot_7.gds` with the art.
+
+Needs the user's decision / action: custom-pad approval request (in the proposal); the control map within 24 inputs; equipment availability list and CVs (sent separately); submission by e-mail to chipalooza@opencircuitdesign.com (Challenge #4 page); license choice (organizers); target margins (REVIEW_CHECKLIST item 5).
