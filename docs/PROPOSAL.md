@@ -177,8 +177,8 @@ ratings (the 3.3 V devices are the 5 V-class `g5v0d10v5` devices; exact rated va
 | 18 | D2S gain peaking | ≤ 300 pF | | 0 dB | 4 dB | | ≤ 2.9 dB; post-layout ≤ 2.5 dB | TBD |
 | 19 | D2S slew rate | 10 … 300 pF | 1 V/µs | 2.4 V/µs | | | 1.76 … 3.17 V/µs; post-layout 1.59 … 2.79 V/µs (settling 0.35 … 0.55 µs, overshoot ≤ 8 %) | TBD |
 | 20 | D2S THD | 0.5 V output amplitude | | −58 dB | −50 dB | | −73.2 / −57.8 / −38.9 dB at 0.25 / 0.5 / 0.75 V output amplitude (`thd_params.csv`) | TBD |
-| 21 | D2S output swing | `vdda` 3.3 V | ≤ 0.9 V low | | ≥ 3.0 V high | | 0.64 … 0.74 V / 3.27 … 3.28 V | TBD |
-| 22 | D2S short-circuit current | | 20 mA | | | TBC (pad metal / ESD) | 49.7 … 120.3 mA | TBD |
+| 21 | D2S output swing | `vdda` 3.3 V | ≤ 0.9 V low | | ≥ 3.0 V high | | 0.64 … 0.74 V / 3.27 … 3.28 V; post-layout 0.64 … 0.74 V / 3.27 … 3.28 V | TBD |
+| 22 | D2S short-circuit current | | 20 mA | | | TBC (pad metal / ESD) | 49.7 … 120.3 mA; post-layout 49.7 … 124.2 mA | TBD |
 | 23 | D2S output impedance | 1 kHz | | 0.2 Ω | 10 Ω | | 0.195 … 3.85 Ω; post-layout 0.208 … 3.30 Ω | TBD |
 | 24 | D2S PSRR (pad-ring supply) | 1 kHz | 60 dB | 71 dB | | | 70.7 … 72.5 dB; post-layout 70.0 … 71.9 dB | TBD |
 | 25 | D2S pad-ring quiescent current | | | 300 µA | 400 µA | | 293 … 314 µA; post-layout ring current 302 … 320 µA | TBD |
