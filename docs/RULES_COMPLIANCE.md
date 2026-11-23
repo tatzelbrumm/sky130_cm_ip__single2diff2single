@@ -28,15 +28,15 @@ Status values: **met** / **partly** / **gap** / **n/a** / **needs user decision*
 | 13 | meets the target specification in post-layout verification; spec changes approved | gap | – | post-layout simulation over PVT for the review of 2027-02-01 |
 | 14 | analog design for 3.3 V; 1.8 V designs need overvoltage protection at the pads | met (by design choice) | PROPOSAL.md §2, §6 (3.3 V analog; 1.8 V only for controls and read-back) | – |
 | 15 | public git repository with everything to reproduce, verify and use the block | partly | this repository (public); sky130 design sources do not exist yet | add schematics, layouts, netlists, decks per the template layout as they are made |
-| 16 | verifiable with open-source tools; AI not required to use, verify, modify | met for what exists | [../verification/](../verification/) (ngspice, sky130A); [AI_ASSISTANCE.md](AI_ASSISTANCE.md) | keep all flows script-driven (Makefile) |
+| 16 | verifiable with open-source tools; AI not required to use, verify, modify | met for the IHP basis | IHP characterization with ngspice / CACE / KLayout / magic / netgen ([SOURCES.md](SOURCES.md)); [AI_ASSISTANCE.md](AI_ASSISTANCE.md) | keep all sky130 flows script-driven (Makefile) |
 | 17 | all sources to generate all views; modifiable with open-source tools | gap | – | xschem schematics, layout scripts / GDS, CACE files committed with each block |
 | 18 | full behavioural description documented in the repository | partly | PROPOSAL.md §3; IHP predecessor documentation | per-block READMEs and data sheets at the schematic review |
-| 19 | no unnecessary data dumps; sign-off data (final DRC and LVS) required | gap (no layout yet) | `.gitignore` keeps raw simulation output out; `verification/results/` holds plots and tables only | DRC / LVS reports in `verification/drc`, `verification/lvs` as in the template |
-| 20 | simulation results as plots, raw data reproducible on demand | met for what exists | [../verification/README.md](../verification/README.md) (commands, versions) | – |
+| 19 | no unnecessary data dumps; sign-off data (final DRC and LVS) required | gap (no layout yet) | `.gitignore` keeps raw simulation output out | DRC / LVS reports in `verification/drc`, `verification/lvs` as in the template |
+| 20 | simulation results as plots, raw data reproducible on demand | gap (sky130); IHP basis summarized as plots / tables in the predecessor documentation | [SOURCES.md](SOURCES.md) | – |
 | 21 | standard open-source license, preferably Apache-2.0 | needs organizers' decision | `LICENSE` (Apache-2.0), `LICENSES/SHL-2.1.txt`, [LICENSE_NOTE.md](LICENSE_NOTE.md) | organizers approve Apache-2.0 or SHL-2.1 |
 | 22 | no sources violating their license or Apache-2.0 | met | LICENSE_NOTE.md (sky130 PDK Apache-2.0; no third-party design sources) | – |
 | 23 | follow the repository template; sign-off scripts runnable by anyone | gap | template compared below | adopt the layout below at the schematic review; Makefile targets for DRC / LVS / PEX / CACE |
-| 24 | design environment free; IIC-OSIC-TOOLS encouraged | met | tool versions pinned to IIC-OSIC-TOOLS 2026.10 ([../verification/README.md](../verification/README.md)) | – |
+| 24 | design environment free; IIC-OSIC-TOOLS encouraged | met | tool versions pinned to IIC-OSIC-TOOLS 2026.10 (IHP basis) | – |
 | 25 | post-layout verification over PVT, commercial spec (≥ 110 °C) | gap (planned wider) | PROPOSAL.md §4 (−40 … 125 °C, 3.0 … 3.6 V, 5 corners) | post-layout CACE over PVT |
 | 26 | layout restricted to slot size; IP wired inside the wrapper | gap | – | slot size and I/O configuration TBD by the harness repository |
 | 27 | two forms: standalone layout and slot-wrapper layout; do not fill the slot | gap | PROPOSAL.md §6 | standalone: the two pad cells (foundry-pad size) + one core macro (references, replica, glue) with its own pins; wrapper: that macro placed and wired in the slot wrapper. IHP slot 7 exists only in the wrapper form |
@@ -60,6 +60,6 @@ Template: `simi1505/sg13cmos5l_chipalooza_analog_project` at `c72f665b` (2026-08
 |---|---|---|
 | `final/`, `layout/`, `schematic/`, `netlist/` of the top cell | missing | at the schematic review (schematic, netlist) and layout review (layout, final) |
 | `macros/<macro>/` with CACE, DRC, LVS, PEX | missing | one macro per block: `sky130_cm_IOPadSingle2Diff`, `sky130_cm_IOPadDiff2Single`, `oa_core`, `bg_core`, `bias_dist`, `pad_ref_rb`, `ctrl` (names provisional) |
-| `testbenches/xschem/` and plots | `verification/` holds ngspice decks and plots for the feasibility runs | move into the template places once xschem schematics exist |
+| `testbenches/xschem/` and plots | missing | with the sky130 schematics (schematic review) |
 | `Makefile`, `.designinit`, `submission.yaml` | missing | copy from the template, adapt to sky130A (the template's precheck fields are IHP-specific) |
 | `docs/` | present (proposal and plans) | the template has no `docs/`; kept as an addition |

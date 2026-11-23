@@ -152,7 +152,7 @@ All values are **sky130 targets (proposed)**, to be confirmed in pre-layout simu
 (commercial 0 … 110 °C is the minimum the block must meet), process corners tt / ss / ff / sf / fs, pad input 0 … 1 V,
 D2S load 1 kΩ ∥ ≤ 300 pF or unloaded. "Basis" gives the IHP sg13cmos5l observed interval (simulation; source in
 [SOURCES.md](SOURCES.md)) and the margin applied; **no sky130 simulation result is included yet** (column "sky130 sim":
-TBD = to come from `verification/`, see [PORT_PLAN.md](PORT_PLAN.md)). Absolute limits: TBC from the sky130 PDK and pad-library
+TBD = sky130 pre-layout simulation for the schematic review, ported from the IHP results; see [PORT_PLAN.md](PORT_PLAN.md)). Absolute limits: TBC from the sky130 PDK and pad-library
 ratings (the 3.3 V devices are the 5 V-class `g5v0d10v5` devices; exact rated values to be copied from the PDK documentation).
 
 | # | quantity | conditions | min | typ | max | absolute limit | basis (IHP observed, schematic unless noted) | sky130 sim |

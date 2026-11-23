@@ -20,16 +20,9 @@ the sky130 feasibility results.
 | `s7_ctrl`, fail-safe shifters `ls_up_fs` | yes | 1.8 V inputs; 3.3 V logic from hv gates or `sky130_fd_sc_hvl`; added selects and read-back (new) | truth table, fail-safe with 3.3 V only |
 | `s7_doutpd` | yes | 1.8 V pull-downs / read-back level-down shifters (new) | – |
 
-## 2. sky130 pre-layout feasibility results
+## 2. sky130 simulations
 
-Status: **in progress** (decks and results in [`../verification/`](../verification/)). Results appear here as plots and
-summary tables, each labelled *sky130 pre-layout schematic simulation (feasibility, not sign-off)*, with tool versions, PDK
-version, corners and conditions. Until then every sky130 number is TBD.
-
-| item | status |
-|---|---|
-| toolchain smoke test (ngspice, sky130A `sky130_fd_pr`) | TBD |
-| Banba current reference core | TBD |
-| Oguey–Aebischer current reference core | TBD |
-| replica `vcm` / `vref` and pad core amplifiers | TBD |
-| test-plan dry run (reference current through a < 5 Ω bus switch) | TBD |
+None in this proposal (decision of 2026-11-23): the basis of the proposal is the IHP sg13cmos5l characterization of the
+taped-out design, completed where it had gaps (see [SOURCES.md](SOURCES.md)). The sky130 schematics and their pre-layout
+simulation over PVT are the work of the schematic review (week of 2026-12-28); they port the IHP circuits and test benches
+and replace the TBD column of [PROPOSAL.md §4](PROPOSAL.md#4-target-specification).

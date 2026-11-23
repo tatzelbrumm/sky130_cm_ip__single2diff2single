@@ -14,7 +14,7 @@ repositories' commit histories and session records show:
 - **layout scripts:** scripted layout generation (Python / KLayout) for macros and the slot assembly;
 - **netlists and test benches:** SPICE netlists, CACE characterization files, test-platform benches;
 - **data sheets:** generated from the committed CACE results by a script;
-- **documentation:** nearly all of it, including this proposal and the sky130 simulation decks in `verification/`.
+- **documentation:** nearly all of it, including this proposal.
 
 What is not AI-dependent:
 

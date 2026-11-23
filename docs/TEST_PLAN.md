@@ -52,7 +52,7 @@ Origin: adapted from the IHP test-platform procedure (`docs/slot7_testplatform/P
 | 2.5 | enable / disable time of each core (sense resistor + oscilloscope) | 27 °C | ≤ 5 µs (row 31) |
 
 Bus path: the shared-line switches are below 5 Ω (rules), so 5 µA drops less than 25 µV across them; the bus measurement
-is valid for DC. (A sky130 pre-layout dry run of this path is in [../verification/](../verification/) when available.)
+is valid for DC.
 
 ## 3. `vcm` and `vref`
 

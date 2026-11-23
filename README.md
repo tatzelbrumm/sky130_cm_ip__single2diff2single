@@ -20,7 +20,6 @@ Designer: Christoph Maier.
 | [docs/SOURCES.md](docs/SOURCES.md) | sources of every IHP value quoted |
 | [docs/LICENSE_NOTE.md](docs/LICENSE_NOTE.md) | license: Apache-2.0 or SHL-2.1, pending the organizers' approval |
 | [docs/AI_ASSISTANCE.md](docs/AI_ASSISTANCE.md) | what was AI-assisted, and why the IP does not require AI |
-| [verification/](verification/) | sky130 pre-layout feasibility simulations (reproducible decks and scripts; results as plots and tables) |
 
 Predecessor (IHP sg13cmos5l, as taped out): [`tatzelbrumm/sg13cmos5l_cm_slot7`](https://github.com/tatzelbrumm/sg13cmos5l_cm_slot7)
 (commit `158afc5`; Chipalooza #2 documentation on branch `chipalooza2-documentation`); design repository
