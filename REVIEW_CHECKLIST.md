@@ -5,7 +5,7 @@
 3. §2 exceptions: custom-pad approval request; is "own references are inside the slot, no exception" acceptable to you?
 4. §3.4: harness bias voltage as `vcm` or `vref` source only works if its value falls in the window (TBD: harness spec).
 5. §4 target table: every value is a **target** chosen from IHP observed intervals with a margin (column "basis"); check margins, in particular rows 4, 5, 7 (mismatch), 16 (D2S INL at 3.0 V left TBD), 20 (THD), 29–30 (reference currents, tighter than IHP, tentative).
-6. §4 column "sky130 sim": all TBD until the simulation results arrive.
+6. §4 column "sky130 sim": all TBD by decision (sky130 simulation comes at the schematic review); the IHP gap simulations (D2S PEX, replica PEX + MC, ss / −40 °C modes, bandgap) will update the "basis" column when they land.
 7. §5 test plan: 110 °C added as a temperature point (commercial limit); OK?
 8. §6 port plan, §7 risks: fallback "buffers in the core behind foundry analog pads" if the custom pads are not approved: acceptable?
 9. §9 license, §10 AI paragraph: wording.
