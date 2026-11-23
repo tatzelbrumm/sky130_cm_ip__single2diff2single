@@ -191,13 +191,13 @@ ratings (the 3.3 V devices are the 5 V-class `g5v0d10v5` devices; exact rated va
 | 32 | 3.3 V block current, enabled | default | | 50 µA | 80 µA | | 48.4 … 49.7 µA | TBD |
 | 33 | pad-ring current, enabled (both pads) | | | 390 µA | 500 µA | | 364.6 … 395.6 µA | TBD |
 | 34 | supply currents, disabled | `enable` = 0 | | | 1 µA | | block 25 … 56 nA, ring 9 … 58 nA | TBD |
-| 35 | pad leakage, block unpowered | pad 0 … 3.3 V, 125 °C | −100 nA | | 100 nA | | S2D ≤ 25 nA, D2S ≤ 67 nA (125 °C) | TBD |
+| 35 | pad leakage, block unpowered | pad 0 … 3.3 V, 125 °C | −100 nA | | 100 nA | | S2D ≤ 25 nA, D2S ≤ 67 nA (125 °C); D2S pad leakage, pad off, post-layout −36.9 … +15.0 nA (48 runs) | TBD |
 
 D2S rows: "post-layout" values are IHP magic-PEX (C-coupled) simulations of the taped-out D2S pad cell made on 2026-11-23
 (predecessor repository, branch `chipalooza2-documentation`, `verification/c2_gaps/d2s_pex/`; see [SOURCES.md](SOURCES.md) S9);
 unloaded closed-loop bandwidth post-layout 1.57 … 2.02 MHz (schematic 1.78 … 2.25 MHz); D2S output noise post-layout 0.142 … 0.156 µV/√Hz at
-100 kHz, 224 µV integrated (schematic 0.143 … 0.156 µV/√Hz, 234 µV). Five of 30 post-layout DC runs did not
-converge in the simulator (−40 °C sf / ff, ff 27 °C 3.6 V) and are being re-run; the other D2S groups are in progress.
+100 kHz, 224 µV integrated (schematic 0.143 … 0.156 µV/√Hz, 234 µV). All D2S CACE groups except mismatch have post-layout results; five of 30 post-layout DC runs did not
+converge in the simulator (−40 °C sf / ff, ff 27 °C 3.6 V) and are being re-run.
 
 Rows 29–30 are tentative specifications of the fallback references, to be reviewed at the final design review. Mismatch and
 noise targets assume the same device areas as on IHP; the sky130 mismatch models decide whether that holds (schematic review).
