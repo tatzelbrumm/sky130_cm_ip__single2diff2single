@@ -183,8 +183,8 @@ ratings (the 3.3 V devices are the 5 V-class `g5v0d10v5` devices; exact rated va
 | 24 | D2S PSRR (pad-ring supply) | 1 kHz | 60 dB | 71 dB | | | 70.7 … 72.5 dB; post-layout 70.0 … 71.9 dB | TBD |
 | 25 | D2S pad-ring quiescent current | | | 300 µA | 400 µA | | 293 … 314 µA; post-layout ring current 302 … 320 µA | TBD |
 | 26 | round trip S2D → D2S error | pad 0 … 1 V, systematic | | 1 mV | 10 mV | | 0.90 … 6.49 mV (slot, extracted pads, 5 corners) | TBD |
-| 27 | `vcm` (replica) | | 1.10 V | 1.26 V | 1.45 V | | 1.115 … 1.395 V | TBD (the sky130 window follows the sky130 pads) |
-| 28 | `vref` (replica) | | 0.40 V | 0.49 V | 0.65 V | | 0.436 … 0.596 V (bias tree reference); 0.376 … 0.668 V with an on-slot core as reference | TBD |
+| 27 | `vcm` (replica) | | 1.10 V | 1.26 V | 1.45 V | | 1.115 … 1.395 V; post-layout (C-coupled PEX) 1.242 … 1.395 V, equal to schematic; mismatch σ 5.4 mV (100 runs) | TBD (the sky130 window follows the sky130 pads) |
+| 28 | `vref` (replica) | | 0.40 V | 0.49 V | 0.65 V | | 0.436 … 0.596 V (bias tree reference); 0.376 … 0.668 V with an on-slot core as reference; post-layout 0.436 … 0.596 V, equal to schematic; mismatch σ 3.8 mV (100 runs) | TBD |
 | 29 | reference current, Banba (tentative, better than IHP) | sourced into 0.7 V | 4.25 µA | 5.0 µA | 5.75 µA | | IHP 3.83 … 6.37 µA (test platform, follows the resistor corners) | TBD |
 | 30 | reference current, Oguey–Aebischer (tentative, better than IHP) | sourced into 0.7 V | 3.5 µA | 5.0 µA | 6.5 µA | | IHP 3.04 … 7.05 µA (PTAT) | TBD |
 | 31 | enable time (block, to 1 %) | | | 2 µs | 5 µs | | S2D 1.36 … 1.52 µs; D2S 0.81 … 1.23 µs (post-layout 1.11 … 2.39 µs); `vcm` 0.79 … 1.81 µs, `vref` 1.03 … 2.02 µs | TBD |
@@ -198,6 +198,11 @@ D2S rows: "post-layout" values are IHP magic-PEX (C-coupled) simulations of the 
 unloaded closed-loop bandwidth post-layout 1.57 … 2.02 MHz (schematic 1.78 … 2.25 MHz); D2S output noise post-layout 0.142 … 0.156 µV/√Hz at
 100 kHz, 224 µV integrated (schematic 0.143 … 0.156 µV/√Hz, 234 µV). All D2S CACE groups except mismatch have post-layout results; five of 30 post-layout DC runs did not
 converge in the simulator (−40 °C sf / ff, ff 27 °C 3.6 V) and are being re-run.
+
+Replica and distribution (IHP, 2026-11-23, predecessor repository `verification/c2_gaps/replica_bias/`, SOURCES S10): `pad_ref_rb`
+extracted from the taped-out slot GDS matches its schematic in DC to 0.1 mV; `bias_dist_pd` copies 5 µA with +0.49 … +1.56 %
+systematic error over 5 corners × −40 / 27 / 125 °C and 0.5 … 2.5 V output, mismatch σ 1.0 … 1.2 % per output; off-state leakage
+≤ 145 pA.
 
 Rows 29–30 are tentative specifications of the fallback references, to be reviewed at the final design review. Mismatch and
 noise targets assume the same device areas as on IHP; the sky130 mismatch models decide whether that holds (schematic review).
