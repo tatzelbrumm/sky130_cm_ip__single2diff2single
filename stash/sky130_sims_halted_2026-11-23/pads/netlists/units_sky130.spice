@@ -1,0 +1,31 @@
+* SPDX-FileCopyrightText: 2026 Christoph Maier
+* SPDX-License-Identifier: Apache-2.0
+*
+* units_sky130: sky130 pre-layout port of unit_r2 (IHP sg13cmos5l_cm_ip__single2diff2single,
+* macros/sg13cmos5l_IOPadDiff2Single/netlist/source/units.spice, commit 91a7da8b).
+* sky130 pre-layout schematic simulation (feasibility, not sign-off).
+*
+* Device rules used for every sky130 port in this folder:
+*  - 3.3 V devices sky130_fd_pr__nfet_g5v0d10v5 / pfet_g5v0d10v5 only.
+*  - Every W / L is an exact characterised bin of the sky130 g5v0d10v5 models (L in 0.5 0.6 0.8 1 2 4 8;
+*    W <= 20 at L <= 1, W <= 7 at L >= 2). Wider devices are m = parallel copies of a bin device.
+*    IHP's L = 6 um devices have no sky130 bin; they become L = 2, 4 or 8 (see each line).
+*  - Units: .option scale = 1u is set by the sky130 library, so W / L are plain numbers in um.
+*
+* unit_r2: split-tail PMOS pair, resistor between the sources, x += f(gp - gn).
+*   Pins: x y gp gn vdd vss vbp. Device on gp drains to y, device on gn drains to x.
+*   IHP: tails 5u/6u at 5 uA, rhigh 4 x 0.5u x 12.65u (150 kOhm), pair 20u/1u (ng 2), bulk = source.
+*   sky130:
+*     tails  Ta / Tb  pfet W=7 L=2 m=2 (14/2): no L = 6 bin; W/L 7 keeps Vsd,sat about 0.2 V, which
+*            the sky130 window needs (|Vtp| of the g5v0d10v5 pfet is about 0.35 V above IHP's hv pmos).
+*     R      sky130_fd_pr__res_xhigh_po_0p35, l = rl (default 26.2 um, 149 kOhm at tt, about 2 kOhm/sq):
+*            one segment instead of IHP's four rhigh segments; body on vss as IHP.
+*     pair   Ma / Mb  pfet W=20 L=1 m=2 (40/1, bulk = source as IHP): twice IHP's W, to push the
+*            pair further into weak inversion and lower Vsg by about 40 mV (window).
+.subckt unit_r2 x y gp gn vdd vss vbp rl=26.2
+XTa sa vbp vdd vdd sky130_fd_pr__pfet_g5v0d10v5 W=7 L=2 m=2
+XTb sb vbp vdd vdd sky130_fd_pr__pfet_g5v0d10v5 W=7 L=2 m=2
+XR sa sb vss sky130_fd_pr__res_xhigh_po_0p35 l={rl}
+XMa y gp sa sa sky130_fd_pr__pfet_g5v0d10v5 W=20 L=1 m=2
+XMb x gn sb sb sky130_fd_pr__pfet_g5v0d10v5 W=20 L=1 m=2
+.ends unit_r2

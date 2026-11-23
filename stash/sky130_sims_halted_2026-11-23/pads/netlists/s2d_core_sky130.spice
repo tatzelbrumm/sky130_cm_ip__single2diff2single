@@ -1,0 +1,86 @@
+* SPDX-FileCopyrightText: 2026 Christoph Maier
+* SPDX-License-Identifier: Apache-2.0
+*
+* s2d_core_sky130: sky130 pre-layout port of the S2D core amplifier s2d_mpdda and of its bias tree
+* (IHP sg13cmos5l_cm_ip__single2diff2single commit 91a7da8b, macros/sg13cmos5l_IOPadSingle2Diff/netlist/
+* source/s2d_mpdda.spice and macros/bias_tree_noab_pd). sky130 pre-layout schematic simulation
+* (feasibility, not sign-off). No ESD, no pad, no enable / power-down switches, no layout dummies.
+*
+* Function (unchanged from IHP): outp - outn = 2 (vin - vref), (outp + outn)/2 = vcm.
+*   Four matched units A1 = A2 (vin, vref), F1 (vcm, vfbp), F2 (vfbn, vcm); balance
+*   2 f(vin - vref) = f(vfbp - vcm) + f(vcm - vfbn) -> vfbp - vcm = vcm - vfbn = vin - vref.
+*   Single folded-cascode stage, outputs are the only high-impedance nodes; CMFB by two more units
+*   (vfbp, vcm), (vfbn, vcm) into a cascoded PMOS diode mirrored 1 : 1 by the loads.
+*   Currents as IHP: unit tails 2 x 5 uA, fold sinks 30 uA (signal) / 20 uA (CMFB), loads 10 uA.
+*
+* Sizes vs IHP (sky130 g5v0d10v5 bins only, see units_sky130.spice for the device rules):
+*   unit_r2            see units_sky130.spice (tails 14/2, pair 40/1, R 149 kOhm xhigh_po).
+*   SX / SY  36/6 (6 x 6/6) -> nfet W=7 L=2 m=6: no L = 6 bin; L = 2 lowers Vds,sat of the sinks so
+*            the low output swing (outn = vcm - 0.51 V) fits; 6 : 1 to BN as IHP.
+*   SXC/SYC  24/6 (4 x 6/6) -> nfet W=7 L=2 m=4 (4 : 1 to BN as IHP).
+*   CX..CYC  30/3 (lcas = 3) -> nfet W=7 L=2 m=4 (28/2): bin-exact, similar W/L.
+*   LP/LN/D  24/4 (ng 4)    -> pfet W=7 L=4 m=4 (28/4).
+*   LPC..DC  30/3           -> pfet W=7 L=2 m=4 (28/2).
+*   XCLP/N   hv nmos MOS capacitors 12/12 (0.53..0.62 pF) -> sky130_fd_pr__cap_mim_m3_1 16 x 16 um
+*            (about 0.55 pF, linear; a sky130 hv nmos gate cap would leave inversion at the low output).
+*   Bias (port of bias_tree_noab_pd without the enable gates):
+*     NI / NBP / NBPC 6/6, 6/6, 2.4/6 -> nfet W=1 L=4 m=5 / m=5 / m=2 (5 : 5 : 2 by finger count)
+*     BP 5/6 -> pfet W=7 L=2 m=2 (= the unit tail); PBN = BP; PBNC 2/6 -> pfet W=7 L=2 m=1, so the
+*            NMOS cascode diode gets 2.5 uA instead of 2 uA (no bin-exact 2 : 5 ratio).
+*     BN 6/6 -> nfet W=7 L=2 m=1 (= one sink finger).
+*     BNC 1/8 -> nfet W={wbnc} L={lbnc} (default 1/4): re-sized so that the fold nodes x / y sit about 0.25 V above
+*            vss (IHP's 1/8 at 2 uA would put them about 0.5 V up and cut the low output swing).
+*     BPC 1/4 -> pfet W=1 L=4 at 2 uA (as IHP).
+*
+* Pins: vdd vss vin vref vcm voutp voutn vfbp vfbn iref   (tie vfbp / vfbn to voutp / voutn; separate only
+*       to allow loop-gain decks). iref: reference current SOURCED into the cell (5 uA), as IHP.
+
+.subckt s2d_bias_sky130 vdd vss iref vbp vbn vbpc vbnc wbnc=1 lbnc=4
+XNI iref iref vss vss sky130_fd_pr__nfet_g5v0d10v5 W=1 L=4 m=5
+XNBP vbp iref vss vss sky130_fd_pr__nfet_g5v0d10v5 W=1 L=4 m=5
+XNBPC vbpc iref vss vss sky130_fd_pr__nfet_g5v0d10v5 W=1 L=4 m=2
+XPBN vbn vbp vdd vdd sky130_fd_pr__pfet_g5v0d10v5 W=7 L=2 m=2
+XPBNC vbnc vbp vdd vdd sky130_fd_pr__pfet_g5v0d10v5 W=7 L=2 m=1
+* diodes
+XBP vbp vbp vdd vdd sky130_fd_pr__pfet_g5v0d10v5 W=7 L=2 m=2
+XBN vbn vbn vss vss sky130_fd_pr__nfet_g5v0d10v5 W=7 L=2 m=1
+XBNC vbnc vbnc vss vss sky130_fd_pr__nfet_g5v0d10v5 W={wbnc} L={lbnc}
+XBPC vbpc vbpc vdd vdd sky130_fd_pr__pfet_g5v0d10v5 W=1 L=4
+.ends s2d_bias_sky130
+
+.subckt s2d_mpdda_sky130 vdd vss vin vref vcm voutp voutn vfbp vfbn vbp vbn vbpc vbnc rl=26.2 wcl=16
+* --- signal DDA
+XA1 x y vin vref vdd vss vbp unit_r2 rl={rl}
+XA2 x y vin vref vdd vss vbp unit_r2 rl={rl}
+XF1 x y vcm vfbp vdd vss vbp unit_r2 rl={rl}
+XF2 x y vfbn vcm vdd vss vbp unit_r2 rl={rl}
+* --- folded cascode (30 uA sinks: 4 x 5 uA from the units + 10 uA branch)
+XSX x vbn vss vss sky130_fd_pr__nfet_g5v0d10v5 W=7 L=2 m=6
+XSY y vbn vss vss sky130_fd_pr__nfet_g5v0d10v5 W=7 L=2 m=6
+XCX voutp vbnc x vss sky130_fd_pr__nfet_g5v0d10v5 W=7 L=2 m=4
+XCY voutn vbnc y vss sky130_fd_pr__nfet_g5v0d10v5 W=7 L=2 m=4
+* --- PMOS loads (10 uA), cascoded, gates on vcmfb
+XLP lp vcmfb vdd vdd sky130_fd_pr__pfet_g5v0d10v5 W=7 L=4 m=4
+XLN ln vcmfb vdd vdd sky130_fd_pr__pfet_g5v0d10v5 W=7 L=4 m=4
+XLPC voutp vbpc lp vdd sky130_fd_pr__pfet_g5v0d10v5 W=7 L=2 m=4
+XLNC voutn vbpc ln vdd sky130_fd_pr__pfet_g5v0d10v5 W=7 L=2 m=4
+* --- CMFB: two units, same polarity (20 uA sinks: 2 x 5 uA from the units + 10 uA branch)
+XM1 xc yc vfbp vcm vdd vss vbp unit_r2 rl={rl}
+XM2 xc yc vfbn vcm vdd vss vbp unit_r2 rl={rl}
+XSXC xc vbn vss vss sky130_fd_pr__nfet_g5v0d10v5 W=7 L=2 m=4
+XSYC yc vbn vss vss sky130_fd_pr__nfet_g5v0d10v5 W=7 L=2 m=4
+XCXC vcmfb vbnc xc vss sky130_fd_pr__nfet_g5v0d10v5 W=7 L=2 m=4
+XCYC vdd vbnc yc vss sky130_fd_pr__nfet_g5v0d10v5 W=7 L=2 m=4
+* CMFB diode: replica of a load with its cascode, low-voltage cascode connection (as IHP)
+XD dd vcmfb vdd vdd sky130_fd_pr__pfet_g5v0d10v5 W=7 L=4 m=4
+XDC vcmfb vbpc dd vdd sky130_fd_pr__pfet_g5v0d10v5 W=7 L=2 m=4
+* --- built-in load per output (MIM instead of IHP's hv nmos inversion capacitor)
+XCLP voutp vss sky130_fd_pr__cap_mim_m3_1 w={wcl} l={wcl}
+XCLN voutn vss sky130_fd_pr__cap_mim_m3_1 w={wcl} l={wcl}
+.ends s2d_mpdda_sky130
+
+* --- the core amplifier as used by the decks: buffer + its own bias tree, feedback tied
+.subckt s2d_core_sky130 vdd vss vin vref vcm voutp voutn iref wbnc=1 lbnc=4
+Xb vdd vss iref vbp vbn vbpc vbnc s2d_bias_sky130 wbnc={wbnc} lbnc={lbnc}
+Xa vdd vss vin vref vcm voutp voutn voutp voutn vbp vbn vbpc vbnc s2d_mpdda_sky130
+.ends s2d_core_sky130

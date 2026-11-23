@@ -30,3 +30,4 @@
   6. FOR_TIM: `0x0D` / `0x0E` are route codes written into `0x20…0x37`, not register addresses (checked against the harness RTL).
   7. delivery README: harness flow "not yet run"; design-repository RUNLOG row 129: passed for v2 on the fork with four patches.
 - No sign-off report exists for the taped-out `final/gds/slot_7.gds` with the art; `slot_7_checks.txt` covers v3 without the art. No DRC / LVS reports committed for `pad_ref_rb` or `bias_dist_pd` at the cited commits.
+- 20:40 User instruction: halt all sky130 simulations, stash the files, simulate what is missing on IHP instead. Both sky130 jobs stopped; their files removed from [NEW] `main` and kept on `sudel_buecher` under `stash/sky130_sims_halted_2026-11-23/` (sources and partial plots only, 1.1 MB). [NEW] docs updated: no sky130 simulation in the proposal; sky130 numbers TBD until the schematic review.

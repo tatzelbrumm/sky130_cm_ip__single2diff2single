@@ -1,0 +1,67 @@
+* SPDX-FileCopyrightText: 2026 Christoph Maier
+* SPDX-License-Identifier: Apache-2.0
+*
+* oa_core_sky130: Oguey-Aebischer type MOS-only reference current core with power-down,
+* sky130A port of the IHP sg13cmos5l cell oa_core_pd (no resistor, no BJT).
+* PRE-LAYOUT FEASIBILITY NETLIST.
+*
+* Ports (same order as IHP oa_core_pd): vdd vss iout en_3v3 en_3v3_b
+*   enabled: en_3v3 = vdd, en_3v3_b = vss; iout SOURCES ~5 uA into a load near 0.7 V.
+*   disabled: en_3v3 = vss, en_3v3_b = vdd: MS1 off, SKS pulls ks low, SVPG pulls the
+*   PMOS mirror gate vpg to vdd, iout high-Z.
+*
+* Device mapping: sg13_hv_nmos / sg13_hv_pmos -> sky130_fd_pr__nfet_g5v0d10v5 /
+*   pfet_g5v0d10v5 (3.3 V use). W/L in um (sky130 ngspice models: .option scale=1u).
+*
+* Principle (as IHP): PMOS mirror P0 : P2 : P8 : PO = 1 : 2 : 8 : 20 (unit I0).
+*   M11 (diode, W/L = 90) carries 8 I0, M10 (W/L = 180, gate vnc = gate of M11)
+*   carries I0: current-density ratio 16, so in weak inversion V(vres) ~ n U_T ln 16.
+*   MCL (long NMOS in triode, gate vbr) converts V(vres) to I0; its gate is set by the
+*   diode MCS (same size) carrying 2 I0. MC10 cascodes M10. I0 ~ mu*Cox*(W/L)*U_T^2,
+*   i.e. strongly PTAT-like (IHP: 3.26 / 4.99 / 6.66 uA at -40 / 27 / 125 C, tt).
+*
+* TOPOLOGY CHANGE vs. IHP (headroom): IHP uses two stacked diode PMOS (P0 on vpg,
+*   P0C on vpc). With sky130 g5v0d10v5 PMOS (|Vt| ~ 1.0 V) the stack leaves too little
+*   room at vdd = 3.0 V, -40 C (same finding as bg_core_sky130). Each PMOS pair is a
+*   SELF-CASCODE device here: lower device L = 8 (mirror device, IHP sizes), upper
+*   device W/L 16x larger at L = 1 (cascode), both gates on vpg = drain of P0C.
+*   MS3 and SVPG act on vpg.
+*
+* Sizing reasoning:
+*   - I0 = 0.25 uA -> iout = 20 I0 = 5 uA (as IHP).
+*   - M10 / M11 / MC10 as IHP (180/1 nf18, 90/1 nf9, 10/1).
+*   - MCS = MCL: W = wcs = 2.0, L = 30 (IHP 3.4/30); wcs tuned in a tt run to give iout
+*     ~ 5 uA at 27 C, 3.3 V (sky130 mu*Cox and slope factor differ from IHP).
+*   - Start-up as IHP: MS1 8 x (0.5/12.5) in series, MS2 10/1 (gate vbr), MS3 0.5/2.
+*
+.subckt oa_core_sky130 vdd vss iout en_3v3 en_3v3_b wcs=2.0
+* --- PMOS self-cascode mirror (bulk = vdd) ---
+XP0  c0   vpg vdd vdd sky130_fd_pr__pfet_g5v0d10v5 w=2  l=8 nf=1
+XP0C vpg  vpg c0  vdd sky130_fd_pr__pfet_g5v0d10v5 w=4  l=1 nf=1
+XP2  c2   vpg vdd vdd sky130_fd_pr__pfet_g5v0d10v5 w=4  l=8 nf=2
+XP2C vbr  vpg c2  vdd sky130_fd_pr__pfet_g5v0d10v5 w=8  l=1 nf=2
+XP8  c8   vpg vdd vdd sky130_fd_pr__pfet_g5v0d10v5 w=16 l=8 nf=8
+XP8C vnc  vpg c8  vdd sky130_fd_pr__pfet_g5v0d10v5 w=32 l=1 nf=8
+XPO  co   vpg vdd vdd sky130_fd_pr__pfet_g5v0d10v5 w=40 l=8 nf=20
+XPOC iout vpg co  vdd sky130_fd_pr__pfet_g5v0d10v5 w=80 l=1 nf=20
+* --- NMOS core ---
+XMC10 vpg vbr d10  vss sky130_fd_pr__nfet_g5v0d10v5 w=10  l=1 nf=1
+XM10  d10 vnc vres vss sky130_fd_pr__nfet_g5v0d10v5 w=180 l=1 nf=18
+XMCL  vres vbr vss vss sky130_fd_pr__nfet_g5v0d10v5 w={wcs} l=30 nf=1
+XM11  vnc vnc vss  vss sky130_fd_pr__nfet_g5v0d10v5 w=90  l=1 nf=9
+XMCS  vbr vbr vss  vss sky130_fd_pr__nfet_g5v0d10v5 w={wcs} l=30 nf=1
+* --- start-up ---
+XMS1_0 n1 en_3v3_b vdd vdd sky130_fd_pr__pfet_g5v0d10v5 w=0.5 l=12.5
+XMS1_1 n2 en_3v3_b n1  vdd sky130_fd_pr__pfet_g5v0d10v5 w=0.5 l=12.5
+XMS1_2 n3 en_3v3_b n2  vdd sky130_fd_pr__pfet_g5v0d10v5 w=0.5 l=12.5
+XMS1_3 n4 en_3v3_b n3  vdd sky130_fd_pr__pfet_g5v0d10v5 w=0.5 l=12.5
+XMS1_4 n5 en_3v3_b n4  vdd sky130_fd_pr__pfet_g5v0d10v5 w=0.5 l=12.5
+XMS1_5 n6 en_3v3_b n5  vdd sky130_fd_pr__pfet_g5v0d10v5 w=0.5 l=12.5
+XMS1_6 n7 en_3v3_b n6  vdd sky130_fd_pr__pfet_g5v0d10v5 w=0.5 l=12.5
+XMS1_7 ks en_3v3_b n7  vdd sky130_fd_pr__pfet_g5v0d10v5 w=0.5 l=12.5
+XMS2 ks  vbr vss vss sky130_fd_pr__nfet_g5v0d10v5 w=10 l=1
+XMS3 vpg ks  vss vss sky130_fd_pr__nfet_g5v0d10v5 w=0.5 l=2
+* --- power-down switches ---
+XSKS  ks  en_3v3_b vss vss sky130_fd_pr__nfet_g5v0d10v5 w=1 l=0.5
+XSVPG vpg en_3v3   vdd vdd sky130_fd_pr__pfet_g5v0d10v5 w=1 l=0.5
+.ends oa_core_sky130

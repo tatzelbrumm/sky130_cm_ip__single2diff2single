@@ -1,0 +1,78 @@
+* SPDX-FileCopyrightText: 2026 Christoph Maier
+* SPDX-License-Identifier: Apache-2.0
+*
+* tb_ref_tran: start-up check of a reference-current core by supply ramp, at one
+* model-library section (@CORNER@).
+* Template: scripts/run_sims.py replaces @PDK_ROOT@ @PDK@ @CORNER@ @OUT@ @NETLIST@ @DUT@.
+*
+* vdd: PWL 0 V -> vfin (linear ramp), then held; the PWL is rewritten per run with alter.
+* en_3v3 is tied to vdd (enabled from the start), en_3v3_b = 0 V.
+* Load: NMOS diode sky130_fd_pr__nfet_g5v0d10v5 W/L = 20/1 (V_GS ~ 0.7..0.9 V at 5 uA),
+*       iout measured through the 0 V source Vmeas.
+* Runs: temperature -40 / 27 / 125 C  x  vfin = 3.0 / 3.6 V  x  ramp 10 us (fast) and
+*       1 ms (slow); simulated to 3x the ramp time.
+* Numerics: a few runs at 125 C abort with "timestep too small" in the first ns (vdd ~ 0);
+*   such a run is repeated with gmin = 1e-14, 1e-15, 1e-13 (default 1e-12). The gmin used is
+*   logged as "RESULT tran_<ramp>_t<T>_v<V> gmin = ..." and reported by summarize.py.
+.lib @PDK_ROOT@/@PDK@/libs.tech/ngspice/sky130.lib.spice @CORNER@
+.include @NETLIST@
+* 1 Tohm from every node to ground: numerical aid only (<= 3.6 pA per node)
+.option rshunt=1e12
+* Gear integration (no trapezoidal ringing on stiff nodes)
+.option method=gear
+
+Vvdd  vdd 0 PWL(0 0 10u 3.3)
+XDUT vdd 0 iout vdd 0 @DUT@
+Vmeas iout nd 0
+XLD  nd nd 0 0 sky130_fd_pr__nfet_g5v0d10v5 w=20 l=1 nf=2
+
+.control
+set wr_singlescale
+set wr_vecnames
+foreach tc -40 27 125
+  option temp = $tc
+  foreach vf 3.0 3.6
+    alter @Vvdd[pwl] = [ 0 0 10u $vf ]
+    let ok = 0
+    foreach gm 1e-12 1e-14 1e-15 1e-13
+      if ok eq 0
+        option gmin = $gm
+        tran 20n 30u
+        let tend = time[length(time)-1]
+        if tend ge 29.99e-6
+          let ok = 1
+          let iout = i(Vmeas)
+          let vddv = v(vdd)
+          wrdata @OUT@_fast_t{$tc}_v{$vf}.txt iout vddv
+          echo "RESULT tran_fast_t{$tc}_v{$vf} gmin = $gm"
+        end
+      end
+    end
+    if ok eq 0
+      echo "RESULT tran_fast_t{$tc}_v{$vf} gmin = FAILED"
+    end
+    option gmin = 1e-12
+    alter @Vvdd[pwl] = [ 0 0 1m $vf ]
+    let ok = 0
+    foreach gm 1e-12 1e-14 1e-15 1e-13
+      if ok eq 0
+        option gmin = $gm
+        tran 2u 3m
+        let tend = time[length(time)-1]
+        if tend ge 2.999e-3
+          let ok = 1
+          let iout = i(Vmeas)
+          let vddv = v(vdd)
+          wrdata @OUT@_slow_t{$tc}_v{$vf}.txt iout vddv
+          echo "RESULT tran_slow_t{$tc}_v{$vf} gmin = $gm"
+        end
+      end
+    end
+    if ok eq 0
+      echo "RESULT tran_slow_t{$tc}_v{$vf} gmin = FAILED"
+    end
+    option gmin = 1e-12
+  end
+end
+.endc
+.end

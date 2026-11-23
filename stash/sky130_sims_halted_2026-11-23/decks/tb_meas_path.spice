@@ -1,0 +1,55 @@
+* SPDX-FileCopyrightText: 2026 Christoph Maier
+* SPDX-License-Identifier: Apache-2.0
+*
+* tb_meas_path: test-plan dry run. Does a 5 ohm series switch between the reference
+* output and an external 0.7 V forcing ammeter change the measured current?
+* Template: scripts/run_sims.py replaces @PDK_ROOT@ @PDK@ @CORNER@ @OUT@ @NETLIST@ @DUT@.
+*
+* Two identical cores (@DUT@) on one 3.3 V supply (ramp 0 -> 3.3 V in 10 us), 27 C:
+*   XREF: iout_ref -> ideal 0.7 V source Vref_ld (the "true" current)
+*   XDUT: iout -> 0.5 pF (on-chip wiring) -> S1 (ideal switch model, Ron = 5 ohm,
+*         Roff = 1 Tohm) -> pad (2 pF) -> external 0.7 V source Vmeter (the ammeter).
+*   S1 is open until 30 us (iout floats up towards vdd, as with an unrouted
+*   output), closes at 30 us; simulated to 100 us.
+* Reported: |I(Vmeter) - I(Vref_ld)| / I(Vref_ld) at 100 us, and the time after the
+*   switch closes until I(Vmeter) is within 0.1 % of its final value.
+.lib @PDK_ROOT@/@PDK@/libs.tech/ngspice/sky130.lib.spice @CORNER@
+.include @NETLIST@
+* Gear integration: with the default trapezoidal rule the 5 ohm x 0.5 pF node (tau = 2.5 ps,
+* far below the time step) rings numerically and shows a fake -26 uA decaying over ~20 us.
+.option rshunt=1e12 method=gear
+.temp 27
+
+Vvdd vdd 0 PWL(0 0 10u 3.3)
+XREF vdd 0 iout_ref vdd 0 @DUT@
+Vref_ld iout_ref 0 0.7
+
+XDUT vdd 0 iout vdd 0 @DUT@
+Ciout iout 0 0.5p
+Vctl ctl 0 PWL(0 0 30u 0 30.01u 1)
+S1 iout pad ctl 0 swmod
+.model swmod sw vt=0.5 vh=0.1 ron=5 roff=1e12
+Cpad pad 0 2p
+Vmeter pad 0 0.7
+
+.control
+set wr_singlescale
+set wr_vecnames
+tran 10n 100u
+let iref = i(Vref_ld)
+let imeas = i(Vmeter)
+wrdata @OUT@.txt iref imeas
+meas tran iref_end find iref at=99.9u
+meas tran imeas_end find imeas at=99.9u
+let rel = abs(imeas_end - iref_end)/iref_end
+echo "RESULT iref_end = $&iref_end"
+echo "RESULT imeas_end = $&imeas_end"
+echo "RESULT rel_diff = $&rel"
+let lo = imeas_end*0.999
+let hi = imeas_end*1.001
+meas tran tset_lo when imeas=lo cross=last
+meas tran tset_hi when imeas=hi cross=last
+echo "RESULT tset_lo = $&tset_lo"
+echo "RESULT tset_hi = $&tset_hi"
+.endc
+.end
