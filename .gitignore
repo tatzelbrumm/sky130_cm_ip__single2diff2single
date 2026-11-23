@@ -1,0 +1,5 @@
+# raw simulation output stays out of the repository (rules: plots, not data dumps)
+*.raw
+*.log
+verification/work/
+__pycache__/

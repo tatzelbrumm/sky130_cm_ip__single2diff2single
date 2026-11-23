@@ -26,7 +26,8 @@ November 2026), consisting of:
 Together they carry a single-ended off-chip signal into the core as a differential signal and back out, with gain set by
 device matching rather than by resistor ratios. For an SoC this is the analog front and back end that a fully differential
 core (filter, ADC driver, DAC output) needs to talk to the single-ended outside world, packed into the pad frame instead of
-the core area, with fail-safe enables and low leakage when unpowered.
+the core area, with fail-safe enables and low leakage when unpowered. The list of Challenge #1 blocks has no analog pad
+buffer and no single-ended / differential converter, so the block fills a gap.
 
 **The pads are the part under review for this proposal.** The supporting circuits are a **fallback for testing** and are
 also reusable on their own: an on-slot Oguey–Aebischer MOS-only current reference, an on-slot Banba current-mode bandgap
