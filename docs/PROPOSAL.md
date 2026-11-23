@@ -185,7 +185,7 @@ ratings (the 3.3 V devices are the 5 V-class `g5v0d10v5` devices; exact rated va
 | 26 | round trip S2D → D2S error | pad 0 … 1 V, systematic | | 1 mV | 10 mV | | 0.90 … 6.49 mV (slot, extracted pads, 5 corners) | TBD |
 | 27 | `vcm` (replica) | | 1.10 V | 1.26 V | 1.45 V | | 1.115 … 1.395 V; post-layout (C-coupled PEX) 1.242 … 1.395 V, equal to schematic; mismatch σ 5.4 mV (100 runs) | TBD (the sky130 window follows the sky130 pads) |
 | 28 | `vref` (replica) | | 0.40 V | 0.49 V | 0.65 V | | 0.436 … 0.596 V (bias tree reference); 0.376 … 0.668 V with an on-slot core as reference; post-layout 0.436 … 0.596 V, equal to schematic; mismatch σ 3.8 mV (100 runs) | TBD |
-| 29 | reference current, Banba (tentative, better than IHP) | sourced into 0.7 V | 4.25 µA | 5.0 µA | 5.75 µA | | IHP 3.83 … 6.37 µA (test platform, follows the resistor corners) | TBD |
+| 29 | reference current, Banba (tentative, better than IHP) | sourced into 0.7 V | 4.25 µA | 5.0 µA | 5.75 µA | | IHP 3.83 … 6.37 µA (test platform); `bg_core_pd` alone 3.829 … 6.369 µA (135 PVT points; resistor corners −21 % / +28 %, MOS ≤ 0.31 %, supply ≤ 0.73 %/V) | TBD |
 | 30 | reference current, Oguey–Aebischer (tentative, better than IHP) | sourced into 0.7 V | 3.5 µA | 5.0 µA | 6.5 µA | | IHP 3.04 … 7.05 µA (PTAT) | TBD |
 | 31 | enable time (block, to 1 %) | | | 2 µs | 5 µs | | S2D 1.36 … 1.52 µs; D2S 0.81 … 1.23 µs (post-layout 1.11 … 2.39 µs); `vcm` 0.79 … 1.81 µs, `vref` 1.03 … 2.02 µs | TBD |
 | 32 | 3.3 V block current, enabled | default | | 50 µA | 80 µA | | 48.4 … 49.7 µA | TBD |
@@ -258,7 +258,7 @@ Details: [PORT_PLAN.md](PORT_PLAN.md).
 |---|---|---|
 | custom pads not approved, or ESD of the custom pads not acceptable | no pad test | ask for approval with this proposal; fallback: the same buffers in the core behind foundry analog pads (loses the pad-frame aspect, keeps the circuits) |
 | custom pad ESD / latch-up cannot be simulated with open tools | unverified protection | reuse the pad library's ESD structures unchanged; DRC with latch-up rules; document what is not simulated |
-| bandgap start-up (on IHP: DC non-convergence at ss / −40 °C in two manual modes) | stuck reference | start-up check by transient over all corners at the schematic review; harness currents selectable as a bypass |
+| bandgap start-up (on IHP: DC non-convergence at ss / −40 °C in four manual modes; shown on 2026-11-23 to be a simulator artefact: power-up transients settle in all modes, no second stable state of the bandgap found) | stuck reference | start-up check by supply-ramp transient over all corners at the schematic review; harness currents selectable as a bypass |
 | model differences (sky130 thresholds, headroom of the 3.3 V devices at 3.0 V) | narrower input and output windows | windows set by replica bias; targets of rows 8, 16, 21 confirmed first |
 | area of two pad cells and the references in a slot | does not fit | pads live in the pad frame; references and glue are small on IHP (well under the IHP slot) |
 | schedule (pads + references + glue in 13 weeks) | incomplete layout | pads first; references are fallbacks and can be dropped in favour of the harness references |

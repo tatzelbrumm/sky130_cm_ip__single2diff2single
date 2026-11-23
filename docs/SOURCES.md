@@ -19,6 +19,7 @@ Every "IHP observed" number in [PROPOSAL.md](PROPOSAL.md) comes from simulation 
 | S8 | the summaries the intervals were read from: data sheets generated from S1–S4 with an ex post facto specification (observed min / median / max) | [`tatzelbrumm/sg13cmos5l_ocd_chipalooza`](https://github.com/tatzelbrumm/sg13cmos5l_ocd_chipalooza), branch `sudel_buecher`, `sudelbuecher/slots/slot_7/datasheets/` and `test_platforms.md`; the Chipalooza #2 description is also on branch `chipalooza2-documentation` of S7 |
 | S9 | D2S pad post-layout (magic PEX) CACE results of the taped-out cell, compared with S2 | [`tatzelbrumm/sg13cmos5l_cm_slot7`](https://github.com/tatzelbrumm/sg13cmos5l_cm_slot7/tree/chipalooza2-documentation/verification/c2_gaps/d2s_pex) branch `chipalooza2-documentation`, `verification/c2_gaps/d2s_pex/` (`results.md`, `run.sh`); made 2026-11-23 |
 | S10 | `pad_ref_rb` post-layout (magic C-coupled PEX of the cell cut from the taped-out `slot_7.gds`) vs schematic; 100-run mismatch Monte Carlo with per-run data; `bias_dist_pd` copy accuracy and mismatch | same branch, `verification/c2_gaps/replica_bias/` (`results.md`, `run.sh`); made 2026-11-23 |
+| S11 | slot modes at ss / −40 °C (power-up transients), `bg_core_pd` alone over PVT and start-up ramps | same branch, `verification/c2_gaps/slot_modes_bg/` (`results.md`, `run.sh`); made 2026-11-23 |
 
-Mapping of PROPOSAL.md section 4 rows to sources: rows 4–13 S1; 14–25 S2; 26, 32–34 S4; 27–28 S3, S4 and S10; 29–30 S5;
+Mapping of PROPOSAL.md section 4 rows to sources: rows 4–13 S1; 14–25 S2; 26, 32–34 S4; 27–28 S3, S4 and S10; 29 S5 and S11; 30 S5;
 31 S1, S2, S3; 35 S6.
