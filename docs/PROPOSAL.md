@@ -187,7 +187,7 @@ ratings (the 3.3 V devices are the 5 V-class `g5v0d10v5` devices; exact rated va
 | 28 | `vref` (replica) | | 0.40 V | 0.49 V | 0.65 V | | 0.436 … 0.596 V (bias tree reference); 0.376 … 0.668 V with an on-slot core as reference | TBD |
 | 29 | reference current, Banba (tentative, better than IHP) | sourced into 0.7 V | 4.25 µA | 5.0 µA | 5.75 µA | | IHP 3.83 … 6.37 µA (test platform, follows the resistor corners) | TBD |
 | 30 | reference current, Oguey–Aebischer (tentative, better than IHP) | sourced into 0.7 V | 3.5 µA | 5.0 µA | 6.5 µA | | IHP 3.04 … 7.05 µA (PTAT) | TBD |
-| 31 | enable time (block, to 1 %) | | | 2 µs | 5 µs | | S2D 1.36 … 1.52 µs; D2S 0.81 … 1.23 µs; `vcm` 0.79 … 1.81 µs, `vref` 1.03 … 2.02 µs | TBD |
+| 31 | enable time (block, to 1 %) | | | 2 µs | 5 µs | | S2D 1.36 … 1.52 µs; D2S 0.81 … 1.23 µs (post-layout 1.11 … 2.39 µs); `vcm` 0.79 … 1.81 µs, `vref` 1.03 … 2.02 µs | TBD |
 | 32 | 3.3 V block current, enabled | default | | 50 µA | 80 µA | | 48.4 … 49.7 µA | TBD |
 | 33 | pad-ring current, enabled (both pads) | | | 390 µA | 500 µA | | 364.6 … 395.6 µA | TBD |
 | 34 | supply currents, disabled | `enable` = 0 | | | 1 µA | | block 25 … 56 nA, ring 9 … 58 nA | TBD |
