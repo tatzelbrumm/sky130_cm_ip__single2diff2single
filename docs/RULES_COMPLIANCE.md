@@ -18,7 +18,7 @@ Status values: **met** / **partly** / **gap** / **n/a** / **needs user decision*
 | 3 | proposal item: type of IP block | met | PROPOSAL.md §1 | – |
 | 4 | proposal item: list of I/O incl. test ports | met (harness register names TBD) | PROPOSAL.md §2 | map to the harness pin names when the harness repository is published |
 | 5 | proposal item: functional description | met | PROPOSAL.md §3 | – |
-| 6 | proposal item: target specification with average, min, max, absolute limits | partly | PROPOSAL.md §4 (35 rows; absolute limits TBC from PDK; sky130 simulation column TBD) | fill absolute limits from the sky130 PDK / pad-library ratings; replace TBD with sky130 pre-layout results ([../verification/](../verification/)) |
+| 6 | proposal item: target specification with average, min, max, absolute limits | partly | PROPOSAL.md §4 (35 rows; absolute limits TBC from PDK; sky130 simulation column TBD) | fill absolute limits from the sky130 PDK / pad-library ratings; replace TBD with sky130 pre-layout results (schematic review) |
 | 7 | proposal item: test-plan outline | met | PROPOSAL.md §5, [TEST_PLAN.md](TEST_PLAN.md) | detailed register sequences when the harness exists |
 | 8 | list of equipment available (sent separately) | needs user decision | [EQUIPMENT_NEEDED.md](EQUIPMENT_NEEDED.md) lists what is *needed*; availability is not in the repository | the user sends the availability list separately |
 | 9 | CVs (sent separately) | needs user decision | – (no personal data in the repository) | the user sends CVs separately |
