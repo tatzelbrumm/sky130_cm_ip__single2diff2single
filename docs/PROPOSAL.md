@@ -176,7 +176,7 @@ ratings (the 3.3 V devices are the 5 V-class `g5v0d10v5` devices; exact rated va
 | 17 | D2S −3 dB bandwidth | 10 … 300 pF | 1 MHz | 2 MHz | | | 1.58 … 3.01 MHz | TBD |
 | 18 | D2S gain peaking | ≤ 300 pF | | 0 dB | 4 dB | | ≤ 2.9 dB | TBD |
 | 19 | D2S slew rate | 10 … 300 pF | 1 V/µs | 2.4 V/µs | | | 1.76 … 3.17 V/µs | TBD |
-| 20 | D2S THD | 0.5 V output amplitude | | −58 dB | −50 dB | | −57.8 dB at 0.5 V; −38.9 dB at 0.75 V | TBD |
+| 20 | D2S THD | 0.5 V output amplitude | | −58 dB | −50 dB | | −73.2 / −57.8 / −38.9 dB at 0.25 / 0.5 / 0.75 V output amplitude (`thd_params.csv`) | TBD |
 | 21 | D2S output swing | `vdda` 3.3 V | ≤ 0.9 V low | | ≥ 3.0 V high | | 0.64 … 0.74 V / 3.27 … 3.28 V | TBD |
 | 22 | D2S short-circuit current | | 20 mA | | | TBC (pad metal / ESD) | 49.7 … 120.3 mA | TBD |
 | 23 | D2S output impedance | 1 kHz | | 0.2 Ω | 10 Ω | | 0.195 … 3.85 Ω | TBD |
@@ -184,7 +184,7 @@ ratings (the 3.3 V devices are the 5 V-class `g5v0d10v5` devices; exact rated va
 | 25 | D2S pad-ring quiescent current | | | 300 µA | 400 µA | | 293 … 314 µA | TBD |
 | 26 | round trip S2D → D2S error | pad 0 … 1 V, systematic | | 1 mV | 10 mV | | 0.90 … 6.49 mV (slot, extracted pads, 5 corners) | TBD |
 | 27 | `vcm` (replica) | | 1.10 V | 1.26 V | 1.45 V | | 1.115 … 1.395 V | TBD (the sky130 window follows the sky130 pads) |
-| 28 | `vref` (replica) | | 0.40 V | 0.49 V | 0.65 V | | 0.436 … 0.596 V | TBD |
+| 28 | `vref` (replica) | | 0.40 V | 0.49 V | 0.65 V | | 0.436 … 0.596 V (bias tree reference); 0.376 … 0.668 V with an on-slot core as reference | TBD |
 | 29 | reference current, Banba (tentative, better than IHP) | sourced into 0.7 V | 4.25 µA | 5.0 µA | 5.75 µA | | IHP 3.83 … 6.37 µA (test platform, follows the resistor corners) | TBD |
 | 30 | reference current, Oguey–Aebischer (tentative, better than IHP) | sourced into 0.7 V | 3.5 µA | 5.0 µA | 6.5 µA | | IHP 3.04 … 7.05 µA (PTAT) | TBD |
 | 31 | enable time (block, to 1 %) | | | 2 µs | 5 µs | | S2D 1.36 … 1.52 µs; D2S 0.81 … 1.23 µs; `vcm` 0.79 … 1.81 µs, `vref` 1.03 … 2.02 µs | TBD |
