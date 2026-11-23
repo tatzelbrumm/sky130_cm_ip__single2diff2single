@@ -1,0 +1,87 @@
+* SPDX-FileCopyrightText: 2026 Christoph Maier
+* SPDX-License-Identifier: Apache-2.0
+*
+* bg_core_sky130: Banba-type current-mode bandgap reference core with power-down,
+* sky130A port of the IHP sg13cmos5l cell bg_core_pd (no op amp, NA/NB source-follower
+* pair equalizes the two emitter-node voltages). PRE-LAYOUT FEASIBILITY NETLIST.
+*
+* Ports (same order as IHP bg_core_pd): vdd vss iout en_3v3 en_3v3_b
+*   enabled: en_3v3 = vdd, en_3v3_b = vss; iout SOURCES ~5 uA into a load near 0.7 V.
+*   disabled: en_3v3 = vss, en_3v3_b = vdd: MS1 off, SKS pulls ks low, SVPG pulls the
+*   PMOS mirror gate vpg to vdd, iout high-Z.
+*
+* Device mapping IHP -> sky130:
+*   sg13_hv_nmos / sg13_hv_pmos -> sky130_fd_pr__nfet_g5v0d10v5 / pfet_g5v0d10v5 (3.3 V use)
+*   rhigh                       -> sky130_fd_pr__res_xhigh_po (2 kohm/sq, w = 0.69 um)
+*   pnpMPA                      -> sky130_fd_pr__pnp_05v5_W3p40L3p40 (fixed-size vertical PNP;
+*                                  collector = base = vss, as in IHP)
+*   All MOS W/L in um (sky130 ngspice models use .option scale=1u).
+*
+* Principle (as IHP): each branch carries I = V_BE1/R1 + U_T ln(8)/R0; PO/POC give 2x.
+*   Node ea: R1A to vss in parallel with Q1 (1x); node eb: R1B to vss in parallel with
+*   R0 + Q2 (8x). NA (diode) / NB (same gate g) force V(ea) ~ V(eb).
+*
+* TOPOLOGY CHANGE vs. IHP (headroom): IHP stacks two diode-connected PMOS (PB on vpg,
+*   PBC on vpc) in branch B. sky130 g5v0d10v5 PMOS have |Vt| ~ 1.0 V (smoke test) and
+*   VSG ~ 1.16..1.22 V at 2.5 uA, -40 C (tt/ss, checked in scratch), so vpc would drop
+*   to 0.25..0.40 V at vdd = 3.0 V, below V(eb) ~ 0.79 V: the IHP stack does not fit.
+*   Here each PMOS pair (PB/PBC, PA/PAC, PO/POC) is a SELF-CASCODE (composite) device:
+*   lower device long and narrow (mirror device), upper device wide (cascode), both
+*   gates on vpg; vpg is the drain of PBC (diode connection of the composite).
+*   Headroom: V(vpc-side) = vdd - VSG(composite) ~ vdd - 1.5 V.
+*   The start-up (MS1 chain, MS2, MS3) and the enable switches (SKS, SVPG) are as in IHP,
+*   but MS3 and SVPG act on the single mirror gate vpg.
+*
+* Sizing reasoning:
+*   - branch current 2.5 uA, output 5 uA (PO/POC = 2 x PB/PBC, as IHP).
+*   - PB/PA: W=10 L=4 (long for matching / low lambda); PBC/PAC: W=40 L=1 nf=4
+*     (W/L 16x larger -> PB keeps ~0.1..0.2 V of VDS, i.e. stays saturated).
+*   - NA/NB: W=20 L=4 nf=2 as IHP (weak/moderate inversion at 2.5 uA).
+*   - Q1 = 1, Q2 = 8 parallel W3p40L3p40 PNPs (ratio 8 as IHP).
+*   - R1 (= R1A = R1B) and R0 lengths were chosen by a tt temperature sweep (see
+*     verification/README.md) to make I(T) flat for the xhigh_po TC (~ -1470 ppm/K body);
+*     IHP used R1B < R1A; here R1A = R1B (simplest; the asymmetry is not needed for
+*     feasibility). The resistor TC is part of the compensation, as in IHP.
+*   - Start-up: MS1 = 8 x (0.5/12.5) PMOS in series (weak pull-up of ks), MS2 10/1
+*     (gate g, pulls ks low once running), MS3 0.5/2 (pulls vpg low while ks is high).
+*
+.subckt bg_core_sky130 vdd vss iout en_3v3 en_3v3_b lr1=106 lr0=31
+* --- PMOS self-cascode mirror (bulk = vdd, one n-well) ---
+XPB  cb  vpg vdd vdd sky130_fd_pr__pfet_g5v0d10v5 w=10 l=4 nf=1
+XPBC vpg vpg cb  vdd sky130_fd_pr__pfet_g5v0d10v5 w=40 l=1 nf=4
+XPA  ca  vpg vdd vdd sky130_fd_pr__pfet_g5v0d10v5 w=10 l=4 nf=1
+XPAC g   vpg ca  vdd sky130_fd_pr__pfet_g5v0d10v5 w=40 l=1 nf=4
+XPO  co  vpg vdd vdd sky130_fd_pr__pfet_g5v0d10v5 w=20 l=4 nf=2
+XPOC iout vpg co vdd sky130_fd_pr__pfet_g5v0d10v5 w=80 l=1 nf=8
+* --- NMOS equalizer pair ---
+XNA g   g ea vss sky130_fd_pr__nfet_g5v0d10v5 w=20 l=4 nf=2
+XNB vpg g eb vss sky130_fd_pr__nfet_g5v0d10v5 w=20 l=4 nf=2
+* --- PNPs (collector, base, emitter) ---
+XQ1  vss vss ea sky130_fd_pr__pnp_05v5_W3p40L3p40
+XQ2a vss vss e2 sky130_fd_pr__pnp_05v5_W3p40L3p40
+XQ2b vss vss e2 sky130_fd_pr__pnp_05v5_W3p40L3p40
+XQ2c vss vss e2 sky130_fd_pr__pnp_05v5_W3p40L3p40
+XQ2d vss vss e2 sky130_fd_pr__pnp_05v5_W3p40L3p40
+XQ2e vss vss e2 sky130_fd_pr__pnp_05v5_W3p40L3p40
+XQ2f vss vss e2 sky130_fd_pr__pnp_05v5_W3p40L3p40
+XQ2g vss vss e2 sky130_fd_pr__pnp_05v5_W3p40L3p40
+XQ2h vss vss e2 sky130_fd_pr__pnp_05v5_W3p40L3p40
+* --- xhigh_po resistors (r0 r1 sub), total length; segment in layout ---
+XR1A ea vss vss sky130_fd_pr__res_xhigh_po w=0.69 l={lr1}
+XR1B eb vss vss sky130_fd_pr__res_xhigh_po w=0.69 l={lr1}
+XR0  eb e2  vss sky130_fd_pr__res_xhigh_po w=0.69 l={lr0}
+* --- start-up ---
+XMS1_0 n1 en_3v3_b vdd vdd sky130_fd_pr__pfet_g5v0d10v5 w=0.5 l=12.5
+XMS1_1 n2 en_3v3_b n1  vdd sky130_fd_pr__pfet_g5v0d10v5 w=0.5 l=12.5
+XMS1_2 n3 en_3v3_b n2  vdd sky130_fd_pr__pfet_g5v0d10v5 w=0.5 l=12.5
+XMS1_3 n4 en_3v3_b n3  vdd sky130_fd_pr__pfet_g5v0d10v5 w=0.5 l=12.5
+XMS1_4 n5 en_3v3_b n4  vdd sky130_fd_pr__pfet_g5v0d10v5 w=0.5 l=12.5
+XMS1_5 n6 en_3v3_b n5  vdd sky130_fd_pr__pfet_g5v0d10v5 w=0.5 l=12.5
+XMS1_6 n7 en_3v3_b n6  vdd sky130_fd_pr__pfet_g5v0d10v5 w=0.5 l=12.5
+XMS1_7 ks en_3v3_b n7  vdd sky130_fd_pr__pfet_g5v0d10v5 w=0.5 l=12.5
+XMS2 ks  g  vss vss sky130_fd_pr__nfet_g5v0d10v5 w=10 l=1
+XMS3 vpg ks vss vss sky130_fd_pr__nfet_g5v0d10v5 w=0.5 l=2
+* --- power-down switches ---
+XSKS  ks  en_3v3_b vss vss sky130_fd_pr__nfet_g5v0d10v5 w=1 l=0.5
+XSVPG vpg en_3v3   vdd vdd sky130_fd_pr__pfet_g5v0d10v5 w=1 l=0.5
+.ends bg_core_sky130

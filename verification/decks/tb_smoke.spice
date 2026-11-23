@@ -1,0 +1,58 @@
+* SPDX-FileCopyrightText: 2026 Christoph Maier
+* SPDX-License-Identifier: Apache-2.0
+*
+* tb_smoke: Id-Vgs smoke test of sky130A MOS models, tt, 27 C.
+* Template: scripts/run_sims.py replaces @PDK_ROOT@ @PDK@ @CORNER@ @OUT@ and runs it.
+*   g5v0d10v5 (5 V gate oxide, used at 3.3 V): W/L = 10/1, |Vds| = 3.3 V, |Vgs| 0..3.3 V
+*   01v8 (1.8 V core):                         W/L = 1/0.15, |Vds| = 1.8 V, |Vgs| 0..1.8 V
+* Vt_cc is the constant-current threshold at |Id| = 100 nA * W/L.
+.lib @PDK_ROOT@/@PDK@/libs.tech/ngspice/sky130.lib.spice @CORNER@
+.temp 27
+
+Vgn  gn  0 0
+Vdn  dn  0 3.3
+XNH  dn  gn 0 0 sky130_fd_pr__nfet_g5v0d10v5 w=10 l=1 nf=1
+
+Vsp  sp  0 3.3
+Vgp  gp  0 3.3
+Vdp  dp  0 0
+XPH  dp  gp sp sp sky130_fd_pr__pfet_g5v0d10v5 w=10 l=1 nf=1
+
+Vgn1 gn1 0 0
+Vdn1 dn1 0 1.8
+XNL  dn1 gn1 0 0 sky130_fd_pr__nfet_01v8 w=1 l=0.15 nf=1
+
+Vsp1 sp1 0 1.8
+Vgp1 gp1 0 1.8
+Vdp1 dp1 0 0
+XPL  dp1 gp1 sp1 sp1 sky130_fd_pr__pfet_01v8 w=1 l=0.15 nf=1
+
+.control
+set wr_singlescale
+set wr_vecnames
+* --- nfet_g5v0d10v5
+dc Vgn 0 3.3 0.01
+let vgs = v(gn)
+let id = -i(Vdn)
+wrdata @OUT@_nfet_g5v0d10v5.txt vgs id
+meas dc vt_nfet_g5v0d10v5 find vgs when id=1e-6
+* --- pfet_g5v0d10v5 (sweep gate from 3.3 V down to 0 V)
+dc Vgp 3.3 0 -0.01
+let vgs = 3.3 - v(gp)
+let id = i(Vdp)
+wrdata @OUT@_pfet_g5v0d10v5.txt vgs id
+meas dc vt_pfet_g5v0d10v5 find vgs when id=1e-6
+* --- nfet_01v8
+dc Vgn1 0 1.8 0.01
+let vgs = v(gn1)
+let id = -i(Vdn1)
+wrdata @OUT@_nfet_01v8.txt vgs id
+meas dc vt_nfet_01v8 find vgs when id=0.6667e-6
+* --- pfet_01v8
+dc Vgp1 1.8 0 -0.01
+let vgs = 1.8 - v(gp1)
+let id = i(Vdp1)
+wrdata @OUT@_pfet_01v8.txt vgs id
+meas dc vt_pfet_01v8 find vgs when id=0.6667e-6
+.endc
+.end
