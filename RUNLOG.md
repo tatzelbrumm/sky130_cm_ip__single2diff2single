@@ -15,3 +15,8 @@
 - Digital-control map (14 of 24 inputs): taped-out bits `dig_in[0..5]` kept at their positions; new: `[6..7]` reference select, `[8]` / `[9]` harness voltage for `vcm` / `vref`, `[10]` reference-current monitor, `[11..12]` pad bias select, `[13]` read-back enable.
 - Third dedicated pin proposed as an optional foundry analog pad for the reference-current monitor.
 - Target-table margins chosen by me from the IHP observed intervals (stated per row as basis); the reference-current targets (rows 29, 30) are tighter than IHP, as the user's decision 3 asks, and are tentative.
+
+- 19:58 Live rules pages read (`rules-4`, `challenge-4`, `challenge-1`, `rules-2`, all HTTP 200). rules-4 live text = the copy of 2026-11-23 apart from line breaks around links. `challenge-4.html` names the submission channel: "send your proposal to chipalooza@opencircuitdesign.com". `challenge-1.html`: no analog pad buffer or S2D / D2S block in the Challenge #1 list (gap note added to PROPOSAL §1).
+- 19:58 Template `simi1505/sg13cmos5l_chipalooza_analog_project` read at `c72f665b` (directory layout, Makefile targets) for the compliance matrix.
+- 19:59 [S7] branch `chipalooza2-documentation` created from `158afc5` (local); P2 content being written by a background job, committed by me after review.
+- 20:00 [NEW] `docs/RULES_COMPLIANCE.md` (35 rows + template comparison), `docs/TEST_PLAN.md` (detailed), `.gitignore`; pushed. `docs/PROPOSAL.pdf` rendered by `scripts/render_proposal_pdf.sh` (pandoc 3.1.3 → HTML → Playwright Chromium PDF; no LaTeX engine installed), 9 pages A4.
