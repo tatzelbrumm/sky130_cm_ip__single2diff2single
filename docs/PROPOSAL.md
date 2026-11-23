@@ -170,8 +170,8 @@ ratings (the 3.3 V devices are the 5 V-class `g5v0d10v5` devices; exact rated va
 | 11 | S2D input noise density | 100 kHz | | 0.15 µV/√Hz | 0.25 µV/√Hz | | 0.142 … 0.157 µV/√Hz | TBD |
 | 12 | S2D PSRR (pad-ring supply), input-referred | 1 kHz | 60 dB | 90 dB | | | 79.1 … 113.4 dB (mismatch runs) | TBD |
 | 13 | S2D pad-ring supply current, enabled | default bias | | 116 µA | 135 µA | | 114.6 … 116.9 µA | TBD |
-| 14 | D2S gain `(pad−vref)/(vinp−vinn)` incl. mismatch | 3.3 … 3.6 V | 0.49 | 0.50 | 0.51 | | 0.4981 … 0.5000; post-layout 0.4983 … 0.5000 (25 of 30 runs); 0.4939 … 0.5085 (mismatch, schematic) | TBD |
-| 15 | D2S output offset incl. mismatch | | −20 mV | 0 | 20 mV | | 0.035 … 1.95 mV (PVT); post-layout 0.032 … 1.74 mV; −11.4 … 10.1 mV (mismatch, schematic) | TBD |
+| 14 | D2S gain `(pad−vref)/(vinp−vinn)` incl. mismatch | 3.3 … 3.6 V | 0.49 | 0.50 | 0.51 | | 0.4981 … 0.5000; post-layout 0.4983 … 0.5000; 0.4939 … 0.5085 (mismatch, schematic) | TBD |
+| 15 | D2S output offset incl. mismatch | | −20 mV | 0 | 20 mV | | 0.035 … 1.95 mV (PVT); post-layout 0.044 … 1.75 mV; −11.4 … 10.1 mV (mismatch, schematic) | TBD |
 | 16 | D2S INL | `vdda` 3.3 … 3.6 V | | 0.5 mV | 10 mV | | 0.12 … 7.4 mV; post-layout 0.12 … 7.5 mV; at 3.0 V 10.9 … 87.4 mV (headroom limit, schematic) | TBD; at 3.0 V: TBD |
 | 17 | D2S −3 dB bandwidth | 10 … 300 pF | 1 MHz | 2 MHz | | | 1.58 … 3.01 MHz; post-layout 1.43 … 2.71 MHz | TBD |
 | 18 | D2S gain peaking | ≤ 300 pF | | 0 dB | 4 dB | | ≤ 2.9 dB; post-layout ≤ 2.5 dB | TBD |
@@ -181,7 +181,7 @@ ratings (the 3.3 V devices are the 5 V-class `g5v0d10v5` devices; exact rated va
 | 22 | D2S short-circuit current | | 20 mA | | | TBC (pad metal / ESD) | 49.7 … 120.3 mA; post-layout 49.7 … 124.2 mA | TBD |
 | 23 | D2S output impedance | 1 kHz | | 0.2 Ω | 10 Ω | | 0.195 … 3.85 Ω; post-layout 0.208 … 3.30 Ω | TBD |
 | 24 | D2S PSRR (pad-ring supply) | 1 kHz | 60 dB | 71 dB | | | 70.7 … 72.5 dB; post-layout 70.0 … 71.9 dB | TBD |
-| 25 | D2S pad-ring quiescent current | | | 300 µA | 400 µA | | 293 … 314 µA; post-layout ring current 302 … 320 µA | TBD |
+| 25 | D2S pad-ring quiescent current | | | 300 µA | 400 µA | | 293 … 314 µA; post-layout ring current 302 … 325 µA | TBD |
 | 26 | round trip S2D → D2S error | pad 0 … 1 V, systematic | | 1 mV | 10 mV | | 0.90 … 6.49 mV (slot, extracted pads, 5 corners) | TBD |
 | 27 | `vcm` (replica) | | 1.10 V | 1.26 V | 1.45 V | | 1.115 … 1.395 V; post-layout (C-coupled PEX) 1.242 … 1.395 V, equal to schematic; mismatch σ 5.4 mV (100 runs) | TBD (the sky130 window follows the sky130 pads) |
 | 28 | `vref` (replica) | | 0.40 V | 0.49 V | 0.65 V | | 0.436 … 0.596 V (bias tree reference); 0.376 … 0.668 V with an on-slot core as reference; post-layout 0.436 … 0.596 V, equal to schematic; mismatch σ 3.8 mV (100 runs) | TBD |
@@ -196,8 +196,8 @@ ratings (the 3.3 V devices are the 5 V-class `g5v0d10v5` devices; exact rated va
 D2S rows: "post-layout" values are IHP magic-PEX (C-coupled) simulations of the taped-out D2S pad cell made on 2026-11-23
 (predecessor repository, branch `chipalooza2-documentation`, `verification/c2_gaps/d2s_pex/`; see [SOURCES.md](SOURCES.md) S9);
 unloaded closed-loop bandwidth post-layout 1.57 … 2.02 MHz (schematic 1.78 … 2.25 MHz); D2S output noise post-layout 0.142 … 0.156 µV/√Hz at
-100 kHz, 224 µV integrated (schematic 0.143 … 0.156 µV/√Hz, 234 µV). All D2S CACE groups except mismatch have post-layout results; five of 30 post-layout DC runs did not
-converge in the simulator (−40 °C sf / ff, ff 27 °C 3.6 V) and are being re-run.
+100 kHz, 224 µV integrated (schematic 0.143 … 0.156 µV/√Hz, 234 µV). All D2S CACE groups except mismatch have post-layout results (all runs; the simulator option `rshunt` = 1 TΩ was
+needed for convergence of the extracted netlist).
 
 Replica and distribution (IHP, 2026-11-23, predecessor repository `verification/c2_gaps/replica_bias/`, SOURCES S10): `pad_ref_rb`
 extracted from the taped-out slot GDS matches its schematic in DC to 0.1 mV; `bias_dist_pd` copies 5 µA with +0.49 … +1.56 %
