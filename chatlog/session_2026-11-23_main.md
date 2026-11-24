@@ -5273,3 +5273,660 @@ EOF
 chmod +x $SB/chatlog/tools/export_all.sh && $SB/chatlog/tools/export_all.sh && cat $SB/chatlog/README.md && du -sh $SB/chatlog; ls -la $SB/chatlog $SB/chatlog/agents | awk '{print $5, $9}'; grep -l -E '[A-Za-z0-9._%+-]+@gmail' -r $SB/chatlog | head; grep -c 'thinking' $SB/chatlog/session_2026-11-23_main.md
 ```
 
+## Tool results / harness — 2026-11-24 22:03:20 UTC
+
+**Tool result:**
+
+```
+# Chat logs of the cloud session of 2026-11-23 / 24
+
+Generated from the session transcripts by `tools/export_all.sh` (converter `tools/jsonl_to_md.py`): user messages, assistant
+replies, every tool call with its inputs, shortened tool results. Left out: the model's internal reasoning, injected system
+reminders, private e-mail addresses. Times are UTC (CET = UTC+1). Regenerated at each push, so the newest part grows.
+
+| log | what |
+|---|---|
+| [session_2026-11-23_main.md](session_2026-11-23_main.md) | the main conversation (user, coordinator) |
+| [agents/2026-11-24_award_docs_gap_analysis.md](agents/2026-11-24_award_docs_gap_analysis.md) | background agent "Award-docs gap analysis", started 2026-11-24 22:02 UTC  |
+| [agents/2026-11-23_sky130_s2d_d2s_core_amp_sims.md](agents/2026-11-23_sky130_s2d_d2s_core_amp_sims.md) | background agent "sky130 S2D/D2S core amp sims", started 2026-11-23 20:01 UTC (stopped by the user) |
+| [agents/2026-11-23_ihp_d2s_pad_post_layout_sims.md](agents/2026-11-23_ihp_d2s_pad_post_layout_sims.md) | background agent "IHP D2S pad post-layout sims", started 2026-11-23 20:41 UTC  |
+| [agents/2026-11-23_ihp_replica_bias_pex_mc_sims.md](agents/2026-11-23_ihp_replica_bias_pex_mc_sims.md) | background agent "IHP replica bias PEX + MC sims", started 2026-11-23 20:41 UTC  |
+| [agents/2026-11-23_sky130_pre_layout_feasibility_sims.md](agents/2026-11-23_sky130_pre_layout_feasibility_sims.md) | background agent "sky130 pre-layout feasibility sims", started 2026-11
+… [1262 more characters cut]
+```
+
+## Assistant — 2026-11-24 22:03:22 UTC
+
+The gmail check found a match in the main log. Checking before anything is committed:
+
+## Assistant — 2026-11-24 22:03:24 UTC
+
+**Tool call: `Bash`**
+
+```bash
+SB=/home/user/sky130_cm_ip__single2diff2single_sudelbuecher; grep -n -o -E '.{60}[A-Za-z0-9._%+-]*@gmail.{20}' $SB/chatlog/session_2026-11-23_main.md | head -3; grep -n -o -E '.{40}thinking.{40}' $SB/chatlog/session_2026-11-23_main.md | head -4
+```
+
+## Tool results / harness — 2026-11-24 22:03:24 UTC
+
+**Tool result:**
+
+```
+5273:/agents | awk '{print $5, $9}'; grep -l -E '[A-Za-z0-9._%+-]+@gmail' -r $SB/chatlog | h
+5070:r', 'tool_result'): 120, ('assistant', 'thinking'): 83, ('assistant', 'text'): 61, ('use
+5273:@gmail' -r $SB/chatlog | head; grep -c 'thinking' $SB/chatlog/session_2026-11-23_main.md
+```
+
+## Assistant — 2026-11-24 22:03:26 UTC
+
+Both are false alarms: the gmail match is my own search pattern, and "thinking" appears only in a block-type count. No address or reasoning leaked. Committing the logs with a run-log entry:
+
+## Assistant — 2026-11-24 22:03:34 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sky130_cm_ip__single2diff2single_sudelbuecher && cat >> RUNLOG.md <<'EOF'
+
+## 2026-11-24
+
+- 22:01 Session resumed (same container: repositories, IHP and sky130A PDKs, tools intact). User: the organizers named the documentation of six Chipalooza #2 projects as award-worthy (Yacine Sotehi; Shivaram Mysore; Adan Kvitschal; Kean Malik, James Patrick, Ibrahim Hanif Mulyana, Rafi Ananta Alden; Arjun Ananth and Man Yu; Brahim Aouissi); asked whether the slot 7 documentation was cut short by the deadline (answer: yes — no graphs in the Chipalooza #2 description, skipped D2S PEX groups, incomplete mode matrix, replica PEX DC only), and asked for a gap analysis, filling the gaps incl. simulations, and DC performance graphs (input / output ranges, linearity).
+- 22:02 Repositories of the six projects identified from `.gitmodules` of `sg13cmos5l_ocd_chipalooza` `tapeout_nov_2026`. Two background agents started: award-documentation gap analysis (read-only clones in the scratchpad); DC performance graphs of the IHP S2D / D2S pads and the round trip (results to [S7] `verification/c2_gaps/dc_curves/`).
+- 22:10 User asked for a chat log and other logs to document the work afterwards. This overrides the task file's rule 10 for chat logs; internal reasoning stays out. Added `chatlog/` (generated from the session transcripts by `chatlog/tools/export_all.sh`; regenerated at every push).
+EOF
+python3 - <<'EOF'
+p='README.md'; s=open(p).read()
+s=s.replace("| `slot7_chipalooza4_proposal_TASK.md` |","| `chatlog/` | chat logs of the cloud session (main conversation and every background agent), generated from the transcripts; see `chatlog/README.md` |\n| `stash/` | halted sky130 simulation files (not used) |\n| `slot7_chipalooza4_proposal_TASK.md` |")
+open(p,'w').write(s)
+EOF
+git add -A && git commit -q -m "Chat logs of the cloud session (main conversation and background agents), generated from the transcripts; run log for 2026-11-24
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push 2>&1 | tail -1
+```
+
+## Tool results / harness — 2026-11-24 22:03:36 UTC
+
+**Tool result:**
+
+```
+4ed3ffe..4415177  sudel_buecher -> sudel_buecher
+```
+
+## Assistant — 2026-11-24 22:03:41 UTC
+
+The chat logs are in place and pushed to `sudel_buecher` of `sky130_cm_ip__single2diff2single` (`4415177`), under `chatlog/`:
+
+- **`session_2026-11-23_main.md`**: our whole conversation since yesterday.
+  - It holds your messages, my replies and every tool call: commands, the files written, the briefs to the background jobs.
+  - Tool results are shortened to 1500 characters.
+- **`agents/`**: one log per background job, eight so far:
+  - the two stopped sky130 jobs
+  - the Chipalooza #2 documentation job
+  - the three IHP gap jobs
+  - the two jobs running now
+- **`README.md`**: an index with each job's start time and whether you stopped it.
+
+The logs are generated from the session transcripts by `chatlog/tools/export_all.sh`, so they record what actually happened. I'll regenerate them at every push.
+
+Three things are left out:
+- **My internal reasoning:** yesterday's task file forbade exporting it, and you only asked for chat logs.
+- **Injected system reminders.**
+- **Your e-mail address:** any address other than `noreply@anthropic.com` and `chipalooza@opencircuitdesign.com` is replaced. I checked the output: no private address appears.
+
+`RUNLOG.md` on the same branch keeps the short dated action log, now with today's entries. It notes that your request for chat logs overrides the task file's rule against them.
+
+The gap analysis and the DC graphs are still running in the background.
+
+## User (or harness) — 2026-11-24 22:04:15 UTC
+
+push the DC graphs as soon as they land
+
+## Assistant — 2026-11-24 22:04:19 UTC
+
+**Tool call: `Monitor`**
+
+_DC curves plots/results changes in slot 7 verification/c2_gaps/dc_curves_
+
+```json
+{
+ "timeout_ms": 1800000,
+ "command": "D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves; last=\"\"; while true; do if [ -d \"$D\" ]; then cur=$(find \"$D\" -type f \\( -name '*.png' -o -name '*.svg' -o -name 'results.md' -o -name '*.csv' \\) -printf '%p %s\\n' 2>/dev/null | sort | md5sum | cut -c1-8); n=$(find \"$D\" -name '*.png' 2>/dev/null | wc -l); if [ \"$cur\" != \"$last\" ] && [ \"$n\" -gt 0 ]; then sleep 15; echo \"dc_curves changed: $n png\"; last=$(find \"$D\" -type f \\( -name '*.png' -o -name '*.svg' -o -name 'results.md' -o -name '*.csv' \\) -printf '%p %s\\n' 2>/dev/null | sort | md5sum | cut -c1-8); fi; fi; sleep 20; done"
+}
+```
+
+## Tool results / harness — 2026-11-24 22:04:19 UTC
+
+**Tool result:**
+
+```
+Monitor started (task b5i49raab, expires in 30m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+```
+
+## Assistant — 2026-11-24 22:04:22 UTC
+
+**Tool call: `SendMessage`**
+
+```json
+{
+ "to": "aff24aecfc7fc90d1",
+ "summary": "push DC graphs incrementally",
+ "message": "The user wants each DC graph pushed as soon as it exists. Please write each finished figure into verification/c2_gaps/dc_curves/plots/ immediately, together with a matching entry in README.md / results.md (mark unfinished figures \"running\"), so every intermediate state I commit is self-explanatory. Priority unchanged: S2D transfer first, then D2S, then round trip.",
+ "type": "message",
+ "recipient": "aff24aecfc7fc90d1",
+ "recipient_kind": "agent",
+ "content": "The user wants each DC graph pushed as soon as it…"
+}
+```
+
+## Tool results / harness — 2026-11-24 22:04:22 UTC
+
+**Tool result:**
+
+```
+{"success":true,"message":"Message queued for delivery to aff24aecfc7fc90d1 at its next tool round. Sending this moved nothing it is running to the background just now, so the message waits for that round unless something moves sooner. If it finishes first, it is resumed with the message and notifies again, so wait for that notification before resending.","pin":{"id":"aff24aecfc7fc90d1","name":"aff24aecfc7fc90d1","ref":"594874"}}
+```
+
+## Assistant — 2026-11-24 22:04:24 UTC
+
+No DC graph has landed yet. A watcher now checks `verification/c2_gaps/dc_curves/` every 20 seconds and tells me when a figure appears or changes. Each time, I'll look at the plot, commit it with its results text and push to `chipalooza2-documentation`. I also asked the graph job to write each figure as soon as it is done, together with its description, so every pushed state explains itself.
+
+The order is S2D transfer curves, then D2S, then the round trip.
+
+## User (or harness) — 2026-11-24 22:04:26 UTC
+
+and tell me where they end up.
+
+## Assistant — 2026-11-24 22:04:32 UTC
+
+They end up on branch `chipalooza2-documentation` of `tatzelbrumm/sg13cmos5l_cm_slot7`:
+
+- **`verification/c2_gaps/dc_curves/plots/`**: the figures, as PNG and SVG where the SVG is small.
+- **`verification/c2_gaps/dc_curves/results.md`**: the input and output range tables per corner, and the key numbers.
+- **`verification/c2_gaps/dc_curves/README.md`**: what each figure shows, how to read it, the linearity criterion, tool versions.
+- **`verification/c2_gaps/dc_curves/run.sh`**: reproduces all figures from the repository.
+
+On GitHub:
+https://github.com/tatzelbrumm/sg13cmos5l_cm_slot7/tree/chipalooza2-documentation/verification/c2_gaps/dc_curves
+
+In your local clone:
+
+```bash
+git fetch origin chipalooza2-documentation
+```
+
+```bash
+git checkout chipalooza2-documentation
+```
+
+```bash
+git pull
+```
+
+Then look in `verification/c2_gaps/dc_curves/plots/`.
+
+Once the figures are final, I'll also embed them in the slot 7 documentation itself, `docs/chipalooza2_as_taped_out/README.md` and the pad data sheets. That way they show where a reader looks. With each push I'll tell you the commit and list the new figures with their paths.
+
+## User (or harness) — 2026-11-24 22:08:37 UTC
+
+the watcher is unnecessary. i am not in a hurry right now.
+
+## Assistant — 2026-11-24 22:08:38 UTC
+
+**Tool call: `TaskStop`**
+
+```json
+{
+ "task_id": "b5i49raab"
+}
+```
+
+## Tool results / harness — 2026-11-24 22:08:38 UTC
+
+**Tool result:**
+
+```
+{"message":"Successfully stopped task: b5i49raab (D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves; last=\"\"; while true; do if [ -d \"$D\" ]; then cur=$(find \"$D\" -type f \\( -name '*.png' -o -name '*.svg' -o -name 'results.md' -o -name '*.csv' \\) -printf '%p %s\\n' 2>/dev/null | sort | md5sum | cut -c1-8); n=$(find \"$D\" -name '*.png' 2>/dev/null | wc -l); if [ \"$cur\" != \"$last\" ] && [ \"$n\" -gt 0 ]; then sleep 15; echo \"dc_curves changed: $n png\"; last=$(find \"$D\" -type f \\( -name '*.png' -o -name '*.svg' -o -name 'results.md' -o -name '*.csv' \\) -printf '%p %s\\n' 2>/dev/null | sort | md5sum | cut -c1-8); fi; fi; sleep 20; done)","task_id":"b5i49raab","task_type":"local_bash","command":"D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves; last=\"\"; while true; do if [ -d \"$D\" ]; then cur=$(find \"$D\" -type f \\( -name '*.png' -o -name '*.svg' -o -name 'results.md' -o -name '*.csv' \\) -printf '%p %s\\n' 2>/dev/null | sort | md5sum | cut -c1-8); n=$(find \"$D\" -name '*.png' 2>/dev/null | wc -l); if [ \"$cur\" != \"$last\" ] && [ \"$n\" -gt 0 ]; then sleep 15; echo \"dc_curves changed: $n png\"; last=$(find \"$D\" -type f \\( -name '*.png' -o -name '*.svg' -o -name 'results.md' -o -name '*.csv' \\) -printf '%p %s\\n' 2>/dev/null | sort | md5sum | cut -c1-8); fi; fi; sleep 20; done"}
+```
+
+## Assistant — 2026-11-24 22:08:40 UTC
+
+The watcher is stopped. I'll push the DC graphs when the graph job reports finished, in one commit with all figures and their descriptions, then tell you the commit and the paths.
+
+## User (or harness) — 2026-11-24 22:10:55 UTC
+
+make 2.1 signal and current flow
+
+```
+harness: enable, dig_in[0..5]            vdd_3v3 / vss_3v3 (gated)        vdd_1v2 (only dig_out pull-downs)
+              |                                   |
+          s7_ctrl  --- fail-safe enables, mode decode, switch matrix (3.3 V logic) ---------------+
+              |                                                                                     |
+        bg_core_pd (Banba bandgap, ~5 uA sourced) --> bias_dist_pd (1:1 copies, switched) --+--> pad_ref_rb: one bias tree -> vcm_rb, vref_s2d_rb
+                                                                                            |         vcm  (S2D vcm = D2S vref)    ~1.26 V
+                                                                                            |         vref (S2D vref)              ~0.49 V
+                                                                                            +--> iref of each pad's own bias tree (s7_an_0_iref, s7_an_1_iref)
+ pad s7_an[0] --> S2D pad: outp - outn = 2 (pad - vref), (outp+outn)/2 = vcm ----+ loop direct or crossed
+                                                                                  v
+ pad s7_an[1] <-- D2S pad: pad - vref = (vinp - vinn)/2  <------------------------+  (or fed from analog_bus0/1)
+```
+
+into a nicer graphic
+
+## Assistant — 2026-11-24 22:11:02 UTC
+
+Before drawing, checking the switch matrix in `glue_logic.md`, so the graphic shows the real connections and not just the ASCII sketch:
+
+## Assistant — 2026-11-24 22:11:03 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && grep -n -E '^## ' glue_logic.md; sed -n '/^## 4/,/^## 6/p' glue_logic.md | cut -c1-400
+```
+
+## Tool results / harness — 2026-11-24 22:11:03 UTC
+
+**Tool result:**
+
+```
+14:## 1. Cells
+24:## 2. Inputs and fail-safe level shifting
+42:## 3. Mode decode (derived from the netlist)
+89:## 4. Switch matrix: ten transmission gates
+103:## 5. Static ties and same-net joins in `slot_7`
+111:## 6. `dig_out` pull-downs (`s7_doutpd`)
+116:## 7. What was verified, and what was not
+133:## 8. Discrepancies to be aware of
+## 4. Switch matrix: ten transmission gates
+
+Each is a `tg_hv` (NMOS + PMOS, 1 µm / 0.45 µm hv, bulks on `vss` / `vddh`), closed when its control is 1 and its complement is 0:
+
+| gate | control | connects | purpose |
+|---|---|---|---|
+| XT1, XT2 | `ld` | S2D `outp`–D2S `vinp`, `outn`–`vinn` | loop direct |
+| XT3, XT4 | `lx` | `outp`–`vinn`, `outn`–`vinp` | loop crossed |
+| XT5, XT6 | `sb` | `outp`–`bus0`, `outn`–`bus1` | monitor / drive the S2D outputs |
+| XT7, XT8 | `bd` | `bus0`–`vinp`, `bus1`–`vinn` | feed the D2S from outside |
+| XT9, XT10 | `rc` | `vcm_rb`–`vcm_pad`, `vref_rb`–`vref_pad` | replica bias onto the pads |
+
+Each control is an inverted NAND output (`ld` = inverter of `ld_b`, and so on); the complement pin of each gate is the NAND output `ld_b`, `lx_b`, `sb_b`, `bd_b`, `rc_b`. All gates are in the 3.3 V domain.
+
+## 5. Static ties and same-net joins in `slot_7`
+
+- **`bias_dist_pd` configuration:** input 0 (`ibg`, the bandgap's ~5 µA) on, inputs 1…3 tied to `vss_3v3` and their enables low; outputs 0…2 on (to `pad_ref_rb`'s `iprb`,
+  `s7_an_0_iref`, `s7_an_1_iref`), output 3 off (`isp`, spare), its enable tied low. The three distrib
+… [555 more characters cut]
+```
+
+## Assistant — 2026-11-24 22:12:43 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pix/make_signal_flow.py`
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Draw the signal and current flow of slot 7 as taped out (158afc5) as an SVG block diagram.
+
+Connections follow glue_logic.md (switch matrix XT1..XT10, same-net joins, bias_dist_pd configuration) and
+README.md section 2. usage: python3 make_signal_flow.py [out.svg]   (default: slot7_signal_flow.svg next to this file)
+"""
+import os
+import sys
+
+W, H = 1240, 830
+C_CTRL, C_IREF, C_VREF, C_SIG, C_BUS, C_TXT = "#7b3fa0", "#c25e00", "#2e7d32", "#1f5fbf", "#666666", "#222222"
+out = []
+
+
+def box(x, y, w, h, lines, fill="#f7f7f7", stroke="#444", bold_first=True, size=13):
+    out.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="6" fill="{fill}" stroke="{stroke}" stroke-width="1.4"/>')
+    ty = y + 20
+    for i, t in enumerate(lines):
+        wgt = "bold" if (i == 0 and bold_first) else "normal"
+        out.append(f'<text x="{x + 10}" y="{ty}" font-size="{size + (1 if i == 0 and bold_first else 0)}" '
+                   f'font-weight="{wgt}" fill="{C_TXT}">{t}</text>')
+        ty += size + 5
+
+
+def line(pts, color, width=2.0, dash=None, arrow=False):
+    d = " ".join(f"{'M' if i == 0 else 'L'}{x},{y}" for i, (x, y) in enumerate(pts))
+    extra = f' stroke-dasharray="{dash}"' if dash else ""
+    mk = f' marker-end="url(#a_{color[1:]})"' if arrow else ""
+    out.append(f'<path d="{d}" fill="none" stroke="{color}" stroke-width="{width}"{extra}{mk}/>')
+
+
+def dot(x, y, color):
+    out.append(f'<circle cx="{x}" cy="{y}" r="3.6" fill="{color}"/>')
+
+
+def text(x, y, t, color=C_TXT, size=12, anchor="start", weight="normal", style="normal"):
+    out.append(f'<text x="{x}" y="{y}" font-size="{size}" fill="{color}" text-anchor="{anchor}" '
+               f'font-weight="{weight}" font-style="{style}">{t}</text>')
+
+
+def switch(x, y, color, label=None):
+    """Open switch symbol between (x, y) and (x + 36, y)."""
+    line([(x, y), (x + 10, y)], color)
+    line([(x + 10, y), (x + 27, y - 9)], color)
+    line([(x + 27, y), (x + 36, y)], color)
+    dot(x + 10, y, color)
+    dot(x + 27, y, color)
+    if label:
+        text(x + 18, y - 13, label, C_CTRL, 11, "middle")
+
+
+def bondpad(x, y, label):
+    out.append(f'<rect x="{x}" y="{y}" width="50" height="50" fill="#e8d9a8" stroke="#8a6d1a" stroke-width="1.5"/>')
+    out.append(f'<rect x="{x + 8}" y="{y + 8}" width="34" height="34" fill="none" stroke="#8a6d1a" stroke-width="1"/>')
+    text(x + 25, y + 68, label, C_TXT, 12, "middle", "bold")
+
+
+# ---- top row: harness controls, s7_ctrl, legend
+box(20, 45, 185, 80, ["harness", "enable, dig_in[0..5]", "1.2 V levels, always-on rail"])
+line([(205, 85), (248, 85)], C_CTRL, arrow=True)
+box(250, 25, 420, 112, ["s7_ctrl: 3.3 V glue logic (71.6 × 38.04 µm)",
+                        "7 fail-safe level shifters ls_up_fs (1.2 V → 3.3 V)",
+                        "key: dig_in[3] = 1 and dig_in[4] = 0, else default",
+                        "mode decode → switch controls ld, lx, sb, bd, rc",
+                        "en / en_b to every block (enable = 0: all off)"], fill="#f3ecf7", stroke=C_CTRL)
+# legend
+lx, ly = 905, 25
+out.append(f'<rect x="{lx}" y="{ly}" width="315" height="135" rx="6" fill="#ffffff" stroke="#999"/>')
+text(lx + 10, ly + 19, "legend", C_TXT, 13, weight="bold")
+for i, (c, dash, w, t) in enumerate([(C_CTRL, "6,4", 2, "control (3.3 V enables, switch controls)"),
+                                      (C_IREF, None, 2.4, "reference current (≈ 5 µA, sourced)"),
+                                      (C_VREF, None, 2.4, "reference voltage (vcm, vref)"),
+                                      (C_SIG, None, 2.4, "signal path"),
+                                      (C_BUS, None, 4, "harness shared analog bus")]):
+    yy = ly + 40 + 20 * i
+    line([(lx + 12, yy - 4), (lx + 52, yy - 4)], c, w, dash)
+    text(lx + 62, yy, t, C_TXT, 12)
+
+# ---- bias row
+box(20, 190, 190, 82, ["bg_core_pd", "Banba current-mode bandgap", "sources ≈ 5 µA (no op amp)"], fill="#fff4e8", stroke=C_IR
+… [5829 more characters cut]
+```
+
+## Tool results / harness — 2026-11-24 22:12:43 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pix/make_signal_flow.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-24 22:12:45 UTC
+
+Gap analysis is in (I'll come back to it). Finishing the diagram first: render and look at it.
+
+## Assistant — 2026-11-24 22:12:47 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pix && python3 make_signal_flow.py && P=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/sf.png && node -e "
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const p = await b.newPage({viewport:{width:1240,height:830}, deviceScaleFactor:1});
+await p.goto('file://$PWD/slot7_signal_flow.svg'); await p.screenshot({path:'$P'}); await b.close(); })();" && ls -la $P
+```
+
+## Tool results / harness — 2026-11-24 22:12:49 UTC
+
+**Tool result:**
+
+```
+/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pix/slot7_signal_flow.svg
+-rw-r--r-- 1 root root 202380 Nov 24 22:12 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/sf.png
+```
+
+## Assistant — 2026-11-24 22:12:50 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/sf.png"
+}
+```
+
+## Tool results / harness — 2026-11-24 22:12:50 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-24 22:13:13 UTC
+
+**Tool call: `Bash`**
+
+```bash
+python3 - <<'EOF'
+p='make_signal_flow.py'; s=open(p).read()
+rep=[
+('def box(x, y, w, h, lines, fill="#f7f7f7", stroke="#444", bold_first=True, size=13):','def box(x, y, w, h, lines, fill="#f7f7f7", stroke="#444", bold_first=True, size=13, top=20):'),
+('    ty = y + 20\n','    ty = y + top\n'),
+('["harness", "enable, dig_in[0..5]", "1.2 V levels, always-on rail"]','["harness", "enable, dig_in[0..5]", "1.2 V levels"]'),
+('["bg_core_pd", "Banba current-mode bandgap", "sources ≈ 5 µA (no op amp)"]','["bg_core_pd", "Banba bandgap, no op amp", "sources ≈ 5 µA"]'),
+('text(798, 182, "rc: XT9, XT10", C_CTRL, 11, "middle")','text(806, 176, "rc: XT9, XT10", C_CTRL, 11)'),
+('text(386, 300, "s7_an_0_iref", C_IREF, 11)','text(386, 410, "s7_an_0_iref", C_IREF, 11)'),
+('box(160, 450, 255, 125, ["S2D pad (custom cell)"','box(160, 450, 255, 140, ["S2D pad (custom cell)"'),
+('    fill="#edf3fc", stroke=C_SIG)\ntext(225, 466','    fill="#edf3fc", stroke=C_SIG, top=40)\ntext(225, 466'),
+('box(820, 450, 255, 125, ["D2S pad (custom cell)"','box(820, 450, 255, 140, ["D2S pad (custom cell)"'),
+('"class-AB output stage"],\n    fill="#edf3fc", stroke=C_SIG)','"class-AB output stage"],\n    fill="#edf3fc", stroke=C_SIG, top=40)'),
+]
+for a,b in rep:
+    assert s.count(a)==1,a; s=s.replace(a,b)
+# move signal row arrows down to match the taller pad boxes
+s=s.replace("line([(85, 510), (158, 510)]","line([(85, 530), (158, 530)]").replace('text(120, 502, "pad"','text(120, 522, "pad"')
+s=s.replace("bondpad(35, 485,","bondpad(35, 505,").replace("bondpad(1110, 485,","bondpad(1110, 505,").replace("line([(1075, 510), (1108, 510)]","line([(1075, 530), (1108, 530)]")
+for a,b in [("(415, 495), (468, 495)","(415, 510), (468, 510)"),("(415, 540), (468, 540)","(415, 555), (468, 555)"),("(770, 495), (818, 495)","(770, 510), (818, 510)"),("(770, 540), (818, 540)","(770, 555), (818, 555)"),
+            ("text(441, 488,","text(441, 503,"),("text(441, 533,","text(441, 548,"),("text(794, 488,","text(794, 503,"),("text(794, 533,","text(794, 548,")]:
+    assert s.count(a)==1,a; s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+python3 make_signal_flow.py >/dev/null && P=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/sf.png && node -e "
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const p = await b.newPage({viewport:{width:1240,height:830}, deviceScaleFactor:1});
+await p.goto('file://$PWD/slot7_signal_flow.svg'); await p.screenshot({path:'$P'}); await b.close(); })();"
+```
+
+## Assistant — 2026-11-24 22:13:14 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/sf.png"
+}
+```
+
+## Tool results / harness — 2026-11-24 22:13:15 UTC
+
+**Tool result:**
+
+```
+(Bash completed with no output)
+```
+
+## Tool results / harness — 2026-11-24 22:13:15 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-24 22:13:25 UTC
+
+Two remaining collisions: the `vref` label is crossed by the green `vcm` tap line, and the bandgap box text touches its edge. Small fix, then commit:
+
+## Assistant — 2026-11-24 22:13:29 UTC
+
+**Tool call: `Bash`**
+
+```bash
+python3 - <<'EOF'
+p='make_signal_flow.py'; s=open(p).read()
+for a,b in [('["bg_core_pd", "Banba bandgap, no op amp", "sources ≈ 5 µA"]','["bg_core_pd", "Banba bandgap", "sources ≈ 5 µA"]'),
+            ('text(1000, 203, "vcm (S2D vcm','text(1075, 203, "vcm (S2D vcm'),
+            ('text(1000, 243, "vref (S2D vref','text(1095, 243, "vref (S2D vref'),
+            ('line([(965, 210), (965, 448)]','line([(990, 210), (990, 448)]'),('dot(965, 210, C_VREF)','dot(990, 210, C_VREF)'),
+            ('text(965, 466, "vref"','text(990, 466, "vref"')]:
+    assert s.count(a)==1,a; s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+python3 make_signal_flow.py >/dev/null && node -e "
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const p = await b.newPage({viewport:{width:1240,height:830}, deviceScaleFactor:2});
+await p.goto('file://$PWD/slot7_signal_flow.svg'); await p.screenshot({path:'$PWD/slot7_signal_flow.png'}); await b.close(); })();" && ls -la slot7_signal_flow.*
+```
+
+## Assistant — 2026-11-24 22:13:29 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pix/slot7_signal_flow.png"
+}
+```
+
+## Tool results / harness — 2026-11-24 22:13:30 UTC
+
+**Tool result:**
+
+```
+-rw-r--r-- 1 root root 480523 Nov 24 22:13 slot7_signal_flow.png
+-rw-r--r-- 1 root root  15974 Nov 24 22:13 slot7_signal_flow.svg
+```
+
+## Tool results / harness — 2026-11-24 22:13:30 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## User (or harness) — 2026-11-24 22:13:30 UTC
+
+[Image: original 2480x1660, displayed at 2000x1339. Multiply coordinates by 1.24 to map to original image.]
+
+## Assistant — 2026-11-24 22:13:37 UTC
+
+Clean now, except "in 0 = bandgap; out 0…2 used" pokes past the right edge of `bias_dist_pd`. Shortening it, then putting the figure into §2.1:
+
+## Assistant — 2026-11-24 22:13:39 UTC
+
+**Tool call: `Bash`**
+
+```bash
+sed -i 's/"in 0 = bandgap; out 0…2 used"/"bandgap in; 3 outputs used"/' make_signal_flow.py && python3 make_signal_flow.py >/dev/null && node -e "
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const p = await b.newPage({viewport:{width:1240,height:830}, deviceScaleFactor:1.5});
+await p.goto('file://$PWD/slot7_signal_flow.svg'); await p.screenshot({path:'$PWD/slot7_signal_flow.png'}); await b.close(); })();" && ls -la slot7_signal_flow.*; cd .. && grep -n "### 2.1" -A 16 README.md | head -20
+```
+
+## Tool results / harness — 2026-11-24 22:13:40 UTC
+
+**Tool result:**
+
+```
+-rw-r--r-- 1 root root 334642 Nov 24 22:13 slot7_signal_flow.png
+-rw-r--r-- 1 root root  15970 Nov 24 22:13 slot7_signal_flow.svg
+59:### 2.1 Signal and current flow
+60-
+61-ʼʼʼ
+62-harness: enable, dig_in[0..5]            vdd_3v3 / vss_3v3 (gated)        vdd_1v2 (only dig_out pull-downs)
+63-              |                                   |
+64-          s7_ctrl  --- fail-safe enables, mode decode, switch matrix (3.3 V logic) ---------------+
+65-              |                                                                                     |
+66-        bg_core_pd (Banba bandgap, ~5 uA sourced) --> bias_dist_pd (1:1 copies, switched) --+--> pad_ref_rb: one bias tree -> vcm_rb, vref_s2d_rb
+67-                                                                                            |         vcm  (S2D vcm = D2S vref)    ~1.26 V
+68-                                                                                            |         vref (S2D vref)              ~0.49 V
+69-                                                                                            +--> iref of each pad's own bias tree (s7_an_0_iref, s7_an_1_iref)
+70- pad s7_an[0] --> S2D pad: outp - outn = 2 (pad - vref), (outp+outn)/2 = vcm ----+ loop direct or crossed
+71-                                                                                  v
+72- pad s7_an[1] <-- D2S pad: pad - vref = (vinp - vinn)/2  <------------------------+  (or fed from analog_bus0/1)
+73-ʼʼʼ
+74-
+75-Default function (enable = 1)
+… [221 more characters cut]
+```
+
+## Assistant — 2026-11-24 22:13:46 UTC
+
+**Tool call: `Bash`**
+
+```bash
+python3 - <<'EOF'
+p='README.md'; s=open(p).read()
+i=s.index("### 2.1 Signal and current flow\n\nʼʼʼ\n"); j=s.index("ʼʼʼ\n",i+40)+4
+ascii_block=s[i+len("### 2.1 Signal and current flow\n\n"):j]
+new=("### 2.1 Signal and current flow\n\n"
+"![Slot 7 signal and current flow: harness controls into s7_ctrl; bg_core_pd, bias_dist_pd and pad_ref_rb supply the pads' "
+"reference currents and vcm / vref; S2D pad, switch matrix and D2S pad form the signal path; analog_bus0..3 taps](pix/slot7_signal_flow.svg)\n\n"
+"*Figure: signal and current flow of slot 7 as taped out (`158afc5`). Connections from the netlist as described in "
+"[glue_logic.md](glue_logic.md) (switch matrix §4, same-net joins and `bias_dist_pd` configuration §5). Generated by "
+"[`pix/make_signal_flow.py`](pix/make_signal_flow.py) (SVG; [PNG](pix/slot7_signal_flow.png)).*\n\n"
+"<details><summary>The same as plain text</summary>\n\n"+ascii_block+"\n</details>\n")
+s=s[:i]+new+s[j:]
+open(p,'w').write(s)
+EOF
+sed -n 59,72p README.md | cut -c1-160; cd /home/user/sg13cmos5l_cm_slot7 && git status --short | head
+```
+
+## Tool results / harness — 2026-11-24 22:13:46 UTC
+
+**Tool result:**
+
+```
+### 2.1 Signal and current flow
+
+![Slot 7 signal and current flow: harness controls into s7_ctrl; bg_core_pd, bias_dist_pd and pad_ref_rb supply the pads' reference currents and vcm / vref; S2D
+
+*Figure: signal and current flow of slot 7 as taped out (`158afc5`). Connections from the netlist as described in [glue_logic.md](glue_logic.md) (switch matrix 
+
+<details><summary>The same as plain text</summary>
+
+ʼʼʼ
+harness: enable, dig_in[0..5]            vdd_3v3 / vss_3v3 (gated)        vdd_1v2 (only dig_out pull-downs)
+              |                                   |
+          s7_ctrl  --- fail-safe enables, mode decode, switch matrix (3.3 V logic) ---------------+
+              |                                                                                     |
+        bg_core_pd (Banba bandgap, ~5 uA sourced) --> bias_dist_pd (1:1 copies, switched) --+--> pad_ref_rb: one bias tree -> vcm_rb, vref_s2d_rb
+ M docs/chipalooza2_as_taped_out/README.md
+?? docs/chipalooza2_as_taped_out/pix/make_signal_flow.py
+?? docs/chipalooza2_as_taped_out/pix/slot7_signal_flow.png
+?? docs/chipalooza2_as_taped_out/pix/slot7_signal_flow.svg
+?? verification/c2_gaps/dc_curves/
+```
+
+## Assistant — 2026-11-24 22:13:50 UTC
+
+Committing the diagram, plus the gap analysis and refreshed chat logs on the notes branch. The DC curves folder is still being written, so I'm leaving it out for now.
+
+## Assistant — 2026-11-24 22:13:59 UTC
+
+**Tool call: `Bash`**
+
+```bash
+git add docs/chipalooza2_as_taped_out/README.md docs/chipalooza2_as_taped_out/pix/make_signal_flow.py docs/chipalooza2_as_taped_out/pix/slot7_signal_flow.svg docs/chipalooza2_as_taped_out/pix/slot7_signal_flow.png && git commit -q -m "Chipalooza #2 description 2.1: signal and current flow as a figure (SVG + PNG, generated by pix/make_signal_flow.py from the netlist connections in glue_logic.md); ASCII kept as plain-text fallback
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push 2>&1 | tail -1
+SB=/home/user/sky130_cm_ip__single2diff2single_sudelbuecher; mkdir -p $SB/notes && cp /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_docs/GAP_ANALYSIS.md $SB/notes/2026-11-24_documentation_gap_analysis.md && wc -c $SB/notes/*.md && cd $SB && cat >> RUNLOG.md <<'EOF'
+- 22:11 Gap analysis finished: `notes/2026-11-24_documentation_gap_analysis.md` (six award-named projects vs ours; matrix and 17 prioritized items). Main finding: ours is the only one with no schematic picture, no DC transfer curve, no Bode plot and no noise plot; its root README is written for the harness owner.
+- 22:14 User asked to turn the ASCII diagram of README §2.1 into a graphic: `docs/chipalooza2_as_taped_out/pix/slot7_signal_flow.svg` (+ PNG), generated by `pix/make_signal_flow.py` from the connections in `glue_logic.md` §4–5 (switch matrix XT1…XT10, same-net joins, bias_dist_pd outputs); rendered with Playwright Chromium and checked visually (two layout passes fixed overlapping labels). ASCII kept in a collapsed plain-text fallback. [S7] pushed.
+EOF
+chatlog/tools/export_all.sh && git add -A && git commit -q -m "Gap analysis of the award-named documentation; run log; chat logs regenerated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push 2>&1 | tail -1
+```
+
