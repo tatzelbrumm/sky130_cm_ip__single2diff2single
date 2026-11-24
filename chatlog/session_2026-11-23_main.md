@@ -6167,3 +6167,146 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push 2>&1 | tail -1
 ```
 
+## Tool results / harness — 2026-11-24 22:26:33 UTC
+
+**Tool result:**
+
+```
+50a7eff..b04f12d  chipalooza2-documentation -> chipalooza2-documentation
+   862ce4d..4525ff2  sudel_buecher -> sudel_buecher
+```
+
+## Assistant — 2026-11-24 22:26:39 UTC
+
+The schematic pictures and layout renders are pushed to `chipalooza2-documentation` (`b04f12d`):
+
+- **`docs/chipalooza2_as_taped_out/pix/schematics/`: 28 SVGs**, rendered with xschem from the design repository's schematic sources at the cited commits.
+  - Pads: both tops, the S2D and D2S core amplifiers, output stages, ESD, bias trees, the matched unit cell.
+  - Slot: `slot_7`, `s7_ctrl`, `s7_doutpd`, `pad_ref_rb` and its parts, `bg_core_pd`, `bias_dist_pd`, the fail-safe level shifter, the 3.3 V gates.
+- **`docs/chipalooza2_as_taped_out/pix/layout/`: 11 PNGs**, rendered with KLayout from the taped-out GDS. Each has a caption with the cell, its size and a scale bar.
+  - The whole slot, 537.15 × 273 µm.
+  - Each block of the slot, the art included.
+  - Both pads, once with all layers and once with Metal2 and below only, because the top metal hides the devices.
+- **Regeneration:** each folder has a README listing every picture with its source file and commit, and a script that regenerates them all. Rerunning the scripts gave identical files.
+
+I opened two samples myself, the S2D core amplifier schematic and the whole-slot layout; both are correct.
+
+A few things look off, all from the source schematics rather than the rendering:
+- In the two pad bias-tree sheets, comment text overlaps the section headers.
+- The ESD and unit-cell sheets have no title block.
+- The three largest sheets have small text at default size, though they zoom cleanly.
+
+The pictures are not yet shown in the description or the data sheets. I'll embed them together with the DC curves, which are still running.
+
+## User (or harness) — 2026-11-24 23:50:47 UTC
+
+_Harness notification:_
+
+```
+<task-notification>
+<status>stopped</status>
+<summary>The container running this session was restarted before background work reported back: "DC performance graphs IHP slot 7" (task aff24aecfc7fc90d1). None of it will report back on its own. Only these stopped agents can be resumed: aff24aecfc7fc90d1. To resume one, send a message to its agent id (agent names no longer resolve after a restart) with the SendMessage tool instead of re-creating it: it continues from its saved transcript, as a general-purpose agent with the same tools if its saved settings did not survive the restart. If no transcript is found the resume fails; re-create the agent then. Every other stopped task listed here is lost: do not send a message to its id. Re-create anything else if still needed (a long-running server 
+… [131 more characters cut]
+```
+
+## Assistant — 2026-11-24 23:50:50 UTC
+
+The container restarted and the DC graph job stopped. Checking what survived before resuming it:
+
+## Assistant — 2026-11-24 23:50:53 UTC
+
+**Tool call: `Bash`**
+
+```bash
+date -u; ls /home/user; ls /foss/pdks 2>&1; which ngspice magic xschem klayout cace 2>&1 | tr '\n' ' '; echo; for d in /home/user/sg13cmos5l_cm_slot7 /home/user/sky130_cm_ip__single2diff2single /home/user/sky130_cm_ip__single2diff2single_sudelbuecher; do echo "$d: $(git -C $d branch --show-current 2>&1) $(git -C $d log --oneline -1 2>&1 | cut -c1-60) dirty=$(git -C $d status --short 2>/dev/null | wc -l)"; done; ls /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/ 2>&1; find /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves -type f 2>/dev/null | head -40; ls /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/ 2>&1 | head
+```
+
+## Tool results / harness — 2026-11-24 23:50:56 UTC
+
+**Tool result:**
+
+```
+Tue Nov 24 23:50:54 UTC 2026
+sg13cmos5l_cm_slot7
+sky130_cm_ip__single2diff2single
+sky130_cm_ip__single2diff2single_sudelbuecher
+IHP-Open-PDK
+ciel
+ihp-sg13cmos5l
+sky130A
+/usr/local/bin/ngspice /usr/local/bin/magic /usr/local/bin/xschem /usr/bin/klayout /usr/local/bin/cace 
+/home/user/sg13cmos5l_cm_slot7: chipalooza2-documentation b04f12d Chipalooza #2 description: 28 schematic SVGs (xschem dirty=1
+/home/user/sky130_cm_ip__single2diff2single: main 400c866 Proposal: bandgap start-up risk updated (ss/-40 C st dirty=0
+/home/user/sky130_cm_ip__single2diff2single_sudelbuecher: sudel_buecher 4525ff2 Run log and chat logs dirty=0
+d2s_pex
+dc_curves
+replica_bias
+slot_modes_bg
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/common.py
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/d2s.py
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/s2d.py
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/mkgroups.py
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/plots/d2s_transfer_tt27_pex.png
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/plots/s2d_transfer_tt27_pex.svg
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/plots/s2d_corners_schematic.svg
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/plots/s2d_transfer_tt27_schematic.png
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/plots/d2s_range.png
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/plots/d2s_corner
+… [2829 more characters cut]
+```
+
+## Assistant — 2026-11-24 23:50:59 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && git status --short | grep -v dc_curves; git diff --stat; git diff | head -30
+```
+
+## Tool results / harness — 2026-11-24 23:50:59 UTC
+
+**Tool result:**
+
+```
+(Bash completed with no output)
+```
+
+## Assistant — 2026-11-24 23:51:02 UTC
+
+Nothing changed there: the one dirty entry is the untracked `dc_curves` folder. Resuming the DC graph job from its saved transcript:
+
+## Assistant — 2026-11-24 23:51:06 UTC
+
+**Tool call: `SendMessage`**
+
+```json
+{
+ "to": "aff24aecfc7fc90d1",
+ "summary": "resume DC graphs after container restart",
+ "message": "The container restarted (23:50 UTC) and your run was stopped. Your files survived in /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/ (common.py, s2d.py, d2s.py, mkgroups.py and about 40 plots in plots/), but README.md, results.md and run.sh do not exist yet; scratch in /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs may or may not be intact (check). Any ngspice runs in flight were killed. Please: (1) check what is complete vs. partial, (2) write README.md (what each figure shows, how to read it, linearity criterion, versions, source commits, what it does NOT show), results.md (range tables per corner, key numbers) and run.sh first, so the folder is self-explanatory now, (3) then finish whatever graphs are missing, re-running only what is needed. Same rules as before (no git state changes, no invented numbers, labels \"IHP sg13cmos5l simulation (schematic | magic PEX)\", files < 300 kB, SPDX headers). 4 CPUs are free now. Report as before when done.",
+ "type": "message",
+ "recipient": "aff24aecfc7fc90d1",
+ "recipient_kind": "agent",
+ "content": "The container restarted (23:50 UTC) and your run …"
+}
+```
+
+## Tool results / harness — 2026-11-24 23:51:07 UTC
+
+**Tool result:**
+
+```
+{"success":true,"message":"Resuming agent aff24ae","resumedAgentId":"aff24aecfc7fc90d1","pin":{"id":"aff24aecfc7fc90d1","name":"aff24aecfc7fc90d1","ref":"594874"}}
+```
+
+## Assistant — 2026-11-24 23:51:13 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sky130_cm_ip__single2diff2single_sudelbuecher && echo "- 23:50 Container restarted; the DC graph agent was stopped mid-run. Repositories, PDKs, tools and its partial output (scripts, ~40 plots in [S7] \`verification/c2_gaps/dc_curves/plots/\`, no README / results / run.sh yet) survived. Agent resumed from its saved transcript with instructions to write README / results / run.sh first, then finish." >> RUNLOG.md && chatlog/tools/export_all.sh && git add -A && git commit -q -m "Run log: container restart, DC graph job resumed; chat logs
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push 2>&1 | tail -1
+```
+
