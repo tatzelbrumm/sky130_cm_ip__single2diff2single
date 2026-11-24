@@ -2659,3 +2659,962 @@ W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgra
 W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs; timeout 600 bash -c "until [ -f $W/out/schematic/d2s_grid.csv.gz ]; do sleep 5; done"; date -u +%T; grep === $W/chain1.log; cat $W/out/schematic/d2s_grid.csv.gz.failed.txt
 ```
 
+## Tool results / harness — 2026-11-24 22:22:21 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+22:22:21
+=== sg13cmos5l_IOPadSingle2Diff pex s2d_grid start 22:10:37
+=== sg13cmos5l_IOPadSingle2Diff pex s2d_grid done 22:13:57
+=== sg13cmos5l_IOPadDiff2Single schematic d2s_grid start 22:13:58
+cat: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/out/schematic/d2s_grid.csv.gz.failed.txt: No such file or directory
+```
+
+## Assistant — 2026-11-24 22:22:25 UTC
+
+**Tool call: `Bash`**
+
+```bash
+D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves; W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs; cat $W/out/pex/s2d_grid.csv.gz.failed.txt; cd $D && python3 s2d.py $W/out $D > /dev/null && python3 crosscheck.py $W/design $D | tail -3; grep -A3 'High end' tables/s2d_grid.md; ls -la plots; find $W/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/_runs_dcg -name '*.sweep' | wc -l
+```
+
+## Tool results / harness — 2026-11-24 22:22:29 UTC
+
+**Tool result:**
+
+```
+|---|---|---|---|---|---|
+| schematic | 27 | 0.62 | 0.25 | 1.0575 ... 1.2993 | 1.0571 ... 1.2994 |
+| pex | 27 | 0.62 | 0.24 | 1.0577 ... 1.2993 | 1.0571 ... 1.2994 |
+High end over all 45 runs: 1.057 V (ss -40 °C 3.0 V) ... 1.299 V (ff -40 °C 3.6 V); low end max 0.087 V (ff 125 °C 3.6 V); max |err vs ideal| over pad 0 ... 1 V: 4.34 mV; gain 1.99676 ... 1.99783.
+
+
+#### S2D input range, IHP sg13cmos5l simulation (magic PEX)
+--
+High end over all 45 runs: 1.057 V (ss -40 °C 3.0 V) ... 1.299 V (ff -40 °C 3.6 V); low end max 0.087 V (ff 125 °C 3.6 V); max |err vs ideal| over pad 0 ... 1 V: 4.34 mV; gain 1.99676 ... 1.99783.
+
+total 1488
+drwxr-xr-x 2 root root   4096 Nov 24 22:22 .
+drwxr-xr-x 6 root root   4096 Nov 24 22:12 ..
+-rw-r--r-- 1 root root 143900 Nov 24 22:22 s2d_corners_pex.png
+-rw-r--r-- 1 root root  54549 Nov 24 22:22 s2d_corners_pex.svg
+-rw-r--r-- 1 root root 143980 Nov 24 22:22 s2d_corners_schematic.png
+-rw-r--r-- 1 root root  54538 Nov 24 22:22 s2d_corners_schematic.svg
+-rw-r--r-- 1 root root 296182 Nov 24 22:22 s2d_linearity_criterion.png
+-rw-r--r-- 1 root root 147553 Nov 24 22:22 s2d_linearity_criterion.svg
+-rw-r--r-- 1 root root 257489 Nov 24 22:22 s2d_supply.png
+-rw-r--r-- 1 root root 131900 Nov 24 22:22 s2d_supply.svg
+-rw-r--r-- 1 root root 105942 Nov 24 22:22 s2d_transfer_tt27_pex.png
+-rw-r--r-- 1 root root  24188 Nov 24 22:22 s2d_transfer_tt27_pex.svg
+-rw-r--r-- 1 root root 105997 Nov 24 22:22 s2d_transfer_tt27_schematic.png
+-rw-r--r-- 1 root root  24179 Nov 24 
+… [40 more characters cut]
+```
+
+## Assistant — 2026-11-24 22:22:32 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/plots/s2d_supply.png"
+}
+```
+
+## Tool results / harness — 2026-11-24 22:22:32 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-24 22:22:48 UTC
+
+**Tool call: `Bash`**
+
+```bash
+D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves; cd $D && python3 - <<'EOF'
+p='s2d.py'; s=open(p).read()
+i=s.index('def supply_plot'); j=s.index('def main')
+new='''def range_plot(allms, dest, cond, name='s2d_range', what='S2D pad: linear input range (1 mV criterion)',
+               xlabel='pad input voltage [V]', xlim=(-0.3, 1.4), ref=None):
+    """Range per corner / temperature / supply as horizontal bars, one panel per view."""
+    views = [v for v in ('schematic', 'pex') if v in allms]
+    fig, axs = plt.subplots(1, len(views), figsize=(max(7.2, 3.8 * len(views) + 0.8), 6.0), sharey=True,
+                            squeeze=False)
+    rows = [(c, t) for c in CORNERS for t in (-40, 27, 125)]
+    for ax, view in zip(axs[0], views):
+        ms = allms[view]
+        for i, (c, t) in enumerate(rows):
+            for j, v in enumerate((3.0, 3.3, 3.6)):
+                k = next((k for k in ms if k[:3] == (c, t, v)), None)
+                if k is None:
+                    continue
+                m = ms[k]
+                y = i + (j - 1) * 0.25
+                ax.plot([m['lo'], m['hi']], [y, y], color=VCOLOR[v], lw=2.2, solid_capstyle='butt')
+                if m['loc']:
+                    ax.plot([m['lo']], [y], marker='<', color=VCOLOR[v], ms=4)
+                if m.get('hic'):
+                    ax.plot([m['hi']], [y], marker='>', color=VCOLOR[v], ms=4)
+        if ref is not None:
+            ax.axvline(ref, color='#8a8984', lw=0.8, ls='-.')
+        ax.set_yticks(range(len(rows)))
+        ax.set_yticklabels(['%s %d °C' % r for r in rows])
+        ax.set_ylim(len(rows) - 0.5, -0.5)
+        ax.set_xlim(*xlim)
+        ax.grid(axis='y', visible=False)
+        ax.set_xlabel(xlabel)
+        ax.set_title(LABEL[view], fontsize=8.5)
+    h = [plt.Line2D([], [], color=VCOLOR[v], lw=2.2, label='iovdd %.1f V' % v) for v in (3.0, 3.3, 3.6)]
+    axs[0][-1].legend(handles=h, loc='lower right')
+    fig.suptitle(what, fontsize=9.5)
+    fig.tight_layout()
+    save(fig, str(dest / 'plots' / name))
+
+
+'''
+s=s[:i]+new+s[j:]
+s=s.replace("        supply_plot(allms, dest, cond)","""        range_plot(allms, dest, cond, what='S2D pad: linear input range per corner and supply (|error from small-'
+                   'signal line| < 1 mV, input-referred)\\nvref %.2f V (dash-dot), vcm %.2f V, iref 5 µA; '
+                   '"<" = criterion still met at the sweep start -0.3 V' % (cond['vref'], cond['vcm']), ref=cond['vref'])""")
+# downsample log plots
+s=s.replace("ax.semilogy(m['pad'], np.abs(m['err_ss']) * 1e3 + 1e-6,","ax.semilogy(m['pad'][::2], np.abs(m['err_ss'][::2]) * 1e3 + 1e-6,")
+open(p,'w').write(s)
+EOF
+rm -f plots/s2d_supply.*; W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs; python3 s2d.py $W/out $D > /dev/null && ls -la plots | grep -v corners
+```
+
+## Tool results / harness — 2026-11-24 22:22:51 UTC
+
+**Tool result:**
+
+```
+total 1300
+drwxr-xr-x 2 root root   4096 Nov 24 22:22 .
+drwxr-xr-x 6 root root   4096 Nov 24 22:12 ..
+-rw-r--r-- 1 root root 293935 Nov 24 22:22 s2d_linearity_criterion.png
+-rw-r--r-- 1 root root 177413 Nov 24 22:22 s2d_linearity_criterion.svg
+-rw-r--r-- 1 root root 122484 Nov 24 22:22 s2d_range.png
+-rw-r--r-- 1 root root  51241 Nov 24 22:22 s2d_range.svg
+-rw-r--r-- 1 root root 105942 Nov 24 22:22 s2d_transfer_tt27_pex.png
+-rw-r--r-- 1 root root  24188 Nov 24 22:22 s2d_transfer_tt27_pex.svg
+-rw-r--r-- 1 root root 105997 Nov 24 22:22 s2d_transfer_tt27_schematic.png
+-rw-r--r-- 1 root root  24179 Nov 24 22:22 s2d_transfer_tt27_schematic.svg
+```
+
+## Assistant — 2026-11-24 22:23:00 UTC
+
+**Tool call: `Bash`**
+
+```bash
+D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves; cd $D && python3 - <<'EOF'
+p='common.py'; s=open(p).read()
+s=s.replace("""def save(fig, path, svg=True):
+    fig.savefig(path + '.png')
+    if svg:
+        fig.savefig(path + '.svg')
+    plt.close(fig)""","""def save(fig, path, svg=True, svg_max=150e3):
+    \"\"\"PNG at 150 dpi; SVG too if it stays below svg_max bytes (otherwise no SVG).\"\"\"
+    import os
+    fig.savefig(path + '.png')
+    if svg:
+        fig.savefig(path + '.svg')
+        if os.path.getsize(path + '.svg') > svg_max:
+            os.remove(path + '.svg')
+    plt.close(fig)""")
+open(p,'w').write(s)
+p='s2d.py'; s=open(p).read()
+s=s.replace("""    fig, axs = plt.subplots(1, len(views), figsize=(max(7.2, 4.0 * len(views) + 0.6), 4.8), sharey=True, squeeze=False)
+    for ax, view in zip(axs[0], views):
+        for k, m in allms[view].items():
+            if k[2] != vdd:""","""    fig, axs = plt.subplots(1, len(views), figsize=(7.6, 4.5), sharey=True, squeeze=False)
+    for ax, view in zip(axs[0], views):
+        for k, m in allms[view].items():
+            if k[2] != vdd:""")
+open(p,'w').write(s)
+EOF
+rm plots/s2d_linearity_criterion.*; W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs; python3 s2d.py $W/out $D > /dev/null && ls -la plots | grep -E 'crit|range'
+```
+
+## Tool results / harness — 2026-11-24 22:23:03 UTC
+
+**Tool result:**
+
+```
+-rw-r--r-- 1 root root 261073 Nov 24 22:23 s2d_linearity_criterion.png
+-rw-r--r-- 1 root root 122484 Nov 24 22:23 s2d_range.png
+-rw-r--r-- 1 root root  51241 Nov 24 22:23 s2d_range.svg
+```
+
+## Assistant — 2026-11-24 22:23:04 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/plots/s2d_range.png"
+}
+```
+
+## Tool results / harness — 2026-11-24 22:23:04 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-24 22:23:10 UTC
+
+**Tool call: `Bash`**
+
+```bash
+D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves; cd $D && python3 - <<'EOF'
+p='s2d.py'; s=open(p).read()
+s=s.replace("""    axs[0][-1].legend(handles=h, loc='lower right')
+    fig.suptitle(what, fontsize=9.5)
+    fig.tight_layout()""","""    fig.legend(handles=h, loc='lower center', ncol=3)
+    fig.suptitle(what, fontsize=9.5)
+    fig.tight_layout(rect=(0, 0.04, 1, 1))""")
+open(p,'w').write(s)
+EOF
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs; python3 s2d.py $W/out $D > /dev/null; grep === $W/chain1.log; find $W/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/_runs_dcg -name '*.sweep' | wc -l
+```
+
+## Tool results / harness — 2026-11-24 22:23:13 UTC
+
+**Tool result:**
+
+```
+=== sg13cmos5l_IOPadSingle2Diff pex s2d_grid start 22:10:37
+=== sg13cmos5l_IOPadSingle2Diff pex s2d_grid done 22:13:57
+=== sg13cmos5l_IOPadDiff2Single schematic d2s_grid start 22:13:58
+38
+```
+
+## Assistant — 2026-11-24 22:23:20 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs; ls $W/design/macros/*/verification/cace/netlist*/*/; for f in $W/design/macros/*/verification/cace/netlist/schematic/*.spice; do echo == $f; grep -i '^\.subckt' $f | awk '{print $2}' | tr '\n' ' '; echo; grep -v -i -E '^\*|^\+|^$' $f | grep -v -i '^\.subckt\|^\.ends' | grep -v '^[XxRrCcDdMmVv]' | head; done
+```
+
+## Tool results / harness — 2026-11-24 22:23:21 UTC
+
+**Tool result:**
+
+```
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/netlist/schematic/:
+sg13cmos5l_IOPadDiff2Single.spice
+
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/netlist/schematic/:
+sg13cmos5l_IOPadSingle2Diff.spice
+
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/netlist_pex/layout/:
+sg13cmos5l_IOPadSingle2Diff.spice
+
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/netlist_pex/pex/:
+sg13cmos5l_IOPadSingle2Diff.spice
+
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/netlist_pex/schematic/:
+sg13cmos5l_IOPadSingle2Diff.spice
+== /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/netlist/schematic/sg13cmos5l_IOPadDiff2Single.spice
+sg13cmos5l_IOPadDiff2Single bias_tree_pd d2s_mpdda_pd d2s_out_p d2s_out_n d2s_sp2k unit_r2 
+== /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/netlist/schematic/sg13cmos5l_IOPadSingle2Diff.spice
+sg13cmos5l_IOPadSingle2Diff
+… [61 more characters cut]
+```
+
+## Assistant — 2026-11-24 22:23:28 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/design/macros; for c in sg13cmos5l_IOPadDiff2Single sg13cmos5l_IOPadSingle2Diff; do awk '/^\.subckt unit_r2/,/^\.ends/' $W/$c/verification/cace/netlist/schematic/$c.spice | grep -v '^\*' | md5sum; done; grep -il 'subckt unit_r2\|subckt d2s_\|subckt bias_tree' /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/tier1/macros/*/netlist/*/* 2>/dev/null; ls /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/tier1/macros/*/netlist/*/
+```
+
+## Tool results / harness — 2026-11-24 22:23:29 UTC
+
+**Tool result:**
+
+```
+ee75cb644396f24b46618c9e04487802  -
+ee75cb644396f24b46618c9e04487802  -
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/tier1/macros/pad_ref_rb/netlist/schematic/pad_ref_rb_klayout.cdl
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/tier1/macros/pad_ref_rb/netlist/source/pad_ref_rb.spice
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/tier1/macros/sg13cmos5l_IOPadDiff2Single/netlist/schematic/sg13cmos5l_IOPadDiff2Single_klayout.cdl
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/tier1/macros/sg13cmos5l_IOPadDiff2Single/netlist/schematic/sg13cmos5l_IOPadDiff2Single_magic.spice
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/tier1/macros/sg13cmos5l_IOPadDiff2Single/netlist/source/d2s_mpdda.spice
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/tier1/macros/sg13cmos5l_IOPadDiff2Single/netlist/source/d2s_mpdda_pd.spice
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/tier1/macros/sg13cmos5l_IOPadDiff2Single/netlist/source/d2s_out.spice
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/tier1/macros/sg13cmos5l_IOPadDiff2Single/netlist/source/sg13cmos5l_IOPadDiff2Single.spice
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/tier1/macros/sg13cmos5l_IOPadDiff2Single/netlist/source/units.sp
+… [4290 more characters cut]
+```
+
+## Assistant — 2026-11-24 22:23:43 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/tier1; sed -n 1,30p $W/macros/en_ctrl_3v3/testbenches/spice/run_starve.py; sed -n 42,70p $W/macros/en_ctrl_3v3/testbenches/spice/run_starve.py; grep -n 'subckt slot_7' -A3 $W/macros/slot_7/netlist/source/slot_7.spice
+```
+
+## Tool results / harness — 2026-11-24 22:23:43 UTC
+
+**Tool result:**
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Starvation check: ring (iovdd) current of the two custom pads and of pad_ref_rb with the slot off, i.e. no iref,
+enables anywhere (pad_ref_rb has no pad pin: its line shows pad_V 0).
+
+usage (repo env, from this directory): python3 -I run_starve.py   -> results/starve.txt (decks and logs in runs/)
+
+The pads are not changed: their extracted layout netlists (netlist/layout/*_klayout.cir of the two pad macros) are
+read and converted to simulator syntax in runs/. iovdd 3.6 V; iref, vcm / vref / vinp / vinn and the core outputs
+float (1 Gohm to iovss); en_3v3 and en_3v3_b each swept 0 ... 3.6 V in 0.3 V steps (169 combinations, as a switched-off
+slot can leave them anywhere); the pad pin driven at 0, 1.8 and 3.6 V. Reported: the largest and smallest iovdd
+current over the 169 combinations.
+"""
+import re
+import subprocess
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+MAC = HERE.parents[2]
+RUNS = HERE / "runs"
+RES = HERE / "results"
+PADS = {"s2d": ("sg13cmos5l_IOPadSingle2Diff", "X1 en enb iovdd 0 iref outn outp padn vcm vref",
+                ["iref", "vcm", "vref", "outp", "outn"]),
+        "d2s": ("sg13cmos5l_IOPadDiff2Single", "X1 en enb iovdd 0 iref padn vinn vinp vref",
+                ["iref", "vinn", "vinp", "vref"]),
+        "prb": ("pad_ref_rb", "X1 en enb iref vcm iovdd vref 0", ["iref", "vcm", "vref"])}
+CORNERS = [("tt", 27), ("ff", 125), ("fs", 125), ("sf", 125), ("
+… [1642 more characters cut]
+```
+
+## Assistant — 2026-11-24 22:23:44 UTC
+
+Now the round-trip script.
+
+## Assistant — 2026-11-24 22:24:09 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/roundtrip.py`
+
+```
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Round trip pad in -> S2D -> slot 7 (default mode) -> D2S -> pad out, DC sweep (IHP sg13cmos5l simulation).
+
+Usage: python3 -I roundtrip.py <work_dir> <out_dir> <job> [<job> ...]
+  job = <view>:<mos>:<temp>:<vdd>     view = klayout | schematic | pex (the two custom pads only, see below)
+  e.g. schematic:tt:27:3.3. Writes <out_dir>/rt_<view>_<mos>_<temp>_<vdd>.csv (sweep) and .log (ngspice output).
+
+The deck is the designer's tier-1 slot deck (design repository commit 9052bd35, docs/slot7_hookup/tier1/run_tier1.py;
+imported from there, so the slot glue and the other blocks are the same): slot_7 (source netlist) in its default mode
+(all mode bits 0, enable 1.2 V), pad_ref_rb and bias_dist_pd from their KLayout-extracted netlists (converted and wrapped
+by run_tier1.wrapped()), bg_core_pd schematic, ls_up_fs / en_ctrl_3v3 / hv_logic source netlists; vdd_3v3 = iovdd;
+S2D vref / vcm and D2S vref come from the slot's replica bias pad_ref_rb (not set by sources), iref from bg_core_pd
+through bias_dist_pd. Pad out unloaded (1 Gohm to ground, as run_tier1.py). Models: MOS corner on hv and lv, res_typ,
+pnp typ, diodes.lib (as run_tier1.py), plus the IHP IO library sg13cmos5l_io.spice and cap_typ (needed by the
+schematic pad netlists; as the pads' CACE templates).
+
+Pad views (both pads always the same view):
+  klayout    netlist/layout/<cell>_klayout.cir at 9052bd35 (the designer's tier-1 view, converted by run_tier1.wrapped())
+  schematic  the CACE schematic netlists of the pads at 91a7da8b (cace/netlist/schematic/<cell>.spice, written by
+             cace_dc.sh's schematic runs)
+  pex        the magic C-coupled PEX netlists as prepared by cace_dc.sh's pex runs (cace/netlist_pex/pex/<cell>.spice:
+             S2D from the design repository, D2S from ../d2s_pex), with ngspice option rshunt=1e12 (needed by the D2S
+             PEX netlist, see ../d2s_pex/README.md)
+The pads' internal subcircuits (unit_r2 appears in both pads) get a per-pad prefix, so that the two netlists do not
+redefine each other's subcircuits.
+
+Sweep: pad in (Vin) -0.3 ... 3.3 V in 5 mV steps. Error = pad_out - (v(vcm_s2d) + v(padin) - v(vref_s2d)), the
+designer's expected value with the replica's actual vcm / vref (run_tier1.py), and err_ss = deviation from the
+small-signal line (slope from pad = vref_s2d +- 0.1 V).
+"""
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+WORK, OUT = Path(sys.argv[1]).resolve(), Path(sys.argv[2]).resolve()
+JOBS = sys.argv[3:]
+T1 = WORK / 'tier1' / 'docs' / 'slot7_hookup' / 'tier1'
+sys.path.insert(0, str(T1))
+import run_tier1 as T  # noqa: E402
+
+PADS = ['sg13cmos5l_IOPadSingle2Diff', 'sg13cmos5l_IOPadDiff2Single']
+RUNS = WORK / 'rt_runs'
+PDK = '/foss/pdks/ihp-sg13cmos5l'
+
+
+def prefixed(src, dst, cell, pfx):
+    """Copy a pad netlist with every subckt except the pad cell renamed to <pfx>_<name> (definitions and calls)."""
+    txt = Path(src).read_text()
+    names = [n for n in re.findall(r'^\.subckt\s+(\S+)', txt, re.M | re.I) if n != cell]
+    for n in names:
+        txt = re.sub(r'(?<![\w.#$])' + re.escape(n) + r'(?![\w.#$])', f'{pfx}_{n}', txt)
+    Path(dst).write_text(txt)
+    return dst
+
+
+def includes(view):
+    RUNS.mkdir(parents=True, exist_ok=True)
+    T.RUNS = T.RUNS.__class__(RUNS)
+    other = [T.wrapped(c) for c in ('pad_ref_rb', 'bias_dist_pd')]
+    if view == 'klayout':
+        pads = [T.wrapped(c) for c in PADS]
+    else:
+        pads = []
+        for c, pfx in zip(PADS, ('s2dpad', 'd2spad')):
+            d = 'netlist/schematic' if view == 'schematic' else 'netlist_pex/pex'
+            src = WORK / 'design' / 'macros' / c / 'verification' / 'cace' / d / f'{c}.spice'
+            pads.append(prefixed(src, RUNS / f'{c}_{view}.spice', c, pfx))
+    return [str(RUNS / p) for p in other] + [str(p) for p in pads]
+
+
+def run(job):
+    view, c, t, v = job.split(':')
+    t, v = int(t), float(v)
+    tag = f'rt_{view}
+… [2198 more characters cut]
+```
+
+## Tool results / harness — 2026-11-24 22:24:09 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/roundtrip.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-24 22:24:18 UTC
+
+**Tool call: `Bash`**
+
+```bash
+D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves; cd $D && python3 - <<'EOF'
+p='roundtrip.py'; s=open(p).read()
+s=s.replace("""def includes(view):
+    RUNS.mkdir(parents=True, exist_ok=True)
+    T.RUNS = T.RUNS.__class__(RUNS)
+    other = [T.wrapped(c) for c in ('pad_ref_rb', 'bias_dist_pd')]""","""def includes(view, rdir):
+    rdir.mkdir(parents=True, exist_ok=True)
+    T.RUNS = rdir
+    other = [T.wrapped(c) for c in ('pad_ref_rb', 'bias_dist_pd')]""")
+s=s.replace("pads.append(prefixed(src, RUNS / f'{c}_{view}.spice', c, pfx))","pads.append(prefixed(src, rdir / f'{c}_{view}.spice', c, pfx))")
+s=s.replace("return [str(RUNS / p) for p in other] + [str(p) for p in pads]","return [str(rdir / p) for p in other] + [str(rdir / p) for p in pads]")
+s=s.replace("    tag = f'rt_{view}_{c}_{t}_{v}'\n","    tag = f'rt_{view}_{c}_{t}_{v}'\n    rdir = RUNS / tag\n")
+s=s.replace("includes(view))","includes(view, rdir))")
+s=s.replace("""    f = RUNS / f'{tag}.spice'""","""    f = rdir / f'{tag}.spice'""")
+s=s.replace("""    (RUNS / '.spiceinit').write_text(spiceinit.read_text())
+    p = subprocess.run(['ngspice', '-b', f.name], cwd=RUNS,""","""    (rdir / '.spiceinit').write_text(spiceinit.read_text())
+    p = subprocess.run(['ngspice', '-b', f.name], cwd=rdir,""")
+open(p,'w').write(s)
+EOF
+grep -n 'RUNS' roundtrip.py; grep -n 'return f.name\|flat = ' /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/tier1/docs/slot7_hookup/tier1/run_tier1.py
+```
+
+## Tool results / harness — 2026-11-24 22:24:18 UTC
+
+**Tool result:**
+
+```
+45:RUNS = WORK / 'rt_runs'
+61:    T.RUNS = rdir
+78:    rdir = RUNS / tag
+37:    flat = RUNS / RS.convert(cell)
+```
+
+## Assistant — 2026-11-24 22:24:22 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs; date -u +%T; grep === $W/chain1.log; find $W/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/_runs_dcg* -name '*.sweep' | wc -l
+```
+
+## Tool results / harness — 2026-11-24 22:24:22 UTC
+
+**Tool result:**
+
+```
+22:24:22
+=== sg13cmos5l_IOPadSingle2Diff pex s2d_grid start 22:10:37
+=== sg13cmos5l_IOPadSingle2Diff pex s2d_grid done 22:13:57
+=== sg13cmos5l_IOPadDiff2Single schematic d2s_grid start 22:13:58
+43
+```
+
+## Assistant — 2026-11-24 22:24:25 UTC
+
+**Tool call: `Bash`**
+
+```bash
+ngspice -v 2>&1 | head -2; cace --version 2>&1 | tail -1; xschem -v 2>&1 | head -1; magic --version 2>&1 | head -1; python3 -c "import matplotlib, numpy, yaml; print(matplotlib.__version__, numpy.__version__, yaml.__version__)"; cat /foss/pdks/ihp-sg13cmos5l/../*.json 2>/dev/null | head -5; ls -la /foss/pdks/; git -C /foss/pdks/IHP-Open-PDK log -1 --format='%H %cd' 2>/dev/null; cd /home/user/sg13cmos5l_cm_slot7 && git log -1 --format='%H'
+```
+
+## Tool results / harness — 2026-11-24 22:24:26 UTC
+
+**Tool result:**
+
+```
+******
+** ngspice-47 : Circuit level simulation program
+cace 2.11.0
+XSCHEM V3.4.8RC
+8.3.685
+3.11.2 2.5.3 6.0.3
+total 20
+drwxr-xr-x 4 root root 4096 Nov 23 19:52 .
+drwxr-xr-x 4 root root 4096 Nov 23 19:50 ..
+drwxr-xr-x 5 root root 4096 Nov 23 19:50 IHP-Open-PDK
+drwxr-xr-x 3 root root 4096 Nov 23 19:52 ciel
+lrwxrwxrwx 1 root root   38 Nov 23 19:50 ihp-sg13cmos5l -> /foss/pdks/IHP-Open-PDK/ihp-sg13cmos5l
+lrwxrwxrwx 1 root root   69 Nov 23 19:52 sky130A -> ciel/sky130/versions/1689ac3f2dc763876eaf967227c7dfe831b031ae/sky130A
+df4c5054ee8ca481c3eb873687274f28cdb50b1e Wed Oct 14 14:25:44 2026 +0200
+50a7eff9ee9da570e912adc592c5c6a9b5e9694d
+```
+
+## Assistant — 2026-11-24 22:24:29 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && git log --oneline -3; git status --short | head
+```
+
+## Tool results / harness — 2026-11-24 22:24:29 UTC
+
+**Tool result:**
+
+```
+50a7eff Chipalooza #2 description 2.1: signal and current flow as a figure (SVG + PNG, generated by pix/make_signal_flow.py from the netlist connections in glue_logic.md); ASCII kept as plain-text fallback
+ea9778f Chipalooza #2 description: section 5a with the ss/-40 C mode verdict and bg_core_pd results
+d3fda9a slot_modes_bg: final results (ss/-40 C stall is a simulator artefact: power-up transient settles in all 8 modes; bg_core_pd alone over PVT with start-up ramps)
+?? docs/chipalooza2_as_taped_out/pix/layout/
+?? docs/chipalooza2_as_taped_out/pix/schematics/
+?? verification/c2_gaps/dc_curves/
+```
+
+## Assistant — 2026-11-24 22:24:30 UTC
+
+Now the README (with status markers) and results.md for the S2D part.
+
+## Assistant — 2026-11-24 22:25:05 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/README.md`
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# DC curves of the two custom pads: input / output range and linearity
+
+**IHP sg13cmos5l simulation (schematic | magic PEX)**, ngspice-47 with the IHP OSDI models, run through CACE 2.11 on
+the pads' own committed CACE testbenches. Pads: `sg13cmos5l_IOPadSingle2Diff` (S2D, `s7_an[0]`) and
+`sg13cmos5l_IOPadDiff2Single` (D2S, `s7_an[1]`) as taped out (`pads/<cell>/<cell>.gds` of this repository; the GDS
+files are byte-identical to the design repository's `layout/klayout/<cell>.klay.gds` at commit 91a7da8b, git blob
+`c871a046…` / `d09ed053…`). Numbers and range tables: **[results.md](results.md)**.
+
+Status: S2D figures done; D2S figures **running**; round trip **running**; range vs vref / vcm **running**. Figures
+marked "running" below do not exist yet.
+
+## Figures (plots/, PNG 150 dpi, SVG where it stays below 150 kB)
+
+| file | status | what it shows |
+|---|---|---|
+| `s2d_transfer_tt27_schematic`, `s2d_transfer_tt27_pex` | done | S2D: outp, outn, outp − outn, (outp + outn)/2 and the ideal 2 (pad − vref) vs the pad voltage −0.3 … 3.3 V; tt, 27 °C, iovdd 3.3 V, vref 0.5 V, vcm 1.2 V; the linear input range (1 mV criterion) shaded |
+| `s2d_corners_schematic`, `s2d_corners_pex` | done | S2D: top, outp − outn vs pad 0 … 1.3 V; bottom, error vs the ideal transfer, vd/2 − (pad − vref), input-referred, symlog mV axis (linear inside ±1 mV, shaded); 5 MOS corners (color) × −40 / 27 / 125 °C (line style), iovdd 3.3 V |
+| `s2d_linearity_criterion` | done | S2D: \|error from the small-signal line\| (the range criterion), input-referred, log axis, schematic and PEX side by side; where a curve crosses 1 mV is the range end; iovdd 3.3 V |
+| `s2d_range` | done | S2D: linear input range (1 mV criterion) as a bar per MOS corner × temperature × iovdd 3.0 / 3.3 / 3.6 V, schematic and PEX |
+| `d2s_*` | running | D2S transfer, error vs ideal, output range |
+| `rt_*` | running | round trip S2D → slot → D2S |
+| `s2d_vrefvcm_*` | running | S2D range vs vref and vcm |
+
+How to read the error plots: "error vs ideal" includes the systematic gain error (S2D gain 1.9968 … 1.9978 instead of
+2, i.e. −0.11 … −0.16 %) and offset, so it is a straight sloped line inside the linear range (0 at pad = vref) and bends
+away at the range ends; "error from the small-signal line" removes gain and offset (the CACE definition of INL) and
+shows only the nonlinearity, which is what limits the range.
+
+## Range criteria
+
+- **S2D input range** = the contiguous pad-voltage range around pad = vref in which |vd − vd0 − G·u| / G < 1 mV,
+  with u = pad source − vref, vd = outp − outn, G = (vd(u = +0.1 V) − vd(u = −0.1 V)) / 0.2 V and vd0 = vd(u = 0).
+  This is exactly the CACE `window_params` criterion of the S2D yaml (template `tb_range`) and the CACE `INL`
+  definition of `tb_dc`, so the table reproduces the committed `window_params` results (cross-check in results.md:
+  within 0.62 mV on Vin_max, the difference being the 10 mV vs 2 mV sweep steps). Differences: the sweep here starts at
+  −0.3 V (CACE: 0 V), so Vin_min < 0 V is reported where the criterion still holds below ground; and it runs at
+  iovdd 3.0 / 3.3 / 3.6 V over all five MOS corners (CACE window: ss / tt / ff).
+- D2S output range: see the D2S section (running).
+
+## Conditions (= the committed CACE testbench `tb_dc` of each pad, only the analysis changed)
+
+`mkgroups.py` copies the pad's `verification/cace/templates/<cell>_tb_dc.sch` (design commit 91a7da8b) to
+`<cell>_tb_dcsweep.sch` and replaces only its `.control` block (one wide `dc` sweep, `wrdata`); sources, models and
+options are unchanged:
+
+- MOS corner on `cornerMOShv` and `cornerMOSlv`, `res_typ`, `cap_typ`, pnp `typ`, `dio_tt`, IHP IO library
+  `sg13cmos5l_io.spice`; `.options method=gear reltol=1e-4 abstol=1e-15 gmin=1e-15` (+ `klu` in the D2S template).
+- Bias: harness iDAC (PMOS mirror) 5 µA into `bias_gen_pd` with sel = 0 (harness current passed to `iref`),
+  `en_ctrl
+… [4271 more characters cut]
+```
+
+## Tool results / harness — 2026-11-24 22:25:05 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/README.md (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-24 22:25:07 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cat /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/tables/s2d_grid.md | head -30; W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs; grep === $W/chain1.log; cat $W/out/schematic/d2s_grid.csv.gz.failed.txt 2>/dev/null
+```
+
+## Tool results / harness — 2026-11-24 22:25:07 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+
+#### S2D input range, IHP sg13cmos5l simulation (schematic)
+
+Vin_min ... Vin_max [V] = contiguous pad range around pad = vref with |error from the small-signal line| < 1 mV (input-referred); vref 0.50 V, vcm 1.20 V. "<=" = criterion still met at the sweep start (-0.3 V).
+
+| corner | T [°C] | 3.0 V | 3.3 V | 3.6 V |
+|---|---|---|---|---|
+| tt | -40 | -0.090 ... 1.126 | -0.233 ... 1.289 | -0.240 ... 1.291 |
+| tt | 27 | -0.098 ... 1.172 | -0.149 ... 1.245 | -0.151 ... 1.245 |
+| tt | 125 | 0.050 ... 1.161 | 0.049 ... 1.164 | 0.050 ... 1.163 |
+| ss | -40 | -0.032 ... 1.057 | -0.236 ... 1.278 | -0.246 ... 1.283 |
+| ss | 27 | -0.059 ... 1.101 | -0.171 ... 1.236 | -0.174 ... 1.236 |
+| ss | 125 | 0.018 ... 1.142 | 0.013 ... 1.154 | 0.014 ... 1.153 |
+| ff | -40 | -0.136 ... 1.193 | -0.216 ... 1.299 | -0.221 ... 1.299 |
+| ff | 27 | -0.099 ... 1.223 | -0.115 ... 1.254 | -0.116 ... 1.254 |
+| ff | 125 | 0.086 ... 1.175 | 0.086 ... 1.175 | 0.087 ... 1.174 |
+| sf | -40 | -0.114 ... 1.160 | -0.220 ... 1.287 | -0.226 ... 1.288 |
+| sf | 27 | -0.099 ... 1.197 | -0.125 ... 1.242 | -0.127 ... 1.241 |
+| sf | 125 | 0.077 ... 1.159 | 0.077 ... 1.161 | 0.077 ... 1.160 |
+| fs | -40 | -0.062 ... 1.091 | -0.243 ... 1.291 | -0.252 ... 1.295 |
+| fs | 27 | -0.084 ... 1.138 | -0.170 ... 1.248 | -0.172 ... 1.249 |
+| fs | 125 | 0.025 ... 1.161 | 0.022 ... 1.168 | 0.023 ... 1.167 |
+
+High end over all 45 runs: 1.057 V (ss -40 °C 3.0 V) ... 1.299 V (ff -40 °C 3.6 V); low end max 0.087 V (ff 125 °C 3.
+… [539 more characters cut]
+```
+
+## Assistant — 2026-11-24 22:25:18 UTC
+
+**Tool call: `Bash`**
+
+```bash
+D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves; cd $D && python3 - <<'EOF'
+p='s2d.py'; s=open(p).read()
+s=s.replace("""    (dest / 'tables' / f'{group}.md')""","""    if 'schematic' in allms and 'pex' in allms:
+        a, b = allms['schematic'], allms['pex']
+        ks = [k for k in a if k in b]
+        out.append('\\nSchematic vs magic PEX over the %d common runs: max |diff| Vin_max %.2f mV, Vin_min %.2f mV, '
+                   'gain %.1e, max over pad -0.3 ... 1.4 V of |diff of the error vs ideal| %.3f mV.\\n'
+                   % (len(ks), max(abs(a[k]['hi'] - b[k]['hi']) for k in ks) * 1e3,
+                      max(abs(a[k]['lo'] - b[k]['lo']) for k in ks) * 1e3, max(abs(a[k]['G'] - b[k]['G']) for k in ks),
+                      max(np.abs(a[k]['err_id'] - b[k]['err_id'])[a[k]['pad'] <= 1.4].max() for k in ks) * 1e3))
+    (dest / 'tables' / f'{group}.md')""")
+open(p,'w').write(s)
+EOF
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs; python3 s2d.py $W/out $D | tail -3
+```
+
+## Tool results / harness — 2026-11-24 22:25:21 UTC
+
+**Tool result:**
+
+```
+Schematic vs magic PEX over the 45 common runs: max |diff| Vin_max 0.02 mV, Vin_min 0.03 mV, gain 2.0e-07, max over pad -0.3 ... 1.4 V of |diff of the error vs ideal| 0.029 mV.
+```
+
+## Assistant — 2026-11-24 22:25:40 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/results.md`
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Results: DC curves of the S2D and D2S pads
+
+IHP sg13cmos5l simulation (schematic | magic PEX), ngspice-47, CACE 2.11, 2026-11-24. Method, criteria, conditions and
+limits: [README.md](README.md). Every number here is from the runs of `run.sh` in this folder (tables generated into
+`tables/`, per-run values in `csv/`).
+
+Status: S2D done. D2S, round trip, range vs vref / vcm: **running** (sections below marked so).
+
+## 1. S2D pad (sg13cmos5l_IOPadSingle2Diff): input range and linearity
+
+Conditions: CACE `tb_dc` sources, vref 0.5 V, vcm 1.2 V, harness iref 5 µA, 50 Ω source, 0.5 pF per output; pad
+swept −0.3 … 3.3 V in 2 mV steps; 5 MOS corners × −40 / 27 / 125 °C × iovdd 3.0 / 3.3 / 3.6 V = 45 runs per view,
+45 / 45 completed in both views.
+
+**Linear input range (|error from the small-signal line| < 1 mV, input-referred; the CACE `window_params`
+criterion).** High end 1.057 V (ss −40 °C 3.0 V) … 1.299 V (ff −40 °C 3.6 V) over all 45 runs; at iovdd ≥ 3.3 V
+1.154 … 1.299 V (lowest at ss 125 °C). Low end: below 0 V (down to −0.252 V) at −40 and 27 °C; above 0 V at 125 °C,
+at most 0.087 V (ff 125 °C 3.6 V). The range at tt 27 °C 3.3 V is −0.149 … 1.245 V. So the documented range
+"0 … about 1 V at vref = 0.5 V" holds in every run for the upper end (≥ 1.057 V) and is met at 0 V except at 125 °C,
+where the error from the small-signal line reaches 1 mV between pad 0.013 V and 0.087 V depending on the corner.
+
+- Gain (small-signal, from u = ±0.1 V) 1.99676 … 1.99783 (ideal 2; −0.16 … −0.11 %), systematic offset < 1 µV.
+- Error vs the ideal 2 (pad − vref), referred to the input, over pad 0 … 1 V: at most 4.34 mV (ff 125 °C, at pad
+  = 0 V; at 27 °C and below about 1 mV, mostly the −0.12 % gain error: ≈ 0.6 mV at pad = vref ± 0.5 V).
+- Schematic vs magic PEX: identical within 0.03 mV in the range ends and 0.029 mV in the error curves (C-coupled
+  extraction, DC).
+- Above the range the outputs saturate: at tt 27 °C 3.3 V, outp − outn rises to about 2.7 V with a step near pad
+  1.52 V (`s2d_transfer_tt27_*`), the common mode leaves vcm there.
+
+Cross-check with the committed CACE `window_params` (design 91a7da8b, ss / tt / ff × 3 T × 3 V, 27 runs per view):
+Vin_max agrees within 0.62 mV (schematic and PEX; CACE sweeps in 10 mV steps, here 2 mV), Vin_min (clipped at 0 V
+as CACE) within 0.25 mV; committed Vin_max 1.0575 … 1.2993 V, here 1.0571 … 1.2994 V (`tables/crosscheck.md`).
+
+Range table per corner (schematic; PEX in `tables/s2d_grid.md`, equal to ±0.03 mV):
+
+| corner | T [°C] | 3.0 V | 3.3 V | 3.6 V |
+|---|---|---|---|---|
+| tt | -40 | -0.090 ... 1.126 | -0.233 ... 1.289 | -0.240 ... 1.291 |
+| tt | 27 | -0.098 ... 1.172 | -0.149 ... 1.245 | -0.151 ... 1.245 |
+| tt | 125 | 0.050 ... 1.161 | 0.049 ... 1.164 | 0.050 ... 1.163 |
+| ss | -40 | -0.032 ... 1.057 | -0.236 ... 1.278 | -0.246 ... 1.283 |
+| ss | 27 | -0.059 ... 1.101 | -0.171 ... 1.236 | -0.174 ... 1.236 |
+| ss | 125 | 0.018 ... 1.142 | 0.013 ... 1.154 | 0.014 ... 1.153 |
+| ff | -40 | -0.136 ... 1.193 | -0.216 ... 1.299 | -0.221 ... 1.299 |
+| ff | 27 | -0.099 ... 1.223 | -0.115 ... 1.254 | -0.116 ... 1.254 |
+| ff | 125 | 0.086 ... 1.175 | 0.086 ... 1.175 | 0.087 ... 1.174 |
+| sf | -40 | -0.114 ... 1.160 | -0.220 ... 1.287 | -0.226 ... 1.288 |
+| sf | 27 | -0.099 ... 1.197 | -0.125 ... 1.242 | -0.127 ... 1.241 |
+| sf | 125 | 0.077 ... 1.159 | 0.077 ... 1.161 | 0.077 ... 1.160 |
+| fs | -40 | -0.062 ... 1.091 | -0.243 ... 1.291 | -0.252 ... 1.295 |
+| fs | 27 | -0.084 ... 1.138 | -0.170 ... 1.248 | -0.172 ... 1.249 |
+| fs | 125 | 0.025 ... 1.161 | 0.022 ... 1.168 | 0.023 ... 1.167 |
+
+(Vin_min … Vin_max in V, pad voltage; vref 0.5 V.)
+
+## 2. D2S pad (sg13cmos5l_IOPadDiff2Single): output range and linearity — running
+
+## 3. Round trip S2D → slot 7 → D2S — running
+
+## 4. S2D range vs vref and vcm — running
+```
+
+## Tool results / harness — 2026-11-24 22:25:40 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/results.md (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-24 22:25:48 UTC
+
+**Tool call: `Bash`**
+
+```bash
+D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves; cd $D && python3 - <<'EOF'
+p='results.md'; s=open(p).read()
+s=s.replace("at iovdd ≥ 3.3 V\n1.154 … 1.299 V (lowest at ss 125 °C)","at iovdd ≥ 3.3 V\n1.153 … 1.299 V (lowest at ss 125 °C 3.6 V)")
+s=s.replace("""at pad
+  = 0 V; at 27 °C and below about 1 mV, mostly the −0.12 % gain error: ≈ 0.6 mV at pad = vref ± 0.5 V).""","""at pad
+  = 0 V); at −40 / 27 °C at most 0.98 mV with iovdd ≥ 3.3 V and 1.47 mV at 3.0 V (ss −40 °C). Inside the range it is
+  mostly the gain error (−0.12 % ≈ 0.6 mV at pad = vref ± 0.5 V).""")
+s=s.replace("with a step near pad\n  1.52 V","with a step near pad\n  1.53 V")
+open(p,'w').write(s)
+EOF
+python3 -c "
+import csv
+r=[x for x in csv.DictReader(l for l in open('$D/csv/s2d_grid_summary.csv') if not l.startswith('#'))]
+for v in ('schematic',):
+  a=[x for x in r if x['view']==v]
+  print(max(float(x['max_abs_err_ideal_0to1V_mV']) for x in a if x['temp']!='125' and float(x['vdd'])>=3.3), max((float(x['max_abs_err_ideal_0to1V_mV']),x['corner_mos'],x['temp'],x['vdd']) for x in a if x['temp']!='125'))
+  print(min(float(x['Vin_max_V']) for x in a if float(x['vdd'])>=3.3))
+"
+```
+
+## Tool results / harness — 2026-11-24 22:25:48 UTC
+
+**Tool result:**
+
+```
+0.977 (1.47, 'ss', '-40', '3.0')
+1.1527
+```
+
+## Assistant — 2026-11-24 22:26:00 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/run.sh`
+
+```
+#!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+#
+# DC curves of the S2D / D2S pads (IHP sg13cmos5l simulation, schematic | magic PEX): reproduces plots/, csv/, tables/
+# of this folder from a checkout of this repository plus the design-repository commits (fetched by fetch.sh).
+# Usage: run.sh [<work_dir>] [fetch|s2d|d2s|rt|vrefvcm|plots|all]   (default ./_work, all)
+# Environment: JOBS = parallel ngspice runs (default 3). Needs PDK_ROOT with ihp-sg13cmos5l, ngspice with the IHP OSDI
+# models, xschem, CACE 2.11, python3 with numpy / matplotlib / pyyaml, git with network access to github.com.
+set -euo pipefail
+HERE=$(cd "$(dirname "$0")" && pwd)
+WORK=$(realpath -m "${1:-$HERE/_work}")
+STEP=${2:-all}
+export PDK_ROOT=${PDK_ROOT:-/foss/pdks} PDK=ihp-sg13cmos5l
+export JOBS=${JOBS:-3}
+S2D=sg13cmos5l_IOPadSingle2Diff
+D2S=sg13cmos5l_IOPadDiff2Single
+mkdir -p "$WORK" "$HERE/plots" "$HERE/csv" "$HERE/tables"
+
+fetch() { "$HERE/fetch.sh" "$WORK"; }
+
+s2d() {
+  "$HERE/cace_dc.sh" "$WORK" $S2D schematic s2d_grid
+  "$HERE/cace_dc.sh" "$WORK" $S2D pex s2d_grid
+  python3 "$HERE/s2d.py" "$WORK/out" "$HERE" s2d_grid
+}
+
+d2s() {
+  "$HERE/cace_dc.sh" "$WORK" $D2S schematic d2s_grid d2s_noload
+  "$HERE/cace_dc.sh" "$WORK" $D2S pex d2s_grid d2s_noload
+  python3 "$HERE/d2s.py" "$WORK/out" "$HERE"
+}
+
+rt() {
+  # needs the pad netlists that the s2d / d2s steps prepared (schematic and PEX views)
+  grep -v '^#' "$HERE/jobs_rt.txt" | xargs -P "$JOBS" -n 1 python3 -I "$HERE/roundtrip.py" "$WORK" "$WORK/out/rt"
+  python3 "$HERE/rt.py" "$WORK/out/rt" "$HERE"
+}
+
+vrefvcm() {
+  "$HERE/cace_dc.sh" "$WORK" $S2D schematic s2d_vrefvcm s2d_slot
+  "$HERE/cace_dc.sh" "$WORK" $D2S schematic d2s_slot
+  python3 "$HERE/vrefvcm.py" "$WORK/out" "$HERE"
+}
+
+plots() {
+  python3 "$HERE/s2d.py" "$WORK/out" "$HERE" s2d_grid
+  python3 "$HERE/d2s.py" "$WORK/out" "$HERE"
+  python3 "$HERE/rt.py" "$WORK/out/rt" "$HERE"
+  python3 "$HERE/vrefvcm.py" "$WORK/out" "$HERE"
+  python3 "$HERE/crosscheck.py" "$WORK/design" "$HERE"
+}
+
+case "$STEP" in
+  all) fetch; s2d; d2s; rt; vrefvcm; plots ;;
+  fetch|s2d|d2s|rt|vrefvcm|plots) $STEP ;;
+  *) echo "unknown step $STEP"; exit 1 ;;
+esac
+```
+
+## Tool results / harness — 2026-11-24 22:26:00 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/run.sh (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-24 22:26:02 UTC
+
+**Tool call: `Bash`**
+
+```bash
+chmod +x /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/run.sh; W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs; date -u +%T; grep === $W/chain1.log; cat $W/out/schematic/d2s_grid.csv.gz.failed.txt 2>/dev/null; find $W/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/_runs_dcg* -name '*.sweep' | wc -l
+```
+
+## Tool results / harness — 2026-11-24 22:26:02 UTC
+
+**Tool result:**
+
+```
+22:26:02
+=== sg13cmos5l_IOPadSingle2Diff pex s2d_grid start 22:10:37
+=== sg13cmos5l_IOPadSingle2Diff pex s2d_grid done 22:13:57
+=== sg13cmos5l_IOPadDiff2Single schematic d2s_grid start 22:13:58
+43
+```
+
+## Assistant — 2026-11-24 22:26:06 UTC
+
+**Tool call: `Bash`**
+
+```bash
+ps aux | grep ngspice | grep -v grep | awk '{print $2, $9, $10, $NF}'; W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs; R=$(ls -d $W/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/_runs_dcg/RUN_*)/parameters/d2s_grid; for d in $R/run_*; do [ -f $d/*.sweep ] || { echo $d; grep -E 'corner_mos|temp|vdd:' $d/conditions.yaml | tr '\n' ' '; echo; tail -3 $d/ngspice_stderr.out; }; done
+```
+
+## Tool results / harness — 2026-11-24 22:26:06 UTC
+
+**Tool result:**
+
+```
+5270 22:14 13:15 sg13cmos5l_IOPadDiff2Single_tb_dcsweep.spice
+5699 22:15 12:22 sg13cmos5l_IOPadDiff2Single_tb_dcsweep.spice
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/_runs_dcg/RUN_2026-11-24_22-13-58/parameters/d2s_grid/run_07
+corner_mos: tt temp: '-40' vdd: '3.3' 
+tail: cannot open '/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/_runs_dcg/RUN_2026-11-24_22-13-58/parameters/d2s_grid/run_07/ngspice_stderr.out' for reading: No such file or directory
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/_runs_dcg/RUN_2026-11-24_22-13-58/parameters/d2s_grid/run_14
+corner_mos: ff temp: '-40' vdd: '3.6' 
+tail: cannot open '/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/_runs_dcg/RUN_2026-11-24_22-13-58/parameters/d2s_grid/run_14/ngspice_stderr.out' for reading: No such file or directory
+```
+
+## Assistant — 2026-11-24 22:26:18 UTC
+
+**Tool call: `Bash`**
+
+```bash
+pkill -f chain1.sh; pkill -f cace_dc.sh; pkill -f 'cace _dcg'; sleep 1; pkill ngspice; sleep 1; ps aux | grep -E 'ngspice|cace' | grep -v grep | wc -l
+```
+
+## Tool results / harness — 2026-11-24 22:26:20 UTC
+
+**Tool result:**
+
+```
+2
+```
+
+## Assistant — 2026-11-24 22:26:21 UTC
+
+**Tool call: `Bash`**
+
+```bash
+ps aux | grep -E 'ngspice|cace' | grep -v grep
+```
+
+## Tool results / harness — 2026-11-24 22:26:22 UTC
+
+**Tool result:**
+
+```
+(Bash completed with no output)
+```
+

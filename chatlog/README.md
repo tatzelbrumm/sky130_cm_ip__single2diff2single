@@ -13,5 +13,6 @@ reminders, private e-mail addresses. Times are UTC (CET = UTC+1). Regenerated at
 | [agents/2026-11-23_ihp_replica_bias_pex_mc_sims.md](agents/2026-11-23_ihp_replica_bias_pex_mc_sims.md) | background agent "IHP replica bias PEX + MC sims", started 2026-11-23 20:41 UTC  |
 | [agents/2026-11-23_sky130_pre_layout_feasibility_sims.md](agents/2026-11-23_sky130_pre_layout_feasibility_sims.md) | background agent "sky130 pre-layout feasibility sims", started 2026-11-23 19:53 UTC (stopped by the user) |
 | [agents/2026-11-23_chipalooza_2_slot_7_docs.md](agents/2026-11-23_chipalooza_2_slot_7_docs.md) | background agent "Chipalooza #2 slot 7 docs", started 2026-11-23 19:58 UTC  |
+| [agents/2026-11-24_schematic_and_layout_pictures.md](agents/2026-11-24_schematic_and_layout_pictures.md) | background agent "Schematic and layout pictures", started 2026-11-24 22:14 UTC  |
 | [agents/2026-11-23_ihp_slot_modes_ss_40_fix.md](agents/2026-11-23_ihp_slot_modes_ss_40_fix.md) | background agent "IHP slot modes ss/-40 fix", started 2026-11-23 20:41 UTC  |
 | [agents/2026-11-24_dc_performance_graphs_ihp_slot_7.md](agents/2026-11-24_dc_performance_graphs_ihp_slot_7.md) | background agent "DC performance graphs IHP slot 7", started 2026-11-24 22:02 UTC  |
