@@ -79,3 +79,1211 @@ vyges_upstream
 … [1540 more characters cut]
 ```
 
+## Assistant — 2026-11-25 11:43:59 UTC
+
+**Tool call: `Bash`**
+
+_List pinned submodule SHAs and earlier clone HEADs_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad; cd $D/award_submodules/harness && git ls-tree tapeout_nov_2026 dependencies/ | grep -E 'slot_(5|6|8|9|16|17)$'; git log -1 --format='%H %cd' tapeout_nov_2026; cd $D/award_docs; for r in sg13cmos5l_yacinesot_ip__diff_opamp_cmfb sg13cmos5l_vyges_ip__pll_rosc vyges_upstream sg13g2_mh_ip__cmos_vref sg13cmos5l_spma_ip__instramp SAR_ADC_IHP SG13CMOS5L_LPVSV_Chipalooza_2; do echo "== $r $(git -C $r rev-parse HEAD) $(git -C $r remote get-url origin) $(git -C $r rev-parse --abbrev-ref HEAD) shallow=$(git -C $r rev-parse --is-shallow-repository)"; done
+```
+
+## Tool results / harness — 2026-11-25 11:44:00 UTC
+
+**Tool result:**
+
+```
+160000 commit 4475fec2950e31af40872fd804efa192e3f56df1	dependencies/slot_16
+160000 commit 61c7da5494fac5d4cdb24a965aecec8f412af9ff	dependencies/slot_17
+160000 commit 4c6faf0c776467c0341596f2b775a3bcb45cf2ed	dependencies/slot_5
+160000 commit 13b8ab23778ba89dc5d04bf23869d52d2cb17422	dependencies/slot_6
+160000 commit 7f30fe3f95ba777187ec1671a20f367ec63515f7	dependencies/slot_8
+160000 commit 67b5a070026cb51d6ced53b414ebb6074f0b83f1	dependencies/slot_9
+2ef5a86964b4f93a5b1e2c9bb8a46edc425cc227 Mon Nov 16 09:22:00 2026 -0500
+== sg13cmos5l_yacinesot_ip__diff_opamp_cmfb 704575144f5200d50ed8e0764521ca0730d26434 https://github.com/YacineSot/sg13cmos5l_yacinesot_ip__diff_opamp_cmfb master shallow=true
+== sg13cmos5l_vyges_ip__pll_rosc 13b8ab23778ba89dc5d04bf23869d52d2cb17422 https://github.com/RTimothyEdwards/sg13cmos5l_vyges_ip__pll_rosc main shallow=true
+== vyges_upstream 3f5915afe3123e5ab580fb4a8fe4839ae968bf3a https://github.com/vyges/vyges-ring-oscillator-pll main shallow=true
+== sg13g2_mh_ip__cmos_vref 426b14ff0237b978fa9348a8d3049b837348be7e https://github.com/adankvitschal/sg13g2_mh_ip__cmos_vref main shallow=true
+== sg13cmos5l_spma_ip__instramp 3e3ebb70db71881027aa2bb1577c7822936fe6f2 https://github.com/orpheus016/sg13cmos5l_spma_ip__instramp main shallow=true
+== SAR_ADC_IHP 4475fec2950e31af40872fd804efa192e3f56df1 https://github.com/arjun2000ananth/SAR_ADC_IHP main shallow=true
+== SG13CMOS5L_LPVSV_Chipalooza_2 61c7da5494fac5d4cdb24a965aecec8f412af9ff https://github.com/AouissiBr
+… [52 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:44:11 UTC
+
+**Tool call: `Bash`**
+
+_Clone six project repos and check out pinned SHAs_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D
+declare -A U=( [5]=https://github.com/YacineSot/sg13cmos5l_yacinesot_ip__diff_opamp_cmfb [6]=https://github.com/RTimothyEdwards/sg13cmos5l_vyges_ip__pll_rosc [8]=https://github.com/adankvitschal/sg13g2_mh_ip__cmos_vref [9]=https://github.com/orpheus016/sg13cmos5l_spma_ip__instramp [16]=https://github.com/arjun2000ananth/SAR_ADC_IHP [17]=https://github.com/AouissiBrahim/SG13CMOS5L_LPVSV_Chipalooza_2 )
+declare -A S=( [5]=4c6faf0c776467c0341596f2b775a3bcb45cf2ed [6]=13b8ab23778ba89dc5d04bf23869d52d2cb17422 [8]=7f30fe3f95ba777187ec1671a20f367ec63515f7 [9]=67b5a070026cb51d6ced53b414ebb6074f0b83f1 [16]=4475fec2950e31af40872fd804efa192e3f56df1 [17]=61c7da5494fac5d4cdb24a965aecec8f412af9ff )
+for k in 5 6 8 9 16 17; do git clone -q --filter=blob:none --no-checkout ${U[$k]} slot_$k 2>&1|tail -1; (cd slot_$k && git checkout -q ${S[$k]} 2>&1 | tail -1; echo "slot $k: $(git rev-parse HEAD) $(git log -1 --format=%cd) ; origin HEAD $(git rev-parse origin/HEAD)"); done
+```
+
+## Tool results / harness — 2026-11-25 11:44:31 UTC
+
+**Tool result:**
+
+```
+slot 5: 4c6faf0c776467c0341596f2b775a3bcb45cf2ed Thu Oct 29 15:49:40 2026 +0100 ; origin HEAD 704575144f5200d50ed8e0764521ca0730d26434
+slot 6: 13b8ab23778ba89dc5d04bf23869d52d2cb17422 Sun Nov 8 22:03:59 2026 -0500 ; origin HEAD 13b8ab23778ba89dc5d04bf23869d52d2cb17422
+slot 8: 7f30fe3f95ba777187ec1671a20f367ec63515f7 Fri Oct 23 11:31:27 2026 -0300 ; origin HEAD 426b14ff0237b978fa9348a8d3049b837348be7e
+slot 9: 67b5a070026cb51d6ced53b414ebb6074f0b83f1 Fri Nov 6 14:49:19 2026 +0700 ; origin HEAD 3e3ebb70db71881027aa2bb1577c7822936fe6f2
+slot 16: 4475fec2950e31af40872fd804efa192e3f56df1 Wed Oct 21 22:26:39 2026 +0200 ; origin HEAD 4475fec2950e31af40872fd804efa192e3f56df1
+slot 17: 61c7da5494fac5d4cdb24a965aecec8f412af9ff Thu Oct 22 12:37:20 2026 +0200 ; origin HEAD 61c7da5494fac5d4cdb24a965aecec8f412af9ff
+```
+
+## Assistant — 2026-11-25 11:44:36 UTC
+
+**Tool call: `Bash`**
+
+_Show commits and doc diffs between pinned and HEAD_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D
+for p in "5 4c6faf0c 704575144f" "8 7f30fe3f 426b14ff" "9 67b5a070 3e3ebb70"; do set -- $p; echo "=== slot $1"; (cd slot_$1; git log --oneline $2..$3 | head -30; echo "-- commits: $(git rev-list --count $2..$3)"; git diff --stat $2 $3 -- '*.md' '*.rst' '*.txt' '*.pdf' 'docs' 'doc' | tail -40); done
+```
+
+## Tool results / harness — 2026-11-25 11:44:38 UTC
+
+**Tool result:**
+
+```
+=== slot 5
+7045751 adding magic rendred top image
+-- commits: 1
+ README.md | 1 +
+ 1 file changed, 1 insertion(+)
+=== slot 8
+426b14f Fix THKOX minimum-width violations in top (issue #2)
+-- commits: 1
+=== slot 9
+3e3ebb7 Add initial testing procedure markdown document
+728bf7e Modify PVT scripts and do post-layout PVT simulations with RC-PEX then documented all of them
+91bd1a7 Clean up README formatting and remove horizontal lines
+16f848b Clean up README formatting and remove extra line breaks
+6f8156b Edit docs again so that the contents compiled correctly in the GitHub webpage
+45d68e1 Clear some redundant docs by combining them or merging them into the existing docs on /docs
+a0d20e3 Directory cleanups
+a7f78d7 Modify documentations to match the latest design
+-- commits: 8
+ docs/ota_5t/media/ota_5t_symbol.svg                |  190 ---
+ docs/ota_5t/report.html                            |   12 -
+ docs/ota_cmos5l.md                                 |  119 ++
+ docs/output_buffer.md                              |  124 ++
+ docs/output_buffer/report.html                     |    2 +-
+ docs/pgia_top.md                                   |  328 ++++
+ docs/pgia_top/cace/README.md                       |   40 +-
+ .../pgia_top/schematic/dc_op_IQ_TOT_vs_vdd.png     |  Bin 3064547 -> 3064538 bytes
+ .../schematic/dc_op_PWR_vs_temperature.png         |  Bin 2454351 -> 2454351 bytes
+ .../schematic/dc_op_VOS_vs_temperature.png         |  Bin 2670519 -> 2670518 bytes
+ .../schematic/tran_EFF_GAIN_vs_g
+… [1909 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:44:43 UTC
+
+**Tool call: `Bash`**
+
+_Inspect specific diffs_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D/slot_5; git diff 4c6faf0c 704575144f -- README.md; cd ../slot_8; git diff --stat 7f30fe3f 426b14ff | tail -5; cd ../slot_9; git diff --stat 67b5a070 3e3ebb70 -- README.md; git diff --stat 67b5a070 3e3ebb70 | head -110 | grep -v '\.png\|\.svg'
+```
+
+## Tool results / harness — 2026-11-25 11:44:45 UTC
+
+**Tool result:**
+
+```
+diff --git a/README.md b/README.md
+index db0bf95..a388b47 100644
+--- a/README.md
++++ b/README.md
+@@ -21,6 +21,7 @@ The amplifier addresses the classic dual Right-Half-Plane (RHP) zero instability
+ | Layout Component | Visual |
+ | :--- | :--- |
+ | **Top-Level Chip Layout (`top.png`)** | ![Top Layout](results/top.png) |
++| **Top-Level Chip Layout "Magic" (`top_magic.pnm`)** | ![Top Layout](results/top_magic.png) |
+ | **Wrapper Integration (`wrapper.png`)** | ![Wrapper Layout](results/wrapper.png) |
+ 
+ ---
+ final/gds/slot_8.gds                  | Bin 609276 -> 607612 bytes
+ layout/top/top-default-5997f5/top.mag |   3 ++-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+ README.md | 473 ++++++++++++++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 369 insertions(+), 104 deletions(-)
+ .gitignore                                         |   293 +-
+ README.md                                          |   473 +-
+ archives/dec2to4/README.md                         |   117 -
+ archives/dec2to4/dec2to4.gds                       |   Bin 11246 -> 0 bytes
+ archives/dec2to4/dec2to4.sch                       |    48 -
+ archives/dec2to4/dec2to4.spice                     |    12 -
+ archives/dec2to4/dec2to4.sym                       |    41 -
+ archives/dec2to4/sg13cmos5l_drc_main.lyrdb         |  2038 --
+ archives/dec2to4/simulations/IHP130_stdcells.spice |    64 -
+ archives/dec2to4/simulations/dec2to4.spice         |    11 -
+ archives/dec2to4/simulations/tb_dec2to4.raw        | 
+… [5379 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:44:50 UTC
+
+**Tool call: `Bash`**
+
+_Compare slot 9 README headings pinned vs HEAD_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D/slot_9; echo PINNED; git show 67b5a070:README.md | grep -n '^#'; echo; echo HEAD; git show 3e3ebb70:README.md | grep -n '^#'; git show 67b5a070:README.md | wc -lw; git show 3e3ebb70:README.md | wc -lw; git log --format='%h %cd %s' -3 67b5a070
+```
+
+## Tool results / harness — 2026-11-25 11:44:50 UTC
+
+**Tool result:**
+
+```
+PINNED
+1:# Programmable Gain Instrumentation Amplifier (PGIA) IP
+8:## Shortcuts
+40:## Overview
+45:## Architecture 
+52:### 1. Instrumentation Amplifier (Input Stage)
+56:### 2. Coarse-Gain Stage (PGA)
+62:### 3. Fine-Gain Stage (PGA)
+68:### 4. Output Buffer & Support Blocks
+73:## I/O Port List
+85:## Target Specifications
+102:## Verification and Test Plan
+
+HEAD
+1:# Programmable Gain Instrumentation Amplifier (PGIA) IP
+18:## Quick Navigation & Reports
+47:## Executive Overview
+53:### Key Architectural Highlights
+62:## System Architecture
+91:### Modular Block Implementation
+99:## Building Blocks Description
+103:### 1. Chip Frame Wrapper ([`slot9_wrapper`](docs/slot9_wrapper.md))
+109:### 2. Core PGIA Macro ([`pgia_top`](docs/pgia_top.md))
+115:### 3. Static Instrumentation Amplifier ([`instramp_cmos5l`](docs/instramp_cmos5l.md))
+122:### 4. Two-Stage Miller OTA ([`ota_cmos5l`](docs/ota_cmos5l.md))
+128:### 5. Binary Programmable Gain Stage ([`gain_stage`](docs/gain-stage.md))
+134:### 6. Gain Stage Resistor Network & Switches ([`gain_network`](docs/gain_network.md))
+140:### 7. Folded-Cascode Class-AB Gain OTA ([`gain_ota`](docs/gain_ota.md))
+146:### 8. Central Bias Generator ([`central_bias`](docs/central_bias.md))
+155:### 9. Output Buffer ([`output_buffer`](docs/output_buffer.md))
+161:### 10. 4-bit Digital Gain Decoder ([`gain_decoder_4b`](docs/gain_decoder_4b.md))
+166:## Gain Configuration Table
+170:### 1. As-Built Performance (Uncompensated Standalone, $v_{\text{in,off}} = 0\text{ V}$
+… [1491 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:45:00 UTC
+
+**Tool call: `Bash`**
+
+_README stats and headings for six slots_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D
+for k in 5 6 8 9 16 17; do f=slot_$k/README.md; ls slot_$k | tr '\n' ' '; echo; echo "=== slot $k: $(wc -l <$f) lines, $(wc -w <$f) words, figs=$(grep -oE '!\[|<img' $f | wc -l), tables=$(grep -cE '^\s*\|?\s*:?-{3,}:?\s*\|' $f), links=$(grep -oE '\]\([^)]+\)' $f | grep -v '^\]\(http' | wc -l)"; grep -nE '^#{1,4} ' $f | grep -v '^\S*:#\s*$'; done 2>&1 | head -300
+```
+
+## Tool results / harness — 2026-11-25 11:45:00 UTC
+
+**Tool result:**
+
+```
+README.md docs gds klayout ota_cmfb_top_pex_tb.raw ota_cmfb_top_tb.raw pex results schema scripts xschemrc 
+grep: Unmatched ( or \(
+=== slot 5: 158 lines, 1436 words, figs=23, tables=6, links=0
+1:# Fully Differential Class-AB Operational Amplifier in IHP 130nm CMOS
+3:## Description
+10:## Schematics & Layout Overview
+12:### Core Schematic & Testbenches
+20:### Physical Layout & Top Integration
+28:## Key Specifications
+53:## Architecture Overview
+80:## Toolchain & PDK Setup
+90:## Running the Simulations
+97:### Simulation Configurations
+114:### Running Monte Carlo Mismatch Analysis
+122:## Simulation Results
+124:### Pre-Layout Simulation Results
+137:### Post-Layout (PEX) Simulation Results
+150:### Post-Layout (PEX) 100-Run Monte Carlo Mismatch Analysis
+LICENSE NOTICE README.md doc gds magic netlist prototype signoff sim tools verilog xschem 
+grep: Unmatched ( or \(
+=== slot 6: 322 lines, 3520 words, figs=4, tables=6, links=0
+1:# sg13cmos5l_vyges_ip__pll_rosc
+34:## Summary
+61:## What it is
+135:## For the integrator
+148:## Physical design
+233:### Layout refinement (branch `layout-refine`, in progress)
+262:## Layout
+276:## Toolchain
+289:## Reproducing the results
+README.md config.json final layout release sch tb tools 
+grep: Unmatched ( or \(
+=== slot 8: 109 lines, 988 words, figs=0, tables=2, links=0
+1:# sg13cmos5l_mh_ip__cmos_vref
+10:## Blocks
+23:## Supply and device geometry
+29:## Toolchain
+38:## Layout
+49:## Reproducing
+64:## Standalone simulation (no analog-designer, no docker o
+… [1975 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:45:06 UTC
+
+**Tool call: `Bash`**
+
+_Read slot 5 README and file layout_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D/slot_5; git ls-files | grep -v -E '\.(png|raw)$' | sed 's|/[^/]*$||' | sort | uniq -c | head -40; cat README.md
+```
+
+## Tool results / harness — 2026-11-25 11:45:07 UTC
+
+**Tool result:**
+
+```
+1 README.md
+      2 docs
+      2 gds
+      5 klayout
+      1 klayout/lvs
+      4 pex
+      2 pex/ota_cmfb_top_pex.spice
+     21 results
+      5 schema
+      2 schema/ac_diff_probe
+      2 schema/ac_probe
+      2 schema/ota_cmfb
+      2 schema/ota_cmfb/simulations
+      4 schema/ota_cmfb_cm_sense
+     10 schema/ota_cmfb_core
+      4 schema/ota_cmfb_core/simulations
+      3 schema/ota_cmfb_fbota
+      2 schema/sg13cmos5l_ESD_Protection
+      9 schema/simulations
+      4 schema/simulations/results
+      4 schema/tian_probe
+      1 scripts
+      4 scripts/output/slot_5__ota_cmfb_top
+      5 scripts/output/slot_5__ota_cmfb_top/magic_RC
+      1 xschemrc
+# Fully Differential Class-AB Operational Amplifier in IHP 130nm CMOS
+
+## Description
+A high-performance, fully differential operational transconductance amplifier (OTA) integrated with a Monticelli Class-AB push-pull output stage, designed and simulated using the open-source **IHP SG13CMOS5L** 130 nm CMOS process design kit (PDK).
+
+The amplifier addresses the classic dual Right-Half-Plane (RHP) zero instability in Class-AB drivers through intentional transconductance asymmetry ($g_{mp} \gg g_{mn}$), enabling simple single-point $RC$ Miller compensation. The design features a continuous-time common-mode feedback (CT-CMFB) loop, integrated local biasing from a single 2.5 µA external current source, and an automated pattern-driven common-centroid layout with STI stress mitigation.
+
+---
+
+## Schematics & Layout Overview
+
+### Core Schema
+… [9278 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:45:11 UTC
+
+**Tool call: `Bash`**
+
+_List slot 5 files and docs content_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D/slot_5; git ls-files | grep -vE 'results/.*\.(png|svg)$'; git ls-files docs | xargs -I{} sh -c 'echo "--- {}"; head -c 600 "{}" 2>/dev/null | strings | head -15'
+```
+
+## Tool results / harness — 2026-11-25 11:45:12 UTC
+
+**Tool result:**
+
+```
+README.md
+docs/README.md
+docs/circuit-blocks-documentation.pdf
+docs/schema.png
+docs/simmontecarlo.png
+docs/simngspice.png
+docs/simopannotate.png
+gds/sg13cmos5l_drc_main.lyrdb
+gds/slot_5.gds
+klayout/final.gds
+klayout/lvs/final.lvsdb
+klayout/sg13cmos5l_drc_main.lyrdb
+klayout/sg13cmos5l_yacinesot_ip__diff_opamp_cmfb.gds
+klayout/sg13g2_drc_main.lyrdb
+klayout/slot5_wrapper.gds
+ota_cmfb_top_pex_tb.raw
+ota_cmfb_top_tb.raw
+pex/ota_cmfb_top.gds.spice
+pex/ota_cmfb_top.sym
+pex/ota_cmfb_top_pex.spice/final.gds.spice
+pex/ota_cmfb_top_pex.spice/ota_cmfb_top.sym
+pex/sg13cmos5l_yacinesot_ip__diff_opamp_cmfb.sym
+pex/slot_5.gds.spice
+schema/ac_diff_probe/ac_diff_probe.sch
+schema/ac_diff_probe/ac_diff_probe.sym
+schema/ac_probe/ac_probe.sch
+schema/ac_probe/ac_probe.sym
+schema/ota_cmfb/ota_cmfb.sch
+schema/ota_cmfb/ota_cmfb_tb.sch
+schema/ota_cmfb/simulations/ota_cmfb_tb.raw
+schema/ota_cmfb/simulations/ota_cmfb_tb.save
+schema/ota_cmfb/simulations/ota_cmfb_tb.spice
+schema/ota_cmfb_cm_sense/ota_cmfb_cm_sense.sch
+schema/ota_cmfb_cm_sense/ota_cmfb_cm_sense.sym
+schema/ota_cmfb_cm_sense/ota_cmfb_cm_sense_shifted.sch
+schema/ota_cmfb_cm_sense/ota_cmfb_cm_sense_tb.sch
+schema/ota_cmfb_core/ota_cmfb_core.sch
+schema/ota_cmfb_core/ota_cmfb_core.sym
+schema/ota_cmfb_core/ota_cmfb_core_output_stage.sch
+schema/ota_cmfb_core/ota_cmfb_core_output_stage.sym
+schema/ota_cmfb_core/ota_cmfb_core_output_stage_tb.sch
+schema/ota_cmfb_core/ota_cmfb_core_push_pull_output_stage.sch
+schema/ota_cmfb_core/ota_cmfb_core_push_pull_o
+… [2981 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:45:17 UTC
+
+**Tool call: `Bash`**
+
+_Inspect slot 5 PDF documentation_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D/slot_5; which pdftotext pdfinfo; pdfinfo docs/circuit-blocks-documentation.pdf 2>&1 | grep -E 'Pages|Title'; pdftotext -layout docs/circuit-blocks-documentation.pdf - 2>/dev/null | grep -vE '^\s*$' | head -80
+```
+
+## Tool results / harness — 2026-11-25 11:45:17 UTC
+
+**Tool result:**
+
+```
+/usr/bin/pdftotext
+/usr/bin/pdfinfo
+Pages:           9
+1.5 V Fully Differential Class-AB Operational
+Amplifier
+Architectural & Subcircuit Documentation
+1. Architectural Overview & Introduction
+ Block #    Subcircuit / Module Name               Primary Architectural Role
+ Block 1    ota_cmfb_top_tb                        Top-Level Multi-Mode SPICE Testbench Schematic
+                                                   Top-Level Structural Integration, CMFB Sensing &
+ Block 2    ota_cmfb_top
+                                                   ESD/Antenna Guarding
+                                                   5-Transistor PMOS Differential Input Core Stage &
+ Block 3    ota_cmfb_core
+                                                   Output Stage Wrapper
+                                                   Monticelli Class-AB Output Driver with gmp >> gmn
+ Block 4    ota_cmfb_core_push_pull_output_stage
+                                                   Decoupling
+                                                   Continuous-Time Common-Mode Feedback (CT-
+ Block 5    ota_cmfb_fbota
+                                                   CMFB) Error Amplifier
+                                                   Differential AC Probe for Open-Loop Gain and Phase
+ Block 6    ac_diff_probe
+                                                   Measurement
+ Block 7    ac_probe                               Single-Ended AC Loop-Breaking Probe
+2. Block 1: Top-Level Testbench (ota_cmfb_top_tb)
+ 
+… [10522 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:45:23 UTC
+
+**Tool call: `Bash`**
+
+_Read slot 6 README_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D/slot_6; cat README.md
+```
+
+## Tool results / harness — 2026-11-25 11:45:24 UTC
+
+**Tool result:**
+
+```
+# sg13cmos5l_vyges_ip__pll_rosc
+
+Ring-oscillator **PLL** for the IHP **SG13CMOS5L** process — a self-biased,
+dual-control-path ring-VCO PLL with a register-selectable ÷N feedback divider.
+**All-CMOS** (no SiGe HBT / MiM cap / deep-N-well / Schottky — none of which
+SG13CMOS5L provides); the loop-filter cap is MOM/poly within the 5-metal stack.
+Built for the **Chipalooza Challenge #2 (IHP SG13CMOS5L)** as an openframe
+analog-slot IP.
+
+> Status: **laid out and handed off to the harness (`gds/`); post-layout check done on the handed-off block.**
+> The block is its own layout cell, instanced once in `gds/slot_6.gds`; both are DRC-, antenna- and
+> LVS-clean on the PDK decks, with all control bits pinned, and the harness test build places it.
+> Post-layout (extracted C, no wire R yet), phase margin passes (46.2° against 45°) and lock at
+> the typical corner is 18 µs. The ring runs about 23 % slower than in the schematic, and lock at
+> ss / −40 °C / 1.08 V is 24 µs against a 20 µs goal. Measured on the handed-off block itself
+> (2026-10-19). See [`doc/implementation.md`](doc/implementation.md)
+> for what is built and measured, and [`doc/proposal.md`](doc/proposal.md) for the original
+> design intent.
+
+![PLL top level](doc/figures/pll_top.svg)
+
+The loop: a tri-state PFD (`Xup`/`Xdn`, reset through `Xnand`/`Xand`, held by `porb`) steers the
+charge pump's switches `Mswup`/`Mswdn` between the current source `Mpsrc` and sink `Mnsnk`; the
+pump drives `vctrl` into `Cp` and the `Rz`–`Cz` zer
+… [19473 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:45:30 UTC
+
+**Tool call: `Bash`**
+
+_Headings of slot 6 linked docs_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D/slot_6; ls doc; wc -lw doc/implementation.md doc/proposal.md; grep -n '^#' doc/implementation.md | head -80; echo; grep -n '^#' doc/proposal.md
+```
+
+## Tool results / harness — 2026-11-25 11:45:31 UTC
+
+**Tool result:**
+
+```
+analog-flow.md
+datasheet
+figures
+implementation.md
+proposal.md
+schematics
+vyges-logo.svg
+  846  8890 doc/implementation.md
+  332  3130 doc/proposal.md
+ 1178 12020 total
+1:# Implementation — ring-oscillator PLL
+7:## PDK pin
+47:## Assumptions
+53:### Process
+65:### Supply rails — 1.2 V and 3.3 V, and which is which
+88:### Supply corner set — 1.08 / 1.20 / 1.32 V, and why the old one was wrong
+121:### Harness resources assumed
+130:### Simulation
+140:### Block-specific
+174:## Cell hierarchy
+198:## VCO tuning curve — measured on the loaded ring
+222:## Loop filter — designed against that curve
+259:## Divider range — what is actually usable
+279:## The loop filter alternative
+312:## Measured
+331:## Verification with Vyges Loom
+347:### Connectivity gate — `vyges loom lvs`
+416:### What is not yet applicable
+426:## Closed-loop acquisition
+454:## PVT
+538:## Against the proposal
+572:## Slot requirements — pins, power and clocks
+584:### Pads required
+593:### Harness resources (shared, no pads)
+601:### Control bits (register field, no pads)
+615:### Clocks
+622:## Floorplan — the slot-6 placement, as checked data
+670:## Not in this revision
+682:## Work remaining, in the order it should be done
+710:## Questions that need answers before layout
+746:## What is actually open
+
+3:# Chipalooza Challenge #2 (IHP SG13CMOS5L) — Proposal: Ring-Oscillator PLL
+12:## 1. Summary
+27:## 2. Why this block
+49:## 3. Architecture
+80:## 4. I/O and test ports
+107:## 5. Target specification
+135:## 6. Harness integrati
+… [418 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:45:37 UTC
+
+**Tool call: `Bash`**
+
+_Read slot 8 README and file layout_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D/slot_8; cat README.md; git ls-files | grep -iE '\.md$|licen|\.pdf$'; git ls-files | sed 's|/[^/]*$||' | sort | uniq -c | sort -rn | head -25
+```
+
+## Tool results / harness — 2026-11-25 11:45:38 UTC
+
+**Tool result:**
+
+```
+# sg13cmos5l_mh_ip__cmos_vref
+
+Analog IP for the IHP **CMOS5L** (`ihp-sg13cmos5l`, a reduced-metal-stack
+130nm-derived open PDK with no deep n-well), designed and
+simulated through the [mh-analog-designer-lite](https://github.com/moduhub/mh-analog-designer-lite)
+tool: schematic capture in xschem, simulation via ngspice or Xyce, and a
+`config.json`-driven pipeline for generating/exploring parameter variations
+(Monte Carlo and manual) and scoring them against named design profiles.
+
+## Blocks
+
+| Block | Topologies | Profiles | What it is |
+| --- | --- | --- | --- |
+| `cmos_vref` | `default`, `lvfet` | `low_power`, `high_performance` | Self-biased CMOS voltage reference: PTAT current mirror compensating the FET V_TH's CTAT behavior. `lvfet` swaps the vptat cascode (M1/M2) for low-voltage NMOS. |
+| `output_amp` | `default` | `low_power` | Two-stage Miller-compensated op-amp (NMOS diff pair + cascode, active PMOS mirror load, CS PMOS output driver) — unity-feedback DC buffer for `cmos_vref`. |
+| `top` | `default` | `bias_matched`, `low_power` | `cmos_vref` + `output_amp` + digital trim/enable, integrated as one hierarchical block. |
+
+Each topology's tests, metrics and pass/fail-relevant design profiles are
+declared in [`config.json`](config.json). There is no absolute per-test
+spec anymore — a profile's own `constraints` (and its figure-of-merit
+formula) are what actually judge a variation.
+
+## Supply and device geometry
+
+- **Nominal supply is 3v3** (`config.json` `defaults`; line
+… [6587 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:45:47 UTC
+
+**Tool call: `Bash`**
+
+_Slot 8 release docs headings_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D/slot_8; for f in release/README.md layout/slot8/README.md release/doc/cmos_vref/README.md release/doc/output_amp/README.md release/doc/top/README.md; do echo "=== $f $(wc -lw < $f) figs=$(grep -oE '!\[|<img' $f | wc -l) tables=$(grep -cE '^\|? *:?-{3,}' $f)"; grep -n '^#' $f; done; cat release/README.md | head -80; cat layout/slot8/README.md
+```
+
+## Tool results / harness — 2026-11-25 11:45:47 UTC
+
+**Tool result:**
+
+```
+=== release/README.md   9 100 figs=0 tables=1
+1:# Release
+=== layout/slot8/README.md   62  617 figs=0 tables=2
+1:# Slot 8 (Chipalooza IHP harness)
+6:## Deliverable expected by the bringup flow (`scripts/get_project_gds.sh`)
+28:## Pin map (top -> wrapper)
+43:## Router netlist
+52:## Geometry notes for routing
+=== release/doc/cmos_vref/README.md   224  1927 figs=24 tables=6
+1:# cmos_vref — default
+14:## Schematic
+18:## Layout
+25:## Parameters
+64:## Design profile
+73:## Test results
+102:## Plots
+104:### current_consumption — Vdd1.8
+108:### current_consumption — plot
+112:### line_reg — All
+116:### line_reg — Typical
+120:### line_reg — Worst
+124:### load_reg — All
+128:### load_reg — Typical
+132:### load_reg — Worst
+136:### noise — plot
+140:### psrr — plot
+144:### reference_current — Vdd1.8
+148:### reference_current — plot
+152:### startup — Vdd1.8
+156:### startup — plot
+160:### temp_sweep — All
+164:### temp_sweep — Typical
+168:### temp_sweep — Vdd1.8
+172:### temp_sweep — Worst
+176:### vref_mismatch — Reference Current
+180:### vref_mismatch — Vref
+184:### vref_stat — Reference Current
+188:### vref_stat — Vref
+192:## LVS
+214:### Net mismatches (1)
+220:### Instance mismatches (1)
+=== release/doc/output_amp/README.md  129 1014 figs=13 tables=7
+1:# output_amp — default
+10:## Schematic
+14:## Layout
+21:## Parameters
+46:## Design profile
+54:## Test results
+69:## Plots
+71:### current_consumption — plot
+75:### load_reg — All
+79:### load_reg — Typical
+83:### load_reg — Worst
+87:### noise — plo
+… [5330 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:45:54 UTC
+
+**Tool call: `Bash`**
+
+_Read slot 8 top release doc_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D/slot_8; sed -n 1,90p release/doc/top/README.md | cut -c1-400; sed -n 144,179p release/doc/top/README.md | cut -c1-300
+```
+
+## Tool results / harness — 2026-11-25 11:45:54 UTC
+
+**Tool result:**
+
+```
+# top — default
+
+**Variation ID:** `top-default-5997f5`  
+**Exported:** 2026-10-23T07:06:41  
+**Layout:** published  
+**LVS:** mismatch
+
+Vref core + output buffer amp integration: cmos_vref (X1) generates vref/pbias/vbg*, output_amp (x2) buffers it, plus a PMOS bias mirror (M1, sized off cmos_vref's own M3), an enable switch (M2), and trim resistors/switches (R1-R8/M6-M9).
+
+**Sub-block dependencies:** X1 (cmos_vref): `cmos_vref-default-5f7415`, x2 (output_amp): `output_amp-default-be0d58` — their materialized schematics (and, for a real registered variation, their own release/doc/ page) are kept in sync with these exact choices every time this block is exported.
+
+## Schematic
+
+![schematic](schematic.png)
+
+## Layout
+
+![layout](layout.png)
+
+- Magic cells (what a designer edits): [`layout/top/top-default-5997f5/`](../../../layout/top/top-default-5997f5/)
+- GDS of that cell: [`release/layout/top/top.gds`](../../layout/top/top.gds)
+
+## Parameters
+
+| Parameter | Value | Description |
+|---|---|---|
+| X1_variation | cmos_vref-default-5f7415 | Which cmos_vref/default variation composes X1 in this top variation -- a real registered variation name, or the reserved value "defaults" (cmos_vref/default's own config.json defaults, no variation needs to be registered first). |
+| x2_variation | output_amp-default-be0d58 | Which output_amp/default variation composes x2 in this top variation -- same convention as X1_variation. |
+| ena_length | 0.45u | Channel Length of M2 (PMOS enable switch, a
+… [12219 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:46:02 UTC
+
+**Tool call: `Bash`**
+
+_Read slot 9 pinned README_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D/slot_9; cat README.md; ls docs; grep -n '^#' docs/README.md | head -30
+```
+
+## Tool results / harness — 2026-11-25 11:46:02 UTC
+
+**Tool result:**
+
+```
+# Programmable Gain Instrumentation Amplifier (PGIA) IP
+**Linear-in-dB from 18 dB to 78 dB on IHP SG13CMOS5L**
+
+[![Chipalooza 2026](https://img.shields.io/badge/Chipalooza_2026-Challenge_%232-blue)](#)
+[![Technology](https://img.shields.io/badge/Technology-IHP_SG13CMOS5L-green)](#)
+[![Status](https://img.shields.io/badge/Status-Active_Development-orange)](#)
+
+## Shortcuts
+Below are the shortcuts to see each core specs. For more interactive report look up docs/<cells>/report.html. Route provided by docs/index.html 
+
+Post-Layout vs Simulation:
+- RC-PEX:
+  - [Two-Stage Miller-Compensated OTA](https://github.com/orpheus016/sg13cmos5l_spma_ip__instramp/blob/main/docs/ota_cmos5l/cace/postlayout_rc.md)
+  - [Instrumentation Amplifier](https://github.com/orpheus016/sg13cmos5l_spma_ip__instramp/blob/main/docs/instramp_cmos5l/cace/postlayout_rc.md)
+- C-PEX:
+  - [Two-Stage Miller-Compensated OTA](https://github.com/orpheus016/sg13cmos5l_spma_ip__instramp/blob/main/docs/ota_cmos5l/cace/postlayout.md)
+  - [Instrumentation Amplifier](https://github.com/orpheus016/sg13cmos5l_spma_ip__instramp/blob/main/docs/instramp_cmos5l/cace/postlayout.md)
+
+Real usage (EEG / EMG / ECG through the chip, schematic and post-layout):
+- [Biosignal demo, results and method](https://github.com/orpheus016/sg13cmos5l_spma_ip__instramp/blob/main/docs/biosignal/README.md)
+- [Interactive report](https://github.com/orpheus016/sg13cmos5l_spma_ip__instramp/blob/main/docs/biosignal/report.html) (download and open locally
+… [8183 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:46:09 UTC
+
+**Tool call: `Bash`**
+
+_Slot 9 linked docs_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D/slot_9; head -40 docs/build_summary.md; ls docs/instramp_cmos5l/cace docs/pgia_top 2>&1 | head; head -50 docs/instramp_cmos5l/cace/postlayout_rc.md 2>/dev/null | cut -c1-250; head -c 300 LICENSE
+```
+
+## Tool results / harness — 2026-11-25 11:46:09 UTC
+
+**Tool result:**
+
+```
+# Build summary
+
+`scripts/build_all.sh` (full, CACE profile typ) at 2026-11-05T21:41:52, branch `main` commit a3285dc, 2084 s. Logs: `runs/build_all/2026-11-05_210707/`.
+
+## Steps
+
+| Step | Result | Time | Last line |
+|---|---|---:|---|
+| registry | ✅ ok | 0 s | cellinfo: note: dec2to4: gds xschem/dec2to4/dec2to4.gds does not exist yet |
+| export | ✅ ok | 2 s | export_slot_gds: OK |
+| flow:ota_cmos5l | ✅ ok | 29 s | flow: docs/ota_cmos5l/status.md |
+| flow:instramp_cmos5l | ✅ ok | 74 s | flow: docs/instramp_cmos5l/status.md |
+| flow:output_buffer | ✅ ok | 29 s | flow: docs/output_buffer/status.md |
+| flow:dec2to4 | ✅ ok | 0 s | flow: docs/dec2to4/status.md |
+| flow:gain_ota | ✅ ok | 28 s | flow: docs/gain_ota/status.md |
+| flow:gain_network | ❌ FAIL | 122 s | flow: docs/gain_network/status.md |
+| flow:gain_stage | ❌ FAIL | 104 s | flow: docs/gain_stage/status.md |
+| flow:central_bias | ✅ ok | 91 s | flow: docs/central_bias/status.md |
+| flow:pgia_top | ✅ ok | 1426 s | flow: docs/pgia_top/status.md |
+| flow:slot9_wrapper | ✅ ok | 105 s | flow: docs/slot9_wrapper/status.md |
+| canary | ⏭ skip | 0 s | skipped |
+| bias | ⏭ skip | 0 s | skipped |
+| images | ✅ ok | 7 s | images: 0 updated, 49 unchanged, 0 error(s), 0 warning(s) |
+| reports:cace | ✅ ok | 65 s | report: docs/index.html |
+| reports:chip | ✅ ok | 0 s | chip report: docs/index.html |
+
+## Cells x flow stages (from docs/<cell>/status.json)
+
+| Cell | cace | drc | audit | drc_harness | lvs | deliver | pex | post_c | post_rc
+… [6652 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:46:15 UTC
+
+**Tool call: `Bash`**
+
+_Slot 9 HEAD README key parts_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D/slot_9; git show 3e3ebb70:README.md | sed -n '1,60p;229,372p' | cut -c1-300
+```
+
+## Tool results / harness — 2026-11-25 11:46:15 UTC
+
+**Tool result:**
+
+```
+# Programmable Gain Instrumentation Amplifier (PGIA) IP
+**Linear-in-dB from 18.06 dB to 78.27 dB on IHP SG13CMOS5L (130 nm BiCMOS)**  
+*Chipalooza 2026 Challenge #2 — Slot 9 Taped-Out Deliverable*
+
+**Design Team:**
+* **Kean Malik Aji Santoso** — Principal Designer
+* **James Patrick** — Designer #1
+* **Rafi Ananta Alden** — Designer #2
+* **Ibrahim Hanif Mulyana** — Designer #3
+
+[![Chipalooza 2026](https://img.shields.io/badge/Chipalooza_2026-Challenge_%232_Slot_9-blue)](#)
+[![Technology](https://img.shields.io/badge/Technology-IHP_SG13CMOS5L-green)](#)
+[![Status](https://img.shields.io/badge/Status-Taped--Out-success)](#)
+[![DRC](https://img.shields.io/badge/DRC-Clean_(0_Violations)-success)](#)
+[![LVS](https://img.shields.io/badge/LVS-MATCH-success)](#)
+[![Chipalooza Harness](https://img.shields.io/badge/Harness_Deliverable-Verified_(slot__9.gds)-success)](#)
+
+## Quick Navigation & Reports
+
+Interactive HTML reports, CACE datasheets, and verification logs are available across the repository:
+
+* **Top-Level & Chip Harness**:
+  * [Chipalooza Slot 9 Deliverable (`slot9_wrapper`)](docs/slot9_wrapper.md) | [Flow Status](docs/slot9_wrapper/status.md)
+  * [Top-Level Core Macro (`pgia_top`)](docs/pgia_top.md) | [Flow Status](docs/pgia_top/status.md) | [CACE Datasheet](docs/pgia_top/cace/README.md)
+  * [Top-Level Gain Code Table & Systematic Offset Analysis](docs/pgia_top/cace/gain_codes.md)
+  * [Top-Level Post-Layout Comparison (Wire C)](docs/pgia_top/cace/postlayout.md) | [(Wire R+C)
+… [17880 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:46:20 UTC
+
+**Tool call: `Bash`**
+
+_Read slot 16 README part 1_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D/slot_16; sed -n '1,260p' README.md | cut -c1-260
+```
+
+## Tool results / harness — 2026-11-25 11:46:21 UTC
+
+**Tool result:**
+
+```
+# 10-Bit SAR ADC — IHP SG13CMOS5L
+
+A fully differential 10-bit successive-approximation-register (SAR) ADC designed in the **IHP SG13CMOS5L** process for the **Chipalooza Challenge**.
+
+The repository contains the transistor-level analog design, SAR control logic, block-level and top-level layout, post-layout verification, and the integration into **Chipalooza slot 16**.
+
+The ADC targets approximately **1 MS/s** operation and uses separate **3.3 V analog/high-voltage** and **1.2 V digital/low-voltage** supply domains.
+
+ADC block and slot-level sign-off have passed. Result plots are available in [`docs/`](docs/).
+
+---
+
+## Team
+
+| Name | Role |
+|---|---|
+| Arjun Ananth | Lead Designer - Design & Layout |
+| Man Yu | Verification |
+
+---
+
+## Overview
+
+The ADC uses a fully differential charge-redistribution SAR architecture.
+
+Main blocks:
+
+- Differential input sampling network
+- Fully differential 10-bit capacitive DAC
+- Strong-arm dynamic comparator with latch
+- 1.2 V ↔ 3.3 V level shifters
+- SAR finite-state machine
+- Digital conversion outputs and status signals
+
+Block diagram:
+
+![Block Diagram](docs/Block_Diagram.png)
+
+---
+
+## Architecture
+
+The ADC consists of the following main blocks:
+
+### Sampling Network
+
+The differential input is sampled onto the CDAC before the SAR conversion begins.
+
+### Capacitive DAC
+
+A fully differential 10-bit capacitive DAC performs the successive-approximation charge redistribution. The CDAC uses a common-mode based differential switching scheme and
+… [5497 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:46:26 UTC
+
+**Tool call: `Bash`**
+
+_Read slot 16 README part 2_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D/slot_16; sed -n '260,485p' README.md | cut -c1-260 | grep -v '^$'; ls docs chipalooza | head -60; head -3 LICENSE
+```
+
+## Tool results / harness — 2026-11-25 11:46:27 UTC
+
+**Tool result:**
+
+```
+# Results and Figures
+The plots, schematics, and layout views below are stored in [`docs/`](docs/) and displayed directly from those files. 
+## ADC Layout
+![Complete SAR ADC GDS layout](docs/layouts/sar_top_gds.png)
+*Top-level `sar_10_bit` layout.*
+## Static Linearity and Transfer Characteristic
+| | |
+|:---:|:---:|
+| <img src="docs/transfer_characteristic.png" alt="ADC transfer characteristic" width="470"><br><sub>ADC transfer characteristic</sub> | <img src="docs/transfer_midscale_zoom.png" alt="Transfer characteristic near midscale" width="470"><br><sub>Transfer charac
+| <img src="docs/dnl_vs_code.png" alt="DNL versus output code" width="470"><br><sub>DNL versus output code</sub> | <img src="docs/inl_vs_code.png" alt="INL versus output code" width="470"><br><sub>INL versus output code</sub> |
+| <img src="docs/dnl_inl_pex_comparison.png" alt="PEX linearity comparison" width="470"><br><sub>PEX linearity comparison</sub> | <img src="docs/code_width_histogram.png" alt="Code width histogram" width="470"><br><sub>Code width histogram</sub> |
+## Conversion Timing, Dynamic Performance and Power
+| | |
+|:---:|:---:|
+| <img src="docs/sndr_enob_vs_fin.png" alt="SNDR and ENOB versus input frequency" width="470"><br><sub>SNDR and ENOB versus input frequency</sub> | <img src="docs/power_50_vs_65MHz.png" alt="Power at 50 and 65 MHz" width="470"><br><sub>Power at 50 and 65 MHz</
+| <img src="docs/conversion_timing_50MHz.png" alt="Conversion timing at 50 MHz" width="470"><br><sub>Conversion t
+… [7511 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:46:33 UTC
+
+**Tool call: `Bash`**
+
+_Slot 16 verification files and docs README_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D/slot_16; git ls-files chipalooza | head -30; wc -lw docs/README.md; grep -n '^#' docs/README.md; sed -n 1,30p docs/README.md | cut -c1-200
+```
+
+## Tool results / harness — 2026-11-25 11:46:33 UTC
+
+**Tool result:**
+
+```
+chipalooza/slot_16/layout/slot16_wrapper.mag
+chipalooza/slot_16/layout/slot_16.gds
+chipalooza/slot_16/netlist/slot_16_lvs.spice
+chipalooza/slot_16/slot16_wrapper.v
+chipalooza/slot_16/slot16_wrapper_lvs.v
+chipalooza/slot_16/verification/drc/slot_16_density.log
+chipalooza/slot_16/verification/drc/slot_16_in_wrapper_main.log
+chipalooza/slot_16/verification/drc/slot_16_main_antenna.log
+chipalooza/slot_16/verification/harness_cocotb/HARNESS_COCOTB_RESULTS.md
+chipalooza/slot_16/verification/harness_cocotb/diag/diag_cells.log
+chipalooza/slot_16/verification/harness_cocotb/diag/diag_cells.py
+chipalooza/slot_16/verification/harness_cocotb/harness_cocotb.log
+chipalooza/slot_16/verification/harness_cocotb/harness_cocotb_iverilog12.log
+chipalooza/slot_16/verification/harness_cocotb/per_test_results.md
+chipalooza/slot_16/verification/harness_cocotb/slot16_smoke.log
+chipalooza/slot_16/verification/harness_cocotb/test_slot16_smoke.py
+chipalooza/slot_16/verification/harness_cocotb/time.txt
+chipalooza/slot_16/verification/harness_cocotb/time_iverilog12.txt
+chipalooza/slot_16/verification/lvs/final/lvs_stdout.log
+ 121  336 docs/README.md
+1:# 10-Bit SAR ADC — IHP SG13CMOS5L
+5:## Block Diagram
+9:## Individual Block Testbenches
+11:### Transmission Gate
+17:### Comparator
+23:### DAC Switch
+31:## ADC Transfer Characteristic
+33:### Full Input Range
+37:### Midscale Detail
+41:## Static Linearity
+43:### Differential Nonlinearity
+47:### Integral Nonlinearity
+51:### PEX Comparison
+55:### Code-Width Distri
+… [1487 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:46:36 UTC
+
+Now slot 17.
+
+## Assistant — 2026-11-25 11:46:39 UTC
+
+**Tool call: `Bash`**
+
+_Read slot 17 README and layout_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D/slot_17; cat README.md | cut -c1-400; git ls-files | grep -vE '\.(png|raw)$' | sed 's|/[^/]*$||' | sort | uniq -c | head -40; git ls-files | grep -iE 'licen|\.md$|\.pdf$'
+```
+
+## Tool results / harness — 2026-11-25 11:46:39 UTC
+
+**Tool result:**
+
+```
+**SG13CMOS5L\_LPSVS**  
+   
+Low-Power Voltage Supervisor (LPSVS) for 1.2 V core supply monitoring, integrating Power-On Reset (POR), Brown-Out Reset (BOR), hysteresis-based voltage detection, and reset-delay functionality.  
+   
+***LPVSV Block Description:***  
+   
+**Analog/ Mixed Signal IP Block**  
+   
+**Low Power Voltage Supervisor (*LPVSV*)** that monitors the ***1V2*** regulated supply generated (***VCORE***) by the on-chip    ***LDO***. The supervisor  ***LPVSV*** ensures reliable startup and operation of the digital core by generating Power-On reset (***POR***) and Brown-Out Reset (***BOR***) signals whenever the regulated outside its safe operating range.  
+   
+The ***LPVSV*** assert the ***RESET*** during startup until the ***1V2*** reaches its normal value and remain stable for a predefine delay. During normal operation, if the ***1V2*** drops below the brown out threshold due to an ***LDO*** failure, overload or supply disturbance, the ***LPVSV*** immediately deasserts the  ***RESET*** to protect the digital core.
+
+![](Docs/LPVSV.png)
+
+   
+**Target Specifications**  
+   
+ Since the ***LDO*** output specification is **1.2 V ±10%**, the ***LPVSV*** thresholds should be based on that.
+
+| **Parameter**       | **Symbol**   | **Min** | **Typ** | **Max** | **Unit** |
+| :-: | :-: | :-: | :-: | :-: | :-: |
+| Supply Voltage        | ***VDD***    | 2.7	| 3.3	| 3.6	| V  |
+| Temperature           | ***T***      | -40	| 27	| 125	| °C |
+| Monitored Voltage     | ***VCORE***  | 0
+… [9148 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:46:48 UTC
+
+**Tool call: `Bash`**
+
+_Recount tables and list slot 17 verification files_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D; for k in 5 6 8 9 16 17; do f=slot_$k/README.md; echo "slot $k tables=$(grep -cE '^\s*\|?(\s*:?-+:?\s*\|)+\s*(:?-+:?)?\s*$' $f) figs=$(grep -oE '!\[|<img' $f | wc -l) badges=$(grep -c 'shields.io' $f) relLinks=$(grep -oE '\]\([^)h#][^)]*\)' $f | wc -l) absLinks=$(grep -oE '\]\(https?://[^)]*\)' $f | wc -l)"; done; f=slot_8/release/doc/top/README.md; cd slot_17; git ls-files DRC LVS GDS Layout Simulation xschem | grep -vE '\.png$'
+```
+
+## Tool results / harness — 2026-11-25 11:46:49 UTC
+
+**Tool result:**
+
+```
+slot 5 tables=6 figs=23 badges=0 relLinks=17 absLinks=0
+slot 6 tables=6 figs=4 badges=0 relLinks=14 absLinks=3
+slot 8 tables=2 figs=0 badges=0 relLinks=3 absLinks=1
+slot 9 tables=2 figs=4 badges=3 relLinks=0 absLinks=20
+slot 16 tables=17 figs=42 badges=0 relLinks=8 absLinks=0
+slot 17 tables=10 figs=7 badges=0 relLinks=7 absLinks=0
+DRC/slot_17_slot_17_full.lyrdb
+GDS/LPVSV_Pex.gds
+GDS/drc_run_slot_17/slot_17_slot_17_full.lyrdb
+GDS/slot_17.gds
+LVS/LPVSV_Pex.lvsdb
+LVS/LPVSV_Pex_extracted.cir
+Layout/LPVSV.sym
+Layout/LPVSV_Pex.gds.spice
+Layout/lvs_run_LPVSV_2026_09_27_23_55_26/LPVSV_Pex.lvsdb
+Layout/lvs_run_LPVSV_2026_09_27_23_55_26/LPVSV_Pex_extracted.cir
+Simulation/DC_EN_TB.sch
+Simulation/DC_TB.sch
+Simulation/DC_TB_MC.sch
+Simulation/DC_Temp_TB.sch
+Simulation/Tran_Fast_TB.sch
+Simulation/Tran_TB.sch
+Simulation/Tran_TB_MC.sch
+xschem/Comp_2Stage.sch
+xschem/Comp_2Stage.sym
+xschem/Delay.sch
+xschem/Delay.sym
+xschem/LPVSV.sch
+xschem/LPVSV.sym
+xschem/xschemrc
+```
+
+## Assistant — 2026-11-25 11:47:01 UTC
+
+**Tool call: `Bash`**
+
+_Keyword coverage grep per README_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D; for k in 5 6 8 9 16 17; do echo "######## slot $k"; for pat in 'DRC' 'LVS' 'antenna' 'licen|Apache|MIT' '\bAI\b|Claude|LLM|Gemini|agent' 'verilog|behavio' 'analog_bus|analog bus' 'ibias|250 ?nA|bias current|bandgap|BGR|vbias' 'dig_in|dig_out' 'temperature|°C|-40|−40' 'test plan|bring-up|Bring-Up|testing' 'Ω|ohm|resistance' 'outline|slot area|within the slot|µm ×|um x|× ?[0-9]+ ?µm' 'SoC|integrat' 'voltage limit|3\.6|1\.32|max(imum)? voltage|abs'; do n=$(grep -ciE "$pat" slot_$k/README.md); echo "  [$pat] $n: $(grep -noiE "$pat" slot_$k/README.md | head -6 | cut -d: -f1 | tr '\n' ' ')"; done; done
+```
+
+## Tool results / harness — 2026-11-25 11:47:02 UTC
+
+**Tool result:**
+
+```
+######## slot 5
+  [DRC] 2: 49 84 
+  [LVS] 2: 49 85 
+  [antenna] 0: 
+  [licen|Apache|MIT] 3: 6 49 73 
+  [\bAI\b|Claude|LLM|Gemini|agent] 0: 
+  [verilog|behavio] 0: 
+  [analog_bus|analog bus] 0: 
+  [ibias|250 ?nA|bias current|bandgap|BGR|vbias] 1: 69 
+  [dig_in|dig_out] 0: 
+  [temperature|°C|-40|−40] 0: 
+  [test plan|bring-up|Bring-Up|testing] 0: 
+  [Ω|ohm|resistance] 0: 
+  [outline|slot area|within the slot|µm ×|um x|× ?[0-9]+ ?µm] 1: 48 
+  [SoC|integrat] 9: 4 6 20 24 45 46 
+  [voltage limit|3\.6|1\.32|max(imum)? voltage|abs] 1: 76 
+######## slot 6
+  [DRC] 5: 11 158 225 251 273 
+  [LVS] 7: 12 160 174 225 251 273 
+  [antenna] 8: 11 159 168 169 170 209 
+  [licen|Apache|MIT] 3: 103 104 322 
+  [\bAI\b|Claude|LLM|Gemini|agent] 0: 
+  [verilog|behavio] 4: 71 95 272 302 
+  [analog_bus|analog bus] 0: 
+  [ibias|250 ?nA|bias current|bandgap|BGR|vbias] 3: 51 65 87 
+  [dig_in|dig_out] 2: 222 222 223 223 223 
+  [temperature|°C|-40|−40] 17: 15 15 46 47 47 48 
+  [test plan|bring-up|Bring-Up|testing] 0: 
+  [Ω|ohm|resistance] 7: 37 52 118 174 182 215 
+  [outline|slot area|within the slot|µm ×|um x|× ?[0-9]+ ?µm] 5: 52 52 152 153 164 206 
+  [SoC|integrat] 1: 135 
+  [voltage limit|3\.6|1\.32|max(imum)? voltage|abs] 5: 41 41 48 117 129 140 
+######## slot 8
+  [DRC] 0: 
+  [LVS] 1: 26 
+  [antenna] 0: 
+  [licen|Apache|MIT] 2: 26 73 
+  [\bAI\b|Claude|LLM|Gemini|agent] 0: 
+  [verilog|behavio] 1: 14 
+  [analog_bus|analog bus] 0: 
+  [ibias|250 ?nA|bias current|bandgap|BGR|vbias] 0: 
+  [dig_in|dig_out] 0: 
+… [1920 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:47:12 UTC
+
+**Tool call: `Bash`**
+
+_Check licences, AI mentions, slot 6 slot requirements_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D; for k in 5 6 8 9 16 17; do echo "== slot $k LICENSE: $(cd slot_$k; git ls-files | grep -iE '^(LICEN|COPYING|NOTICE)' | tr '\n' ' ')  AI-mentions: $(cd slot_$k; git grep -liE 'claude|chatgpt|copilot|AI-assisted|gemini' -- '*.md' 2>/dev/null | head -5 | tr '\n' ' ')"; done; cd slot_6; sed -n '572,622p' doc/implementation.md
+```
+
+## Tool results / harness — 2026-11-25 11:47:12 UTC
+
+**Tool result:**
+
+```
+== slot 5 LICENSE:   AI-mentions: 
+== slot 6 LICENSE: LICENSE NOTICE   AI-mentions: 
+== slot 8 LICENSE:   AI-mentions: 
+== slot 9 LICENSE: LICENSE   AI-mentions: docs/cace_ci/00_overview.md gds/pgia_top/layout_implementation_plan.md 
+== slot 16 LICENSE: LICENSE   AI-mentions: 
+== slot 17 LICENSE:   AI-mentions: 
+## Slot requirements — pins, power and clocks
+
+✅ **Allocated: slot 6, two pins.** That is exactly what this block asks for — `ref` in and
+`vco_out` out — so there is no pin negotiation to have. The two pads below are the allocation,
+not a request.
+
+This is the **implemented** port list.
+
+ʼʼʼtext
+.subckt pll_rosc  ref porb rstb nsel0 nsel1 ibias vco_out vdd vss
+ʼʼʼ
+
+### Pads required
+
+| Signal | Kind | Requirement |
+| --- | --- | --- |
+| `ref` | clock in | Reference, **16–50 MHz**. Needs a clean edge; a shared analog mux is acceptable electrically but any added jitter appears directly at the output multiplied by N. |
+| `vco_out` | clock out | **Up to 735 MHz.** This is the demanding one: a shared mux path will not carry it intact, so it wants a **dedicated pad with a proper output buffer**, and the board side needs a controlled-impedance route. If only a muxed pad is available, we would add an on-slot divider and characterise a lower output frequency instead. |
+
+**Two pads, one of them a genuine high-frequency output.** That is the block's main ask.
+
+### Harness resources (shared, no pads)
+
+| Signal | From the harness |
+| --- | --- |
+| `vdd` | **1.2 V**, the harness co
+… [1785 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:47:21 UTC
+
+**Tool call: `Bash`**
+
+_Spot-check remaining items_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules; cd $D/slot_9; git grep -niE 'claude|gemini|AI-assisted' -- docs/cace_ci/00_overview.md | head -3; cd ../slot_5; pdftotext -layout docs/circuit-blocks-documentation.pdf - | grep -iE 'pin|port|temperat|corner|license|DRC|LVS' | head -15; cd ../slot_6; grep -nE '−40|-40|110 ?°C|125' doc/implementation.md | head -5; grep -n 'analog_bus\|analog bus\|shared analog' doc/implementation.md doc/proposal.md | head -5
+```
+
+## Tool results / harness — 2026-11-25 11:47:21 UTC
+
+**Tool result:**
+
+```
+docs/cace_ci/00_overview.md:33:See [STATUS.md](STATUS.md). Plan source: `/headless/.claude/plans/hi-i-would-like-splendid-dahl.md`.
+                                                                                                                  .lib cornerMOSlv.lib mos_tt
+                                                                                                                  .lib cornerMOShv.lib mos_tt
+                                                                    .endc                                         .lib cornerMOSCAP.lib moscap_tt            CL1 Voutp 0 {cl}                                                                         ota_cmfb_top
+                                                                                                                  .lib cornerCAP.lib cap_typ                 CL2 Voutn 0 {cl}                                                                   EN
+                                                                                                                  .lib cornerRES.lib res_typ                                                               Vcm                     Vcm
+                                                                                                                  .lib cornerDIO.lib dio_tt                                                                                                    Ib
+                                                                        SimulateNGSPICE let vin_diff = vinp-v
+… [2868 more characters cut]
+```
+

@@ -13122,3 +13122,732 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin sudel_buecher && git log --oneline -1
 ```
 
+## Tool results / harness — 2026-11-25 11:43:55 UTC
+
+**Tool result:**
+
+```
+5988986 RUNLOG: user's clarification on data book vs digest; chatlog regenerated
+```
+
+## Assistant — 2026-11-25 11:43:58 UTC
+
+The data book is as you left it: your page-break fix (`e61b669`) stays, and the checklist is out of it. That's where it will stay until you say otherwise. Keep the nitpicks coming; they go into the data book. Digest material goes only into the digest.
+
+The digest rewrite waits on the agent that is still reading the six award-named projects at the commits their harness submodules point to. When its report arrives, I'll rewrite the digest so it covers every rules item the way those documents do, without labelling anything as a rule. The chatlog and RUNLOG are current (`5988986` on `sudel_buecher`).
+
+## User (or harness) — 2026-11-25 11:44:10 UTC
+
+Digest: Think "databook for dummies". What a Vogon _thinks_ a data book should look like. Requires diplomacy.
+
+## Assistant — 2026-11-25 11:44:31 UTC
+
+Understood: the conventional data-sheet look, front page included (features, applications, block diagram), then pins, operating conditions, a min/typ/max table, typical curves, and design files with licence. That layout covers the rules items without naming them. I'm collecting the min/typ/max values from the data sheets now; the agent's report on the six projects will settle the remaining layout choices.
+
+## Assistant — 2026-11-25 11:44:33 UTC
+
+**Tool call: `Bash`**
+
+_Read S2D data sheet spec table (PEX view)_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/datasheets && grep -n "^## \|^### " sg13cmos5l_IOPadSingle2Diff.md | head -30; awk '/^### View: post-layout/,/^## CACE/' sg13cmos5l_IOPadSingle2Diff.md | cut -c1-170 | head -60
+```
+
+## Tool results / harness — 2026-11-25 11:44:33 UTC
+
+**Tool result:**
+
+```
+16:## Pins
+33:## Default conditions
+50:## Figures
+88:## Specification (ex post facto, as characterized)
+92:### View: schematic
+154:### View: post-layout (magic PEX, C-coupled)
+205:## CACE run summaries (designer's working limits): schematic
+211:### dc_params
+224:### range_params
+235:### window_params
+245:### dc_sel_params
+258:### dc_sel3_params
+271:### dc_ibias_params
+284:### ac_params
+295:### ac_mm_params
+311:### tran_params
+323:### noise_params
+334:### pd_params
+348:### enable_params
+361:### mm_params
+375:### mc_params
+389:## CACE run summaries (designer's working limits): post-layout (magic PEX, C-coupled)
+395:### dc_params
+408:### range_params
+419:### window_params
+429:### dc_sel_params
+442:### dc_sel3_params
+455:### dc_ibias_params
+468:### ac_params
+479:### tran_params
+### View: post-layout (magic PEX, C-coupled)
+
+| group | quantity | unit | min | typ (typical conditions) | median | max | runs | where min / where max |
+|---|---|---|---:|---:|---:|---:|---|---|
+| dc_params | Gain |  | 1.998 | 1.999 | 1.999 | 1.999 | 135 | vdd=3.0, corner_mos=fs, corner_r=wcs, temp=-40 / vdd=3.3, corner_mos=ss, corner_r=bcs, temp=125 |
+| dc_params | Input offset (systematic) | mV | -3.143e-05 | -8.642e-06 | -7.775e-07 | 0.0005804 | 135 | vdd=3.0, corner_mos=ff, corner_r=wcs, temp=27 / vdd=3.6, corner_mo
+| dc_params | Integral nonlinearity | mV | 0.08722 | 0.1518 | 0.163 | 1.069 | 135 | vdd=3.6, corner_mos=ss, corner_r=bcs, temp=27 / vdd=3.0, corner_mos=ss, corner_r=wcs, 
+| dc_params | Outp
+… [6694 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:44:36 UTC
+
+**Tool call: `Bash`**
+
+_Read D2S data sheet spec table_
+
+```bash
+grep -n "^## \|^### " sg13cmos5l_IOPadDiff2Single.md | head -12; awk '/^### View: schematic/,/^## CACE/' sg13cmos5l_IOPadDiff2Single.md | cut -c1-150 | grep -v "^$" | head -70
+```
+
+## Tool results / harness — 2026-11-25 11:44:36 UTC
+
+**Tool result:**
+
+```
+16:## Pins
+32:## Default conditions
+50:## Figures
+88:## Specification (ex post facto, as characterized)
+92:### View: schematic
+176:## CACE run summaries (designer's working limits): schematic
+182:### dc_params
+198:### dc_3v0_params
+214:### dc_sel_params
+230:### dc_sel3_params
+246:### dc_ibias_params
+262:### ac_params
+### View: schematic
+| group | quantity | unit | min | typ (typical conditions) | median | max | runs | where min / where max |
+|---|---|---|---:|---:|---:|---:|---|---|
+| dc_params | Gain |  | 0.4983 | 0.4999 | 0.5 | 0.5 | 30 | corner_mos=ff, temp=125, vdd=3.3 / corner_mos=ff, temp=27, vdd=3.6 |
+| dc_params | Output offset | mV | 0.03202 | 0.05152 | 0.06727 | 1.737 | 30 | corner_mos=ss, temp=-40, vdd=3.3 / corner_mos=ff, temp=125, vdd=3.6 |
+| dc_params | Integral nonlinearity | mV | 0.1208 | 1.376 | 0.4504 | 7.5 | 30 | corner_mos=ss, temp=125, vdd=3.6 / corner_mos=ss, temp=-40, vdd=3.3 |
+| dc_params | IO ring supply current | uA | 301.7 | 308.4 | 311.3 | 325.3 | 30 | corner_mos=ss, temp=125, vdd=3.3 / corner_mos=ff, temp=-40, vdd=3.6 |
+| dc_params | Core ring supply current | nA | 0.008253 | 0.1185 | 0.1185 | 23.89 | 30 | corner_mos=ss, temp=-40, vdd=3.6 / corner_mos=ff, temp=125, vd
+| dc_params | Quiescent current OP | uA | 216.6 | 222.9 | 225.5 | 238.6 | 30 | corner_mos=ss, temp=125, vdd=3.3 / corner_mos=ff, temp=-40, vdd=3.6 |
+| dc_params | Quiescent current ON | uA | 216.2 | 222.8 | 225 | 238.5 | 30 | corner_mos=ss, temp=125, vdd=3.3 / corner_mos=ff, temp=-40
+… [7845 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:45:04 UTC
+
+**Tool call: `Bash`**
+
+_Read pins, modes; look for PDK docs_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && sed -n '/^### 4.1 Top level/,/^### 4.2/p' docs/chipalooza2_as_taped_out/README.md | cut -c1-260; sed -n '/^### 2.4 Modes/,/^### 2.5/p' docs/chipalooza2_as_taped_out/README.md | cut -c1-260; ls /foss/pdks/ihp-sg13cmos5l/libs.doc 2>/dev/null | head; find /foss/pdks/ihp-sg13cmos5l -iname "*.md" -path "*doc*" 2>/dev/null | head
+```
+
+## Tool results / harness — 2026-11-25 11:45:04 UTC
+
+**Tool result:**
+
+```
+### 4.1 Top level
+
+`slot_7` (537.15 × 273 µm) sits in the chip as `slot7_wrapper` in `chipalooza_frame` at (1363.85, 2153.95) µm; the origin of `slot_7` itself is at (1379.95, 2170.05) µm in chip coordinates (checked on 2026-11-22). The harness reads
+`final/gds/slot_7.gds` (top cell `slot_7`) and the two custom pad cells in `pads/`. Frame and all 63 pin names, layers and
+positions are the harness's; the stand-in's Metal4 stub pins were removed. LEF, `.lib` and `.vh` were not changed (`.lib` is a
+pin-less stub).
+
+- **Supplies:** `vdd_3v3` / `vss_3v3`; `vdd_1v2` only for the `dig_out` pull-downs. The slot works with only `vdd_3v3`
+  switched on.
+- **Enable:** `enable` = 1 selects the default mode: bandgap reference, replica bias on, loop S2D → D2S direct, `vcm` on
+  `analog_bus2` and `vref` on `analog_bus3`.
+- **Fail-safe:** disabled, the slot draws leakage only; with the slot's supplies off, the pads draw leakage only (≤ 67 nA at
+  125 °C, simulation by the designer).
+- **`dig_out[11:0]`:** held low by 12 NMOS pull-downs (`s7_doutpd`, gate on `vdd_1v2`).
+
+Block diagram, from `docs/slot_7.md` of the delivery repository: harness `enable` and `dig_in[0..5]` → `s7_ctrl` (master enable,
+mode decode, switch matrix) → bandgap core `bg_core_pd` → `bias_dist_pd` → `pad_ref_rb` (replica bias) and both custom pads;
+S2D pad → D2S pad loop direct or swapped; S2D outputs on `analog_bus0/1` or D2S fed from them; `vcm` / `vref` on
+`analog_bus2/3`. Picture: [`docs/slot_7.png`](../slot_7.png).
+
+… [1052 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:45:06 UTC
+
+**Tool call: `Bash`**
+
+_Look for PDK voltage limits documentation_
+
+```bash
+ls /foss/pdks/ihp-sg13cmos5l/libs.doc/doc 2>/dev/null | head -20; find /foss/pdks/ihp-sg13cmos5l/libs.doc -maxdepth 3 | head -30; grep -rli "maximum\|absolute" /foss/pdks/ihp-sg13cmos5l/libs.doc 2>/dev/null | head
+```
+
+## Tool results / harness — 2026-11-25 11:45:07 UTC
+
+**Tool result:**
+
+```
+SG13CMOS5L_os_layout_rules.pdf
+SG13CMOS5L_os_process_spec.pdf
+/foss/pdks/ihp-sg13cmos5l/libs.doc
+/foss/pdks/ihp-sg13cmos5l/libs.doc/doc
+/foss/pdks/ihp-sg13cmos5l/libs.doc/doc/SG13CMOS5L_os_process_spec.pdf
+/foss/pdks/ihp-sg13cmos5l/libs.doc/doc/SG13CMOS5L_os_layout_rules.pdf
+```
+
+## Assistant — 2026-11-25 11:45:11 UTC
+
+**Tool call: `Bash`**
+
+_Search PDK process spec for voltage limits_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad && pdftotext -layout /foss/pdks/ihp-sg13cmos5l/libs.doc/doc/SG13CMOS5L_os_process_spec.pdf ps.txt && grep -n -i "max\.\|maximum\|operating voltage\|breakdown\|Vdd\b\|3\.3 V\|3\.6\|nominal" ps.txt | head -40; pdfinfo /foss/pdks/ihp-sg13cmos5l/libs.doc/doc/SG13CMOS5L_os_process_spec.pdf | grep -E "Title|Pages|ModDate|CreationDate"
+```
+
+## Tool results / harness — 2026-11-25 11:45:11 UTC
+
+**Tool result:**
+
+```
+46:  3.5 Maximum Current Densities . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       18
+47:  3.6 Layer Thickness Values . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      19
+247: Breakdown Voltage                BVDSSN013                 V       2.0       2.7           [A.f1]   WxL = 10 x
+257: Junction Breakdown               BVNPW                     V                 12            [A.f3]
+287: Breakdown Voltage                BVDSSP013                 V                 -2.9    -2.2    [A.f1]   WxL = 10 x
+297: Junction Breakdown               BVNPW                     V                 -12             [A.f3]
+323: Breakdown Voltage                BVDSSNI013                V       2.0       2.7           [A.f1]   WxL = 10 x
+336:VGS ≤ 3.3 V (Maximum) @ 27°C for LG ≥ 0.6 µm4
+354: Breakdown Voltage                BVDSSNHV013                V        5.3    6.1            [A.f2]   WxL = 10 x
+364: Junction Breakdown               BVNPWHV                    V               12             [A.f3]
+376:VGS ≤ 3.3 V (Maximum) @ 27°C for LG ≥ 0.5 µm5
+394: Breakdown Voltage                BVDSSPHV04                 V                -6.3    -5.3    [A.f2]   WxL = 10 x
+404: Junction Breakdown               BVNPWhv                    V                -12             [A.f3]
+416:VGS ≤ 3.3 V (Maximum) @ 27°C for LG ≥ 0.6 µm6
+430: Breakdown Voltage                BVDSSNIHV045               V        5.2    6.1            [A.f2]   WxL = 10 
+… [1340 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:45:16 UTC
+
+**Tool call: `Bash`**
+
+_Read HV device voltage limit context_
+
+```bash
+sed -n 330,340p /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/ps.txt; sed -n 343,380p /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/ps.txt; grep -n -i "tolerance\|±\|10 %\|10%\|supply" /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/ps.txt | head
+```
+
+## Tool results / harness — 2026-11-25 11:45:16 UTC
+
+**Tool result:**
+
+```
+9 of 25
+                                   SG13CMOS5L Process Specification Rev. 0.2
+
+
+2.1.4 HV-NMOS
+VGS ≤ 3.3 V (Maximum) @ 27°C for LG ≥ 0.6 µm4
+                                                                             Tar-           Meas.
+ Parameter                        Name                     Unit        Min           Max             Comment
+                                                                             get            Cond.
+ Threshold Voltage                VTNHV10x045                V        0.63   0.70    0.77   [A.a2]   WxL = 10 x
+ Long Channel Device                                                                                 10 µm2
+ Threshold Voltage                VTNHV030x045               V        0.59   0.67    0.75   [A.a2]   WxL = 0.30 x
+ Small Channel Device                                                                                0.45 µm2
+ Saturation Current               IDSNHV045              µA/µm        480    560     640    [A.b2]   WxL = 10 x
+ Short Channel Device                                                                                0.45 µm2
+ Off-Current Short                IOFFNHV045             LOG10               -12.5   -11    [A.c2]   WxL = 10 x
+ Channel Device                                          (A/µm)                                      0.45 µm2
+ Drain Induced Barrier            DIBLNHV045              mV/V        0      15      30     [A.d2]   WxL = 10 x
+ Lowering 0.1/1.2V                             
+… [2021 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:46:10 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/DIGEST.md`
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# S2D / D2S analog pad pair with on-chip reference — data sheet
+
+**IHP SG13CMOS5L · Chipalooza Challenge #2, slot 7 · taped out 2026-11-09 · preliminary: simulation results, silicon not yet measured**
+
+## Features
+
+- Single-ended pad → differential pair (**S2D**, gain 2) and differential pair → single-ended pad (**D2S**, gain ½)
+- Gain set by matched transistors, not resistors: 1.9985 … 1.9993 and 0.4983 … 0.5000 over process, temperature and supply
+- Input 0 … 1 V, output 0.2 … 2.3 V, error below 1 mV end to end at 27 °C
+- 1 … 2 MHz bandwidth, no peaking; drives 10 … 300 pF and 1 kΩ
+- On-chip bandgap reference, bias distribution and replica bias; no external reference needed
+- Single 3.3 V supply, 0.45 mA; below 0.1 µA when disabled; fail-safe when unpowered
+- Test modes through digital controls: swapped loop, monitor and drive the internal pair, external references
+
+## Applications
+
+Analog test access to an SoC; differential on-chip signal paths from and to single-ended pads; low-frequency
+instrumentation and audio-range interfaces.
+
+## Description
+
+The input pad (S2D, `s7_an[0]`) produces outp − outn = 2 (pad − vref) around the common mode vcm. The output pad (D2S,
+`s7_an[1]`) produces pad = vcm + (vinp − vinn)/2. A bandgap core sets the 5 µA references of both pads; a replica-bias
+block derives vcm ≈ 1.26 V and vref ≈ 0.49 V from copies of the pads' own circuits, so the operating point tracks process
+and temperature. In the default mode the pads form a loop: the output pad repeats the input pad, shifted by vcm − vref
+≈ 0.77 V.
+
+![Functional block diagram](pix/slot7_signal_flow.svg)
+
+## Pins
+
+| pin | type | function |
+|---|---|---|
+| `s7_an[0]` | analog input, pad | S2D input |
+| `s7_an[1]` | analog output, pad | D2S output |
+| `analog_bus0`, `analog_bus1` | analog, shared bus | mode mon: S2D outp / outn out; mode feed: D2S vinp / vinn in |
+| `analog_bus2`, `analog_bus3` | analog, shared bus | vcm / vref out (read with a high-impedance meter); mode ext: vcm / vref in |
+| `enable` | digital input | slot on (default mode) / off |
+| `dig_in[0]`, `[1]`, `[2]`, `[5]` | digital inputs | modes swap, mon, feed, ext |
+| `dig_in[3]`, `dig_in[4]` | digital inputs | key: the mode bits act only with `dig_in[3]` = 1 and `dig_in[4]` = 0 |
+| `dig_out[11:0]` | digital outputs | not used, held low |
+| `vdd_3v3`, `vss_3v3` | supply | 3.3 V supply of the slot |
+| `vdd_1v2` | supply | gate supply of the `dig_out` pull-downs only |
+| pad ring `iovdd`, `iovss` | supply | 3.3 V supply of the two pads |
+
+The shared buses reach the chip pins through the harness's analog switches; the S2D → D2S loop stays stable with the
+switches closed (simulated with 10 kΩ per switch).
+
+## Absolute maximum ratings
+
+The limits of the IHP SG13CMOS5L 3.3 V devices apply (process specification Rev. 0.2: gate-source voltage ≤ 3.3 V
+maximum at 27 °C for the high-voltage MOS devices; drain breakdown ≥ 5.3 V). Pad voltages beyond the pad-ring supplies are
+clamped by the pads' diodes. ESD robustness has not been simulated.
+
+## Recommended operating conditions
+
+| parameter | min | typ | max | unit |
+|---|---:|---:|---:|---|
+| supply `vdd_3v3`, pad ring | 3.0 | 3.3 | 3.6 | V |
+| temperature (simulated) | −40 | 27 | 125 | °C |
+| input voltage, S2D pad (linear operation) | 0 | | 1.0 | V |
+| load capacitance, D2S pad | 10 | | 300 | pF |
+| load resistance, D2S pad (to 1.26 V) | 1 | | | kΩ |
+
+## Electrical characteristics
+
+Typical: tt, 27 °C, 3.3 V, default mode, slot's own references. Min / max: 5 process corners × −40 / 27 / 125 °C ×
+3.0 / 3.3 / 3.6 V unless stated. Pads from extracted layout where marked (x).
+
+| parameter | conditions | min | typ | max | unit |
+|---|---|---:|---:|---:|---|
+| **End to end (S2D → D2S)** | | | | | |
+| transfer | out = vcm + (in − vref) | | | | |
+| error, pad in 0 … 1 V | | | 0.86 | 6.5 | mV |
+| −3 dB bandwidth | unloaded … 1 kΩ ∥ 100 pF, 5 PVT points (x) | 1.
+… [4081 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 11:46:10 UTC
+
+**Tool result:**
+
+```
+The file /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/DIGEST.md has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 11:46:27 UTC
+
+Checking conditions for three rows. My draft calls the 1 % settling time a PVT range, but the sources say tt 27 °C only; the extracted D2S bandwidth and slew rows still need their load confirmed:
+
+## Assistant — 2026-11-25 11:46:29 UTC
+
+**Tool call: `Bash`**
+
+_Check conditions of bandwidth, settling, slew numbers_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps && grep -n "1\.08\|1\.69\|453\|623" ac_tran/results.md | cut -c1-260 | head -8; grep -n "1\.43\|2\.71\|1\.59\|2\.79" d2s_pex/results.md | cut -c1-260 | head -6
+```
+
+## Tool results / harness — 2026-11-25 11:46:29 UTC
+
+**Tool result:**
+
+```
+23:| fs 125 °C 3.6 V | 1.694 / 1.519 / 1.673 | 1.348 / 1.210 / 1.308 | 1.677 / 1.478 / 1.637 |
+24:| sf -40 °C 3.0 V | 1.470 / 1.283 / 1.451 | 1.235 / 1.082 / 1.185 | 1.473 / 1.262 / 1.434 |
+35:| schematic | 460 / 461 ns; 633 / 634 ns | 557 / 552 ns; 778 / 768 ns | 453 / 465 ns; 593 / 619 ns |
+36:| magic PEX | 517 / 518 ns; 710 / 711 ns | 623 / 617 ns; 867 / 856 ns | 524 / 533 ns; 696 / 714 ns |
+60:| ac_load_params | f3dB[MHz] | 6 | 1.582e+06 | 2.162e+06 | 3.006e+06 | 6 | 1.425e+06 | 1.961e+06 | 2.713e+06 | -11.6 |
+63:| ac_load_params | PSRR_100k[] | 6 | 31.59 | 31.62 | 31.63 | 6 | 30.95 | 30.98 | 31 | -2.03 |
+67:| tran_params | SR_rise[V/us] | 9 | 1.76e+06 | 2.448e+06 | 3.054e+06 | 9 | 1.591e+06 | 2.151e+06 | 2.732e+06 | -12.5 |
+68:| tran_params | SR_fall[V/us] | 9 | 1.781e+06 | 2.466e+06 | 3.166e+06 | 9 | 1.603e+06 | 2.15e+06 | 2.794e+06 | -13.3 |
+121:| tran_params | Slew rate, rising | V/us | >= 1 | 1.591 | 9 | pass |
+```
+
+## Assistant — 2026-11-25 11:46:30 UTC
+
+**Tool call: `Bash`**
+
+_Read round-trip table headers and D2S load conditions_
+
+```bash
+sed -n 14,40p ac_tran/results.md | cut -c1-240; grep -n "ac_load_params\|cload\|rload" d2s_pex/README.md | head -5
+```
+
+## Tool results / harness — 2026-11-25 11:46:31 UTC
+
+**Tool result:**
+
+```
+ideal copy of vref_d2s with 10 or 100 pF. `csv/rt_*_summary.csv`; `*` = schematic run that needed the rshunt retry.
+
+Round-trip −3 dB bandwidth [MHz] (relative to the gain at 1 kHz; `rt_bode_tt27`, `rt_bode_pvt`, `rt_f3db`):
+
+| PVT | unloaded: sch / PEX / KLayout | 1 kΩ ∥ 10 pF | 1 kΩ ∥ 100 pF |
+|---|---|---|---|
+| tt 27 °C 3.3 V | 1.532 / 1.356 / 1.514 | 1.265 / 1.122 / 1.220 | 1.523 / 1.325 / 1.487 |
+| ss -40 °C 3.0 V | 1.536* / 1.332 / 1.514 | 1.283* / 1.117 / 1.229 | 1.553* / 1.318 / 1.509 |
+| ff 125 °C 3.6 V | 1.627 / 1.466 / 1.607 | 1.292 / 1.166 / 1.254 | 1.588 / 1.408 / 1.548 |
+| fs 125 °C 3.6 V | 1.694 / 1.519 / 1.673 | 1.348 / 1.210 / 1.308 | 1.677 / 1.478 / 1.637 |
+| sf -40 °C 3.0 V | 1.470 / 1.283 / 1.451 | 1.235 / 1.082 / 1.185 | 1.473 / 1.262 / 1.434 |
+
+- Gain at 1 kHz −0.011 … −0.048 dB (0.9945 … 0.9988); no peaking above the 1 kHz gain in any of the 45 runs; phase at
+  f−3dB −70 … −97°. The magic PEX pads cost 11 … 15 % bandwidth against the schematic; the KLayout-extracted pads (no
+  parasitic capacitance, the designer's tier-1 view) 1 … 4 %. 1 kΩ ∥ 10 pF has the lowest bandwidth: the D2S alone
+  shows the same order (`d2s_bode_loads`: 1.57 MHz at 1 kΩ + 10 pF vs 2.00 MHz at 1 kΩ + 100 pF).
+- Step 0.25 → 0.75 V (10 ns edges), settling of pad_d2s to 1 % / 0.1 % of the step after the input edge, rise / fall
+  (`rt_step_tt27`, `rt_step_pvt`):
+
+| pads, tt 27 °C | unloaded | 1 kΩ ∥ 10 pF | 1 kΩ ∥ 100 pF |
+|---|---|---|---|
+| schematic | 460 / 461 ns; 633 / 634 ns 
+… [607 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:46:47 UTC
+
+**Tool call: `Bash`**
+
+_Fix conditions; build digest; render_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && python3 - <<'EOF'
+p='docs/chipalooza2_as_taped_out/DIGEST.md'
+s=open(p).read()
+reps=[
+("| −3 dB bandwidth | unloaded … 1 kΩ ∥ 100 pF, 5 PVT points (x) | 1.08 | | 1.69 | MHz |",
+ "| −3 dB bandwidth | 5 PVT points; unloaded, 1 kΩ ∥ 10 pF, 1 kΩ ∥ 100 pF; schematic and (x) | 1.08 | | 1.69 | MHz |"),
+("| settling to 1 %, 0.25 → 0.75 V step | 3 loads (x) | 453 | | 623 | ns |",
+ "| settling to 1 %, 0.25 → 0.75 V step | 27 °C; the same loads; schematic and (x) | 453 | | 623 | ns |"),
+("| linear output range (10 mV) | 3.3 V, 1 kΩ, input common mode 1.26 V | 0.328 … 2.258 | 0.211 … 2.317 | | V |",
+ "| linear output range (10 mV), low end | 3.3 V, 1 kΩ, input common mode 1.26 V | | 0.211 | 0.328 | V |\n| linear output range (10 mV), high end | 3.3 V, 1 kΩ, input common mode 1.26 V | 2.258 | 2.317 | | V |"),
+("| −3 dB bandwidth | 1 kΩ, 10 … 300 pF (x) | 1.43 | | 2.71 | MHz |","| −3 dB bandwidth | 10 … 300 pF, 1 kΩ or open (x) | 1.43 | | 2.71 | MHz |"),
+("| slew rate | 1 kΩ, 10 … 300 pF (x) | 1.59 | | 2.79 | V/µs |","| slew rate | 10 … 300 pF (x) | 1.59 | | 2.79 | V/µs |"),
+("- Input 0 … 1 V, output 0.2 … 2.3 V, error below 1 mV end to end at 27 °C","- Input 0 … 1 V; D2S output 0.2 … 2.3 V; error below 1 mV end to end at 27 °C"),
+("maximum at 27 °C for the high-voltage MOS devices; drain breakdown ≥ 5.3 V).",
+ "maximum at 27 °C for the high-voltage MOS devices at the specified gate lengths; drain-source breakdown ≥ 5.2 V)."),
+("switches closed (simulated with 10 kΩ per switch).","switches closed, 10 … 30 times slower (simulated with 10 kΩ per switch)."),
+]
+for a,b in reps:
+    assert s.count(a)==1,a; s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+python3 docs/chipalooza2_as_taped_out/book/build_book.py --digest-only 2>&1 | grep -v "WARNING\|^$\|^warning\|^??\|^ M"; git checkout -q -- docs/chipalooza2_as_taped_out/pdf/slot7_rules_checklist.pdf 2>/dev/null; git status --short; pdfinfo docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf | grep Pages; S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book; rm -f $S/g-*; pdftoppm -r 60 -png docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf $S/g; python3 -c "
+from PIL import Image; import glob
+fs=sorted(glob.glob('$S/g-*.png')); ims=[Image.open(f) for f in fs]
+s=Image.new('RGB',(sum(i.size[0] for i in ims),ims[0].size[1]),'white'); x=0
+for i in ims: s.paste(i,(x,0)); x+=i.size[0]
+s.save('$S/g_all.png')"
+```
+
+## Tool results / harness — 2026-11-25 11:46:49 UTC
+
+**Tool result:**
+
+```
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+ M docs/chipalooza2_as_taped_out/DIGEST.md
+ M docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+Pages:           4
+```
+
+## Assistant — 2026-11-25 11:46:55 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/g_all.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 11:46:55 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 11:47:07 UTC
+
+**Tool call: `Bash`**
+
+_Fix figure-grid detection and CSS; rebuild digest_
+
+```bash
+python3 - <<'EOF'
+p='docs/chipalooza2_as_taped_out/book/build_book.py'
+s=open(p).read()
+a="""    h = h.replace('<table>', '<table class="figs">', 2)
+    # the first table is the key-number table, the second the figure pair
+    h = h.replace('<table class="figs">', '<table>', 1)
+"""
+b="""    # tables that hold images are figure grids (no borders, equal columns); all others are data tables
+    h = re.sub(r'<table>(?=(?:(?!</table>).)*?<img)', '<table class="figs">', h, flags=re.S)
+"""
+assert s.count(a)==1; s=s.replace(a,b)
+a="td:first-child { width: 36%; }\n"
+assert s.count(a)==1; s=s.replace(a,"")
+a="table.figs td { border: none; width: 50%; font-size: 7.6pt; padding: 0 3pt; }"
+b="table.figs { table-layout: fixed; }\ntable.figs td { border: none; width: 50%; font-size: 7.6pt; padding: 0 3pt; text-align: left; }\ntable.figs td img { width: 100%; }"
+assert s.count(a)==1; s=s.replace(a,b)
+a="p > img:only-child { display: block; margin: 3pt auto; max-height: 78mm; }"
+b="p > img:only-child { display: block; margin: 3pt auto; max-height: 70mm; }\ntr { break-inside: avoid; }\nh2 + table, h2 + p { break-before: avoid; }"
+assert s.count(a)==1; s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+python3 docs/chipalooza2_as_taped_out/book/build_book.py --digest-only 2>&1 | grep -v "WARNING\|^$\|^warning\|^??\|^ M"; pdfinfo docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf | grep Pages; S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book; rm -f $S/g-*; pdftoppm -r 60 -png docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf $S/g; python3 -c "
+from PIL import Image; import glob
+fs=sorted(glob.glob('$S/g-*.png')); ims=[Image.open(f) for f in fs]
+s=Image.new('RGB',(sum(i.size[0] for i in ims),ims[0].size[1]),'white'); x=0
+for i in ims: s.paste(i,(x,0)); x+=i.size[0]
+s.save('$S/g_all.png')"
+```
+
+## Tool results / harness — 2026-11-25 11:47:09 UTC
+
+**Tool result:**
+
+```
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+Pages:           4
+```
+
+## Assistant — 2026-11-25 11:47:17 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/g_all.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 11:47:17 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 11:47:29 UTC
+
+**Tool call: `Bash`**
+
+_Simplify features and electrical table; rebuild_
+
+```bash
+python3 - <<'EOF'
+p='docs/chipalooza2_as_taped_out/DIGEST.md'
+s=open(p).read()
+import re
+a=s[s.index('## Features'):s.index('## Applications')]
+b='''## Features
+
+- Single-ended pad to differential pair (S2D, gain 2) and back (D2S, gain ½)
+- Input 0 … 1 V; output error below 1 mV at 27 °C
+- Bandwidth 1 … 2 MHz; loads 10 … 300 pF, 1 kΩ
+- On-chip bandgap reference and bias; single 3.3 V supply, 0.45 mA
+- Test modes selected by digital inputs
+
+'''
+s=s.replace(a,b)
+for row in ["| transfer | out = vcm + (in − vref) | | | | |\n",
+            "| output impedance, 1 kHz | 3.3 V | 0.19 | 0.21 | 3.3 | Ω |\n",
+            "| PSRR (`iovdd`), 1 kHz | 3.3 V | 70.6 | 71.5 | 72.5 | dB |\n",
+            "| integral nonlinearity, ±1 V differential in | input common mode 1.26 V, 3.3 V / 3.0 V | | | 0.56 / 1.38 | mV |\n"]:
+    assert s.count(row)==1,row; s=s.replace(row,'')
+a="| input noise density, 1 kHz / 100 kHz | 3.3 V (x) | | 679 / 152 | 726 / 156 | nV/√Hz |"
+b="| input noise density, 1 kHz | 3.3 V (x) | 596 | 679 | 726 | nV/√Hz |"
+assert s.count(a)==1; s=s.replace(a,b)
+a="| error, pad in 0 … 1 V | | | 0.86 | 6.5 | mV |"
+b="| error from out = vcm + (in − vref), in 0 … 1 V | | | 0.86 | 6.5 | mV |"
+assert s.count(a)==1; s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+python3 docs/chipalooza2_as_taped_out/book/build_book.py --digest-only 2>&1 | grep -v "WARNING\|^$\|^warning\|^??\|^ M"; pdfinfo docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf | grep Pages
+```
+
+## Tool results / harness — 2026-11-25 11:47:30 UTC
+
+**Tool result:**
+
+```
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+Pages:           4
+```
+
+## Assistant — 2026-11-25 11:47:34 UTC
+
+**Tool call: `Bash`**
+
+_Check page fill of digest_
+
+```bash
+for i in 1 2 3 4; do echo "p$i: $(pdftotext -f $i -l $i docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf - | grep -v '^$' | head -1) ... $(pdftotext -f $i -l $i docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf - | grep -v '^$' | wc -l) lines"; done
+```
+
+## Tool results / harness — 2026-11-25 11:47:34 UTC
+
+**Tool result:**
+
+```
+p1: S2D / D2S analog pad pair with on-chip reference — ... 142 lines
+p2: The shared buses reach the chip pins through the harness's analog switches; the S2D → D2S loop stays stable with ... 162 lines
+p3: parameter ... 59 lines
+p4: 2. Read vcm and vref on analog_bus2 and analog_bus3: about 1.26 V and 0.49 V. ... 11 lines
+```
+
+## Assistant — 2026-11-25 11:47:41 UTC
+
+**Tool call: `Bash`**
+
+_Shrink figures; rebuild; render_
+
+```bash
+python3 - <<'EOF'
+p='docs/chipalooza2_as_taped_out/book/build_book.py'
+s=open(p).read()
+a="table.figs td img { width: 100%; }"
+b="table.figs td img { width: 88%; }"
+assert s.count(a)==1; s=s.replace(a,b)
+a="p > img:only-child { display: block; margin: 3pt auto; max-height: 70mm; }"
+b="p > img:only-child { display: block; margin: 3pt auto; max-height: 64mm; }"
+assert s.count(a)==1; s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+python3 docs/chipalooza2_as_taped_out/book/build_book.py --digest-only 2>&1 | grep -v "WARNING\|^$\|^warning\|^??\|^ M"; pdfinfo docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf | grep Pages; S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book; rm -f $S/g-*; pdftoppm -r 60 -png docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf $S/g; python3 -c "
+from PIL import Image; import glob
+fs=sorted(glob.glob('$S/g-*.png')); ims=[Image.open(f) for f in fs]
+s=Image.new('RGB',(sum(i.size[0] for i in ims),ims[0].size[1]),'white'); x=0
+for i in ims: s.paste(i,(x,0)); x+=i.size[0]
+s.save('$S/g_all.png')"
+```
+
+## Tool results / harness — 2026-11-25 11:47:43 UTC
+
+**Tool result:**
+
+```
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+Pages:           3
+```
+
+## Assistant — 2026-11-25 11:47:45 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/g_all.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 11:47:45 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 11:47:55 UTC
+
+**Tool call: `Bash`**
+
+_Commit digest source, rebuild digest only, push_
+
+```bash
+git add docs/chipalooza2_as_taped_out/DIGEST.md docs/chipalooza2_as_taped_out/book/build_book.py && git commit -q -m "DIGEST.md: rewritten as a conventional data sheet (features, applications, description, block diagram, pins, ratings, operating conditions, electrical characteristics min/typ/max, typical curves, modes, verification, test, files and licence)
+
+build_book.py: digest figure grids detected by content; digest-only CSS. The
+data book is not changed.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && python3 docs/chipalooza2_as_taped_out/book/build_book.py --digest-only 2>&1 | grep -v "WARNING\|^$\|^warning\|^??\|^ M"; git status --short; git diff --stat -- docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf; git add docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf && git commit -q -m "docs: slot7_digest.pdf rebuilt (data-sheet form, 3 pages)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin chipalooza2-documentation && git log --oneline -3
+```
+
+## Tool results / harness — 2026-11-25 11:47:59 UTC
+
+**Tool result:**
+
+```
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+ M docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+9f799c5 docs: slot7_digest.pdf rebuilt (data-sheet form, 3 pages)
+641ceb1 DIGEST.md: rewritten as a conventional data sheet (features, applications, description, block diagram, pins, ratings, operating conditions, electrical characteristics min/typ/max, typical curves, modes, verification, test, files and licence)
+00c14d5 Revert the rules checklist commit c053ae2 (data book appendix G, front-page row, RULES_CHECKLIST.md)
+```
+
+## Assistant — 2026-11-25 11:48:11 UTC
+
+**Tool call: `Bash`**
+
+_Log digest rewrite and findings; push chatlog_
+
+```bash
+cd /home/user/sky130_cm_ip__single2diff2single_sudelbuecher && cat >> RUNLOG.md <<'EOF'
+- User on the digest: "databook for dummies", "what a Vogon thinks a data book should look like", later "Mozart meets Salieri in front of the emperor: think Salieri's score", i.e. plain and conventional, nothing clever hidden in it. Rewritten as a conventional data sheet ([S7] 641ceb1 source, 9f799c5 PDF, 3 pages): features, applications, description, block diagram, pins, absolute maximum ratings, recommended operating conditions, electrical characteristics (min / typ / max with conditions, values from the data sheets, DC curves, AC / transient and D2S post-layout results; settling marked 27 °C only after checking its source), typical performance curves, modes, physical and verification data, how to test, design files / tools / licence. Data book PDF unchanged (diff empty).
+- Finding while writing the ratings: the PDK process specification (SG13CMOS5L_os_process_spec.pdf, Rev. 0.2, §2.1.4 / 2.1.5) gives VGS ≤ 3.3 V (maximum) at 27 °C for the HV MOS devices (footnote: 1 FIT in 10 years for HCI; gate lengths ≥ 0.6 µm NMOS, ≥ 0.5 µm PMOS); BVDSS HV ≥ 5.2 V. The characterization runs to 3.6 V as a supply-tolerance corner. Quoted in the digest; not yet in the data book (user decides).
+- Known mismatch left for the user: the data book's front-page row still calls the digest "slot 7 in two pages" (now a 3-page data sheet); not changed because digest adaptations are not to go into the data book yet.
+EOF
+bash chatlog/tools/export_all.sh >/dev/null 2>&1; git add -A && git commit -q -m "RUNLOG: digest as conventional data sheet; PDK VGS finding; chatlog regenerated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin sudel_buecher && git log --oneline -1
+```
+
+## Assistant — 2026-11-25 11:48:12 UTC
+
+**Tool call: `SendUserFile`**
+
+```json
+{
+ "files": [
+  "/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf"
+ ],
+ "caption": "Digest as a plain data sheet (3 pages)",
+ "status": "normal",
+ "display": "attach"
+}
+```
+
