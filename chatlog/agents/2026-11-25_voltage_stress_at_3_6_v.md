@@ -7781,3 +7781,402 @@ cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && sed -n 
             for q in ('vgs', 'vgd', 'vds', 'vgb'):
 ```
 
+## Assistant — 2026-11-25 19:26:11 UTC
+
+**Tool call: `Bash`**
+
+_Regenerate outputs with headers_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+s=open('analyze.py').read()
+a="""        w = csv.writer(f)
+        w.writerow(['# per MOS instance: max |V| over all runs of a supply class (3.3 / 3.6 V): signed value at the '
+                    'max, run tag, sweep value [V] or time [s]; vgx = the larger of |VGS| and |VGD|; *_held = largest '
+                    '|value| held for at least 100 ns (transients; DC points count as held); electrical source = lower '
+                    '(NMOS) / higher (PMOS) of the two diffusion terminals'])"""
+b="""        f.write('# IHP sg13cmos5l simulation (ngspice-47, analyze.py): per MOS instance, max |V| over all runs of a '
+                'supply class (3.3 / 3.6 V): signed value at the max, run tag, sweep value [V] or time [s]; *_held = '
+                'largest |value| held for at least 100 ns (transients; DC points count as held), max of |VGS| and |VGD| '
+                'for vgx_held; electrical source = lower (NMOS) / higher (PMOS) of the two diffusion terminals\\n')
+        w = csv.writer(f)"""
+assert a in s; s=s.replace(a,b)
+open('analyze.py','w').write(s)
+EOF
+python3 -I analyze.py _work . | tail -1; python3 -I edges.py _work . en:tt:27:3.6 '' step2n step05n trap 2>&1 | grep -c "^\["; head -3 csv/*.csv | head -30; ls plots; du -sh csv/* | sort -h | tail -3; cmp csv/top20_vgx_held_3v6.csv /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/t20.csv
+```
+
+## Tool results / harness — 2026-11-25 19:26:15 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+analyze: runs 222 failed 16
+4
+==> csv/device_max.csv <==
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# IHP sg13cmos5l simulation (ngspice-47, analyze.py): per MOS instance, max |V| over all runs of a supply class (3.3 / 3.6 V): signed value at the max, run tag, sweep value [V] or time [s]; *_held = largest |value| held for at least 100 ns (transients; DC points count as held), max of |VGS| and |VGD| for vgx_held; electrical source = lower (NMOS) / higher (PMOS) of the two diffusion terminals
+
+==> csv/flags_over_3v3.csv <==
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+runs,inst,block,type,W_um,L_um,meets_spec_LG,vgs_V,run_vgs,x_vgs,vgd_V,run_vgd,x_vgd,vgx_held_V
+
+==> csv/gate_stress_bins.csv <==
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+runs,meets_spec_LG,held_100ns,bin_0_3.3009999999999997V,bin_3.3009999999999997_3.35V,bin_3.35_3.5V,bin_3.5_3.6V,bin_3.6_3.65V,bin_3.65_3.8V,bin_3.8_4.0V,bin_4.0_5.0V,bin_5.0_99V
+
+==> csv/node_extremes.csv <==
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+job,supply_V,vmax_V,node_vmax,where_vmax,vmin_V,node_vmin,where_vmin
+
+==> csv/runs.csv <==
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+tag,kind,variant,mos,temp_C,vdd_V,status,aid,points
+
+==> csv/solver_check_en_tt_27_3.6.csv <==
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# 
+… [508 more characters cut]
+```
+
+## Assistant — 2026-11-25 19:26:20 UTC
+
+**Tool call: `Bash`**
+
+_Fix bin labels and rerun full check summary_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && sed -i "s/\[f'bin_{a}_{b}V' for a, b in/[f'bin_{a:g}_{b:g}V' for a, b in/" analyze.py && python3 -I analyze.py _work . | tail -1 && sed -n 3p csv/gate_stress_bins.csv && export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1 VS_TMO_TRAN=500 && timeout 580 python3 -I edges.py _work . en:tt:27:3.6 '' step2n step05n trap nqs nqsbg 2>&1 | grep "^\[" | cut -c1-80
+```
+
+## Tool results / harness — 2026-11-25 19:26:53 UTC
+
+**Tool result:**
+
+```
+analyze: runs 222 failed 16
+runs,meets_spec_LG,held_100ns,bin_0_3.301V,bin_3.301_3.35V,bin_3.35_3.5V,bin_3.5_3.6V,bin_3.6_3.65V,bin_3.65_3.8V,bin_3.8_4V,bin_4_5V,bin_5_99V
+['default', 'gear, cshunt 1 fF, max step 10 ns (stress runs)', 4345, '5.308', '-
+['step2n', 'max step 2 ns', 21073, '5.316', '-6.838', '4.155', '4.155 n.xs.xd.xl
+['step05n', 'max step 0.5 ns', 84047, '5.314', '-6.917', '4.155', '4.155 n.xs.xd
+['trap', 'trapezoidal', 4250, '4.912', '-4.241', '4.163', '4.142 n.xs.xd.xlay.x_
+['nqs', 'NQS model (rfmode=1) on bg_core_pd and ls_up_fs', 'FAILED', '', '', '',
+['nqsbg', 'NQS model (rfmode=1) on bg_core_pd', 'FAILED', '', '', '', '', '']
+[This command modified 1 file you've previously read: verification/c2_gaps/voltage_stress/analyze.py. Call Read before editing.]
+```
+
+## Assistant — 2026-11-25 19:26:58 UTC
+
+**Tool call: `Bash`**
+
+_Check SPDX headers and spelling_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && for f in $(git ls-files --others --exclude-standard . ; ); do printf "%-45s " $f; head -c 300 $f | grep -c "SPDX-License-Identifier" ; done; grep -n -i "colour\|analys\|behaviour\|modell\|labell\|centre\|favour\|optimis\|characteris" *.md *.py *.sh jobs.txt | grep -v "analyze\|Analysis\|analysis" | head
+```
+
+## Tool results / harness — 2026-11-25 19:26:58 UTC
+
+**Tool result:**
+
+```
+.gitignore                                    1
+README.md                                     1
+analyze.py                                    1
+csv/device_max.csv                            1
+csv/flags_over_3v3.csv                        1
+csv/gate_stress_bins.csv                      1
+csv/node_extremes.csv                         1
+csv/runs.csv                                  1
+csv/solver_check_en_tt_27_3.6.csv             1
+csv/top20_vds_3v6.csv                         1
+csv/top20_vds_held_3v3.csv                    1
+csv/top20_vds_held_3v6.csv                    1
+csv/top20_vgb_3v6.csv                         1
+csv/top20_vgs_3v6.csv                         1
+csv/top20_vgx_3v6.csv                         1
+csv/top20_vgx_held_3v3.csv                    1
+csv/top20_vgx_held_3v6.csv                    1
+csv/type_length_max.csv                       1
+edges.py                                      1
+jobs.txt                                      1
+plots/hist_vgs_vds_3v6.png                    0
+plots/hist_vgs_vds_3v6.png.license            1
+plots/ranked_vgs_vds_3v6.png                  0
+plots/ranked_vgs_vds_3v6.png.license          1
+plots/solver_check_en_tt_27_3.6.png           0
+plots/solver_check_en_tt_27_3.6.png.license   1
+rawread.py                                    1
+results.md                                    1
+run.sh                                        1
+tables.md                                     1
+vs.py                                         1
+tables.md:30
+… [640 more characters cut]
+```
+
+## Assistant — 2026-11-25 19:27:06 UTC
+
+**Tool call: `Bash`**
+
+_Review results.md beginning_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && sed -i 's/The S2D `vref` and the D2S `vinp` \/ `vinn` fall to about −0.26 … −0.48 V once their switches open./The S2D `vref` and the D2S `vinp` \/ `vinn` fall to about −0.26 … −0.52 V once their switches open./' results.md && grep -c "0.52 V once" results.md && sed -n 1,40p results.md
+```
+
+## Tool results / harness — 2026-11-25 19:27:06 UTC
+
+**Tool result:**
+
+```
+1
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Terminal voltages of every MOS device in slot 7 and its custom pads: results
+
+**IHP sg13cmos5l simulation**, ngspice-47, IHP OSDI models (PSP 103, quasi-static unless stated otherwise). The deck is
+the slot-level deck: pads, `pad_ref_rb` and `bias_dist_pd` are KLayout-extracted with the diode fix applied. It has
+499 MOS devices, all HV. Method, conditions and limits of this study: [README.md](README.md). Every generated table:
+[tables.md](tables.md). Runs of 2026-11-25.
+
+In this file:
+
+- *Gate stress* means max(|VGS|, |VGD|). The source is the electrical source: the lower diffusion terminal for NMOS, the
+  higher for PMOS.
+- *Peak* means the largest value at any simulated point.
+- *Held* means the largest value that stays for at least 100 ns. For DC runs, held = peak.
+- *Above 3.3 V* means above 3.301 V. This 1 mV tolerance keeps out VGS = supply, which comes out a few µV above 3.3 V at
+  some points.
+- *L meets LG* means L ≥ 0.6 µm for HV-NMOS and L ≥ 0.5 µm for HV-PMOS. This is the specification's condition. Every
+  other device in the slot has L = 0.45 µm.
+
+## 1. Verdict
+
+| question | answer |
+|---|---|
+| Largest terminal voltages at **3.3 V nominal**, enabled, DC (15 PVT points; pad −0.2 … 3.3 V; three D2S loads) | \|VGS\| **3.300 V**: the 3.3 V logic, gate at one rail and source at the other. \|VGD\| and \|VDS\| **3.500 V**: S2D pad clamp PMOS `x2s.xlay.x_3` (266.4/0.6 µm, L mee
+… [3664 more characters cut]
+```
+
+## Assistant — 2026-11-25 19:27:13 UTC
+
+**Tool call: `Bash`**
+
+_Review rest of results.md_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+s=open('results.md').read()
+a="All of them see VGS or VGD = supply. |"
+b="All of them see VGS or VGD = supply; the S2D clamp sees supply + 0.2 V with the pad at −0.2 V. |"
+assert a in s; s=s.replace(a,b); open('results.md','w').write(s)
+EOF
+sed -n 40,200p results.md
+```
+
+## Tool results / harness — 2026-11-25 19:27:13 UTC
+
+**Tool result:**
+
+```
+| supply | gate-length class | devices | gate stress > 3.3 V | max gate stress [V] | max \|VDS\| [V] |
+|---|---|---|---|---|---|
+| 3.0 V | L meets LG | 255 | 0 | 3.300 (S2D clamp NMOS `x_43`, 88/0.6 µm, gate at ground, pad at 3.3 V) | 3.300 |
+| 3.0 V | 0.45 µm | 244 | 0 | 3.000 | |
+| 3.3 V | L meets LG | 255 | 1 (S2D clamp `x_3`, 3.500 V at pad −0.2 V) | 3.500 | 3.500 |
+| 3.3 V | 0.45 µm | 244 | 0 | 3.300 | |
+| 3.6 V | L meets LG | 255 | 74 (`ls_up_fs` 67, S2D pad 4, `bg_core_pd` 3) | 3.800 | 3.800 |
+| 3.6 V | 0.45 µm | 244 | 154 (`s7_ctrl` logic 58, `ls_up_fs` 48, `bias_dist_pd` 40, `tg_hv` 7, S2D pad 1) | 3.600 | |
+
+Neither the D2S load (unloaded, 1 kΩ to vterm, 1 kΩ to ground) nor the temperature changes these maxima. The same
+values appear at every corner, because they are set by the rails and the pad source, not by the analog operating point.
+
+## 3. Transients and the disabled state
+
+Largest values per job kind (all devices, all runs of that kind). From `tables.md`:
+
+| job | supply | runs | max \|VGS\| [V] | device | max \|VGD\| [V] | max \|VDS\| [V] |
+|---|---|---|---|---|---|---|
+| step (pad 0 → supply → −0.2 → 0.5 V, 10 ns) | 3.3 | 6 | 3.300 | logic | 3.501 | 3.500 (S2D clamp) |
+| step | 3.6 | 14 | 3.600 | logic | 3.801 | 3.800 (S2D clamp) |
+| pu (10 µs ramp) / pu fast (1 µs) | 3.3 | 2 / 3 | 3.300 / 3.301 | logic | 3.300 / 5.491 | 3.300 / 7.815 |
+| pu / pu fast | 3.6 | 4 / 7 | 3.600 / 3.601 | logic | 3.600 / 5.851 | 3.600 / 8.196 |
+| pu late (enable 20 µs after the ra
+… [11004 more characters cut]
+```
+
+## Assistant — 2026-11-25 19:27:28 UTC
+
+**Tool call: `Bash`**
+
+_Add third mechanism and recheck tables_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+s=open('results.md').read()
+a="""Peaks above the supply by more than a few tens of mV come from two mechanisms:"""
+b="""Peaks above the supply come from three mechanisms:"""
+assert a in s; s=s.replace(a,b)
+a="""Per-device lists: [tables.md](tables.md), sections "Top 20 devices by …\""""
+b="""3. **Switching overshoot of logic nodes**, for nanoseconds at the bit and enable edges. Up to 3.483 V (3.3 V) and
+   3.817 V (3.6 V) on the `ls_up_fs` output inverters during mode switching. Not held: the held values of these devices
+   are the supply.
+
+Per-device lists: [tables.md](tables.md), sections "Top 20 devices by …\""""
+assert a in s; s=s.replace(a,b)
+open('results.md','w').write(s)
+EOF
+python3 - <<'EOF'
+import re
+for f in ['/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/'+x for x in ['README.md','results.md','tables.md']]:
+    lines=open(f).read().splitlines(); bad=0; i=0
+    while i<len(lines):
+        if lines[i].lstrip().startswith('|') and i+1<len(lines) and re.match(r'^\|(-+\|)+$',lines[i+1].strip().replace(' ','')):
+            nc=lambda l: re.sub(r'\\\|','',l).strip().count('|')-1
+            n=nc(lines[i]); j=i+1
+            while j<len(lines) and lines[j].lstrip().startswith('|'):
+                if nc(lines[j])!=n: bad+=1; print(f,j+1)
+                j+=1
+            i=j
+        else: i+=1
+    print(f.split('/')[-1],'bad',bad)
+EOF
+```
+
+## Tool results / harness — 2026-11-25 19:27:28 UTC
+
+**Tool result:**
+
+```
+README.md bad 0
+results.md bad 0
+tables.md bad 0
+```
+
+## Assistant — 2026-11-25 19:27:31 UTC
+
+**Tool call: `Bash`**
+
+_Skim README method section_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && sed -n 30,75p README.md
+```
+
+## Tool results / harness — 2026-11-25 19:27:31 UTC
+
+**Tool result:**
+
+```
+### Deck (`vs.py`)
+
+The designer's tier-1 slot deck (design repository `tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single`, commit
+`9052bd35928c6d40344e8e686c9abbe736bfadb9`, `docs/slot7_hookup/tier1/run_tier1.py`, imported unchanged), built as
+[../ac_tran/slot.py](../ac_tran/slot.py) builds it for the KLayout pad view:
+
+- `slot_7` source netlist (`macros/slot_7/netlist/source/slot_7.spice`: `s7_ctrl` glue logic with 7 `ls_up_fs`,
+  13 `nand2_hv`, 12 `inv_hv`, 10 `tg_hv`; `s7_doutpd`), `hv_logic` and `en_ctrl_3v3` source netlists;
+- `bg_core_pd` schematic netlist (`netlist/schematic/bg_core_pd_magic.spice`), as in the designer's runs;
+- `pad_ref_rb`, `bias_dist_pd` and both custom pads (`sg13cmos5l_IOPadSingle2Diff` = S2D, `sg13cmos5l_IOPadDiff2Single`
+  = D2S) **KLayout-extracted** from the layout (`netlist/layout/*_klayout.cir`, converted and port-wrapped by
+  `run_tier1.wrapped()`), with the antenna-diode fix of [../klayout_pad_diodes/fix_diodes.py](../klayout_pad_diodes/fix_diodes.py)
+  applied (imported, unchanged) and the KLayout instance names `X$<n>` written `X_<n>` (a `$` would be expanded as a
+  variable in ngspice's `.control` section). The extracted views merge parallel fingers into one device of the summed
+  width, so the device count of the pads is that of the extracted netlist (S2D 65, D2S 64 MOS).
+- `vdd_3v3` = `iovdd` = the supply under test; the pads' `vdd` / `vss` pins on `iovdd` / ground as in `run_tier1.py`
+  (the extracted pads have no separate core-suppl
+… [3690 more characters cut]
+```
+
+## Assistant — 2026-11-25 19:27:36 UTC
+
+**Tool call: `Bash`**
+
+_Fix README retry description and check status_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+s=open('README.md').read()
+a="""  `../slot_modes_bg`); a failed transient is rerun with a 2 ns maximum step, then with trapezoidal integration."""
+b="""  `../slot_modes_bg`); a failed transient is rerun with a 2 ns maximum step, then with a 0.5 ns maximum step. (The
+  first pass retried with trapezoidal integration instead; its two results were discarded, results.md section 8.)"""
+assert a in s; s=s.replace(a,b); open('README.md','w').write(s)
+EOF
+grep -n "trapezoidal" README.md vs.py | head; ls -la; git -C /home/user/sg13cmos5l_cm_slot7 status --short | head
+```
+
+## Tool results / harness — 2026-11-25 19:27:36 UTC
+
+**Tool result:**
+
+```
+README.md:54:  first pass retried with trapezoidal integration instead; its two results were discarded, results.md section 8.)
+README.md:95:  maximum step, with trapezoidal integration, and with the PDK's non-quasi-static model card (`rfmode=1`, PSP NQS with
+vs.py:32:         chk_step05n, chk_step01n = maximum time step 2 / 0.5 / 0.1 ns, chk_trap = trapezoidal, chk_nocshunt,
+vs.py:363:        # step2n / step05n / step01n (maximum time step 2 / 0.5 / 0.1 ns), trap (trapezoidal integration), nocshunt
+total 232
+drwxr-xr-x  6 root root  4096 Nov 25 19:27 .
+drwxr-xr-x 13 root root  4096 Nov 25 14:14 ..
+-rw-r--r--  1 root root   105 Nov 25 14:35 .gitignore
+-rw-r--r--  1 root root 15432 Nov 25 19:27 README.md
+drwxr-xr-x  2 root root  4096 Nov 25 19:26 __pycache__
+drwxr-xr-x  9 root root  4096 Nov 25 19:22 _work
+-rw-r--r--  1 root root 29062 Nov 25 19:26 analyze.py
+drwxr-xr-x  2 root root  4096 Nov 25 19:22 csv
+-rw-r--r--  1 root root  4855 Nov 25 19:25 edges.py
+-rw-r--r--  1 root root  4738 Nov 25 18:27 jobs.txt
+drwxr-xr-x  2 root root  4096 Nov 25 19:26 plots
+-rw-r--r--  1 root root  1100 Nov 25 14:11 rawread.py
+-rw-r--r--  1 root root 19146 Nov 25 19:27 results.md
+-rwxr-xr-x  1 root root  2315 Nov 25 19:24 run.sh
+-rw-r--r--  1 root root 89907 Nov 25 19:26 tables.md
+-rw-r--r--  1 root root 21226 Nov 25 19:23 vs.py
+?? verification/c2_gaps/voltage_stress/
+```
+
+## Assistant — 2026-11-25 19:27:38 UTC
+
+**Tool call: `Bash`**
+
+_Remove bytecode cache and confirm status_
+
+```bash
+rm -rf /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/__pycache__; git -C /home/user/sg13cmos5l_cm_slot7 status --short --ignored verification/c2_gaps/voltage_stress | head
+```
+
+## Tool results / harness — 2026-11-25 19:27:39 UTC
+
+**Tool result:**
+
+```
+?? verification/c2_gaps/voltage_stress/
+!! verification/c2_gaps/voltage_stress/_work/
+```
+
+## Assistant — 2026-11-25 19:27:53 UTC
+
+**Tool call: `SubagentHandback`**
+
+```json
+{
+ "message": "The simulation is complete: 222 of 238 runs finished. At 3.3 V nominal, no 0.45 µm device goes above 3.3 V while the slot is enabled. Above 3.3 V there are two cases: the disabled state at 3.3 V, and every rail-to-rail device at 3.6 V.\n\n**Setup.** I used the slot-level deck from `../ac_tran/slot.py`, with KLayout-extracted pads, `pad_ref_rb` and `bias_dist_pd`, plus the `fix_diodes.py` fix. It contains 499 MOS devices, all HV, with no LV device and no iNMOS. \"Gate stress\" below is the larger of |VGS| and |VGD|; \"held\" means the value lasted at least 100 ns.\n\n**3.3 V, enabled, DC** (15 PVT points, pad −0.2 … 3.3 V, three loads):\n- Largest |VGS| is 3.300 V, on 1/0.45 µm logic with gate at one rail and source at the other.\n- Largest |VGD| and |VDS| is 3.500 V, on the S2D clamp PMOS `x2s.xlay.x_3` (266.4/0.6 µm). This only happens with the pad driven to −0.2 V, and its VGS is 0.\n\n**3.3 V, disabled state after an enable edge:**\n- Floating nodes are kicked past the rails and stay there for the rest of the run. Examples: the spare `bias_dist_pd` output `isp`, `vref`, `vinp`/`vinn`.\n- Held gate stress reaches 3.714 V on `bias_dist_pd` TG NMOS `x_8.x_7` (1/0.45 µm, `en`, ff −40 °C).\n- 17 devices at 0.45 µm are held above 3.301 V: 10 `tg_hv` switches, 4 `bias_dist_pd` TGs, and 3 that are within 2 mV of 3.3 V.\n\n**3.6 V:**\n- In DC, |VGS| is 3.600 V and |VGD| and |VDS| are 3.800 V (the same clamp).\n- 154 of 244 devices at 0.45 µm and 74 of 255 devices meeting the length condition are above 3.3 V. The 74 are 67 `ls_up_fs` PMOS (0.3/20 and 0.3/5), 4 in the S2D pad and 3 in `bg_core_pd`.\n- In transients, held gate stress reaches 4.082 V (`s7_ctrl` `xt10` PMOS, 1/0.45 µm) and held |VDS| reaches 4.283 V (`bg_core_pd` `xms1_7`, 0.5/12.5 µm).\n\n**Breakdown (BVDSS 5.3 V):** all held |VDS| stay at least 1.0 V below 5.3 V.\n\n**Long-channel stack spikes (not counted as real stress):**\n- Internal nodes of the `bg_core_pd` start-up chain and the `ls_up_fs` leaker stacks spike for nanoseconds, up to |VDS| 10.7 V and gate stress 7.9 V.\n- These spikes are unchanged with 10, 2 and 0.5 ns time steps, so they are not a step-size artifact. They are larger than capacitive coupling allows, which points to the quasi-static model.\n- The NQS (non-quasi-static) runs aborted before the edge, so how large the spikes really are is not settled.\n\n**Fail-safe:**\n- Slot off and ring on: stress is at most the supply.\n- Everything off with the pads driven: no node goes above 0.83 V.\n\n**What I could not do:**\n- No result from:\n  - `dc` ss −40 °C 3.0 V unloaded.\n  - `fs` at 7 of the −40 °C points; the slow-transient `fst` replacement covers all ten.\n  - `mode` at ff −40 °C (3.3 and 3.6 V) and sf −40 °C 3.6 V.\n  - `off` tt 27 °C 3.3 V.\n  - Four 10 µs power-up runs at 125 °C.\n- I discarded the two runs that converged only with trapezoidal integration (`mode` ff −40 °C 3.6 V, `off` tt 27 °C 3.3 V).\n- The 10 µs power-up needed a two-slope ramp; a
+… [598 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 19:27:54 UTC
+
+**Tool result:**
+
+```
+{"success":true,"message":"Report delivered to your caller."}
+```
+
