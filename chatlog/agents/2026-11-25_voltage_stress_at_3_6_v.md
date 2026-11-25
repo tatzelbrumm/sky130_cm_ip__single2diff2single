@@ -1722,3 +1722,1283 @@ Command was moved to the background (ID: bvfsyiioe) so that a message that arriv
 Session cwd remains /home/user/sg13cmos5l_cm_slot7; directory changes made by the backgrounded command do not apply to subsequent commands.
 ```
 
+## Assistant — 2026-11-25 14:31:46 UTC
+
+**Tool call: `Bash`**
+
+_Wait for transient test output_
+
+```bash
+sleep 240; cat /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output
+```
+
+## Tool results / harness — 2026-11-25 14:31:46 UTC
+
+**Tool result:**
+
+```
+<tool_use_error>Blocked: sleep 240 followed by: cat /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output. To wait for a condition, use Monitor with an until-loop (e.g. `until <check>; do sleep 2; done`). To wait for a command you started, use run_in_background: true. Do not chain shorter sleeps to work around this block.</tool_use_error>
+```
+
+## Assistant — 2026-11-25 14:31:50 UTC
+
+**Tool call: `Bash`**
+
+_Check transient test progress_
+
+```bash
+cat /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output; ls -la /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/_work/runs/off_tt_27_3.6/
+```
+
+## Tool results / harness — 2026-11-25 14:31:50 UTC
+
+**Tool result:**
+
+```
+off_tt_27_3.6 ok 
+62 s
+total 40
+drwxr-xr-x  2 root root 4096 Nov 25 14:27 .
+drwxr-xr-x 11 root root 4096 Nov 25 14:27 ..
+-rw-r--r--  1 root root 1091 Nov 25 14:26 .spiceinit
+-rw-r--r--  1 root root 2537 Nov 25 14:26 bias_dist_pd_flat.spice
+-rw-r--r--  1 root root 2418 Nov 25 14:26 off_tt_27_3.6.spice
+-rw-r--r--  1 root root 3433 Nov 25 14:26 pad_ref_rb_flat.spice
+-rw-r--r--  1 root root 6994 Nov 25 14:26 sg13cmos5l_IOPadDiff2Single_flat.spice
+-rw-r--r--  1 root root 6793 Nov 25 14:26 sg13cmos5l_IOPadSingle2Diff_flat.spice
+```
+
+## Assistant — 2026-11-25 14:33:13 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/analyze.py`
+
+```
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Collect the per-device terminal-voltage maxima of all vs.py runs; tables (Markdown), summary CSVs, plots.
+
+Usage: python3 -I analyze.py <work_dir> <out_dir>
+  reads <work_dir>/topo.csv, <work_dir>/dev/*.csv.gz, <work_dir>/nodes/*.csv.gz, <work_dir>/log/*.log
+  writes <out_dir>/csv/*.csv, <out_dir>/tables.md, <out_dir>/plots/*.png
+
+Limits compared (PDK process specification SG13CMOS5L Rev. 0.2, sections 2.1.4 ... 2.1.6, libs.doc/doc/
+SG13CMOS5L_os_process_spec.pdf): VGS <= 3.3 V (maximum) at 27 C for HV-NMOS with LG >= 0.6 um and HV-PMOS with
+LG >= 0.5 um (footnote: 1 FIT in 10 years for HCI); breakdown BVDSSNHV013 min 5.3 V, BVDSSPHV04 max -5.3 V
+(i.e. |BVDSS| >= 5.3 V), BVDSSNIHV045 min 5.2 V (HV-iNMOS; no iNMOS is used in slot 7).
+"""
+import csv
+import gzip
+import re
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt  # noqa: E402
+
+WORK, OUT = Path(sys.argv[1]).resolve(), Path(sys.argv[2]).resolve()
+VLIM = 3.3
+LG = {'sg13_hv_nmos': 0.6, 'sg13_hv_pmos': 0.5}
+BVDSS = {'sg13_hv_nmos': 5.3, 'sg13_hv_pmos': 5.3}
+QTY = ('vgs', 'vgd', 'vds', 'vgb', 'vsb', 'vdb')
+KIND_TXT = {'dc': 'DC, enabled default mode, S2D pad swept', 'fs': 'fail-safe: slot supplies 0, ring on, pads driven',
+            'fs0': 'fail-safe: all supplies 0, pads driven', 'off': 'disabled (enable 0), pad ramped',
+            'pu': 'power-up transient', 'en': 'enable off / on edges', 'step': 'full-swing S2D pad steps',
+            'mode': 'mode switching', 'topo': 'topology run (DC tt 27 C 3.3 V, as dc open)'}
+
+
+def block(inst):
+    p = inst.split('.')
+    if p[1] == 'x2s':
+        return 'S2D pad'
+    if p[1] == 'x2d':
+        return 'D2S pad'
+    b = p[2]
+    if b == 'xc':
+        sub = p[3]
+        if sub.startswith('xl'):
+            return 's7_ctrl ls_up_fs'
+        if sub.startswith('xt'):
+            return 's7_ctrl tg_hv switches'
+        return 's7_ctrl logic'
+    return {'xbg': 'bg_core_pd', 'xd': 'bias_dist_pd', 'xr': 'pad_ref_rb', 'xdo': 's7_doutpd'}.get(b, b)
+
+
+def load_topo():
+    rows = []
+    with open(WORK / 'topo.csv') as f:
+        for r in csv.DictReader(f):
+            r['L'] = round(float(r['l']) * 1e6, 4)
+            r['W'] = round(float(r['w']) * 1e6, 4)
+            r['NF'] = int(round(float(r['nf'] or 1)))
+            r['block'] = block(r['inst'])
+            r['type'] = 'HV-NMOS' if 'nmos' in r['dev'] else 'HV-PMOS'
+            r['spec_L'] = r['L'] >= LG[r['dev']] - 1e-9
+            r['cap'] = r['d'] == r['s']        # drain = source: MOS capacitor (or a shorted dummy)
+            r['name'] = '.'.join(r['inst'].split('.')[:-1])  # subckt instance name (without the PDK's inner N)
+            rows.append(r)
+    return rows
+
+
+def parse_tag(tag):
+    m = re.match(r'^(\w+?)_(\w\w)_(-?\d+)_([\d.]+)(?:_(\w+))?$', tag)
+    kind, c, t, v, var = m.groups()
+    return dict(kind=kind, mos=c, temp=int(t), vdd=float(v), var=var or '')
+
+
+def load_runs():
+    runs = {}
+    for f in sorted((WORK / 'dev').glob('*.csv.gz')):
+        tag = f.name[:-7]
+        info = parse_tag(tag)
+        with gzip.open(f, 'rt') as fh:
+            head = fh.readline()
+            m = re.search(r'aid (\S+), (\d+) points', head)
+            info['aid'], info['npts'] = (m.group(1).rstrip(','), int(m.group(2))) if m else ('?', 0)
+            rd = csv.DictReader(fh)
+            info['dev'] = {r['inst']: r for r in rd}
+        runs[tag] = info
+    return runs
+
+
+def failed_runs(runs):
+    out = []
+    for f in sorted((WORK / 'log').glob('*.log')):
+        tag = f.name[:-4]
+        if tag not in runs:
+            txt = f.read_text(errors='replace')
+            m = re.findall(r'(doAnalyses:[^\n]*|TIMEOUT[^\n]*|Error: Transient op failed[^\n]*|timestep too small[^\n]*)',
+                           txt)
+            t = re.findall(r'tran simulation\(s\) aborted|time = 
+… [18397 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 14:33:13 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/analyze.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:33:18 UTC
+
+**Tool call: `Bash`**
+
+_Check power-up test status_
+
+```bash
+cat /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output; pgrep -af "ngspice -b pu"
+```
+
+## Tool results / harness — 2026-11-25 14:33:18 UTC
+
+**Tool result:**
+
+```
+off_tt_27_3.6 ok 
+62 s
+8882 ngspice -b pu_tt_27_3.6.spice
+```
+
+## Assistant — 2026-11-25 14:33:22 UTC
+
+**Tool call: `Monitor`**
+
+_power-up test transient completes_
+
+```json
+{
+ "timeout_ms": 1800000,
+ "command": "until grep -q \"pu_tt_27_3.6\" /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output; do sleep 5; done; tail -3 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:33:22 UTC
+
+**Tool result:**
+
+```
+Monitor started (task bzinpqs6b, expires in 30m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+```
+
+## Assistant — 2026-11-25 14:33:24 UTC
+
+Meanwhile, I'll run the analysis on the completed runs to debug it.
+
+## Assistant — 2026-11-25 14:33:26 UTC
+
+**Tool call: `Bash`**
+
+_Debug analysis on completed runs_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && mkdir -p /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/an && python3 -I analyze.py _work /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/an 2>&1 | tail -5; head -c 6000 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/an/tables.md
+```
+
+## Tool results / harness — 2026-11-25 14:33:28 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+    m = re.match(r'^(\w+?)_(\w\w)_(-?\d+)_([\d.]+)(?:_(\w+))?$', tag)
+  File "/usr/local/lib/python3.13/re/__init__.py", line 167, in match
+    return _compile(pattern, flags).match(string)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+TypeError: expected string or bytes-like object, got 'NoneType'
+head: cannot open '/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/an/tables.md' for reading: No such file or directory
+```
+
+## Assistant — 2026-11-25 14:33:35 UTC
+
+**Tool call: `Bash`**
+
+_Rerun analysis after fix_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+p='analyze.py'
+s=open(p).read()
+s=s.replace("""def cond_txt(tag, x, q):
+    i = parse_tag(tag)""","""def cond_txt(tag, x, q):
+    if tag is None:
+        return 'no run'
+    i = parse_tag(tag)""")
+open(p,'w').write(s)
+EOF
+python3 -I analyze.py _work /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/an 2>&1 | tail -5; head -c 8000 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/an/tables.md
+```
+
+## Tool results / harness — 2026-11-25 14:33:37 UTC
+
+**Tool result:**
+
+```
+analyze: runs 7 failed 1
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Generated tables (analyze.py)
+
+## Runs
+
+| job | what | runs ok | supply [V] | solver aid |
+|---|---|---|---|---|
+| dc 1k | DC, enabled default mode, S2D pad swept | 1 | 3.6 | none |
+| dc 1kgnd | DC, enabled default mode, S2D pad swept | 1 | 3.6 | none |
+| dc open | DC, enabled default mode, S2D pad swept | 1 | 3.6 | none |
+| fs | fail-safe: slot supplies 0, ring on, pads driven | 1 | 3.6 | rshunt |
+| fs0 | fail-safe: all supplies 0, pads driven | 1 | 3.6 | rshunt |
+| off | disabled (enable 0), pad ramped | 1 | 3.6 | none |
+| topo | topology run (DC tt 27 C 3.3 V, as dc open) | 1 | 3.3 | none |
+
+Failed runs (no result): 1
+
+| run | last solver message |
+|---|---|
+| dcoff_tt_27_3.6 | doAnalyses: DC:  Timestep too small;  vin = -0.2: trouble with dparea-instance d.x2s.xlay.x$63.d1 |
+
+## Maximum per device type and gate length, supply class 3.3 V (all runs at 3.3 V)
+
+| type | L [um] | L meets spec LG | devices | blocks | max \|VGS\| [V] | where (\|VGS\|) | max \|VGD\| [V] | max \|VDS\| [V] | where (\|VDS\|) | max \|VGB\| [V] | devices with \|VGS\| or \|VGD\| > 3.3 V | same, 27 C runs only |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| HV-NMOS | 0.45 | no | 134 | D2S pad, S2D pad, bg_core_pd, bias_dist_pd, pad_ref_rb, s7_ctrl logic, s7_ctrl ls_up_fs, s7_ctrl tg_hv switches, s7_doutpd | 3.300 | xs.xc.xle.xi2.xn (topo tt 27 C 3.3 V, pad 0.05 V) | 3.300 | 3.3
+… [6524 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:33:45 UTC
+
+**Tool call: `Bash`**
+
+_Inspect node extremes of disable transient_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && sed -n '/Node extremes/,$p' /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/an/tables.md; zcat _work/nodes/off_tt_27_3.6.csv.gz | sort -t, -k2 -g | tail -5; zcat _work/nodes/off_tt_27_3.6.csv.gz | sort -t, -k4 -g | head -5; grep "xs.xd.xlay.x\$8.x\$7" _work/topo.csv
+```
+
+## Tool results / harness — 2026-11-25 14:33:45 UTC
+
+**Tool result:**
+
+```
+## Node extremes (transients and DC): highest node voltage and lowest node voltage per job kind
+
+| job | supply [V] | highest node [V] | node (where) | lowest node [V] | node (where) |
+|---|---|---|---|---|---|
+| dc 1k | 3.6 | 3.600 | v(en0) (dc 1k tt 27 C 3.6 V, pad 2.15 V) | -0.200 | v(n.x2s.xlay.x$202.nsg13_hv_pmos#gp) (dc 1k tt 27 C 3.6 V, pad -0.20 V) |
+| dc 1kgnd | 3.6 | 3.600 | v(en0) (dc 1kgnd tt 27 C 3.6 V, pad 0.20 V) | -0.200 | v(n.x2s.xlay.x$202.nsg13_hv_pmos#gp) (dc 1kgnd tt 27 C 3.6 V, pad -0.20 V) |
+| dc open | 3.6 | 3.600 | v(en0) (dc open tt 27 C 3.6 V, pad 0.40 V) | -0.200 | v(n.x2s.xlay.x$202.nsg13_hv_pmos#gp) (dc open tt 27 C 3.6 V, pad -0.20 V) |
+| fs | 3.6 | 3.600 | v(iovdd) (fs tt 27 C 3.6 V, pad 0.00 V) | -0.000 | i(epo) (fs tt 27 C 3.6 V, pad 3.60 V) |
+| fs0 | 3.6 | 0.779 | v(n.x2s.xlay.x$202.nsg13_hv_pmos#gp) (fs0 tt 27 C 3.6 V, pad 3.60 V) | -0.003 | i(epo) (fs0 tt 27 C 3.6 V, pad 3.60 V) |
+| off | 3.6 | 5.308 | v(xs.xbg.net1) (off tt 27 C 3.6 V, t = 1.14 us) | -0.469 | v(xs.xc.xle.l1) (off tt 27 C 3.6 V, t = 1.14 us) |
+| topo | 3.3 | 3.300 | v(en0) (topo tt 27 C 3.3 V, pad 0.85 V) | -0.200 | v(n.x2s.xlay.x$202.nsg13_hv_pmos#gp) (topo tt 27 C 3.3 V, pad -0.20 V) |
+v(xs.xbg.net5),4.8794,1.13749e-06,2.7675,1.1005e-06
+v(xs.xbg.net4),5.044,1.13731e-06,2.9707,1.1005e-06
+v(xs.xbg.net3),5.1855,1.13731e-06,3.1499,1.1005e-06
+v(xs.xbg.net2),5.3013,1.13731e-06,3.3121,1.1005e-06
+v(xs.xbg.net1),5.3078,1.13715e-06,3.4613,1.1005e-06
+# off_tt_27_3.6
+node,vmax,x_vma
+… [408 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:34:00 UTC
+
+**Tool call: `Bash`**
+
+_Check whether pu run is still going_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && pgrep -af "ngspice -b" | grep -v hbm | grep -v c_tt; cat /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output
+```
+
+## Tool results / harness — 2026-11-25 14:34:00 UTC
+
+**Tool result:**
+
+```
+8882 ngspice -b pu_tt_27_3.6.spice
+10899 ngspice -b itest_pdk_d2s_neg.spice
+off_tt_27_3.6 ok 
+62 s
+```
+
+## Assistant — 2026-11-25 14:34:07 UTC
+
+**Tool call: `Bash`**
+
+_List overshooting devices and nodes in disable run_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/_work && zcat dev/off_tt_27_3.6.csv.gz | awk -F, 'NR>2{a=$2<0?-$2:$2; b=$4<0?-$4:$4; m=a>b?a:b; if(m>3.61) print m, $1, $3, $5}' | sort -rn | head -20; zcat nodes/off_tt_27_3.6.csv.gz | awk -F, 'NR>2 && $1!~/#/ && ($2>3.65 || $4< -0.05)' | sort -t, -k2 -rn | head -30
+```
+
+## Tool results / harness — 2026-11-25 14:34:07 UTC
+
+**Tool result:**
+
+```
+4.1559 n.xs.xd.xlay.x$8.x$7.nsg13_hv_nmos 1.1446e-06 1.1446e-06
+4.0428 n.xs.xd.xlay.x$5.x$7.nsg13_hv_nmos 1.13646e-06 1.1446e-06
+4.0372 n.xs.xd.xlay.x$7.x$7.nsg13_hv_nmos 1.13646e-06 1.1446e-06
+4.0292 n.xs.xd.xlay.x$6.x$7.nsg13_hv_nmos 1.13656e-06 1.1446e-06
+3.9948 n.xs.xc.xt10.xp.nsg13_hv_pmos 6.4015e-05 1.38525e-06
+3.8622 n.xs.xc.xt8.xp.nsg13_hv_pmos 6.37525e-06 3.59525e-06
+3.8622 n.xs.xc.xt3.xp.nsg13_hv_pmos 3e-05 3.59525e-06
+3.8622 n.xs.xc.xt2.xp.nsg13_hv_pmos 3e-05 3.59525e-06
+3.8609 n.xs.xc.xt7.xp.nsg13_hv_pmos 6.50525e-06 3.70525e-06
+3.8609 n.xs.xc.xt4.xp.nsg13_hv_pmos 3e-05 3.70525e-06
+3.8609 n.xs.xc.xt1.xp.nsg13_hv_pmos 3e-05 3.70525e-06
+3.8 n.x2s.xlay.x$3.nsg13_hv_pmos 6.0015e-05 3e-05
+3.7754 n.xs.xd.xlay.x$6.x$8.nsg13_hv_pmos 1.13685e-06 1.13702e-06
+3.7196 n.xs.xc.xt6.xp.nsg13_hv_pmos 3e-05 6.37525e-06
+3.7163 n.xs.xc.xt5.xp.nsg13_hv_pmos 3e-05 6.50525e-06
+3.7111 n.xs.xd.xlay.x$7.x$8.nsg13_hv_pmos 1.1368e-06 1.13702e-06
+3.634 n.x2s.xlay.x$172.nsg13_hv_pmos 1.14324e-06 1.14162e-06
+3.6173 n.xs.xc.xirc.xp.nsg13_hv_pmos 1.13605e-06 1.13702e-06
+3.6173 n.xs.xc.xirc.xn.nsg13_hv_nmos 1.13702e-06 1.13702e-06
+3.6173 n.xs.xc.xild.xp.nsg13_hv_pmos 1.13605e-06 1.13702e-06
+v(xs.xbg.net1),5.3078,1.13715e-06,3.4613,1.1005e-06
+v(xs.xbg.net2),5.3013,1.13731e-06,3.3121,1.1005e-06
+v(xs.xbg.net3),5.1855,1.13731e-06,3.1499,1.1005e-06
+v(xs.xbg.net4),5.044,1.13731e-06,2.9707,1.1005e-06
+v(xs.xbg.net5),4.8794,1.13749e-06,2.7675,1.1005e-06
+v(xs.xbg.net6),4.6885,1.13784e-06,2.5269,1.1005e-06
+v
+… [1063 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:34:28 UTC
+
+**Tool call: `Bash`**
+
+_Show junction areas of bandgap chain PMOS_
+
+```bash
+grep "xbg.xms1_0.nsg13\|xbg.xms1_1.nsg13" /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/topo.out | cut -c1-600
+```
+
+## Tool results / harness — 2026-11-25 14:34:28 UTC
+
+**Tool result:**
+
+```
+406 : n.xs.xbg.xms1_0.nsg13_hv_pmos xs.xbg.net1 xs.en_b vdd_3v3 vdd_3v3 xs.xbg.xms1_0:sg13g2_hv_pmos_psp w=    5.000000000000000e-07     l=    1.250000000000000e-05     nf=    1.000000000000000e+00     mult=    1.000000000000000e+00     as=    1.700000000000000e-13     ad=    1.700000000000000e-13     ps=    1.680000000000000e-06     pd=    1.680000000000000e-06     dta=    0.000000000000000e+00     ngcon=2 delvto=0 factuo=1
+   406 : n.xs.xbg.xms1_1.nsg13_hv_pmos xs.xbg.net2 xs.en_b xs.xbg.net1 vdd_3v3 xs.xbg.xms1_1:sg13g2_hv_pmos_psp w=    5.000000000000000e-07     l=    1.250000000000000e-05     nf=    1.000000000000000e+00     mult=    1.000000000000000e+00     as=    1.700000000000000e-13     ad=    1.700000000000000e-13     ps=    1.680000000000000e-06     pd=    1.680000000000000e-06     dta=    0.000000000000000e+00     ngcon=2 delvto=0 factuo=1
+```
+
+## Assistant — 2026-11-25 14:34:38 UTC
+
+**Tool call: `Bash`**
+
+_Check pu run elapsed time_
+
+```bash
+cat /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output; ps -o etime,cmd -p $(pgrep -f "ngspice -b pu_tt") 2>/dev/null
+```
+
+## Tool results / harness — 2026-11-25 14:34:38 UTC
+
+**Tool result:**
+
+```
+off_tt_27_3.6 ok 
+62 s
+    ELAPSED CMD
+      07:24 ngspice -b pu_tt_27_3.6.spice
+```
+
+## Assistant — 2026-11-25 14:34:44 UTC
+
+**Tool call: `Monitor`**
+
+_pu test finishes_
+
+```json
+{
+ "timeout_ms": 1800000,
+ "command": "until ! pgrep -f \"ngspice -b pu_tt_27_3.6\" >/dev/null && grep -q \"pu_tt\" /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output; do sleep 10; done; tail -3 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:34:44 UTC
+
+**Tool result:**
+
+```
+Monitor started (task bvxbu0ahh, expires in 30m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+```
+
+## Assistant — 2026-11-25 14:34:55 UTC
+
+**Tool call: `Bash`**
+
+_Check pu run files_
+
+```bash
+ls -la /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/_work/runs/pu_tt_27_3.6/; ps -o etime,cmd -p $(pgrep -f "ngspice -b pu_tt") 2>/dev/null
+```
+
+## Tool results / harness — 2026-11-25 14:34:55 UTC
+
+**Tool result:**
+
+```
+total 40
+drwxr-xr-x  2 root root 4096 Nov 25 14:27 .
+drwxr-xr-x 11 root root 4096 Nov 25 14:27 ..
+-rw-r--r--  1 root root 1091 Nov 25 14:27 .spiceinit
+-rw-r--r--  1 root root 2537 Nov 25 14:27 bias_dist_pd_flat.spice
+-rw-r--r--  1 root root 3433 Nov 25 14:27 pad_ref_rb_flat.spice
+-rw-r--r--  1 root root 2411 Nov 25 14:27 pu_tt_27_3.6.spice
+-rw-r--r--  1 root root 6994 Nov 25 14:27 sg13cmos5l_IOPadDiff2Single_flat.spice
+-rw-r--r--  1 root root 6793 Nov 25 14:27 sg13cmos5l_IOPadSingle2Diff_flat.spice
+    ELAPSED CMD
+      07:40 ngspice -b pu_tt_27_3.6.spice
+```
+
+## Assistant — 2026-11-25 14:34:59 UTC
+
+**Tool call: `Bash`**
+
+_Show current time_
+
+```bash
+date
+```
+
+## Tool results / harness — 2026-11-25 14:34:59 UTC
+
+**Tool result:**
+
+```
+Wed Nov 25 14:34:59 UTC 2026
+```
+
+## Assistant — 2026-11-25 14:35:05 UTC
+
+**Tool call: `Bash`**
+
+_Count unique terminal nodes_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/_work && python3 -c "
+import csv
+r=list(csv.DictReader(open('topo.csv')))
+s=set()
+for x in r: s|={x['d'],x['g'],x['s'],x['b']}
+print(len(s))"; zcat nodes/off_tt_27_3.6.csv.gz | wc -l; zcat nodes/off_tt_27_3.6.csv.gz | grep -c "#"
+```
+
+## Tool results / harness — 2026-11-25 14:35:05 UTC
+
+**Tool result:**
+
+```
+284
+4124
+3722
+```
+
+## Assistant — 2026-11-25 14:35:15 UTC
+
+**Tool call: `Bash`**
+
+_Save only MOS terminal nodes in raw files_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+p='vs.py'
+s=open(p).read()
+old="""    ctrl = ('listing e\\n' if kind == 'topo' else '') + f\"\"\"set filetype=binary
+{ana}"""
+new="""    ctrl = ('listing e\\n' if kind == 'topo' else '') + save_lines() + f\"\"\"set filetype=binary
+{ana}"""
+assert old in s
+s=s.replace(old,new)
+old2="""def parse_listing(text):"""
+new2='''def save_lines():
+    """'save' of the MOS terminal nodes only (from topo.csv; without it, i.e. in the topo run, ngspice keeps every node
+    including the OSDI devices' internal nodes) plus the testbench nodes."""
+    if not topo_csv().exists():
+        return ''
+    nodes = set()
+    for r in load_topo():
+        nodes |= {r['d'], r['g'], r['s'], r['b']}
+    nodes = sorted(nodes - {'0'}) + ['padin', 'padout', 'iovdd', 'vdd_3v3', 'enable', 'vterm', 'v12']
+    nodes = list(dict.fromkeys(nodes))
+    return ''.join('save ' + ' '.join(f'v({n})' for n in nodes[i:i + 20]) + '\\n' for i in range(0, len(nodes), 20))
+
+
+def parse_listing(text):'''
+s=s.replace(old2,new2)
+open(p,'w').write(s)
+EOF
+python3 -c "
+import sys; sys.argv=['x','/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/_work']
+sys.path.insert(0,'/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress')
+import vs; t=vs.save_lines(); print(t[:300]); print(t.count('save'))"
+```
+
+## Tool results / harness — 2026-11-25 14:35:16 UTC
+
+**Tool result:**
+
+```
+save v(b0) v(b1) v(d0) v(d1) v(d2) v(d3) v(d4) v(d5) v(do0) v(do1) v(do10) v(do11) v(do2) v(do3) v(do4) v(do5) v(do6) v(do7) v(do8) v(do9)
+save v(en0) v(en1) v(enable) v(enb0) v(enb1) v(iovdd) v(iref0) v(iref1) v(outn) v(outp) v(padin) v(padout) v(v12) v(vcm_s2d) v(vdd_3v3) v(vinn) v(vinp) v(vref_d2
+15
+```
+
+## Assistant — 2026-11-25 14:35:27 UTC
+
+**Tool call: `Bash`**
+
+_Write prioritized job list_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+L=["# SPDX-FileCopyrightText: 2026 Christoph Maier","# SPDX-License-Identifier: Apache-2.0",
+"# vs.py jobs, run in this order (run.sh: one ngspice at a time): <kind>:<mos>:<temp>:<vdd>[:<variant>]",
+"# topology first (writes topo.csv, which the other jobs use for their 'save' list)","topo:tt:27:3.3"]
+C=['tt','ss','ff','sf','fs']; T=[-40,27,125]
+pvt=[(c,t,v) for v in (3.3,3.6) for c in C for t in T]+[('ss',-40,3.0),('sf',-40,3.0)]
+L.append("# DC, enabled default mode: 5 corners x 3 temperatures x 3.3 / 3.6 V, plus the tier-1 points at 3.0 V; three D2S loads")
+for c,t,v in pvt:
+    for ld in ('open','1k','1kgnd'):
+        L.append(f"dc:{c}:{t}:{v}:{ld}")
+L.append("# fail-safe DC: slot supplies off (ring on) and all supplies off, both pads driven through 1 kOhm")
+for c,t,v in pvt[:30]:
+    for k in ('fs','fs0'):
+        L.append(f"{k}:{c}:{t}:{v}")
+L.append("# transients, priority order: 3.6 V first at tt 27 C and the fast / slow corner extremes, then 3.3 V")
+tp=[('tt',27,3.6),('ff',-40,3.6),('ff',125,3.6),('ss',-40,3.6),('ss',125,3.6),('sf',-40,3.6),('fs',125,3.6),
+    ('tt',27,3.3),('ff',-40,3.3),('ss',-40,3.3)]
+kinds=['off','en','step:open','step:100p','mode','pu:fast','pu']
+for k in kinds:
+    for c,t,v in tp[:1]:
+        kk=k.split(':'); L.append(':'.join([kk[0],c,str(t),str(v)]+kk[1:]))
+for c,t,v in tp[1:]:
+    for k in kinds:
+        kk=k.split(':'); L.append(':'.join([kk[0],c,str(t),str(v)]+kk[1:]))
+open('jobs.txt','w').write('\n'.join(L)+'\n')
+EOF
+grep -vc "^#" jobs.txt
+```
+
+## Tool results / harness — 2026-11-25 14:35:27 UTC
+
+**Tool result:**
+
+```
+227
+```
+
+## Assistant — 2026-11-25 14:35:37 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/run.sh`
+
+```
+#!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+#
+# Terminal voltages of every MOS device of slot 7 and its two custom pads (IHP sg13cmos5l simulation, ngspice-47 with
+# the IHP OSDI models): reproduces csv/, plots/ and tables.md of this folder from a checkout of this repository plus
+# the design-repository commits 91a7da8b / 9052bd35 (fetched by ../dc_curves/fetch.sh, shallow and blobless).
+# Usage: run.sh [<work_dir>] [fetch|sim|analyze|all]   (default ./_work, all)
+#   sim runs the jobs of jobs.txt one after the other (one ngspice process at a time); a job whose result exists in
+#   <work_dir>/dev is skipped (FORCE=1 reruns everything). Raw files are deleted after evaluation (KEEP_RAW=1 keeps them).
+# Needs PDK_ROOT with ihp-sg13cmos5l, ngspice-47 with the IHP OSDI models, python3 with numpy / matplotlib,
+# git with network access to github.com.
+set -euo pipefail
+HERE=$(cd "$(dirname "$0")" && pwd)
+WORK=$(realpath -m "${1:-$HERE/_work}")
+STEP=${2:-all}
+export PDK_ROOT=${PDK_ROOT:-/foss/pdks} PDK=ihp-sg13cmos5l
+export PYTHONDONTWRITEBYTECODE=1
+mkdir -p "$WORK"
+
+fetch() { "$HERE/../dc_curves/fetch.sh" "$WORK"; }
+
+tagof() {  # job -> run tag (as vs.py)
+  local IFS=:; set -- $1
+  echo "$1_$2_$3_$4${5:+_$5}"
+}
+
+sim() {
+  local j
+  grep -v '^#' "$HERE/jobs.txt" | while read -r j; do
+    [ -n "$j" ] || continue
+    if [ "${FORCE:-0}" != 1 ] && [ -f "$WORK/dev/$(tagof "$j").csv.gz" ]; then continue; fi
+    python3 -I "$HERE/vs.py" "$WORK" "$j"
+  done
+}
+
+analyze() {
+  python3 -I "$HERE/analyze.py" "$WORK" "$HERE"
+}
+
+case "$STEP" in
+  all) fetch; sim; analyze ;;
+  fetch|sim|analyze) $STEP ;;
+  *) echo "unknown step $STEP"; exit 1 ;;
+esac
+```
+
+## Tool results / harness — 2026-11-25 14:35:37 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/run.sh (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:35:42 UTC
+
+**Tool call: `Bash`**
+
+_Add .gitignore and check pu_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && chmod +x run.sh && printf '# SPDX-FileCopyrightText: 2026 Christoph Maier\n# SPDX-License-Identifier: Apache-2.0\n_work/\n__pycache__/\n' > .gitignore && cat .gitignore; ps -o etime,cmd -p $(pgrep -f "ngspice -b pu_tt") 2>/dev/null
+```
+
+## Tool results / harness — 2026-11-25 14:35:42 UTC
+
+**Tool result:**
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+_work/
+__pycache__/
+    ELAPSED CMD
+      08:28 ngspice -b pu_tt_27_3.6.spice
+```
+
+## Assistant — 2026-11-25 14:35:48 UTC
+
+**Tool call: `Bash`**
+
+_Gather references for README_
+
+```bash
+grep -n -i "1 µm / 0.45\|0.45 µm\|1/0.45" docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md | head -10; git -C . rev-parse --short HEAD; cat /foss/pdks/ihp-sg13cmos5l/../*.txt 2>/dev/null | head -3; ls /foss/pdks; md5sum /foss/pdks/ihp-sg13cmos5l/libs.doc/doc/SG13CMOS5L_os_process_spec.pdf
+```
+
+## Tool results / harness — 2026-11-25 14:35:48 UTC
+
+**Tool result:**
+
+```
+493:1 / 0.45 µm hv. Disabled: all TGs open, TDN pulls `ni` to vss, SVPD pulls `vpd` to vdd.
+8c58c8c
+IHP-Open-PDK
+ciel
+ihp-sg13cmos5l
+sky130A
+b0275fe63f332765fe1527a2d050c0fe  /foss/pdks/ihp-sg13cmos5l/libs.doc/doc/SG13CMOS5L_os_process_spec.pdf
+```
+
+## Assistant — 2026-11-25 14:35:52 UTC
+
+**Tool call: `Monitor`**
+
+_pu test finishes (re-arm)_
+
+```json
+{
+ "timeout_ms": 1800000,
+ "command": "until ! pgrep -f \"ngspice -b pu_tt_27_3.6\" >/dev/null; do sleep 10; done; sleep 3; tail -3 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output; date"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:35:52 UTC
+
+**Tool result:**
+
+```
+Monitor started (task bi6vpmopa, expires in 30m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+```
+
+## Assistant — 2026-11-25 14:35:54 UTC
+
+**Tool call: `TaskStop`**
+
+```json
+{
+ "task_id": "bvxbu0ahh"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:35:54 UTC
+
+**Tool result:**
+
+```
+{"message":"Successfully stopped task: bvxbu0ahh (until ! pgrep -f \"ngspice -b pu_tt_27_3.6\" >/dev/null && grep -q \"pu_tt\" /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output; do sleep 10; done; tail -3 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output)","task_id":"bvxbu0ahh","task_type":"local_bash","command":"until ! pgrep -f \"ngspice -b pu_tt_27_3.6\" >/dev/null && grep -q \"pu_tt\" /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output; do sleep 10; done; tail -3 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output"}
+```
+
+## Assistant — 2026-11-25 14:35:56 UTC
+
+**Tool call: `TaskStop`**
+
+```json
+{
+ "task_id": "bzinpqs6b"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:35:56 UTC
+
+**Tool result:**
+
+```
+{"message":"Successfully stopped task: bzinpqs6b (until grep -q \"pu_tt_27_3.6\" /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output; do sleep 5; done; tail -3 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output)","task_id":"bzinpqs6b","task_type":"local_bash","command":"until grep -q \"pu_tt_27_3.6\" /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output; do sleep 5; done; tail -3 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output"}
+```
+
+## Assistant — 2026-11-25 14:36:05 UTC
+
+**Tool call: `Bash`**
+
+_Locate aid handling in vs.py_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && grep -n "aid" vs.py | head -30
+```
+
+## Tool results / harness — 2026-11-25 14:36:06 UTC
+
+**Tool result:**
+
+```
+40:from every node to ground, solver aid as ../ac_tran); transients use method=gear cshunt=1e-15 (as run_tier1.py's own
+93:def deck(T, kind, c, t, v, var, rdir, tag, aid):
+98:    opt = '.option gmin=1e-12' + (' method=gear cshunt=1e-15' if tran else '') + (' rshunt=1e12' if aid == 'rshunt'
+100:    tmax = '2n' if aid == 'step2n' else '10n'
+249:def evaluate(tag, raw, kind, aid):
+279:    hdr = (f'# {tag}: kind {kind}, aid {aid or "none"}, {n} points; per value: signed value at max |.|, sweep value '
+304:    # disabled / unpowered states have nodes held only by leakage: their DC sweep goes straight to the solver aid
+309:    ok, aid = False, ''
+310:    for aid in tries:
+311:        d = deck(T, kind, c, t, v, var, rdir, tag, aid)
+324:        log += f'=== aid: {aid or "none"} ===\n' + (out if kind == 'topo' else out[-30000:]) + '\n'
+339:        evaluate(tag, raw, kind, aid)
+342:    print(tag, 'ok' if ok else 'FAILED', f'(aid {aid})' if ok and aid else '', flush=True)
+```
+
+## Assistant — 2026-11-25 14:36:09 UTC
+
+**Tool call: `Bash`**
+
+_Show run() head_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && sed -n 296,312p vs.py
+```
+
+## Tool results / harness — 2026-11-25 14:36:09 UTC
+
+**Tool result:**
+
+```
+p = job.split(':')
+    kind, c, t, v = p[0], p[1], int(p[2]), float(p[3])
+    var = p[4] if len(p) > 4 else ''
+    tag = f'{kind}_{c}_{t}_{v}' + (f'_{var}' if var else '')
+    rdir = WORK / 'runs' / tag
+    (WORK / 'log').mkdir(parents=True, exist_ok=True)
+    spiceinit = Path(PDK) / 'libs.tech' / 'ngspice' / '.spiceinit'
+    log = ''
+    # disabled / unpowered states have nodes held only by leakage: their DC sweep goes straight to the solver aid
+    if kind in ('fs', 'fs0'):
+        tries = ['rshunt']
+    else:
+        tries = [''] + (['rshunt'] if kind in ('dc', 'topo') else ['step2n'])
+    ok, aid = False, ''
+    for aid in tries:
+        d = deck(T, kind, c, t, v, var, rdir, tag, aid)
+        (rdir / '.spiceinit').write_text(spiceinit.read_text())
+```
+
+## Assistant — 2026-11-25 14:36:22 UTC
+
+**Tool call: `Bash`**
+
+_Add solver-check variants_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+p='vs.py'
+s=open(p).read()
+rep=[("""    opt = '.option gmin=1e-12' + (' method=gear cshunt=1e-15' if tran else '') + (' rshunt=1e12' if aid == 'rshunt'
+                                                                                    else '')
+    tmax = '2n' if aid == 'step2n' else '10n'""",
+"""    topt = {'trap': ' method=trap cshunt=1e-15', 'nocshunt': ' method=gear'}.get(aid, ' method=gear cshunt=1e-15')
+    opt = '.option gmin=1e-12' + (topt if tran else '') + (' rshunt=1e12' if aid == 'rshunt' else '')
+    tmax = {'step2n': '2n', 'step05n': '0.5n', 'step01n': '0.1n'}.get(aid, '10n')"""),
+("""    if kind in ('fs', 'fs0'):
+        tries = ['rshunt']""","""    if var.startswith('chk_'):
+        # solver check of a transient (analyze.py keeps these out of the stress tables): only the given setting,
+        # step2n / step05n / step01n (maximum time step 2 / 0.5 / 0.1 ns), trap (trapezoidal integration), nocshunt
+        tries = [var[4:]]
+    elif kind in ('fs', 'fs0'):
+        tries = ['rshunt']"""),
+("""         mode  mode switching""","""         (transients: variant chk_<aid> = solver check, the same deck with only that setting: chk_step2n,
+         chk_step05n, chk_step01n = maximum time step 2 / 0.5 / 0.1 ns, chk_trap = trapezoidal, chk_nocshunt)
+         mode  mode switching"""),
+]
+for a,b in rep:
+    assert a in s, a
+    s=s.replace(a,b)
+open(p,'w').write(s)
+p='analyze.py'
+s=open(p).read()
+a="""        info = parse_tag(tag)
+        with gzip.open(f, 'rt') as fh:"""
+b="""        info = parse_tag(tag)
+        if info['kind'] == 'topo' or info['var'].startswith('chk'):
+            continue   # topology run (= dc open tt 27 C 3.3 V, rerun as a dc job) and solver checks: not counted
+        with gzip.open(f, 'rt') as fh:"""
+assert a in s; s=s.replace(a,b)
+a="""        tag = f.name[:-4]
+        if tag not in runs:"""
+b="""        tag = f.name[:-4]
+        if tag not in runs and not tag.startswith('topo') and '_chk_' not in tag:"""
+assert a in s; s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+python3 -m py_compile vs.py analyze.py && echo ok
+```
+
+## Tool results / harness — 2026-11-25 14:36:22 UTC
+
+**Tool result:**
+
+```
+ok
+```
+
+## Assistant — 2026-11-25 14:36:27 UTC
+
+**Tool call: `Bash`**
+
+_Remove stale dcoff outputs and check pu_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/_work && rm -rf log/dcoff_* runs/dcoff_* ; ps -o etime,cmd -p $(pgrep -f "ngspice -b pu_tt") 2>/dev/null; date
+```
+
+## Tool results / harness — 2026-11-25 14:36:27 UTC
+
+**Tool result:**
+
+```
+ELAPSED CMD
+      09:13 ngspice -b pu_tt_27_3.6.spice
+Wed Nov 25 14:36:27 UTC 2026
+```
+
+## Assistant — 2026-11-25 14:36:30 UTC
+
+**Tool call: `Monitor`**
+
+_wait pu (placeholder no-op)_
+
+```json
+{
+ "timeout_ms": 60000,
+ "command": "true"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:36:30 UTC
+
+**Tool result:**
+
+```
+Monitor started (task b1pm2rzly, expires in 1m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+```
+
+## Assistant — 2026-11-25 14:36:33 UTC
+
+**Tool call: `Bash`**
+
+_Read HOW_IT_WORKS sizing context_
+
+```bash
+sed -n 480,500p docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md; grep -n "^#" docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md | head -40
+```
+
+## Tool results / harness — 2026-11-25 14:36:34 UTC
+
+**Tool result:**
+
+```
+The `bg_core` comment in `bias_ref.spice` (P) says the PMOS mirror is in "moderate inversion for headroom at 3.0 V /
+ss / −40 C"; other size choices are not explained.
+
+## 6. `bias_dist_pd` and the fail-safe enables
+
+### 6.1 `bias_dist_pd`: switchable 1 : 1 distribution
+
+Sources: `macros/bias_dist_pd/README.md`, `netlist/source/bias_dist_pd.spice` (S); configuration in the slot:
+[glue_logic.md](glue_logic.md) §5. Chain: input TGs → NMOS diode NI 6 / 6 → NM 6 / 6 → PMOS diode PD 5 / 6 → outputs
+PO0 … PO3 5 / 6, each behind a TG; enabled inputs add in NI. In the slot input 0 is the bandgap; outputs 0 / 1 / 2 go to
+`pad_ref_rb`, S2D, D2S (output 3 off). "Devices: those of `bias_tree_pd` (NI 6u/6u like the tree's NI, PD / PO 5u/6u
+like BP)". The two pads get the inner pair PO1 / PO2 next to PD, "mirror images of each other: both pads get the matched
+pair" (designer's decision of 2026-11-08). Each leg is a `bdp_slice`: `nand2_hv(en_3v3, en_k)` → `inv_hv` → `tg_hv`, all
+1 / 0.45 µm hv. Disabled: all TGs open, TDN pulls `ni` to vss, SVPD pulls `vpd` to vdd.
+
+Simulated ([replica_bias](../../verification/c2_gaps/replica_bias/results.md) §3): systematic copy ratio +0.49 … +1.56 %,
+falling by about 0.5 % from 0.5 to 2.5 V output voltage ("output conductance of PO / the switch"); mismatch σ 1.0 …
+1.2 % per output; the pads' pair `iout1 − iout2` σ 0.36 … 0.41 % because it shares NI / NM / PD; off leakage ≤ 145 pA.
+**Derivation (added here):** NI's drain is at its gate (0.91 V at tt) while
+… [1510 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:36:36 UTC
+
+**Tool call: `Bash`**
+
+_Read ls_up_fs section_
+
+```bash
+sed -n 514,546p docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md
+```
+
+## Tool results / harness — 2026-11-25 14:36:36 UTC
+
+**Tool result:**
+
+```
+### 6.2 Fail-safe enables: `ls_up_fs`
+
+Sources: `macros/en_ctrl_3v3/README.md`, `netlist/source/en_ctrl_3v3.spice` (S); slot use: [glue_logic.md](glue_logic.md) §2.
+
+![ls_up_fs schematic](pix/schematics/ls_up_fs.svg)
+
+*Figure 6.2: `ls_up_fs` (S), the level shifter of every slot input bit (7 instances in `s7_ctrl`).*
+
+Problem it solves (README "Why v2"): v1 sensed the slot supplies with ratioed detectors and shifted with a
+latch that needs the slot's 1.2 V; with that 1.2 V off and `enable` high its latch drew up to 152 µA. v2 uses the fact
+that the harness drives `enable` and `dig_in` from an always-on 1.2 V rail, so the bits are valid even while the slot's
+`vdd_1v2` is off, and shifts each bit **without any 1.2 V supply**, on the slot's switched `vdd_3v3` only:
+
+- **XN1** (hv NMOS 1 / 0.45, gate = the 1.2 V input) pulls node `x` low when the input is 1.
+- **Leaker:** 10 hv PMOS 0.3 / 20 in series (effectively 0.3 / 200), gates on the same input. With the input at 0 it has
+  full gate drive and pulls `x` high; with the input at 1.2 V it is "2–5× weaker" and loses to XN1. It is the only
+  static current, and only while the input is high: 28 … 92 nA over corners (netlist header).
+- **Latch XPF** (hv PMOS 0.3 / 5, gate `y` = NOT `x`): once `x` is high it holds it (hysteresis) against XN1's leakage.
+- Three `inv_hv` (1 / 0.45) give `y`, `out`, `out_b`.
+
+The input must be a real harness level: XN1 conducts 0.6 … 8 µA at a 0.67 V gate. Monte Carlo was not run; the README's
+argument 
+… [875 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:36:43 UTC
+
+**Tool call: `Bash`**
+
+_Check pu run and memory_
+
+```bash
+ps -o etime,cmd -p $(pgrep -f "ngspice -b pu_tt") 2>/dev/null; free -g | head -2
+```
+
+## Tool results / harness — 2026-11-25 14:36:43 UTC
+
+**Tool result:**
+
+```
+ELAPSED CMD
+      09:28 ngspice -b pu_tt_27_3.6.spice
+               total        used        free      shared  buff/cache   available
+Mem:              15           0          13           0           1          14
+```
+
+## Assistant — 2026-11-25 14:36:52 UTC
+
+**Tool call: `Bash`**
+
+_Wait for pu run to finish_
+
+```bash
+timeout 580 bash -c 'while pgrep -f "ngspice -b pu_tt_27_3.6" >/dev/null; do sleep 5; done'; date; cat /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output
+```
+
+## Tool results / harness — 2026-11-25 14:46:32 UTC
+
+**Tool result:**
+
+```
+Wed Nov 25 14:46:32 UTC 2026
+off_tt_27_3.6 ok 
+62 s
+```
+
+## Assistant — 2026-11-25 14:46:47 UTC
+
+**Tool call: `Bash`**
+
+_Kill slow power-up run_
+
+```bash
+pkill -f "ngspice -b pu_tt_27_3.6"; sleep 2; cat /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output; pgrep -af "ngspice -b pu_tt"
+```
+
+## Tool results / harness — 2026-11-25 14:46:49 UTC
+
+**Tool result:**
+
+```
+off_tt_27_3.6 ok 
+62 s
+15097 ngspice -b pu_tt_27_3.6.spice
+```
+
+## Assistant — 2026-11-25 14:46:53 UTC
+
+**Tool call: `Bash`**
+
+_Stop the power-up job and its retry_
+
+```bash
+pkill -f "vs.py _work off:tt" ; pkill -f "vs.py _work pu:tt"; pkill -f "ngspice -b pu_tt_27_3.6"; sleep 1; pgrep -af "vs.py|ngspice -b pu"; echo; tail -3 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output
+```
+
+## Tool results / harness — 2026-11-25 14:46:55 UTC
+
+**Tool result:**
+
+```
+1180 s
+
+[exited with code 0]
+```
+
+## Assistant — 2026-11-25 14:46:58 UTC
+
+**Tool call: `Bash`**
+
+_Time enable and step transients_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1; for j in en:tt:27:3.6 step:tt:27:3.6:open; do s=$(date +%s); timeout 900 python3 -I vs.py _work $j 2>&1 | tail -1; echo "$(( $(date +%s)-s )) s"; done
+```
+
+## Tool results / harness — 2026-11-25 14:48:14 UTC
+
+**Tool result:**
+
+```
+KeyError: 'xs.xd.xlay.x$1.n_7'
+45 s
+KeyError: 'xs.xd.xlay.x$1.n_7'
+30 s
+```
+
+## Assistant — 2026-11-25 14:48:19 UTC
+
+**Tool call: `Bash`**
+
+_Inspect raw names of saved nodes_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/_work/runs/en_tt_27_3.6 && ls -la *.raw; head -c 200000 en_tt_27_3.6.raw | strings | grep -i "xd.xlay.x" | head; head -c 200000 en_tt_27_3.6.raw | strings | grep -c "	v("; grep -i "warn\|error" ../../log/en_tt_27_3.6.log | head
+```
+
+## Tool results / harness — 2026-11-25 14:48:20 UTC
+
+**Tool result:**
+
+```
+-rw-r--r-- 1 root root 9079730 Nov 25 14:47 en_tt_27_3.6.raw
+260
+Error: 1.n_1: no such variable.
+Error: 1.n_7: no such variable.
+Error: 1.n_i5: no such variable.
+Error: 2.n_1: no such variable.
+Error: 2.n_7: no such variable.
+Error: 2.n_i5: no such variable.
+Error: 3.n_1: no such variable.
+Error: 3.n_7: no such variable.
+Error: 3.n_i5: no such variable.
+Error: 4.n_1: no such variable.
+```
+
+## Assistant — 2026-11-25 14:48:31 UTC
+
+**Tool call: `Bash`**
+
+_List tokens containing dollar signs_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && grep -o '\S*\$\S*' _work/runs/topo_tt_27_3.3/*_flat.spice | awk -F: '{print $2}' | sed 's/[0-9]\+$//' | sort | uniq -c
+```
+
+## Tool results / harness — 2026-11-25 14:48:31 UTC
+
+**Tool result:**
+
+```
+217 X$
+```
+
+## Assistant — 2026-11-25 14:48:38 UTC
+
+**Tool call: `Bash`**
+
+_Rename KLayout instances, redo topology and test transients_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+p='vs.py'
+s=open(p).read()
+a="""        name = T.wrapped(c)
+        fix_diodes.fix_file(rdir / name)
+        out.append(str(rdir / name))"""
+b="""        name = T.wrapped(c)
+        fix_diodes.fix_file(rdir / name)
+        # KLayout instance names X$<n> -> X_<n>: '$' would be expanded as a variable in the .control 'save' lines
+        f = rdir / name
+        f.write_text(re.sub(r'^X\\$', 'X_', f.read_text(), flags=re.M))
+        out.append(str(f))"""
+assert a in s; s=s.replace(a,b)
+s=s.replace("""by run_tier1.wrapped()), the pads' antenna diodes given their extracted size by ../klayout_pad_diodes/fix_diodes.py.""",
+"""by run_tier1.wrapped()), the pads' antenna diodes given their extracted size by ../klayout_pad_diodes/fix_diodes.py
+(and the KLayout instance names X$<n> written X_<n>, so that they can be named in ngspice's .control section).""")
+open(p,'w').write(s)
+EOF
+rm -rf _work/dev _work/nodes _work/log _work/runs _work/topo.csv; export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1; python3 -I vs.py _work topo:tt:27:3.3 | tail -2; grep -c '\$' _work/topo.csv; for j in en:tt:27:3.6 step:tt:27:3.6:open off:tt:27:3.6; do s=$(date +%s); timeout 900 python3 -I vs.py _work $j 2>&1 | tail -1; echo "$(( $(date +%s)-s )) s"; done
+```
+
+## Tool results / harness — 2026-11-25 14:50:41 UTC
+
+**Tool result:**
+
+```
+topo: 499 MOS instances -> /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/_work/topo.csv
+topo_tt_27_3.3 ok 
+0
+en_tt_27_3.6 ok 
+37 s
+step_tt_27_3.6_open ok 
+28 s
+off_tt_27_3.6 ok 
+53 s
+```
+
+## Assistant — 2026-11-25 14:50:46 UTC
+
+**Tool call: `Bash`**
+
+_Time fast power-up and mode transients_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1 VS_TMO_TRAN=900; for j in pu:tt:27:3.6:fast mode:tt:27:3.6; do s=$(date +%s); python3 -I vs.py _work $j 2>&1 | tail -1; echo "$(( $(date +%s)-s )) s"; done
+```
+
+## Tool results / harness — 2026-11-25 14:50:47 UTC
+
+**Tool result:**
+
+```
+Command running in background with ID: bd7ztlcmd. Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bd7ztlcmd.output. You will be notified when it completes. To check interim output, use Read on that file path.
+Session cwd remains /home/user/sg13cmos5l_cm_slot7; directory changes made by the backgrounded command do not apply to subsequent commands.
+```
+
+## Assistant — 2026-11-25 14:50:52 UTC
+
+**Tool call: `Bash`**
+
+_Analyze current transient runs_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 -I analyze.py _work /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/an 2>&1 | tail -2; sed -n '/per job kind/,$p' /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/an/tables.md
+```
+
+## Tool results / harness — 2026-11-25 14:50:53 UTC
+
+**Tool result:**
+
+```
+analyze: runs 3 failed 0
+## Largest |VGS|, |VGD|, |VDS| per job kind (over all devices and runs of the kind)
+
+| job | supply [V] | runs | max \|VGS\| [V] | device, where | max \|VGD\| [V] | max \|VDS\| [V] | device, where |
+|---|---|---|---|---|---|---|---|
+| en | 3.6 | 1 | 4.156 | xs.xd.xlay.x_8.x_7 1/0.45 (en tt 27 C 3.6 V, t = 2.14 us) | 7.196 | 10.186 | xs.xbg.xms1_0 0.5/12.5 (en tt 27 C 3.6 V, t = 22.01 us) |
+| off | 3.6 | 1 | 4.156 | xs.xd.xlay.x_8.x_7 1/0.45 (off tt 27 C 3.6 V, t = 1.14 us) | 4.156 | 4.471 | xs.xbg.xms1_7 0.5/12.5 (off tt 27 C 3.6 V, t = 1.14 us) |
+| step open | 3.6 | 1 | 3.600 | xs.xc.xild.xp 1/0.45 (step open tt 27 C 3.6 V, t = 12.02 us) | 3.800 | 3.800 | x2s.xlay.x_3 266.4/0.6 (step open tt 27 C 3.6 V, t = 12.01 us) |
+
+## Node extremes (transients and DC): highest node voltage and lowest node voltage per job kind
+
+| job | supply [V] | highest node [V] | node (where) | lowest node [V] | node (where) |
+|---|---|---|---|---|---|
+| en | 3.6 | 5.308 | v(xs.xbg.net1) (en tt 27 C 3.6 V, t = 2.14 us) | -6.586 | v(xs.xbg.net1) (en tt 27 C 3.6 V, t = 22.01 us) |
+| off | 3.6 | 5.308 | v(xs.xbg.net1) (off tt 27 C 3.6 V, t = 1.14 us) | -0.469 | v(xs.xc.xle.l1) (off tt 27 C 3.6 V, t = 1.14 us) |
+| step open | 3.6 | 3.706 | v(x2s.xlay.n_i9) (step open tt 27 C 3.6 V, t = 2.01 us) | -0.200 | v(padin) (step open tt 27 C 3.6 V, t = 12.01 us) |
+```
+
+## Assistant — 2026-11-25 14:51:16 UTC
+
+**Tool call: `Bash`**
+
+_Wait for fast power-up and mode runs_
+
+```bash
+timeout 590 bash -c 'while pgrep -f "vs.py _work" >/dev/null; do sleep 5; done'; cat /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bd7ztlcmd.output
+```
+

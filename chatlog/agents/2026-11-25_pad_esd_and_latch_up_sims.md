@@ -5187,3 +5187,1997 @@ hbmls_esdproxy_d2s_gnd_vdd_p2000 rc 0 ok t_end 1000.0 ns
 hbmls_esdproxy_d2s_gnd_vdd_n2000 rc 0 ok t_end 1000.0 ns
 ```
 
+## Assistant — 2026-11-25 14:31:36 UTC
+
+Now stop the old batch and run the reduced PDK-diode subset.
+
+## Assistant — 2026-11-25 14:31:38 UTC
+
+**Tool call: `Bash`**
+
+_Stop old batch before PDK subset_
+
+```bash
+pkill -f "esd.py _work run" ; sleep 1; pkill -x ngspice; sleep 1; pgrep -a ngspice; cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && rm -f _work/hbm/hbm_pdk_*.json _work/hbm/*.raw; tail -2 _work/hbm_run.log
+```
+
+## Tool results / harness — 2026-11-25 14:31:41 UTC
+
+**Tool result:**
+
+```
+Permission for this action was denied by the Claude Code auto mode classifier. Reason: [Destructive or Unwanted Actions]. If you have other tasks that don't depend on this action, continue working on those. IMPORTANT: You *may* attempt to accomplish this action using other tools that might naturally be used to accomplish this goal, e.g. using head instead of cat. But you *should not* attempt to work around this denial in malicious ways, e.g. do not use your ability to run tests to execute non-test actions. You should only try to work around this restriction in reasonable ways that do not attempt to bypass the intent behind this denial. If you believe this capability is essential to complete the user's request, first try a safer method. Get as much of the rest of the task done as you can, then STOP and explain to the user what you were trying to do and why you need this permission. Let the user decide how to proceed. To allow this type of action in the future, the user can add a permission rule for Bash to their settings. Auto mode judged this without the repository's git status. It will see git status on your next three requests, which may clear a block on a git command that discards work. If git status shows nothing the command would lose, you may send it once more on its own.
+```
+
+## Assistant — 2026-11-25 14:31:43 UTC
+
+**Tool call: `ToolSearch`**
+
+```json
+{
+ "query": "select:TaskStop"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:31:43 UTC
+
+**Tool result:**
+
+```
+[tool_reference]
+```
+
+## Assistant — 2026-11-25 14:31:47 UTC
+
+**Tool call: `TaskStop`**
+
+```json
+{
+ "task_id": "b0lak6we8"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:31:47 UTC
+
+**Tool result:**
+
+```
+{"message":"Successfully stopped task: b0lak6we8 (cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 esd.py _work run > _work/hbm_run.log 2>&1)","task_id":"b0lak6we8","task_type":"local_bash","command":"cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 esd.py _work run > _work/hbm_run.log 2>&1"}
+```
+
+## Assistant — 2026-11-25 14:31:48 UTC
+
+**Tool call: `Bash`**
+
+_Confirm no ngspice running_
+
+```bash
+pgrep -a ngspice; pgrep -af esd.py; tail -3 /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/hbm_run.log; ls /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/hbm/ | grep -c json
+```
+
+## Tool results / harness — 2026-11-25 14:31:49 UTC
+
+**Tool result:**
+
+```
+8882 ngspice -b pu_tt_27_3.6.spice
+10589 ngspice -b c_tt_27_3.3_op.spice
+hbmls_esdproxy_d2s_gnd_vss_n2000 rc 0 ok t_end 1000.0 ns
+hbmls_esdproxy_d2s_gnd_vdd_p2000 rc 0 ok t_end 1000.0 ns
+hbmls_esdproxy_d2s_gnd_vdd_n2000 rc 0 ok t_end 1000.0 ns
+44
+```
+
+## Assistant — 2026-11-25 14:31:53 UTC
+
+**Tool call: `Bash`**
+
+_Run HBM network check and model IV characterization_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 esd.py _work wave && python3 iv.py _work 2>&1 | tail -15
+```
+
+## Tool results / harness — 2026-11-25 14:31:54 UTC
+
+**Tool result:**
+
+```
+{'network': 'L_fast', 'l_uH': 1.365, 'load_ohm': 0.0, 'i_peak_A': 1.3, 'rise_10_90_ns': np.float64(1.85), 'decay_to_1_over_e_ns': np.float64(150.0)}
+{'network': 'L_fast', 'l_uH': 1.365, 'load_ohm': 500.0, 'i_peak_A': 0.984, 'rise_10_90_ns': np.float64(1.42), 'decay_to_1_over_e_ns': np.float64(200.0)}
+{'network': 'L_slow', 'l_uH': 6.827, 'load_ohm': 0.0, 'i_peak_A': 1.2273, 'rise_10_90_ns': np.float64(7.96), 'decay_to_1_over_e_ns': np.float64(150.1)}
+{'network': 'L_slow', 'l_uH': 6.827, 'load_ohm': 500.0, 'i_peak_A': 0.9464, 'rise_10_90_ns': np.float64(6.39), 'decay_to_1_over_e_ns': np.float64(200.0)}
+  File "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/iv.py", line 21
+    'pad (drain) -> iovdd (body, source); gate to iovdd via 6.768 kOhm (rppd value of the IO library's Clamp_P20N0D)'),
+                                                                                                                    ^
+SyntaxError: unterminated string literal (detected at line 21)
+```
+
+## Assistant — 2026-11-25 14:31:58 UTC
+
+**Tool call: `Bash`**
+
+_Rerun model IV characterization_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && sed -i "s/IO library's Clamp_P20N0D/IO library cell Clamp_P20N0D/" iv.py && python3 iv.py _work 2>&1 | tail -15; cat csv/hbm_network_check.csv
+```
+
+## Tool results / harness — 2026-11-25 14:32:02 UTC
+
+**Tool result:**
+
+```
+{'model': 'pdk', 'device': 'dpantenna 1.26x27.78 (S2D DP1)', 'direction': 'p+/n-well, pad -> iovdd', 'v_at_0.001A': 4.888, 'v_at_0.01A': 41.448, 'v_at_0.1A': 404.703, 'v_at_0.5A': 2018.721, 'v_at_1A': 4036.176, 'v_at_1.33A': 5367.688, 'v_at_2A': 8062.984}
+{'model': 'pdk', 'device': 'dantenna 1.26x27.78 (S2D DN1)', 'direction': 'n+/p-sub forward: iovss -> pad', 'v_at_0.001A': 5.79, 'v_at_0.01A': 50.54, 'v_at_0.1A': 495.644, 'v_at_0.5A': 2473.434, 'v_at_1A': 4945.601, 'v_at_1.33A': 6577.223, 'v_at_2A': 9880.017}
+{'model': 'pdk', 'device': 'dpantenna 1.26x65.8 (D2S DP0)', 'direction': 'p+/n-well, pad -> iovdd', 'v_at_0.001A': 2.563, 'v_at_0.01A': 18.498, 'v_at_0.1A': 175.606, 'v_at_0.5A': 873.418, 'v_at_1A': 1745.615, 'v_at_1.33A': 2321.256, 'v_at_2A': 3486.486}
+{'model': 'pdk', 'device': 'dantenna 1.26x67.6 (D2S DN0)', 'direction': 'n+/p-sub forward: iovss -> pad', 'v_at_0.001A': 2.901, 'v_at_0.01A': 21.964, 'v_at_0.1A': 210.281, 'v_at_0.5A': 1046.795, 'v_at_1A': 2092.37, 'v_at_1.33A': 2782.44, 'v_at_2A': 4179.302}
+{'model': 'pdk', 'device': 'MCP drain junction, hv PMOS 266.4/0.6 ng 40 (S2D)', 'direction': 'pad (drain) -> iovdd (body, source); gate to iovdd via 6.768 kOhm (rppd value of the IO library cell Clamp_P20N0D)', 'v_at_0.001A': 0.517, 'v_at_0.01A': 1.199, 'v_at_0.1A': 4.441, 'v_at_0.5A': 10.579, 'v_at_1A': 12.541, 'v_at_1.33A': 13.278, 'v_at_2A': 14.6}
+{'model': 'pdk', 'device': 'MCN drain junction, hv NMOS 88/0.6 ng 20 (S2D)', 'direction': 'iovss (body, source) -> pad
+… [2427 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:32:08 UTC
+
+**Tool call: `Bash`**
+
+_Run latch-up, PDK HBM subset and SCR sequentially_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && (python3 latchup.py _work itest; python3 latchup.py _work ovt; python3 esd.py _work run hbm_pdk; python3 scr.py _work) > _work/chain.log 2>&1
+```
+
+## Tool results / harness — 2026-11-25 14:32:08 UTC
+
+**Tool result:**
+
+```
+Command running in background with ID: b5wwdqr2o. Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/b5wwdqr2o.output. You will be notified when it completes. To check interim output, use Read on that file path.
+Session cwd remains /home/user/sg13cmos5l_cm_slot7; directory changes made by the backgrounded command do not apply to subsequent commands.
+```
+
+## Assistant — 2026-11-25 14:32:09 UTC
+
+Meanwhile, post-process the HBM results available so far.
+
+## Assistant — 2026-11-25 14:32:12 UTC
+
+**Tool call: `Bash`**
+
+_Post-process HBM and print summary table_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 esd.py _work post 2>&1 | grep -v Warn | tail -3; python3 - <<'EOF'
+import sys; sys.path.insert(0,'/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad')
+from md import *
+s=load('csv/hbm_summary.csv')
+print(table([r for r in s if r['diode_model']=='esdproxy'], ['pad','config','v_hbm','l_hbm_uH','i_peak_A','v_pad_peak','v_iovdd_peak','v_iovss_peak','v_ring_peak','i_rc_clamps_peak_A','status']))
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:32:14 UTC
+
+**Tool result:**
+
+```
+| pad | config | v_hbm | l_hbm_uH | i_peak_A | v_pad_peak | v_iovdd_peak | v_iovss_peak | v_ring_peak | i_rc_clamps_peak_A | status |
+|---|---|---|---|---|---|---|---|---|---|---|
+| s2d | gnd_vss | 500 | 1.36 | 0.323 | 3.93 | 2.21 | 0.000236 | 2.21 | 0.323 | ok |
+| s2d | gnd_vss | -500 | 1.36 | -0.325 | -1.94 | -0.0548 | -0.0182 | 0.0366 | 0.00364 | ok |
+| s2d | gnd_vss | 1000 | 1.36 | 0.648 | 5.78 | 2.44 | 0.000329 | 2.44 | 0.648 | ok |
+| s2d | gnd_vss | -1000 | 1.36 | -0.651 | -2.87 | -0.078 | -0.0365 | 0.0415 | 0.00499 | ok |
+| s2d | gnd_vss | 2000 | 1.36 | 1.3 | 9.3 | 3.28 | 0.000473 | 3.28 | 1.3 | ok |
+| s2d | gnd_vss | -2000 | 1.36 | -1.3 | -4.7 | -0.117 | -0.073 | 0.0451 | 0.00685 | ok |
+| s2d | gnd_vdd | 500 | 1.36 | 0.325 | 2.35 | 0.0867 | 0.0577 | 0.0291 | 0.00289 | ok |
+| s2d | gnd_vdd | -500 | 1.36 | -0.324 | -3.58 | -0.0015 | -2.2 | 2.2 | 0.324 | ok |
+| s2d | gnd_vdd | 1000 | 1.36 | 0.65 | 3.72 | 0.174 | 0.0871 | 0.0865 | 0.0041 | ok |
+| s2d | gnd_vdd | -1000 | 1.36 | -0.649 | -5.04 | -0.00219 | -2.44 | 2.44 | 0.649 | ok |
+| s2d | gnd_vdd | 2000 | 1.36 | 1.3 | 6.39 | 0.347 | 0.14 | 0.208 | 0.00558 | ok |
+| s2d | gnd_vdd | -2000 | 1.36 | -1.3 | -7.81 | -0.00331 | -3.19 | 3.19 | 1.3 | ok |
+| s2d | p2p | 500 | 1.36 | 0.323 | 5.36 | 3.2 | 1.37 | 2.22 | 0.317 | ok |
+| s2d | p2p | -500 | 1.36 | -0.322 | -5.17 | -1.51 | -3.25 | 2.21 | 0.318 | ok |
+| s2d | p2p | 1000 | 1.36 | 0.646 | 7.67 | 4.15 | 1.76 | 2.48 | 0.635 | ok |
+| s2d | p2p | -1000 | 1.36 | -0.646 | -7.23 | -
+… [2372 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:32:22 UTC
+
+**Tool call: `Bash`**
+
+_Find worst-case oxide voltages per device_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+import sys; sys.path.insert(0,'/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad')
+from md import *
+m=load('csv/hbm_mos.csv')
+# per device, max over all esdproxy fast runs (pad zapped = own pad or p2p) of vox, and the run
+import collections
+best=collections.OrderedDict()
+for r in m:
+    if r['diode_model']!='esdproxy' or not r['run'].startswith('hbm_'): continue
+    key=(r['pad'],r['device'],r['role'] if 'largest' not in r['role'] else 'LARGEST')
+    for v in (500,1000,2000):
+      if abs(int(r['v_hbm']))!=v: continue
+      k2=key+(v,)
+      if k2 not in best or float(r['max_vox'])>float(best[k2]['max_vox']): best[k2]=r
+for k,r in best.items():
+    if k[3]==2000 or 'LARGEST'==k[2]: print(k[0],k[1],k[2][:30],k[3],r['max_vgs'],r['max_vgd'],r['max_vgb'],r['max_vox'],r['run'].replace('hbm_esdproxy_',''), r['pad_zapped'])
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:32:22 UTC
+
+**Tool result:**
+
+```
+s2d xs2d.xp.xmcn LARGEST 500 0.3468 3.9931 0.3468 3.9931 s2d_p2p_p500 s2d
+d2s xd2s.xt.xtdn LARGEST 500 2.2082 2.2082 2.2082 2.2082 s2d_gnd_vss_p500 s2d
+s2d xs2d.xp.xmcn LARGEST 1000 0.46692 5.906 0.46692 5.906 s2d_p2p_p1000 s2d
+d2s xd2s.xd.xsabp LARGEST 1000 2.4375 2.4375 2.4375 2.4375 s2d_gnd_vss_p1000 s2d
+d2s xd2s.xt.xtdn LARGEST 1000 2.4392 2.4331 2.4392 2.4392 s2d_gnd_vdd_n1000 s2d
+s2d xs2d.xa.xs.xa1.xma input device of unit XA1 (gate 2000 6.8058 8.825 6.8058 8.825 s2d_p2p_p2000 s2d
+s2d xs2d.xa.xs.xa2.xma input device of unit XA2 (gate 2000 6.8058 8.825 6.8058 8.825 s2d_p2p_p2000 s2d
+s2d xs2d.xp.xmcp clamp PMOS MCP (drain = pad, g 2000 0.65489 8.025 0.65489 8.025 s2d_p2p_n2000 s2d
+s2d xs2d.xp.xmcn clamp NMOS MCN (drain = pad, g 2000 0.58605 9.4901 0.58605 9.4901 d2s_p2p_n2000 d2s
+s2d xs2d.xp.xmcn LARGEST 2000 0.58605 9.4901 0.58605 9.4901 d2s_p2p_n2000 d2s
+d2s xd2s.xd.xc1.xmb feedback input of unit C1 (gat 2000 4.3608 5.977 4.3608 5.977 s2d_p2p_n2000 s2d
+d2s xd2s.xd.xc2.xmb feedback input of unit C2 (gat 2000 4.3608 5.977 4.3608 5.977 s2d_p2p_n2000 s2d
+d2s xd2s.xd.xsa disable switch SA (a to iovdd) 2000 3.5139 4.1884 3.5139 4.1884 s2d_p2p_n2000 s2d
+d2s xd2s.xd.xsb disable switch SB (b to iovss) 2000 3.4815 4.0002 3.4815 4.0002 s2d_p2p_p2000 s2d
+d2s xd2s.xfp.xop output PMOS OP (drain = pad) 2000 2.0916 5.3079 2.0916 5.3079 s2d_p2p_p2000 s2d
+d2s xd2s.xfn.xon output NMOS ON (drain = pad) 2000 2.0745 6.3554 2.0745 6.3554 s2d_p2p_n2000 s2d
+d2s xd2s.xcma Miller capacitor CMA (g
+… [1820 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:32:29 UTC
+
+**Tool call: `Bash`**
+
+_Check latch-up chain progress_
+
+```bash
+cat /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/chain.log; ls -la /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/latchup/ 2>/dev/null | head
+```
+
+## Tool results / harness — 2026-11-25 14:32:29 UTC
+
+**Tool result:**
+
+```
+total 232
+drwxr-xr-x 2 root root   4096 Nov 25 14:32 .
+drwxr-xr-x 8 root root   4096 Nov 25 14:32 ..
+-rw-r--r-- 1 root root   1091 Nov 25 14:32 .spiceinit
+-rw-r--r-- 1 root root  67587 Nov 25 14:32 itest_pdk_s2d_pos.log
+-rw-r--r-- 1 root root   4589 Nov 25 14:32 itest_pdk_s2d_pos.spice
+-rw-r--r-- 1 root root 145852 Nov 25 14:32 itest_pdk_s2d_pos_op.raw
+```
+
+## Assistant — 2026-11-25 14:32:32 UTC
+
+**Tool call: `Bash`**
+
+_Inspect I-test log_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/latchup && date; grep -v "^ Reference\|^$" itest_pdk_s2d_pos.log | grep -iv "warning: redef" | head -20; tail -c 600 itest_pdk_s2d_pos.log
+```
+
+## Tool results / harness — 2026-11-25 14:32:32 UTC
+
+**Tool result:**
+
+```
+Wed Nov 25 14:32:32 UTC 2026
+Note: No compatibility mode selected!
+Circuit: * itest_pdk_s2d_pos: current forced into pad_s2d, iovdd 3.6 v
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+Using SPARSE 1.3 as Direct Linear Solver
+OSDI(debug) n.xd2s.xd.xb.xr[1].nr1: WARNING: V(i2,c) voltage is greater than specified by vmax
+OSDI(debug) n.xd2s.xd.xb.xr[0].nr1: WARNING: V(i1,c) voltage is greater than specified by vmax
+OSDI(debug) n.xd2s.xd.xa.xr[1].nr1: WARNING: V(i2,c) voltage is greater than specified by vmax
+OSDI(debug) n.xd2s.xd.xa.xr[0].nr1: WARNING: V(i1,c) voltage is greater than specified by vmax
+OSDI(debug) n.xd2s.xd.xb.xr[0].nr1: WARNING: V(i1,c) voltage is greater than specified by vmax
+OSDI(debug) n.xd2s.xd.xb.xr[1].nr1: WARNING: V(i2,c) voltage is greater than specified by vmax
+OSDI(debug) n.xd2s.xd.xa.xr[1].nr1: WARNING: V(i2,c) voltage is greater than specified by vmax
+OSDI(debug) n.xd2s.xd.xa.xr[0].nr1: WARNING: V(i1,c) voltage is greater than specified by vmax
+OSDI(debug) n.xd2s.xd.xc2.xr[2].nr1: OSDI(debug) n.xd2s.xd.xc1.xr[2].nr1: WARNING: V(i1,c) voltage is greater than specified by vmax
+OSDI(debug) n.xd2s.xd.xc1.xr[3].nr1: WARNING: V(i2,c) voltage is greater than specified by vmax
+OSDI(debug) n.xd2s.xd.xb.xr[0].nr1: WARNING: V(i1,c) voltage is greater than specified by vmax
+OSDI(debug) n.xd2s.xd.xb.xr[1].nr1: WARNING: V(i2,c) voltage is greater than specified by vmax
+OSDI(debug) n.xd2s.xd.xa.xr[0].nr1: WARNING: V(i1,c) voltage is greater than specified
+… [858 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:32:57 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/tables.py`
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Markdown tables for results.md from csv/ (no simulation). Usage: python3 tables.py > _work/tables.md
+Pipes inside cells are escaped as \\|."""
+import csv
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+CFG = {'gnd_vss': 'iovss gnd', 'gnd_vdd': 'iovdd gnd', 'p2p': 'other pad gnd'}
+
+
+def load(name):
+    f = HERE / 'csv' / name
+    if not f.exists():
+        return []
+    return list(csv.DictReader(l for l in open(f) if not l.startswith('#')))
+
+
+def fmt(x):
+    try:
+        v = float(x)
+    except (TypeError, ValueError):
+        return str(x)
+    if v != v:
+        return 'n/a'
+    a = abs(v)
+    if a >= 100:
+        return '%.0f' % v
+    if a >= 10:
+        return '%.1f' % v
+    if a >= 1:
+        return '%.2f' % v
+    return '%.3g' % v
+
+
+def table(rows, cols, heads):
+    esc = [h.replace('|', '\\|') for h in heads]
+    out = ['| ' + ' | '.join(esc) + ' |', '|' + '---|' * len(cols)]
+    for r in rows:
+        cells = [(c(r) if callable(c) else fmt(r.get(c, ''))).replace('|', '\\|') for c in cols]
+        out.append('| ' + ' | '.join(cells) + ' |')
+    return '\n'.join(out)
+
+
+def main():
+    print('## model I-V\n')
+    iv = load('model_iv.csv')
+    print(table(iv, ['model', 'device', 'v_at_0.01A', 'v_at_0.1A', 'v_at_0.5A', 'v_at_1.33A'],
+                ['model', 'device', 'V at 10 mA', 'V at 0.1 A', 'V at 0.5 A', 'V at 1.33 A']))
+    print('\n## HBM summary (esdproxy)\n')
+    s = load('hbm_summary.csv')
+    for pad in ('s2d', 'd2s'):
+        rows = [r for r in s if r['pad'] == pad and r['diode_model'] == 'esdproxy']
+        print(f'\n### {pad}\n')
+        print(table(rows, [lambda r: CFG[r['config']], 'v_hbm', 'l_hbm_uH', 'i_peak_A', 'v_pad_peak', 'v_iovdd_peak',
+                           'v_iovss_peak', 'v_ring_peak', 'i_rc_clamps_peak_A'],
+                    ['grounded', 'V_HBM (V)', 'L (uH)', 'I peak (A)', 'V pad peak (V)', 'V iovdd peak (V)',
+                     'V iovss peak (V)', 'max |iovdd - iovss| (V)', 'RC clamps peak (A)']))
+    print('\n## HBM summary (pdk)\n')
+    rows = [r for r in s if r['diode_model'] == 'pdk']
+    print(table(rows, ['pad', lambda r: CFG[r['config']], 'v_hbm', 'status', 't_end_ns', 'v_pad_peak',
+                       'v_iovdd_peak', 'v_iovss_peak'],
+                ['pad', 'grounded', 'V_HBM (V)', 'status', 'ran to (ns)', 'V pad peak (V)', 'V iovdd peak (V)',
+                 'V iovss peak (V)']))
+    print('\n## diodes at +-2 kV (esdproxy, L fast)\n')
+    d = load('hbm_diodes.csv')
+    rows = [r for r in d if r['diode_model'] == 'esdproxy' and r['run'].startswith('hbm_') and abs(int(r['v_hbm'])) == 2000
+            and float(r['i_peak_A']) > 0.01]
+    print(table(rows, ['pad_zapped', lambda r: CFG[r['config']], 'v_hbm', 'diode', 'type', 'area_um2', 'perim_um',
+                       'i_peak_A', 'j_area_mA_um2', 'j_perim_mA_um', 'v_ak_at_peak', 'energy_nJ'],
+                ['zapped', 'grounded', 'V_HBM', 'diode', 'type', 'area (um2)', 'perimeter (um)', 'I peak (A)',
+                 'I / area (mA/um2)', 'I / perimeter (mA/um)', 'V_ak at peak (V)', 'energy (nJ)']))
+    print('\n## largest diode current per diode over all esdproxy runs, by HBM level\n')
+    best = {}
+    for r in d:
+        if r['diode_model'] != 'esdproxy' or not r['run'].startswith('hbm_'):
+            continue
+        k = (r['diode'], abs(int(r['v_hbm'])))
+        if float(r['i_peak_A']) > float(best.get(k, {'i_peak_A': -1})['i_peak_A']):
+            best[k] = r
+    rows = [best[k] for k in sorted(best)]
+    print(table(rows, ['diode', 'area_um2', lambda r: str(abs(int(r['v_hbm']))), 'i_peak_A', 'j_area_mA_um2',
+                       'j_perim_mA_um', 'energy_nJ', lambda r: r['run'].replace('hbm_esdproxy_', '')],
+                ['diode', 'area (um2)', '|V_HBM| (V)', 'I peak forward (A)', 'mA/um2', 'mA/um', 'energy (nJ)',
+                 'worst run']))
+    print('\n## oxides: worst over all esdproxy runs per device and
+… [2054 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 14:32:57 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/tables.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:32:58 UTC
+
+**Tool call: `Bash`**
+
+_Generate markdown tables_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 tables.py > _work/tables.md && sed -n '/diodes at/,/I-test/p' _work/tables.md
+```
+
+## Tool results / harness — 2026-11-25 14:32:58 UTC
+
+**Tool result:**
+
+```
+## diodes at +-2 kV (esdproxy, L fast)
+
+| zapped | grounded | V_HBM | diode | type | area (um2) | perimeter (um) | I peak (A) | I / area (mA/um2) | I / perimeter (mA/um) | V_ak at peak (V) | energy (nJ) |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| s2d | iovss gnd | 2000 | s2d.DP1 | dpantenna | 35.0 | 58.1 | 0.6 | 17.1 | 10.3 | 6.02 | 309 |
+| s2d | iovss gnd | 2000 | s2d.DP2 | dpantenna | 35.0 | 58.1 | 0.6 | 17.1 | 10.3 | 6.02 | 309 |
+| s2d | iovss gnd | -2000 | s2d.DN1 | dantenna | 35.0 | 58.1 | 0.613 | 17.5 | 10.6 | 4.63 | 269 |
+| s2d | iovss gnd | -2000 | s2d.DN2 | dantenna | 35.0 | 58.1 | 0.613 | 17.5 | 10.6 | 4.63 | 269 |
+| s2d | iovdd gnd | 2000 | s2d.DP1 | dpantenna | 35.0 | 58.1 | 0.603 | 17.2 | 10.4 | 6.04 | 310 |
+| s2d | iovdd gnd | 2000 | s2d.DP2 | dpantenna | 35.0 | 58.1 | 0.603 | 17.2 | 10.4 | 6.04 | 310 |
+| s2d | iovdd gnd | -2000 | s2d.DN1 | dantenna | 35.0 | 58.1 | 0.612 | 17.5 | 10.5 | 4.62 | 268 |
+| s2d | iovdd gnd | -2000 | s2d.DN2 | dantenna | 35.0 | 58.1 | 0.612 | 17.5 | 10.5 | 4.62 | 268 |
+| s2d | other pad gnd | 2000 | s2d.DP1 | dpantenna | 35.0 | 58.1 | 0.598 | 17.1 | 10.3 | 6.01 | 308 |
+| s2d | other pad gnd | 2000 | s2d.DP2 | dpantenna | 35.0 | 58.1 | 0.598 | 17.1 | 10.3 | 6.01 | 308 |
+| s2d | other pad gnd | 2000 | d2s.DN0 | dantenna | 85.2 | 138 | 0.593 | 6.96 | 4.30 | 2.47 | 164 |
+| s2d | other pad gnd | 2000 | d2s.DN1 | dantenna | 85.2 | 138 | 0.593 | 6.96 | 4.30 | 2.47 | 164 |
+| s2d | other pad gnd | -2000 | s2d.DN1 | dantenna | 35.0 | 5
+… [9161 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:33:06 UTC
+
+**Tool call: `Bash`**
+
+_Check I-test progress_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work && cat chain.log; ls -la latchup | tail -5; tail -c 300 latchup/itest_pdk_s2d_pos.log
+```
+
+## Tool results / harness — 2026-11-25 14:33:06 UTC
+
+**Tool result:**
+
+```
+itest_pdk_s2d_pos rc 0
+itest_pdk_s2d_neg rc 0
+-rw-r--r-- 1 root root   145852 Nov 25 14:32 itest_pdk_s2d_neg_op.raw
+-rw-r--r-- 1 root root    68219 Nov 25 14:32 itest_pdk_s2d_pos.log
+-rw-r--r-- 1 root root 21161899 Nov 25 14:32 itest_pdk_s2d_pos.raw
+-rw-r--r-- 1 root root     4589 Nov 25 14:32 itest_pdk_s2d_pos.spice
+-rw-r--r-- 1 root root   145852 Nov 25 14:32 itest_pdk_s2d_pos_op.raw
+ence value :  6.24000e-01 Reference value :  6.80000e-01 Reference value :  7.58000e-01 Reference value :  8.24000e-01 Reference value :  8.98000e-01 Reference value :  9.76000e-01
+No. of Data Rows : 1001
+binary raw file "itest_pdk_s2d_pos.raw"
+Note: Simulation executed from .control section
+```
+
+## Assistant — 2026-11-25 14:33:10 UTC
+
+**Tool call: `Bash`**
+
+_Quick look at I-test results so far_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && ls _work/latchup/*.raw; python3 -c "
+import sys; sys.path.insert(0,'.'); import latchup; rows=latchup.itest_post('_work')
+for r in rows: print(r)
+" 2>&1 | tail -8
+```
+
+## Tool results / harness — 2026-11-25 14:33:11 UTC
+
+**Tool result:**
+
+```
+_work/latchup/itest_pdk_s2d_neg.raw
+_work/latchup/itest_pdk_s2d_neg_op.raw
+_work/latchup/itest_pdk_s2d_pos.raw
+_work/latchup/itest_pdk_s2d_pos_op.raw
+{'run': 'itest_pdk_s2d_pos', 'diode_model': 'pdk', 'pad': 's2d', 'injection': '+100 mA', 'status': 'ok', 'v_pad': 8.0174, 'v_pad_at_0': 0.22383, 'i_at_vpad_limit_A': 0.022996, 'vpad_limit': 5.4, 'v_iovdd_at_pad': 3.6266, 'v_iovss_at_pad': 1.8514e-05, 'i_supply_mA': -99.565, 'i_supply_at_0_mA': 0.43493, 'i_iovss_pads_mA': 0.43512, 'i_DP1_mA': 0.84731, 'i_DP2_mA': 0.84731, 'i_DN1_mA': 1.975e-05, 'i_DN2_mA': 1.975e-05, 'i_MCP_mA': 98.305, 'i_MCN_mA': 4.1129e-08, 's2d_outp': 3.2881, 's2d_outn': 0.31444, 's2d_outp_at_0': 1.0065, 's2d_outn_at_0': 1.5381, 'd2s_pad': 1.2601, 'd2s_pad_at_0': 1.2601, 's2d_vbp': 2.2987, 's2d_vbp_at_0': 2.272, 'd2s_vbp': 2.2974, 'd2s_vbp_at_0': 2.272, 's2d_vbn': 0.91387, 's2d_vbn_at_0': 0.91383, 'd2s_vbn': 0.91387, 'd2s_vbn_at_0': 0.91383, 's2d_vbpc': 2.2392, 's2d_vbpc_at_0': 2.2126, 'd2s_vbpc': 2.2379, 'd2s_vbpc_at_0': 2.2126, 's2d_vbnc': 1.2085, 's2d_vbnc_at_0': 1.2084, 'd2s_vbnc': 1.2085, 'd2s_vbnc_at_0': 1.2084}
+{'run': 'itest_pdk_s2d_neg', 'diode_model': 'pdk', 'pad': 's2d', 'injection': '-100 mA', 'status': 'ok', 'v_pad': -5.7036, 'v_pad_at_0': 0.22383, 'i_at_vpad_limit_A': 0.016835, 'vpad_limit': -1.8, 'v_iovdd_at_pad': 3.5999, 'v_iovss_at_pad': -0.005595, 'i_supply_mA': 0.43494, 'i_supply_at_0_mA': 0.43493, 'i_iovss_pads_mA': -99.565, 'i_DP1_mA': -1.4641e-07, 'i_DP2_mA': -1.4641e-07, 'i_DN1_mA': -0.
+… [5217 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:33:17 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/plots/hbm_wave_s2d.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:33:17 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 14:33:19 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/plots/hbm_oxide.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:33:19 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 14:33:25 UTC
+
+**Tool call: `Bash`**
+
+_Move oxide plot legend below axes_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+p='esd.py'; s=open(p).read()
+old="""    axs[0].legend(fontsize=6)
+    fig.suptitle(f'Peak gate-oxide voltage"""
+new="""    fig.legend(fontsize=6.5, loc='lower center', ncol=3)
+    fig.suptitle(f'Peak gate-oxide voltage"""
+assert old in s; s=s.replace(old,new)
+old2="""                 fontsize=8.5)
+    fig.tight_layout()
+    fig.savefig(C.HERE / 'plots/hbm_oxide.png', dpi=150)"""
+new2="""                 fontsize=8.5)
+    fig.tight_layout(rect=(0, 0.1, 1, 1))
+    fig.savefig(C.HERE / 'plots/hbm_oxide.png', dpi=150)"""
+assert old2 in s; s=s.replace(old2,new2)
+s=s.replace("fig, axs = plt.subplots(1, 2, figsize=(10, 4.6))","fig, axs = plt.subplots(1, 2, figsize=(10, 5.2))")
+open(p,'w').write(s)
+EOF
+cat _work/chain.log
+```
+
+## Tool results / harness — 2026-11-25 14:33:25 UTC
+
+**Tool result:**
+
+```
+itest_pdk_s2d_pos rc 0
+itest_pdk_s2d_neg rc 0
+```
+
+## Assistant — 2026-11-25 14:33:39 UTC
+
+**Tool call: `Bash`**
+
+_Wait for I-test and overvoltage runs_
+
+```bash
+L=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/chain.log; timeout 1700 bash -c "until grep -q 'ovt_esdproxy' $L; do sleep 15; done"; cat $L
+```
+
+## Tool results / harness — 2026-11-25 14:37:10 UTC
+
+**Tool result:**
+
+```
+itest_pdk_s2d_pos rc 0
+itest_pdk_s2d_neg rc 0
+itest_pdk_d2s_pos rc 0
+itest_pdk_d2s_neg rc 0
+itest_esdproxy_s2d_pos rc 0
+itest_esdproxy_s2d_neg rc 0
+itest_esdproxy_d2s_pos rc 0
+itest_esdproxy_d2s_neg rc 0
+ovt_esdproxy.spice rc 0
+```
+
+## Assistant — 2026-11-25 14:37:13 UTC
+
+**Tool call: `Bash`**
+
+_Post-process latch-up results_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 latchup.py _work post 2>&1 | tail -3; python3 tables.py > _work/tables.md; sed -n '/## I-test/,$p' _work/tables.md; python3 - <<'EOF'
+import csv
+rows=list(csv.DictReader(l for l in open('csv/itest.csv') if not l.startswith('#')))
+for r in rows: print({k:v for k,v in r.items() if v!=''})
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:37:14 UTC
+
+**Tool result:**
+
+```
+## I-test
+
+| diode model | pad | forced | sweep | V pad (V) | I at 5.4 V / -1.8 V (A) | V iovdd at pad (V) | I supply (mA) | I supply at 0 (mA) | I into iovss pads (mA) |
+|---|---|---|---|---|---|---|---|---|---|
+| pdk | s2d | +100 mA | ok | 8.02 | 0.023 | 3.63 | -99.6 | 0.435 | 0.435 |
+| pdk | s2d | -100 mA | ok | -5.70 | 0.0168 | 3.60 | 0.435 | 0.435 | -99.6 |
+| pdk | d2s | +100 mA | ok | 2.02 | 0.172 | 3.60 | 0.209 | 0.435 | 100 |
+| pdk | d2s | -100 mA | ok | -0.833 | 0.139 | 3.57 | 95.2 | 0.435 | -4.83 |
+| esdproxy | s2d | +100 mA | ok | 4.95 | 0.205 | 3.63 | -99.6 | 0.435 | 0.435 |
+| esdproxy | s2d | -100 mA | ok | -1.26 | 0.276 | 3.60 | 0.435 | 0.435 | -99.6 |
+| esdproxy | d2s | +100 mA | ok | 2.02 | 0.572 | 3.60 | 0.209 | 0.435 | 100 |
+| esdproxy | d2s | -100 mA | ok | -0.791 | 0.763 | 3.57 | 95.1 | 0.435 | -4.90 |
+
+## overvoltage
+
+| pad | supply (V) | I supply (mA) | max \|vgs\| | device | max \|vgd\| | device | max \|vds\| | device | max \|vdb\| | device |
+|---|---|---|---|---|---|---|---|---|---|---|
+| s2d | 3.60 | 0.435 | 2.69 | xs2d.xt.xtgn | 3.01 | xs2d.xa.xtnp | 3.21 | xs2d.xa.xs.xcyc | 3.60 | xs2d.xa.xs.xcyc |
+| s2d | 5.40 | 0.489 | 4.49 | xs2d.xt.xtgn | 5.05 | xs2d.xa.xtnp | 5.00 | xs2d.xa.xs.xcyc | 5.40 | xs2d.xa.xs.xcyc |
+| d2s | 3.60 | 0.435 | 2.69 | xd2s.xt.xtgn | 2.68 | xd2s.xt.xtgn | 2.69 | xd2s.xt.xpbn | 2.95 | xd2s.xd.xfpl |
+| d2s | 5.40 | 0.489 | 4.49 | xd2s.xt.xtgn | 4.48 | xd2s.xt.xtgn | 4.47 | xd2s.xt.xpbn | 4.74 | xd2s.xd.xfpl |
+{'run': 'itest_pdk
+… [8558 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:37:26 UTC
+
+**Tool call: `Bash`**
+
+_Check chain progress_
+
+```bash
+cat /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/chain.log | tail -6
+```
+
+## Tool results / harness — 2026-11-25 14:37:26 UTC
+
+**Tool result:**
+
+```
+itest_pdk_d2s_neg rc 0
+itest_esdproxy_s2d_pos rc 0
+itest_esdproxy_s2d_neg rc 0
+itest_esdproxy_d2s_pos rc 0
+itest_esdproxy_d2s_neg rc 0
+ovt_esdproxy.spice rc 0
+```
+
+## Assistant — 2026-11-25 14:37:29 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/plots/itest_vpad.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:37:29 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 14:37:32 UTC
+
+**Tool call: `Bash`**
+
+_Show generated IV and HBM tables_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && sed -n '1,/## HBM summary (pdk)/p' _work/tables.md; cat _work/chain.log | tail -3
+```
+
+## Tool results / harness — 2026-11-25 14:37:33 UTC
+
+**Tool result:**
+
+```
+## model I-V
+
+| model | device | V at 10 mA | V at 0.1 A | V at 0.5 A | V at 1.33 A |
+|---|---|---|---|---|---|
+| pdk | dpantenna 1.26x27.78 (S2D DP1) | 41.4 | 405 | 2019 | 5368 |
+| pdk | dantenna 1.26x27.78 (S2D DN1) | 50.5 | 496 | 2473 | 6577 |
+| pdk | dpantenna 1.26x65.8 (D2S DP0) | 18.5 | 176 | 873 | 2321 |
+| pdk | dantenna 1.26x67.6 (D2S DN0) | 22.0 | 210 | 1047 | 2782 |
+| pdk | MCP drain junction, hv PMOS 266.4/0.6 ng 40 (S2D) | 1.20 | 4.44 | 10.6 | 13.3 |
+| pdk | MCN drain junction, hv NMOS 88/0.6 ng 20 (S2D) | 5.62 | 48.1 | 237 | 629 |
+| pdk | OP drain junction, hv PMOS 546.12/0.6 ng 82 (D2S) | 0.929 | 3.03 | 8.15 | 11.5 |
+| pdk | ON drain junction, hv NMOS 299.2/1 ng 68 (D2S) | 1.10 | 3.14 | 10.8 | 17.4 |
+| esdproxy | dpantenna 1.26x27.78 (S2D DP1) | 1.00 | 1.82 | 5.19 | 12.1 |
+| esdproxy | dantenna 1.26x27.78 (S2D DN1) | 0.979 | 1.60 | 3.97 | 8.76 |
+| esdproxy | dpantenna 1.26x65.8 (D2S DP0) | 0.929 | 1.31 | 2.76 | 5.70 |
+| esdproxy | dantenna 1.26x67.6 (D2S DN0) | 0.911 | 1.22 | 2.24 | 4.24 |
+
+## HBM summary (esdproxy)
+
+
+### s2d
+
+| grounded | V_HBM (V) | L (uH) | I peak (A) | V pad peak (V) | V iovdd peak (V) | V iovss peak (V) | max \|iovdd - iovss\| (V) | RC clamps peak (A) |
+|---|---|---|---|---|---|---|---|---|
+| iovss gnd | 500 | 1.36 | 0.323 | 3.93 | 2.21 | 0.000236 | 2.21 | 0.323 |
+| iovss gnd | -500 | 1.36 | -0.325 | -1.94 | -0.0548 | -0.0182 | 0.0366 | 0.00364 |
+| iovss gnd | 1000 | 1.36 | 0.648 | 5.78 | 2.44 | 0.000329 | 2.44 | 0.648 |
+| iovss gnd | -1000
+… [3467 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:37:38 UTC
+
+**Tool call: `Bash`**
+
+_Check current PDK HBM run_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/hbm && ls -t | head -5; f=$(ls -t hbm_pdk*.log | head -1); echo $f; tail -c 400 $f; pgrep -af "ngspice -b hbm_pdk"
+```
+
+## Tool results / harness — 2026-11-25 14:37:38 UTC
+
+**Tool result:**
+
+```
+hbm_pdk_s2d_gnd_vss_p500.log
+hbm_pdk_s2d_gnd_vss_p500.spice
+wave_L_slow_500.log
+wave_L_slow_500.spice
+wave_L_slow_0.log
+hbm_pdk_s2d_gnd_vss_p500.log
+ :  1.27474e-09 Reference value :  1.27480e-09 Reference value :  1.27486e-09 Reference value :  1.27492e-09 Reference value :  1.27498e-09 Reference value :  1.27504e-09 Reference value :  1.27510e-09 Reference value :  1.27515e-09 Reference value :  1.27521e-09 Reference value :  1.27527e-09 Reference value :  1.27533e-09 Reference value :  1.27539e-09 Reference value :  1.27545e-0911549 ngspice -b hbm_pdk_s2d_gnd_vss_p500.spice
+```
+
+## Assistant — 2026-11-25 14:37:44 UTC
+
+**Tool call: `TaskStop`**
+
+```json
+{
+ "task_id": "b5wwdqr2o"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:37:44 UTC
+
+**Tool result:**
+
+```
+{"message":"Successfully stopped task: b5wwdqr2o (cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && (python3 latchup.py _work itest; python3 latchup.py _work ovt; python3 esd.py _work run hbm_pdk; python3 scr.py _work) > _work/chain.log 2>&1)","task_id":"b5wwdqr2o","task_type":"local_bash","command":"cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && (python3 latchup.py _work itest; python3 latchup.py _work ovt; python3 esd.py _work run hbm_pdk; python3 scr.py _work) > _work/chain.log 2>&1"}
+```
+
+## Assistant — 2026-11-25 14:37:50 UTC
+
+**Tool call: `Bash`**
+
+_Add wall-time limit to HBM runs_
+
+```bash
+pgrep -af "ngspice -b hbm_pdk"; cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+p='esd.py'; s=open(p).read()
+old="""        rc = C.run_ngspice(p, p.with_suffix('.log'))
+        log = p.with_suffix('.log').read_text(errors='replace')
+        ok = raw.exists() and 'aborted' not in log and 'Timestep too small' not in log
+        status = 'ok' if ok else ('aborted' if raw.exists() else 'no raw')
+        out = {'job': job, 'status': status, 'rc': rc}"""
+new="""        import re
+        import subprocess
+        try:
+            rc = C.run_ngspice(p, p.with_suffix('.log'), timeout=TIMEOUT)
+            timed_out = False
+        except subprocess.TimeoutExpired:
+            rc, timed_out = -1, True
+        log = p.with_suffix('.log').read_text(errors='replace')
+        ok = raw.exists() and 'aborted' not in log and 'Timestep too small' not in log
+        status = 'ok' if ok else ('aborted' if raw.exists() else 'no raw')
+        if timed_out:
+            tr = re.findall(r'Reference value :\\s*([0-9.eE+-]+)', log)
+            status = 'stopped after %d s wall time at t = %.4g ns' % (TIMEOUT, float(tr[-1]) * 1e9 if tr else 0)
+        out = {'job': job, 'status': status, 'rc': rc}"""
+assert old in s; s=s.replace(old,new)
+s=s.replace("L_SLOW = 10e-9 / 2.197 * 1500\n","L_SLOW = 10e-9 / 2.197 * 1500\nTIMEOUT = 600   # s wall time per HBM run (the PDK-diode runs can crawl at ps time steps)\n",1)
+open(p,'w').write(s)
+EOF
+grep -n "TIMEOUT" esd.py | head; grep -n "timeout" common.py
+```
+
+## Tool results / harness — 2026-11-25 14:37:50 UTC
+
+**Tool result:**
+
+```
+23:TIMEOUT = 600   # s wall time per HBM run (the PDK-diode runs can crawl at ps time steps)
+220:            rc = C.run_ngspice(p, p.with_suffix('.log'), timeout=TIMEOUT)
+229:            status = 'stopped after %d s wall time at t = %.4g ns' % (TIMEOUT, float(tr[-1]) * 1e9 if tr else 0)
+291:def run_ngspice(deck_path, log_path, timeout=3600):
+299:                           env=env, timeout=timeout)
+```
+
+## Assistant — 2026-11-25 14:37:56 UTC
+
+**Tool call: `Bash`**
+
+_Run SCR estimate then PDK-diode HBM subset_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && sed -i 's/^TIMEOUT = 600 /TIMEOUT = 240 /' esd.py && rm -f _work/hbm/hbm_pdk_*.json && (python3 scr.py _work; python3 esd.py _work run hbm_pdk) > _work/chain2.log 2>&1
+```
+
+## Tool results / harness — 2026-11-25 14:37:56 UTC
+
+**Tool result:**
+
+```
+Command running in background with ID: bsygs584w. Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bsygs584w.output. You will be notified when it completes. To check interim output, use Read on that file path.
+Session cwd remains /home/user/sg13cmos5l_cm_slot7; directory changes made by the backgrounded command do not apply to subsequent commands.
+```
+
+## Assistant — 2026-11-25 14:37:58 UTC
+
+**Tool call: `Bash`**
+
+_Check SCR sweep progress_
+
+```bash
+sleep 60; cat /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/chain2.log
+```
+
+## Tool results / harness — 2026-11-25 14:37:58 UTC
+
+**Tool result:**
+
+```
+<tool_use_error>Blocked: sleep 60 followed by: cat /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/chain2.log. To wait for a condition, use Monitor with an until-loop (e.g. `until <check>; do sleep 2; done`). To wait for a command you started, use run_in_background: true. Do not chain shorter sleeps to work around this block.</tool_use_error>
+```
+
+## Assistant — 2026-11-25 14:38:01 UTC
+
+**Tool call: `Bash`**
+
+_Check SCR progress_
+
+```bash
+cat /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/chain2.log; cat /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/scr/scr.log | tail -5
+```
+
+## Tool results / harness — 2026-11-25 14:38:01 UTC
+
+**Tool result:**
+
+```
+0.5 0.5 300 300 0.01 inf inf
+0.5 0.5 300 300 0.1 inf inf
+0.5 0.5 300 3000 0.01 inf inf
+0.5 0.5 300 3000 0.1 inf inf
+0.5 0.5 3000 300 0.01 inf inf
+0.5 0.5 3000 300 0.1 inf inf
+0.5 0.5 3000 3000 0.01 inf inf
+0.5 0.5 3000 3000 0.1 inf inf
+0.5 2 300 300 0.01 inf inf
+0.5 2 300 300 0.1 inf inf
+0.5 2 300 3000 0.01 inf inf
+0.5 2 300 3000 0.1 inf inf
+0.5 2 3000 300 0.01 inf inf
+0.5 2 3000 300 0.1 inf inf
+0.5 2 3000 3000 0.01 inf inf
+0.5 2 3000 3000 0.1 inf inf
+0.5 10 300 300 0.01 1e-06 1e-06
+0.5 10 300 300 0.1 1e-06 1e-06
+0.5 10 300 3000 0.01 1e-06 1e-06
+0.5 10 300 3000 0.1 1e-06 1e-06
+0.5 10 3000 300 0.01 1e-06 1e-06
+0.5 10 3000 300 0.1 1e-06 1e-06
+0.5 10 3000 3000 0.01 1e-06 1e-06
+0.5 10 3000 3000 0.1 1e-06 1e-06
+2 0.5 300 300 0.01 inf inf
+2 0.5 300 300 0.1 inf inf
+2 0.5 300 3000 0.01 inf inf
+2 0.5 300 3000 0.1 inf inf
+2 0.5 3000 300 0.01 inf inf
+2 0.5 3000 300 0.1 inf inf
+2 0.5 3000 3000 0.01 inf inf
+2 0.5 3000 3000 0.1 inf inf
+2 2 300 300 0.01 1e-06 1e-06
+2 2 300 300 0.1 1e-06 1e-06
+2 2 300 3000 0.01 1e-06 1e-06
+2 2 300 3000 0.1 3.543549277607243e-05 3.3573836918953165e-05
+2 2 3000 300 0.01 1e-06 1e-06
+2 2 3000 300 0.1 3.3573836918953165e-05 3.543549277607243e-05
+2 2 3000 3000 0.01 1e-06 1e-06
+2 2 3000 3000 0.1 1e-06 1e-06
+2 10 300 300 0.01 0.00028014810899173136 0.00034882093275067136
+2 10 300 300 0.1 2.8006937678817305e-05 3.487229008889481e-05
+
+No. of Data Rows : 1246
+ilast               =  1.09969e-01
+ilast = 1.099695e-01
+Note: Simulation executed from .control section
+```
+
+## Assistant — 2026-11-25 14:38:08 UTC
+
+**Tool call: `TaskStop`**
+
+```json
+{
+ "task_id": "bsygs584w"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:38:08 UTC
+
+**Tool result:**
+
+```
+{"message":"Successfully stopped task: bsygs584w (cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && sed -i 's/^TIMEOUT = 600 /TIMEOUT = 240 /' esd.py && rm -f _work/hbm/hbm_pdk_*.json && (python3 scr.py _work; python3 esd.py _work run hbm_pdk) > _work/chain2.log 2>&1)","task_id":"bsygs584w","task_type":"local_bash","command":"cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && sed -i 's/^TIMEOUT = 600 /TIMEOUT = 240 /' esd.py && rm -f _work/hbm/hbm_pdk_*.json && (python3 scr.py _work; python3 esd.py _work run hbm_pdk) > _work/chain2.log 2>&1"}
+```
+
+## Assistant — 2026-11-25 14:38:17 UTC
+
+**Tool call: `Bash`**
+
+_Fix SCR start state and test a few cases_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+p='scr.py'; s=open(p).read()
+old_v="""Vdd vdd 0 {VSUP}"""
+new_v="""Vdd vdd 0 pwl(0 0 1u {VSUP})"""
+assert old_v in s; s=s.replace(old_v,new_v)
+s=s.replace("Vramp ramp 0 pwl(0 0 1u 1 3u 1 3.2u 0)","Vramp ramp 0 pwl(0 0 2u 0 3u 1 5u 1 5.2u 0)")
+s=s.replace("""tran 5n 6u
+let iend = -i(vdd)
+meas tran ilast find iend at=5.9u""","""tran 5n 9u uic
+let iend = -i(vdd)
+meas tran ilast find iend at=8.9u""")
+old="""def trigger(work, bn, bp, rnw, rsub, alpha, pol, imax=1.0):
+    \"\"\"Smallest injected pad current (A) that leaves the PNPN latched; inf if not up to imax.\"\"\"
+    if not latched(work, bn, bp, rnw, rsub, alpha, imax, pol):"""
+new="""def trigger(work, bn, bp, rnw, rsub, alpha, pol, imax=1.0):
+    \"\"\"Smallest injected pad current (A) that leaves the PNPN latched; inf if not up to imax; 0 if it latches
+    during the supply ramp without injection.\"\"\"
+    if latched(work, bn, bp, rnw, rsub, alpha, 0.0, pol):
+        return 0.0
+    if not latched(work, bn, bp, rnw, rsub, alpha, imax, pol):"""
+assert old in s; s=s.replace(old,new)
+s=s.replace("""Trigger test: injection ramped up within 1 us, held 2 us, removed; latched if the supply current stays > 1 mA at the
+end. The trigger current is found by bisection.""","""Trigger test: supply ramped 0 -> 3.6 V in 1 us (transient from all-zero, so the PNPN starts off), injection ramped
+up from 2 to 3 us, held to 5 us, removed by 5.2 us; latched if the supply current is still > 1 mA at 8.9 us. The
+trigger current is found by bisection (14 steps, geometric, 1 uA ... 1 A).""")
+s=s.replace("""'(inf: not latched up to 1 A); alpha""","""'(inf: not latched up to 1 A; 0: latches during the supply ramp without injection); alpha""")
+open(p,'w').write(s)
+EOF
+grep -n "pwl\|uic\|at=" scr.py; rm -f csv/scr_trigger.csv; python3 -c "
+import sys; sys.path.insert(0,'.'); import scr
+for args in [(0.5,10,300,300,0.01),(2,2,300,300,0.01),(2,10,300,300,0.1),(10,10,3000,3000,0.1),(0.5,0.5,300,300,0.1)]:
+    print(args, scr.trigger('_work',*args,'neg'), scr.trigger('_work',*args,'pos'))
+"
+```
+
+## Tool results / harness — 2026-11-25 14:38:20 UTC
+
+**Tool result:**
+
+```
+40:Vdd vdd 0 pwl(0 0 1u {VSUP})
+46:Vramp ramp 0 pwl(0 0 2u 0 3u 1 5u 1 5.2u 0)
+50:tran 5n 9u uic
+52:meas tran ilast find iend at=8.9u
+(0.5, 10, 300, 300, 0.01) 0.2713136722927858 0.7029490172795754
+(2, 2, 300, 300, 0.01) 0.35866376244847686 0.35866376244847686
+(2, 10, 300, 300, 0.1) 0.027078037633887206 0.03570543882619261
+(10, 10, 3000, 3000, 0.1) 0.002411705194239334 0.002411705194239334
+(0.5, 0.5, 300, 300, 0.1) inf inf
+```
+
+## Assistant — 2026-11-25 14:38:24 UTC
+
+**Tool call: `Bash`**
+
+_Run SCR grid then PDK-diode HBM subset_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && (python3 scr.py _work; python3 esd.py _work run hbm_pdk) > _work/chain2.log 2>&1
+```
+
+## Tool results / harness — 2026-11-25 14:38:25 UTC
+
+**Tool result:**
+
+```
+Command running in background with ID: bugxx5kcc. Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bugxx5kcc.output. You will be notified when it completes. To check interim output, use Read on that file path.
+Session cwd remains /home/user/sg13cmos5l_cm_slot7; directory changes made by the backgrounded command do not apply to subsequent commands.
+```
+
+## Assistant — 2026-11-25 14:38:27 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/plots/overvoltage_isupply.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:38:27 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 14:38:35 UTC
+
+**Tool call: `Bash`**
+
+_Extract input-device oxide values per configuration_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+import csv
+m=list(csv.DictReader(l for l in open('csv/hbm_mos.csv') if not l.startswith('#')))
+# per pad zapped, per config at +-2kV: max vox of input device and of any device in either pad
+for r in m:
+    if r['run'].startswith('hbm_esdproxy') and abs(int(r['v_hbm']))==2000 and r['pad']==r['pad_zapped'] and r['device'] in ('xs2d.xa.xs.xa1.xma','xd2s.xd.xc1.xmb'):
+        print(r['run'], r['max_vgs'], r['max_vgd'], r['max_vox'])
+for r in m:
+    if r['run'].startswith('hbm_esdproxy') and abs(int(r['v_hbm']))==500 and 'largest' in r['role']:
+        print(r['run'], r['pad'], r['device'], r['max_vox'])
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:38:35 UTC
+
+**Tool result:**
+
+```
+hbm_esdproxy_s2d_gnd_vss_p2000 6.6564 8.6452 8.6452
+hbm_esdproxy_s2d_gnd_vss_n2000 4.0174 4.0167 4.0174
+hbm_esdproxy_s2d_gnd_vdd_p2000 5.2259 5.7647 5.7647
+hbm_esdproxy_s2d_gnd_vdd_n2000 4.1138 4.1135 4.1138
+hbm_esdproxy_s2d_p2p_p2000 6.8058 8.825 8.825
+hbm_esdproxy_s2d_p2p_n2000 4.1104 4.11 4.1104
+hbm_esdproxy_d2s_gnd_vss_p2000 4.1926 5.7172 5.7172
+hbm_esdproxy_d2s_gnd_vss_n2000 1.9321 1.9318 1.9321
+hbm_esdproxy_d2s_gnd_vdd_p2000 2.4631 2.6644 2.6644
+hbm_esdproxy_d2s_gnd_vdd_p2000 2.4631 2.6644 2.6644
+hbm_esdproxy_d2s_gnd_vdd_n2000 1.9442 1.944 1.9442
+hbm_esdproxy_d2s_p2p_p2000 4.3608 5.977 5.977
+hbm_esdproxy_d2s_p2p_n2000 1.9378 1.9376 1.9378
+hbm_esdproxy_s2d_gnd_vss_p500 s2d xs2d.xp.xmcn 3.932
+hbm_esdproxy_s2d_gnd_vss_p500 d2s xd2s.xt.xtdn 2.2082
+hbm_esdproxy_s2d_gnd_vss_n500 s2d xs2d.xp.xmcn 1.9241
+hbm_esdproxy_s2d_gnd_vss_n500 d2s xd2s.xt.xtdn 0.042675
+hbm_esdproxy_s2d_gnd_vdd_p500 s2d xs2d.xp.xmcn 2.2894
+hbm_esdproxy_s2d_gnd_vdd_p500 d2s xd2s.xt.xtdn 0.024981
+hbm_esdproxy_s2d_gnd_vdd_n500 s2d xs2d.xp.xmcp 3.5304
+hbm_esdproxy_s2d_gnd_vdd_n500 d2s xd2s.xt.xtdn 2.2049
+hbm_esdproxy_s2d_p2p_p500 s2d xs2d.xp.xmcn 3.9931
+hbm_esdproxy_s2d_p2p_p500 d2s xd2s.xfp.xop 2.9684
+hbm_esdproxy_s2d_p2p_n500 s2d xs2d.xp.xmcp 3.6201
+hbm_esdproxy_s2d_p2p_n500 d2s xd2s.xfn.xon 3.0413
+hbm_esdproxy_d2s_gnd_vss_p500 s2d xs2d.xt.xtdn 2.2058
+hbm_esdproxy_d2s_gnd_vss_p500 d2s xd2s.xfn.xon 2.9758
+hbm_esdproxy_d2s_gnd_vss_n500 s2d xs2d.xt.xtdn 0.10687
+hbm_esdproxy_d2s_gnd_vss_n500 d2s xd2s.xd.xc1.xmb
+… [428 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:38:39 UTC
+
+**Tool call: `Bash`**
+
+_Check SCR grid progress_
+
+```bash
+wc -l /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/chain2.log; tail -3 /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/chain2.log
+```
+
+## Tool results / harness — 2026-11-25 14:38:39 UTC
+
+**Tool result:**
+
+```
+44 /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/chain2.log
+2 10 300 300 0.1 0.027078037633887206 0.03570543882619261
+2 10 300 3000 0.01 0.22632697983427383 0.1271299999662063
+2 10 300 3000 0.1 0.022645424634725454 0.012709427163281961
+```
+
+## Assistant — 2026-11-25 14:40:32 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/results.md`
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# ESD (HBM) and latch-up of the slot-7 pads: results
+
+**IHP sg13cmos5l simulation**, ngspice-47 with the IHP OSDI models, tt, 27 °C, runs of 2026-11-25. Method, ring model,
+diode-model variants and how to reproduce: [README.md](README.md). Tables below are made by `tables.py` from `csv/`.
+
+> **Model validity.** The PDK's diode and MOS models are **not calibrated for ESD currents**: no snapback, no
+> high-injection or self-heating behavior fitted at ampere currents, no thermal failure model, no parasitic
+> thyristor. The PDK antenna-diode model is fitted for reverse bias only and is unusable in forward at ESD currents
+> (§1); the HBM tables therefore use the **ESD-diode proxy** (`esdproxy`: the PDK's `diodevss_mod` / `diodevdd_mod`
+> scaled to the antenna-diode areas), which is itself not a model of these diodes. All numbers are **indicative**:
+> where the current goes, and which gate oxides see how much of the pad voltage. They do **not** say whether the pads
+> pass a given HBM level. Only silicon (HBM / TLP measurement) can.
+
+## 0. Verdicts
+
+| question | answer (indicative, see validity note) |
+|---|---|
+| Is there a supply clamp between iovdd and iovss? | **Yes.** Five `sg13cmos5l_IOPadIOVdd` cells, each an RC-triggered 756.8 µm NMOS clamp, 2.09 … 2.53 mm along the ring from the slot-7 pads (harness `tapeout_nov_2026`, `2ef5a869`). In every HBM run they keep \|iovdd − iovss\| at the pads ≤ 3.52 V (2 kV), so the core of both pads sees at most about the 3.6 V operating supply across its rails. |
+| Peak pad voltage at ±2 kV | S2D: +9.30 / −4.70 V (iovss grounded), +6.39 / −7.81 V (iovdd grounded), +12.0 / −11.2 V (D2S pad grounded). D2S: +6.29 / −2.62 V, +3.52 / −5.60 V, +11.2 / −12.0 V. The S2D is higher because its diodes are 35 µm² per stripe against 83 … 85 µm² on the D2S. |
+| Does any gate oxide see more than its rating? | **Against the only rating the PDK gives (VGS ≤ 3.3 V, a hot-carrier lifetime limit, not a breakdown limit): yes**, at 1 kV on both pads and already at 500 V on the S2D (input-device gate–drain 3.52 V, clamp MCN gate–drain 3.99 V). At 2 kV the S2D input devices XA1 / XA2 (gate = pad, no secondary protection) see **8.83 V gate-to-drain** (8.65 V with iovss grounded), the clamp gates 8.0 … 9.5 V; on the D2S the feedback inputs C1 / C2 (gate = pad) 5.98 V, the output devices 5.3 / 6.4 V, the Miller capacitors (behind 2 kΩ) 4.1 / 4.4 V. The PDK gives no gate-oxide breakdown or ESD rating, so whether 8.8 V across 7.3 … 7.5 nm of oxide for a few ns is destructive cannot be decided from the PDK; see §3.3. |
+| Diode current density at 2 kV | S2D: 0.60 … 0.61 A per stripe, 17.1 … 17.5 mA/µm², 10.3 … 10.6 mA/µm of perimeter, 268 … 310 nJ per stripe. D2S: 0.59 … 0.63 A, 7.0 … 7.4 mA/µm², 4.3 … 4.6 mA/µm, 164 … 188 nJ. The 2 kΩ `d2s_sp2k` diodes carry ≤ 1.1 mA. |
+| I-test ±100 mA at 3.6 V | S2D: the current goes into the supply through the pad diodes **and the clamp MOS channels** (MCP / MCN conduct as transistors once the pad is beyond the rail); pad +4.95 / −1.26 V (proxy) or +8.02 / −5.70 V (PDK diodes); outputs saturate (+100 mA: outp 3.29 V, outn 0.31 V); bias lines move ≤ 27 mV. D2S: the **enabled output stage sinks / sources the 100 mA itself** (ON 100 mA, OP 95 mA), pad +2.02 / −0.79 V, no diode current. 5.4 V on the pad needs 0.20 A (S2D, proxy; 23 mA with PDK diodes) and 0.57 A (D2S, proxy; 0.17 A with PDK diodes). |
+| Overvoltage 5.4 V | supply current 0.435 → 0.489 mA; largest MOS stress \|vgs\| 4.49 V, \|vgd\| 5.05 V, \|vds\| 5.00 V (below BVDSS min 5.3 V), junctions 5.4 V (below 12 V); VGS ≤ 3.3 V exceeded on the enable switches and bias tree. |
+| Latch-up | **cannot be simulated with the PDK models** (no parasitic PNPN). Layout: both pads use double guard rings around every ESD device; KLayout latch-up DRC (`-rd latchUpRules=true`): **0 violations** for both pads and the slot. Lumped PNPN with assumed parameters: 
+… [20871 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 14:40:32 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/results.md (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:40:33 UTC
+
+**Tool call: `Bash`**
+
+_Check chain2 progress_
+
+```bash
+wc -l /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/chain2.log; tail -4 /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/chain2.log
+```
+
+## Tool results / harness — 2026-11-25 14:40:34 UTC
+
+**Tool result:**
+
+```
+75 /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/chain2.log
+10 10 3000 3000 0.1 0.002411705194239334 0.002411705194239334
+hbm_pdk_s2d_gnd_vss_p500 rc 1 aborted t_end 1.3 ns
+hbm_pdk_s2d_gnd_vss_n500 rc 0 ok t_end 1000.0 ns
+hbm_pdk_s2d_gnd_vss_p2000 rc 1 aborted t_end 1.2 ns
+```
+
+## Assistant — 2026-11-25 14:40:49 UTC
+
+**Tool call: `Bash`**
+
+_Fix MCN source connection in IV test_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && sed -i "s/'X1 0 g 0 a sg13_hv_nmos w=88u l=0.6u ng=20\\\\nRg g a 1.959k'/'X1 0 g a a sg13_hv_nmos w=88u l=0.6u ng=20\\\\nRg g a 1.959k'/" iv.py && grep -n "ng=20" iv.py
+```
+
+## Tool results / harness — 2026-11-25 14:40:49 UTC
+
+**Tool result:**
+
+```
+22:    ('MCN drain junction, hv NMOS 88/0.6 ng 20 (S2D)', 'X1 0 g a a sg13_hv_nmos w=88u l=0.6u ng=20\nRg g a 1.959k',
+[This command modified 1 file you've previously read: verification/c2_gaps/pad_esd_latchup/iv.py. Call Read before editing.]
+```
+
+## Assistant — 2026-11-25 14:40:54 UTC
+
+**Tool call: `Bash`**
+
+_Rename MOS IV entries to drain path_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && sed -i "s/ drain junction, hv/ drain path, hv/g; s/and of the drain junctions of the pad clamps \/ output/and of the drain paths (drain junction, and the channel where the gate tie turns it on) of the pad clamps \/ output/" iv.py && grep -n "drain path" iv.py | head
+```
+
+## Tool results / harness — 2026-11-25 14:40:54 UTC
+
+**Tool result:**
+
+```
+4:diodes (PDK diodes.lib and the ESD-diode proxy of common.py) and of the drain paths (drain junction, and the channel where the gate tie turns it on) of the pad clamps / output
+20:    ('MCP drain path, hv PMOS 266.4/0.6 ng 40 (S2D)', 'X1 a g 0 0 sg13_hv_pmos w=266.4u l=0.6u ng=40\nRg g 0 6.768k',
+22:    ('MCN drain path, hv NMOS 88/0.6 ng 20 (S2D)', 'X1 0 g a a sg13_hv_nmos w=88u l=0.6u ng=20\nRg g a 1.959k',
+24:    ('OP drain path, hv PMOS 546.12/0.6 ng 82 (D2S)', 'X1 a 0 0 0 sg13_hv_pmos w=546.12u l=0.6u ng=82',
+26:    ('ON drain path, hv NMOS 299.2/1 ng 68 (D2S)', 'X1 0 a a a sg13_hv_nmos w=299.2u l=1u ng=68',
+[This command modified 1 file you've previously read: verification/c2_gaps/pad_esd_latchup/iv.py. Call Read before editing.]
+```
+
+## Assistant — 2026-11-25 14:40:59 UTC
+
+**Tool call: `Bash`**
+
+_Summarize SCR trigger results_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 scr_plot.py && python3 - <<'EOF'
+import csv
+rows=list(csv.DictReader(l for l in open('csv/scr_trigger.csv') if not l.startswith('#')))
+print(len(rows))
+import collections
+for bn in ['0.5','2','10']:
+  for bp in ['0.5','2','10']:
+    for pol in ['neg','pos']:
+      v=[(r['r_nwell_ohm'],r['r_sub_ohm'],r['alpha'],r['i_trigger_A']) for r in rows if r['beta_npn']==bn and r['beta_pnp']==bp and r['injection']==pol]
+      print(bn,bp,pol,' '.join('%s/%s/%s:%s'%(a,b,c,('%.3g'%float(d)) if d!='inf' else 'inf') for a,b,c,d in v))
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:41:00 UTC
+
+**Tool result:**
+
+```
+144
+0.5 0.5 neg 300/300/0.01:inf 300/300/0.1:inf 300/3000/0.01:inf 300/3000/0.1:inf 3000/300/0.01:inf 3000/300/0.1:inf 3000/3000/0.01:inf 3000/3000/0.1:inf
+0.5 0.5 pos 300/300/0.01:inf 300/300/0.1:inf 300/3000/0.01:inf 300/3000/0.1:inf 3000/300/0.01:inf 3000/300/0.1:inf 3000/3000/0.01:inf 3000/3000/0.1:inf
+0.5 2 neg 300/300/0.01:inf 300/300/0.1:inf 300/3000/0.01:inf 300/3000/0.1:inf 3000/300/0.01:inf 3000/300/0.1:inf 3000/3000/0.01:inf 3000/3000/0.1:inf
+0.5 2 pos 300/300/0.01:inf 300/300/0.1:inf 300/3000/0.01:inf 300/3000/0.1:inf 3000/300/0.01:inf 3000/300/0.1:inf 3000/3000/0.01:inf 3000/3000/0.1:inf
+0.5 10 neg 300/300/0.01:0.271 300/300/0.1:0.0271 300/3000/0.01:0.228 300/3000/0.1:0.0228 3000/300/0.01:0.0443 3000/300/0.1:0.00443 3000/3000/0.01:0.0241 3000/3000/0.1:0.00242
+0.5 10 pos 300/300/0.01:0.703 300/300/0.1:0.0703 300/3000/0.01:0.462 300/3000/0.1:0.0461 3000/300/0.01:0.266 3000/300/0.1:0.0266 3000/3000/0.01:0.062 3000/3000/0.1:0.0062
+2 0.5 neg 300/300/0.01:inf 300/300/0.1:inf 300/3000/0.01:inf 300/3000/0.1:inf 3000/300/0.01:inf 3000/300/0.1:inf 3000/3000/0.01:inf 3000/3000/0.1:inf
+2 0.5 pos 300/300/0.01:inf 300/300/0.1:inf 300/3000/0.01:inf 300/3000/0.1:inf 3000/300/0.01:inf 3000/300/0.1:inf 3000/3000/0.01:inf 3000/3000/0.1:inf
+2 2 neg 300/300/0.01:0.359 300/300/0.1:0.0359 300/3000/0.01:0.235 300/3000/0.1:0.0235 3000/300/0.01:0.128 3000/300/0.1:0.0128 3000/3000/0.01:0.0318 3000/3000/0.1:0.00318
+2 2 pos 300/300/0.01:0.359 300/300/0.1:0.0359 300/3000/0.01:0.128 300/3000/0
+… [1471 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:41:10 UTC
+
+**Tool call: `Bash`**
+
+_Build SCR markdown table_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF' > _work/scr_table.md
+import csv
+rows=list(csv.DictReader(l for l in open('csv/scr_trigger.csv') if not l.startswith('#')))
+def g(bn,bp,rn,rs,a,pol):
+    for r in rows:
+        if (r['beta_npn'],r['beta_pnp'],r['r_nwell_ohm'],r['r_sub_ohm'],r['alpha'],r['injection'])==(bn,bp,rn,rs,a,pol):
+            v=r['i_trigger_A']; return 'no latch ≤ 1 A' if v=='inf' else ('%.3g A'%float(v) if float(v)>=1 else '%.3g mA'%(float(v)*1e3))
+cols=[('300','300'),('300','3000'),('3000','300'),('3000','3000')]
+print('| β_npn × β_pnp | injection | α | '+' | '.join(f'R_nw {a} Ω, R_sub {b} Ω' for a,b in cols)+' |')
+print('|'+'---|'*(3+len(cols)))
+for bn,bp in [('0.5','0.5'),('0.5','2'),('2','0.5'),('0.5','10'),('2','2'),('2','10'),('10','10')]:
+    for pol in ['neg','pos']:
+        for a in ['0.01','0.1']:
+            print(f'| {bn} × {bp} | {"−" if pol=="neg" else "+"} | {a} | '+' | '.join(g(bn,bp,rn,rs,a,pol) for rn,rs in cols)+' |')
+EOF
+cat _work/scr_table.md | head -8; tail -3 _work/chain2.log
+```
+
+## Tool results / harness — 2026-11-25 14:41:10 UTC
+
+**Tool result:**
+
+```
+| β_npn × β_pnp | injection | α | R_nw 300 Ω, R_sub 300 Ω | R_nw 300 Ω, R_sub 3000 Ω | R_nw 3000 Ω, R_sub 300 Ω | R_nw 3000 Ω, R_sub 3000 Ω |
+|---|---|---|---|---|---|---|
+| 0.5 × 0.5 | − | 0.01 | no latch ≤ 1 A | no latch ≤ 1 A | no latch ≤ 1 A | no latch ≤ 1 A |
+| 0.5 × 0.5 | − | 0.1 | no latch ≤ 1 A | no latch ≤ 1 A | no latch ≤ 1 A | no latch ≤ 1 A |
+| 0.5 × 0.5 | + | 0.01 | no latch ≤ 1 A | no latch ≤ 1 A | no latch ≤ 1 A | no latch ≤ 1 A |
+| 0.5 × 0.5 | + | 0.1 | no latch ≤ 1 A | no latch ≤ 1 A | no latch ≤ 1 A | no latch ≤ 1 A |
+| 0.5 × 2 | − | 0.01 | no latch ≤ 1 A | no latch ≤ 1 A | no latch ≤ 1 A | no latch ≤ 1 A |
+| 0.5 × 2 | − | 0.1 | no latch ≤ 1 A | no latch ≤ 1 A | no latch ≤ 1 A | no latch ≤ 1 A |
+hbm_pdk_s2d_gnd_vss_p2000 rc 1 aborted t_end 1.2 ns
+hbm_pdk_s2d_gnd_vss_n2000 rc 0 ok t_end 1000.0 ns
+hbm_pdk_s2d_gnd_vdd_p500 rc 0 ok t_end 1000.0 ns
+```
+
+## Assistant — 2026-11-25 14:41:12 UTC
+
+Now write the SCR section into results.md.
+
+## Assistant — 2026-11-25 14:41:22 UTC
+
+**Tool call: `Bash`**
+
+_Insert SCR section into results.md_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+tab=open('_work/scr_table.md').read().strip()
+txt=f"""`scr.py`, `csv/scr_trigger.csv`, [plots/scr_trigger.png](plots/scr_trigger.png). **Every parameter here is an
+assumption; nothing comes from the PDK.** Structure: PNP (emitter = p+ at iovdd, base = n-well node, collector =
+substrate node) and NPN (emitter = n+ at iovss, base = substrate node, collector = n-well node), n-well resistance
+R_nw to the iovdd tie, substrate resistance R_sub to the iovss guard ring, Gummel–Poon BJTs with IS = 1e-15 A
+(V_BE ≈ 0.72 V at 1 mA) and 10 Ω emitter / collector series resistance, iovdd 3.6 V. Injection: a fraction α of the
+forced pad current reaches the victim behind the guard rings (negative injection: electrons collected by the well;
+positive: holes collected by the substrate). Supply ramped from 0 V so the PNPN starts off; injection held 2 µs, then
+removed; "latched" = supply current > 1 mA 3.7 µs after removal; trigger current by bisection. Ranges: β 0.5 … 10
+each, R 300 … 3000 Ω (a decade around the scale one gets for a few µm of lightly doped silicon between an injector and
+a tie; the process spec lists no n-well or substrate sheet resistance), α 1 % and 10 % (the guard rings collect the
+rest).
+
+{tab}
+
+- **No latch at all for β_npn · β_pnp ≤ 1** (the regenerative loop gain cannot exceed 1), whatever the injection.
+- Where the loop gain is > 1, the trigger current follows ≈ 0.7 V / (α · R) of the resistor the injected carriers flow
+  through (R_sub for positive, R_nw for negative injection, as the asymmetric columns show): **24 mA … 0.70 A at
+  α = 1 %, 2.4 … 70 mA at α = 10 %**. A trigger current below the JESD78 100 mA appears only with α = 10 %, or with
+  α = 1 % and both resistances at 3 kΩ.
+- The lumped model says what would have to be true for latch-up at 100 mA (10 % of the injected carriers past the
+  double guard rings into a well or substrate region with ≥ 1 kΩ to its tie, and parasitic β product > 1). It cannot
+  say whether that is true here; that needs either a TCAD / calibrated parasitic-bipolar model of the process or a
+  JESD78 measurement. The geometry (§5.2: double guard rings around every pad-connected diffusion, ≥ 8.6 µm from the
+  ESD devices to the core's opposite-type diffusions, LU rules clean) is what one would draw to keep α small."""
+s=open('results.md').read(); s=s.replace('SCR_PLACEHOLDER',txt); open('results.md','w').write(s)
+EOF
+grep -c PLACEHOLDER results.md
+```
+
+## Tool results / harness — 2026-11-25 14:41:23 UTC
+
+**Tool result:**
+
+```
+1
+```
+
+## Assistant — 2026-11-25 14:41:36 UTC
+
+**Tool call: `Bash`**
+
+_Tighten SCR wording in results.md_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+s=open('results.md').read()
+old="""R 300 … 3000 Ω (a decade around the scale one gets for a few µm of lightly doped silicon between an injector and
+a tie; the process spec lists no n-well or substrate sheet resistance), α 1 % and 10 % (the guard rings collect the
+rest)."""
+new="""R_nw and R_sub 300 Ω and 3000 Ω each (chosen to span a decade; the process spec lists no n-well or substrate sheet
+resistance from which to compute them), α 1 % and 10 % (the guard rings collect the rest)."""
+assert old in s; s=s.replace(old,new)
+old="""- Where the loop gain is > 1, the trigger current follows ≈ 0.7 V / (α · R) of the resistor the injected carriers flow
+  through (R_sub for positive, R_nw for negative injection, as the asymmetric columns show): **24 mA … 0.70 A at
+  α = 1 %, 2.4 … 70 mA at α = 10 %**."""
+new="""- Where the loop gain is > 1, the trigger current scales as 1 / α and falls with the resistances, of the order of
+  0.7 V / (α · R) (with equal R_nw = R_sub = 300 Ω and α = 1 %: 0.27 … 0.36 A against 0.23 A from that estimate):
+  **24 mA … 0.70 A at α = 1 %, 2.4 … 70 mA at α = 10 %**."""
+assert old in s; s=s.replace(old,new)
+s=s.replace("""A real gate-grounded NMOS such as MCN (gate tied to iovss by rppd, as in the IHP
+  `Clamp_N20N0D` it is drawn after) would snap back""","""A real gate-grounded NMOS such as MCN (gate tied to iovss by rppd; same size and gate tie as
+  the IHP `Clamp_N20N0D`) would snap back""")
+open('results.md','w').write(s)
+EOF
+tail -4 _work/chain2.log
+```
+
+## Tool results / harness — 2026-11-25 14:41:36 UTC
+
+**Tool result:**
+
+```
+hbm_pdk_s2d_gnd_vss_n500 rc 0 ok t_end 1000.0 ns
+hbm_pdk_s2d_gnd_vss_p2000 rc 1 aborted t_end 1.2 ns
+hbm_pdk_s2d_gnd_vss_n2000 rc 0 ok t_end 1000.0 ns
+hbm_pdk_s2d_gnd_vdd_p500 rc 0 ok t_end 1000.0 ns
+```
+
+## Assistant — 2026-11-25 14:41:50 UTC
+
+**Tool call: `Bash`**
+
+_Update README and run.sh details_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+s=open('README.md').read()
+rep=[("| HBM | `esd.py` | 80 transient runs (1 µs each); per run the raw file is analyzed and deleted → `csv/hbm_*.csv`, `plots/hbm_*.png`; network check → `csv/hbm_network_check.csv` |",
+"| HBM | `esd.py` | 60 transient runs (1 µs each; 44 with the ESD-diode proxy, 16 with the PDK antenna-diode model, 240 s wall-time limit each); per run the raw file is analyzed and deleted → `csv/hbm_*.csv`, `plots/hbm_*.png`; network check → `csv/hbm_network_check.csv` |"),
+("| lumped thyristor | `scr.py` | PNPN with assumed β, well / substrate resistances and collection fraction; trigger current by bisection → `csv/scr_trigger.csv`, `plots/scr_trigger.png` |",
+"| lumped thyristor | `scr.py`, `scr_plot.py` | PNPN with assumed β, well / substrate resistances and collection fraction; trigger current by bisection → `csv/scr_trigger.csv`, `plots/scr_trigger.png` |\n| tables | `tables.py` | the Markdown tables of results.md from `csv/` → `_work/tables.md` |"),
+("100 pF charged to V0, a switch closing at 1 ns, 1.5 kΩ, and a series inductance L. Without L the solver stops at the\nfirst nanosecond (the current step); L is set from the JS-001 rise-time window (2 … 10 ns into a short, 10–90 % rise =\n2.197 L / 1.5 kΩ): L = 1.365 µH (2 ns, all runs) and 6.83 µH (10 ns, sensitivity runs `hbmls_*` at ±2 kV).",
+"100 pF charged to V0, a switch closing at 1 ns, 1.5 kΩ, and a series inductance L. Without L the solver stops at the\nfirst nanosecond (the current step); L is set from the ends of the JS-001 rise-time window (2 … 10 ns into a short,\ntaking the 10–90 % rise of an RL step, 2.197 L / 1.5 kΩ): L = 1.365 µH (all runs) and 6.83 µH (sensitivity runs\n`hbmls_*` at ±2 kV). Measured into a short: 1.85 ns and 7.96 ns (the capacitor already discharges during the rise)."),
+("./run.sh            # all steps, about 1.5 h on one CPU; ngspice runs one at a time","./run.sh            # all steps, about 2 h on one CPU; ngspice runs one at a time"),
+]
+for a,b in rep:
+    assert a in s, a[:40]; s=s.replace(a,b)
+open('README.md','w').write(s)
+r=open('run.sh').read()
+r=r.replace("post()     { python3 esd.py \"$WORK\" post; python3 latchup.py \"$WORK\" post; python3 scr_plot.py; }",
+"post()     { python3 esd.py \"$WORK\" post; python3 latchup.py \"$WORK\" post; python3 scr_plot.py; python3 tables.py > \"$WORK/tables.md\"; }")
+r=r.replace("  all) fetch; ring; iv; hbm; latchup; geometry; scr ;;","  all) fetch; ring; iv; hbm; latchup; geometry; scr; post ;;")
+open('run.sh','w').write(r)
+EOF
+grep -n "post\|all)" run.sh
+```
+
+## Tool results / harness — 2026-11-25 14:41:50 UTC
+
+**Tool result:**
+
+```
+7:# Usage: run.sh [fetch|ring|iv|hbm|latchup|geometry|scr|post|all]   (default all; work dir ./_work)
+22:hbm()      { python3 esd.py "$WORK" wave; python3 esd.py "$WORK" run; python3 esd.py "$WORK" post; }
+23:latchup()  { python3 latchup.py "$WORK" itest; python3 latchup.py "$WORK" ovt; python3 latchup.py "$WORK" post; }
+26:post()     { python3 esd.py "$WORK" post; python3 latchup.py "$WORK" post; python3 scr_plot.py; python3 tables.py > "$WORK/tables.md"; }
+29:  all) fetch; ring; iv; hbm; latchup; geometry; scr; post ;;
+30:  fetch|ring|iv|hbm|latchup|geometry|scr|post) "$STEP" ;;
+```
+
+## Assistant — 2026-11-25 14:41:52 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/plots/scr_trigger.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:41:52 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 14:41:55 UTC
+
+**Tool call: `Bash`**
+
+_Wait for PDK-diode HBM subset to finish_
+
+```bash
+L=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/chain2.log; timeout 3000 bash -c "until [ \$(grep -c '^hbm_pdk' $L) -ge 16 ]; do sleep 15; done"; grep "^hbm_pdk" $L
+```
+
+## Tool results / harness — 2026-11-25 14:48:26 UTC
+
+**Tool result:**
+
+```
+hbm_pdk_s2d_gnd_vss_p500 rc 1 aborted t_end 1.3 ns
+hbm_pdk_s2d_gnd_vss_n500 rc 0 ok t_end 1000.0 ns
+hbm_pdk_s2d_gnd_vss_p2000 rc 1 aborted t_end 1.2 ns
+hbm_pdk_s2d_gnd_vss_n2000 rc 0 ok t_end 1000.0 ns
+hbm_pdk_s2d_gnd_vdd_p500 rc 0 ok t_end 1000.0 ns
+hbm_pdk_s2d_gnd_vdd_n500 rc 1 aborted t_end 1.3 ns
+hbm_pdk_s2d_gnd_vdd_p2000 rc 0 ok t_end 1000.0 ns
+hbm_pdk_s2d_gnd_vdd_n2000 rc 1 aborted t_end 1.2 ns
+hbm_pdk_d2s_gnd_vss_p500 rc 1 aborted t_end 1.3 ns
+hbm_pdk_d2s_gnd_vss_n500 rc 1 aborted t_end 14.5 ns
+hbm_pdk_d2s_gnd_vss_p2000 rc 1 aborted t_end 1.1 ns
+hbm_pdk_d2s_gnd_vss_n2000 rc 1 aborted t_end 1.1 ns
+hbm_pdk_d2s_gnd_vdd_p500 rc -1 stopped after 240 s wall time at t = 1.182 ns t_end 0.0 ns
+hbm_pdk_d2s_gnd_vdd_n500 rc 1 aborted t_end 1.3 ns
+hbm_pdk_d2s_gnd_vdd_p2000 rc 1 aborted t_end 1.1 ns
+hbm_pdk_d2s_gnd_vdd_n2000 rc 1 aborted t_end 1.1 ns
+```
+
+## Assistant — 2026-11-25 14:48:31 UTC
+
+**Tool call: `Bash`**
+
+_Rerun IV, post-process, regenerate tables_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 iv.py _work 2>&1 | grep MCN; python3 esd.py _work post 2>&1 | grep -iv warn | tail -2; python3 tables.py > _work/tables.md; sed -n '/## model I-V/,/## HBM summary (esd/p' _work/tables.md; sed -n '/## HBM summary (pdk)/,/## diodes/p' _work/tables.md
+```
+
+## Tool results / harness — 2026-11-25 14:48:38 UTC
+
+**Tool result:**
+
+```
+{'model': 'pdk', 'device': 'MCN drain path, hv NMOS 88/0.6 ng 20 (S2D)', 'direction': 'iovss (body, source) -> pad (drain); gate to iovss via 1.959 kOhm (Clamp_N20N0D)', 'v_at_0.001A': 0.614, 'v_at_0.01A': 1.44, 'v_at_0.1A': 5.781, 'v_at_0.5A': 13.131, 'v_at_1A': 18.885, 'v_at_1.33A': 21.973, 'v_at_2A': 27.402}
+## model I-V
+
+| model | device | V at 10 mA | V at 0.1 A | V at 0.5 A | V at 1.33 A |
+|---|---|---|---|---|---|
+| pdk | dpantenna 1.26x27.78 (S2D DP1) | 41.4 | 405 | 2019 | 5368 |
+| pdk | dantenna 1.26x27.78 (S2D DN1) | 50.5 | 496 | 2473 | 6577 |
+| pdk | dpantenna 1.26x65.8 (D2S DP0) | 18.5 | 176 | 873 | 2321 |
+| pdk | dantenna 1.26x67.6 (D2S DN0) | 22.0 | 210 | 1047 | 2782 |
+| pdk | MCP drain path, hv PMOS 266.4/0.6 ng 40 (S2D) | 1.20 | 4.44 | 10.6 | 13.3 |
+| pdk | MCN drain path, hv NMOS 88/0.6 ng 20 (S2D) | 1.44 | 5.78 | 13.1 | 22.0 |
+| pdk | OP drain path, hv PMOS 546.12/0.6 ng 82 (D2S) | 0.929 | 3.03 | 8.15 | 11.5 |
+| pdk | ON drain path, hv NMOS 299.2/1 ng 68 (D2S) | 1.10 | 3.14 | 10.8 | 17.4 |
+| esdproxy | dpantenna 1.26x27.78 (S2D DP1) | 1.00 | 1.82 | 5.19 | 12.1 |
+| esdproxy | dantenna 1.26x27.78 (S2D DN1) | 0.979 | 1.60 | 3.97 | 8.76 |
+| esdproxy | dpantenna 1.26x65.8 (D2S DP0) | 0.929 | 1.31 | 2.76 | 5.70 |
+| esdproxy | dantenna 1.26x67.6 (D2S DN0) | 0.911 | 1.22 | 2.24 | 4.24 |
+
+## HBM summary (esdproxy)
+## HBM summary (pdk)
+
+| pad | grounded | V_HBM (V) | status | ran to (ns) | V pad peak (V) | V iovdd peak (V) | V iovss peak (V) |
+|---|---|---|---|---|---
+… [1177 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:48:45 UTC
+
+**Tool call: `Bash`**
+
+_Inspect PDK-diode HBM runs that completed_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+import json
+for n in ['hbm_pdk_s2d_gnd_vss_n500','hbm_pdk_s2d_gnd_vss_n2000','hbm_pdk_s2d_gnd_vdd_p500','hbm_pdk_s2d_gnd_vdd_p2000']:
+    d=json.load(open(f'_work/hbm/{n}.json'))
+    print(n, round(d['summary']['v_pad_peak'],2))
+    for r in d['diodes']:
+        if r['diode'].startswith('s2d') and abs(r['i_peak_A'])>1e-3: print('   ',r['diode'],round(r['i_peak_A'],4),round(r['energy_nJ'],1))
+    for r in d['mos']:
+        if r['pad']=='s2d': print('   ',r['device'],round(r['max_vgs'],2),round(r['max_vgd'],2),round(r['max_vds'],2), r['role'][:20])
+EOF
+grep -c . _work/hbm/hbm_pdk_s2d_gnd_vss_n2000.log; python3 - <<'EOF'
+import sys; sys.path.insert(0,'/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup')
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:48:46 UTC
+
+**Tool result:**
+
+```
+hbm_pdk_s2d_gnd_vss_n500 -10.75
+    s2d.DN1 0.002 2.8
+    s2d.DN2 0.002 2.8
+    xs2d.xa.xs.xa1.xma 10.09 10.09 1.2 input device of unit
+    xs2d.xa.xs.xa2.xma 10.09 10.09 1.2 input device of unit
+    xs2d.xp.xmcp 0.86 10.64 10.17 clamp PMOS MCP (drai
+    xs2d.xp.xmcn 4.08 10.73 10.74 clamp NMOS MCN (drai
+    xs2d.xp.xmcn 4.08 10.73 10.74 largest max_vox of a
+hbm_pdk_s2d_gnd_vss_n2000 -20.7
+    s2d.DP1 -0.0013 1.3
+    s2d.DN1 0.004 12.6
+    s2d.DP2 -0.0013 1.3
+    s2d.DN2 0.004 12.6
+    xs2d.xa.xs.xa1.xma 19.93 19.93 1.84 input device of unit
+    xs2d.xa.xs.xa2.xma 19.93 19.93 1.84 input device of unit
+    xs2d.xp.xmcp 1.1 19.77 19.86 clamp PMOS MCP (drai
+    xs2d.xp.xmcn 5.68 20.64 20.63 clamp NMOS MCN (drai
+    xs2d.xp.xmcn 5.68 20.64 20.63 largest max_vox of a
+hbm_pdk_s2d_gnd_vdd_p500 9.2
+    s2d.DP1 0.002 2.1
+    s2d.DP2 0.002 2.1
+    xs2d.xa.xs.xa1.xma 8.37 8.44 2.99 input device of unit
+    xs2d.xa.xs.xa2.xma 8.37 8.44 2.99 input device of unit
+    xs2d.xp.xmcp 6.91 8.59 9.12 clamp PMOS MCP (drai
+    xs2d.xp.xmcn 0.71 8.88 8.88 clamp NMOS MCN (drai
+    xs2d.xp.xmcn 0.71 8.88 8.88 largest max_vox of a
+hbm_pdk_s2d_gnd_vdd_p2000 13.21
+    s2d.DP1 0.0029 8.1
+    s2d.DN1 -0.001 0.0
+    s2d.DP2 0.0029 8.1
+    s2d.DN2 -0.001 0.0
+    xs2d.xa.xs.xa1.xma 12.24 12.29 4.0 input device of unit
+    xs2d.xa.xs.xa2.xma 12.24 12.29 4.0 input device of unit
+    xs2d.xp.xmcp 9.31 12.83 12.89 clamp PMOS MCP (drai
+    xs2d.xp.xmcn 1.02 12.74 12.74 clamp NMOS MCN (drai
+    xs2d.xp.xmcp 9.31 1
+… [35 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:49:03 UTC
+
+**Tool call: `Bash`**
+
+_Insert PDK-model HBM section and fix IV table_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+tab=open('_work/tables.md').read().split('## HBM summary (pdk)')[1].split('## diodes')[0].strip()
+txt=f"""The same zaps with `dantenna` / `dpantenna` as shipped (16 runs: both pads, iovss or iovdd grounded, ±500 V and
+±2 kV; 240 s wall-time limit per run; `csv/hbm_summary.csv`, rows `hbm_pdk_*`). "aborted" = ngspice stopped with
+"timestep too small"; the peak values are those reached until then.
+
+{tab}
+
+- 12 of 16 runs stop in the first 0.1 … 14 ns, at the current edge, with the pad at up to 9.3 V; the solver cannot
+  follow the 2 … 4 kΩ forward branches of the diode model together with the MOS junctions.
+- The four S2D runs that finish show what the model implies: the antenna diodes carry only 2 … 4 mA, the clamp MOS
+  devices (MCN / MCP as transistors and through their linearized junctions) carry the rest, and the pad reaches
+  **−10.8 V (−500 V) and −20.7 V (−2 kV)** with iovss grounded, **+9.2 V (+500 V) and +13.2 V (+2 kV)** with iovdd
+  grounded; the S2D input-device oxide then sees 10.1 V (−500 V) to 19.9 V (−2 kV).
+- These numbers are a property of a model that its authors fitted for reverse bias only; they are not a prediction of
+  the silicon. They do show that, without a forward-capable diode model, every conclusion about the pad voltage depends
+  on the model rather than on the circuit, which is why the tables in §3.1 … §3.3 use the proxy."""
+s=open('results.md').read(); s=s.replace('PDK_HBM_PLACEHOLDER',txt)
+# update model IV table MCN row and text
+s=s.replace("| pdk | MCP drain junction, hv PMOS 266.4/0.6 ng 40 (S2D) | 1.20 | 4.44 | 10.6 | 13.3 |","| pdk | MCP drain path, hv PMOS 266.4/0.6 ng 40 (S2D) | 1.20 | 4.44 | 10.6 | 13.3 |")
+s=s.replace("| pdk | MCN drain junction, hv NMOS 88/0.6 ng 20 (S2D) | 5.62 | 48.1 | 237 | 629 |","| pdk | MCN drain path, hv NMOS 88/0.6 ng 20 (S2D) | 1.44 | 5.78 | 13.1 | 22.0 |")
+s=s.replace("| pdk | OP drain junction, hv PMOS 546.12/0.6 ng 82 (D2S) |","| pdk | OP drain path, hv PMOS 546.12/0.6 ng 82 (D2S) |")
+s=s.replace("| pdk | ON drain junction, hv NMOS 299.2/1 ng 68 (D2S) |","| pdk | ON drain path, hv NMOS 299.2/1 ng 68 (D2S) |")
+old="""- The PSP junctions are linearized above `imax` (2.0 / 2.5 mA), so the clamp drain junctions alone become tens to
+  hundreds of ohms; where the PMOS / NMOS channel turns on (gate tied to the rail, drain beyond it), the MOS conducts as
+  a transistor, which is physical (OP, ON, MCP rows: a few V at 0.1 A). MCN, whose gate goes to iovss through 1.96 kΩ,
+  shows only the linearized junction (48 V at 0.1 A)."""
+new="""- "Drain path" = the pad-to-rail path of the clamp / output MOS with its gate tied as in the pad (MCP gate to iovdd
+  via 6.768 kΩ, MCN gate to iovss via 1.959 kΩ, the rppd values of the IHP cells `Clamp_P20N0D` / `Clamp_N20N0D`; OP /
+  ON gate at their own rail, as disabled). Once the pad is beyond the rail, the device conducts as a transistor with
+  the pad as its source (gate − pad > V_T), in parallel with its drain junction; that is physical. The PSP junctions
+  themselves are linearized above `imax` (2.0 / 2.5 mA for hv NMOS / PMOS), so they add little at ESD currents."""
+assert old in s; s=s.replace(old,new)
+open('results.md','w').write(s)
+EOF
+grep -n "PLACEHOLDER" results.md; grep -n "drain junction" results.md README.md
+```
+
+## Tool results / harness — 2026-11-25 14:49:03 UTC
+
+**Tool result:**
+
+```
+results.md:56:  the pad as its source (gate − pad > V_T), in parallel with its drain junction; that is physical. The PSP junctions
+README.md:37:| model check | `iv.py` | forward I–V of the pad diodes and of the clamp / output-device drain junctions in the compact models → `csv/model_iv.csv`, `plots/model_iv.png` |
+README.md:68:The MOS devices keep the PDK PSP models in both variants. Their drain junctions (JUNCAP2) are linearized above
+```
+
+## Assistant — 2026-11-25 14:49:23 UTC
+
+**Tool call: `Bash`**
+
+_Fix oxide table claims and README wording_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+s=open('results.md').read()
+old="| both | any other MOS of either pad | ≤ 2.2 | ≤ 2.44 | ≤ 3.26 | (bias tree / switches, set by \\|iovdd − iovss\\|) |\n"
+assert old in s
+s=s.replace(old,"")
+old2="""The worst values come from the pad-to-pad configuration,"""
+new2="""Devices off the pad path (bias tree, enable switches, core) are recorded only where they were the largest of their pad
+in a run (`role` = "largest …" in `csv/hbm_mos.csv`): that happened only in runs where that pad was neither zapped nor
+the return, with at most 2.21 / 2.44 / 3.26 V at 500 V / 1 kV / 2 kV; in the other runs they are below the pad-path
+maximum of the run. The worst values come from the pad-to-pad configuration,"""
+assert old2 in s; s=s.replace(old2,new2)
+open('results.md','w').write(s)
+r=open('README.md').read()
+r=r.replace("and of the clamp / output-device drain junctions in the compact models","and of the clamp / output-device drain paths (junction and channel, gate tied as in the pad) in the compact models")
+r=r.replace("give 404 V at 0.1 A forward","give 405 V at 0.1 A forward")
+open('README.md','w').write(r)
+EOF
+grep -n "405 V\|drain paths" README.md
+```
+
+## Tool results / harness — 2026-11-25 14:49:23 UTC
+
+**Tool result:**
+
+```
+15:> diodes are fitted "for the reverse direction" (`diodes.lib` header) and give 405 V at 0.1 A forward (table in
+37:| model check | `iv.py` | forward I–V of the pad diodes and of the clamp / output-device drain paths (junction and channel, gate tied as in the pad) in the compact models → `csv/model_iv.csv`, `plots/model_iv.png` |
+```
+
+## Assistant — 2026-11-25 14:49:30 UTC
+
+**Tool call: `Bash`**
+
+_Check off-path largest-oxide cases_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+import csv,sys; sys.path.insert(0,'.'); import esd
+path={d for p in esd.PATH_DEVICES.values() for d,_ in p}
+m=list(csv.DictReader(l for l in open('csv/hbm_mos.csv') if not l.startswith('#')))
+mx={}
+for r in m:
+    if r['diode_model']!='esdproxy' or not r['run'].startswith('hbm_') or 'largest' not in r['role'] or r['device'] in path: continue
+    inv = r['pad']==r['pad_zapped'] or r['config']=='p2p'
+    k=(inv,abs(int(r['v_hbm'])))
+    mx[k]=max(mx.get(k,0),float(r['max_vox']))
+    if inv: print(r['run'],r['pad'],r['device'],r['max_vox'])
+print(mx)
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:49:31 UTC
+
+**Tool result:**
+
+```
+hbm_esdproxy_d2s_gnd_vdd_p1000 d2s xd2s.xd.xpcr 1.7643
+{(False, 500): 2.2082, (False, 1000): 2.4392, (False, 2000): 3.2583, (True, 1000): 1.7643}
+```
+
+## Assistant — 2026-11-25 14:49:35 UTC
+
+**Tool call: `Bash`**
+
+_Correct off-path oxide statement_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+s=open('results.md').read()
+old="""in a run (`role` = "largest …" in `csv/hbm_mos.csv`): that happened only in runs where that pad was neither zapped nor
+the return, with at most 2.21 / 2.44 / 3.26 V at 500 V / 1 kV / 2 kV; in the other runs they are below the pad-path
+maximum of the run."""
+new="""in a run (`role` = "largest …" in `csv/hbm_mos.csv`): in runs where that pad was neither zapped nor the return, with
+at most 2.21 / 2.44 / 3.26 V at 500 V / 1 kV / 2 kV, and once in a zapped pad (D2S cascode XPCR, 1.76 V, iovdd
+grounded, +1 kV); in all other runs they are below the pad-path maximum of the run."""
+assert old in s; s=s.replace(old,new); open('results.md','w').write(s)
+EOF
+echo ok
+```
+
+## Tool results / harness — 2026-11-25 14:49:36 UTC
+
+**Tool result:**
+
+```
+ok
+```
+
+## Assistant — 2026-11-25 14:49:41 UTC
+
+**Tool call: `Bash`**
+
+_Check markdown tables for pipe and column issues_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+import re
+for f in ['README.md','results.md']:
+    lines=open(f).read().split('\n')
+    i=0; incode=False
+    while i<len(lines):
+        l=lines[i]
+        if l.startswith('ʼʼʼ'): incode=not incode
+        if not incode and l.startswith('|'):
+            j=i; blk=[]
+            while j<len(lines) and lines[j].startswith('|'): blk.append((j,lines[j])); j+=1
+            def n(x): return len(re.split(r'(?<!\\)\|', x.strip()))-2
+            c=[n(x) for _,x in blk]
+            if len(set(c))>1: print(f, 'table at line', i+1, 'column counts', c)
+            i=j; continue
+        i+=1
+    # unescaped |x| inside cells heuristics
+    for k,l in enumerate(lines):
+        if l.startswith('|') and re.search(r'(?<![\\ ])\|[A-Za-z]', l): print(f,k+1,'possible unescaped:', l[:100])
+print('checked')
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:49:41 UTC
+
+**Tool result:**
+
+```
+checked
+```
+
+## Assistant — 2026-11-25 14:49:47 UTC
+
+**Tool call: `Bash`**
+
+_Review verdict table_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && sed -n 18,35p results.md
+```
+
+## Tool results / harness — 2026-11-25 14:49:47 UTC
+
+**Tool result:**
+
+```
+## 0. Verdicts
+
+| question | answer (indicative, see validity note) |
+|---|---|
+| Is there a supply clamp between iovdd and iovss? | **Yes.** Five `sg13cmos5l_IOPadIOVdd` cells, each an RC-triggered 756.8 µm NMOS clamp, 2.09 … 2.53 mm along the ring from the slot-7 pads (harness `tapeout_nov_2026`, `2ef5a869`). In every HBM run they keep \|iovdd − iovss\| at the pads ≤ 3.52 V (2 kV), so the core of both pads sees at most about the 3.6 V operating supply across its rails. |
+| Peak pad voltage at ±2 kV | S2D: +9.30 / −4.70 V (iovss grounded), +6.39 / −7.81 V (iovdd grounded), +12.0 / −11.2 V (D2S pad grounded). D2S: +6.29 / −2.62 V, +3.52 / −5.60 V, +11.2 / −12.0 V. The S2D is higher because its diodes are 35 µm² per stripe against 83 … 85 µm² on the D2S. |
+| Does any gate oxide see more than its rating? | **Against the only rating the PDK gives (VGS ≤ 3.3 V, a hot-carrier lifetime limit, not a breakdown limit): yes**, at 1 kV on both pads and already at 500 V on the S2D (input-device gate–drain 3.52 V, clamp MCN gate–drain 3.99 V). At 2 kV the S2D input devices XA1 / XA2 (gate = pad, no secondary protection) see **8.83 V gate-to-drain** (8.65 V with iovss grounded), the clamp gates 8.0 … 9.5 V; on the D2S the feedback inputs C1 / C2 (gate = pad) 5.98 V, the output devices 5.3 / 6.4 V, the Miller capacitors (behind 2 kΩ) 4.1 / 4.4 V. The PDK gives no gate-oxide breakdown or ESD rating, so whether 8.8 V across 7.3 … 7.5 nm of oxide for a few ns is destructive cannot be decided f
+… [1603 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:49:54 UTC
+
+**Tool call: `Bash`**
+
+_Refine verdict rows_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+s=open('results.md').read()
+s=s.replace("pad +2.02 / −0.79 V, no diode current.","pad +2.02 / −0.79 V, diode current ≤ 0.5 mA.")
+s=s.replace("KLayout latch-up DRC (`-rd latchUpRules=true`): **0 violations** for both pads and the slot. Lumped PNPN with assumed parameters: §5.3. |",
+"KLayout latch-up DRC (`-rd latchUpRules=true`): **0 violations** for both pads and the slot. Lumped PNPN with assumed parameters (§5.3): no latch for β_npn·β_pnp ≤ 1; otherwise trigger 24 mA … 0.70 A if 1 % of the injected carriers pass the guard rings, 2.4 … 70 mA if 10 % do. |")
+s=s.replace("| CDM | not done (§6). |","| PDK antenna-diode model as shipped | 12 of 16 HBM runs abort at the current edge; the 4 that finish put the S2D pad at −20.7 V / +13.2 V at ∓2 kV (§3.4): model-limited, not a prediction. |\n| CDM | not done (§6). |")
+open('results.md','w').write(s)
+EOF
+grep -c "β_npn·β_pnp" results.md
+```
+
+## Tool results / harness — 2026-11-25 14:49:54 UTC
+
+**Tool result:**
+
+```
+1
+```
+
+## Assistant — 2026-11-25 14:50:04 UTC
+
+**Tool call: `Bash`**
+
+_Add license sidecars and check spelling_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && sed -i 's|put the S2D pad at −20.7 V / +13.2 V at ∓2 kV (§3.4)|put the S2D pad at −20.7 V (−2 kV, iovss grounded) and +13.2 V (+2 kV, iovdd grounded) (§3.4)|' results.md && for f in plots/*.png; do printf 'SPDX-FileCopyrightText: 2026 Christoph Maier\nSPDX-License-Identifier: Apache-2.0\n' > "$f.license"; done; ls plots; grep -n -i -E "\b(behaviour|colour|analyse[ds]?|modelling|modelled|labelled|centre|summarise|organis)" *.md *.py *.sh | grep -v "def analyse\|analyse(" | head
+```
+
+## Tool results / harness — 2026-11-25 14:50:04 UTC
+
+**Tool result:**
+
+```
+hbm_oxide.png
+hbm_oxide.png.license
+hbm_vpad_peak.png
+hbm_vpad_peak.png.license
+hbm_wave_d2s.png
+hbm_wave_d2s.png.license
+hbm_wave_s2d.png
+hbm_wave_s2d.png.license
+itest_vpad.png
+itest_vpad.png.license
+lu_layout_d2s.png
+lu_layout_d2s.png.license
+lu_layout_s2d.png
+lu_layout_s2d.png.license
+model_iv.png
+model_iv.png.license
+overvoltage_isupply.png
+overvoltage_isupply.png.license
+scr_trigger.png
+scr_trigger.png.license
+esd.py:201:    """Run the jobs one after the other; analyse each raw file at once and delete it (about 40 MB each) unless
+[This command modified 1 file you've previously read: verification/c2_gaps/pad_esd_latchup/results.md. Call Read before editing.]
+```
+
+## Assistant — 2026-11-25 14:50:09 UTC
+
+**Tool call: `Bash`**
+
+_US spelling rename and re-run post steps_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && sed -i 's/\banalyse\b/analyze/g; s/\banalysed\b/analyzed/g' esd.py lu_geometry.py && grep -n "analys" *.py | head; python3 -c "import ast;[ast.parse(open(f).read()) for f in ['esd.py','lu_geometry.py','latchup.py','scr.py','iv.py','common.py','tables.py','ring.py','scr_plot.py']]"; python3 esd.py _work post 2>&1 | grep -v Warn | grep -i error; python3 lu_geometry.py . >/dev/null && python3 tables.py > _work/tables.md && echo fine; ls; git -C /home/user/sg13cmos5l_cm_slot7 status --short
+```
+
+## Tool results / harness — 2026-11-25 14:50:13 UTC
+
+**Tool result:**
+
+```
+fine
+README.md
+__pycache__
+_work
+common.py
+csv
+esd.py
+fetch_harness.sh
+iv.py
+latchup.py
+lu_geometry.py
+plots
+results.md
+ring.py
+run.sh
+scr.py
+scr_plot.py
+tables.py
+?? verification/c2_gaps/pad_esd_latchup/
+?? verification/c2_gaps/slot_pex/
+?? verification/c2_gaps/voltage_stress/
+[This command modified 2 files you've previously read: verification/c2_gaps/pad_esd_latchup/lu_geometry.py, verification/c2_gaps/pad_esd_latchup/esd.py. Call Read before editing.]
+```
+
+## Assistant — 2026-11-25 14:50:18 UTC
+
+**Tool call: `Bash`**
+
+_Verify SPDX headers and ignored paths_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && for f in csv/* *.py *.sh *.md .gitignore; do head -3 "$f" | grep -q "SPDX-License-Identifier: Apache-2.0" || echo "MISSING $f"; done; git -C /home/user/sg13cmos5l_cm_slot7 status --short --ignored verification/c2_gaps/pad_esd_latchup | head; du -sh csv plots _work
+```
+
+## Tool results / harness — 2026-11-25 14:50:19 UTC
+
+**Tool result:**
+
+```
+?? verification/c2_gaps/pad_esd_latchup/
+!! verification/c2_gaps/pad_esd_latchup/__pycache__/
+!! verification/c2_gaps/pad_esd_latchup/_work/
+204K	csv
+1.3M	plots
+218M	_work
+```
+
+## Assistant — 2026-11-25 14:50:37 UTC
+
+I've finished the HBM and latch-up simulations of both pads. The key result is that the S2D input-device gates exceed the PDK's only gate rating at every HBM level. All numbers are indicative: the PDK diode and MOS models are not calibrated for ESD currents, and they have no snapback, high-injection, thermal or parasitic-thyristor behavior. The shipped antenna-diode model is fitted for reverse bias and gives 405 V at 0.1 A forward. So the HBM tables use a stand-in: the PDK's sg13g2 ESD-diode models (`diodevss_mod` / `diodevdd_mod`), scaled to these diodes' areas. With the shipped model as is, 12 of 16 HBM runs abort; the 4 that finish put the S2D pad at −20.7 V / +13.2 V.
+
+**Supply clamp:** present. The harness pad ring has five IHP `IOPadIOVdd` RC clamps (756.8 µm NMOS each), 2.09–2.53 mm along the ring from the slot-7 pads. I modeled them with the ring resistance (0.25 mΩ/µm), and they hold |iovdd − iovss| ≤ 3.52 V at 2 kV.
+
+**HBM at ±2 kV (all 44 runs with the stand-in diode model completed):**
+
+| pad | iovss grounded | iovdd grounded | other pad grounded | per diode at 2 kV |
+|---|---|---|---|---|
+| S2D | +9.30 / −4.70 V | +6.39 / −7.81 V | +12.0 / −11.2 V | 0.60–0.61 A, 17.1–17.5 mA/µm², 10.3–10.6 mA/µm, 268–310 nJ |
+| D2S | +6.29 / −2.62 V | +3.52 / −5.60 V | +11.2 / −12.0 V | 0.59–0.63 A, 7.0–7.4 mA/µm², 164–188 nJ |
+
+The D2S 2 kΩ secondary-stage diodes carry ≤ 1.1 mA.
+
+**Gate oxides:** yes, they exceed the only rating the PDK gives (VGS ≤ 3.3 V, which is a hot-carrier lifetime limit, not a breakdown voltage).
+- **S2D input devices** (gate on the pad, no secondary protection): gate-to-drain 3.52 V at 500 V, 5.37 V at 1 kV, 8.83 V at 2 kV. That is 12.1 MV/cm across the 7.3 nm oxide.
+- **S2D clamp gates:** 9.49 V (MCN) and 8.03 V (MCP) at 2 kV.
+- **D2S at 2 kV:** feedback-input gates 5.98 V, output devices 6.36 / 5.31 V, Miller capacitors 4.40 / 4.06 V.
+- The PDK gives no oxide-breakdown or ESD rating, so whether these levels are destructive cannot be decided here.
+
+**Latch-up I-test** (3.6 V supply, pads enabled), with the stand-in diode model:
+- **S2D:** at ±100 mA the pad sits at +4.95 / −1.26 V. The current flows through the diodes plus the clamp transistors into the supply or the iovss pads. The outputs saturate, and the bias lines move ≤ 27 mV. Reaching 5.4 V takes 0.20 A (23 mA with the shipped diode model).
+- **D2S:** the enabled output stage sinks or sources the 100 mA itself, holding the pad at +2.02 / −0.79 V.
+- **5.4 V overvoltage:** supply current goes from 0.435 to 0.489 mA. The largest stress is |vds| 5.00 V, below BVDSS (5.3 V min), and |vgs| 4.49 V.
+- **Layout check:** KLayout latch-up DRC finds 0 violations for both pads and the slot. Both pads have double guard rings around every ESD device.
+- **Lumped thyristor estimate (all parameters assumed):** no latch when β_npn·β_pnp ≤ 1. Otherwise it triggers at 24 mA–0.70 A if 1 % of the injected carriers pass the guard rings, or 2.4–70 mA if 10 % do.
+
+**What I assumed:**
+- Ring geometry from the harness padframe (`tapeout_nov_2026`, commit 2ef5a869); the other ~50 pads on the ring and any on-chip decoupling are left out.
+- The HBM network's series inductance comes from the JS-001 rise-time window; the measured rise is 1.85 ns, just under its 2 ns minimum.
+- Unpowered pins use the disabled state; tt corner, 27 °C only.
+
+**Not done:**
+- CDM: package and die capacitance are unknown.
+- Snapback and thermal failure: not in the models.
+- Corners and temperature beyond tt / 27 °C.
+- A measured trigger current for the thyristor: the process spec gives no well or substrate sheet resistance.
+- The 1.2 V supply pins and supply-to-supply zaps.
+
+I wrote only inside `verification/c2_gaps/pad_esd_latchup/`, ran one ngspice process at a time, and did not commit. Markdown tables escape `|` and have matching column counts.
+
+Everything is in `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/`; start with `results.md` (README.md, run.sh, scripts, `csv/`, `plots/` alongside; raw data in the git-ignored `_work/`).
+
+## Assistant — 2026-11-25 14:50:50 UTC
+
+**Tool call: `SubagentHandback`**
+
+```json
+{
+ "message": "I've finished the HBM and latch-up simulations of both pads. The key result is that the S2D input-device gates exceed the PDK's only gate rating at every HBM level. All numbers are indicative: the PDK diode and MOS models are not calibrated for ESD currents, and they have no snapback, high-injection, thermal or parasitic-thyristor behavior. The shipped antenna-diode model is fitted for reverse bias and gives 405 V at 0.1 A forward. So the HBM tables use a stand-in: the PDK's sg13g2 ESD-diode models (`diodevss_mod` / `diodevdd_mod`), scaled to these diodes' areas. With the shipped model as is, 12 of 16 HBM runs abort; the 4 that finish put the S2D pad at −20.7 V / +13.2 V.\n\n**Supply clamp:** present. The harness pad ring has five IHP `IOPadIOVdd` RC clamps (756.8 µm NMOS each), 2.09–2.53 mm along the ring from the slot-7 pads. I modeled them with the ring resistance (0.25 mΩ/µm), and they hold |iovdd − iovss| ≤ 3.52 V at 2 kV.\n\n**HBM at ±2 kV (all 44 runs with the stand-in diode model completed):**\n\n| pad | iovss grounded | iovdd grounded | other pad grounded | per diode at 2 kV |\n|---|---|---|---|---|\n| S2D | +9.30 / −4.70 V | +6.39 / −7.81 V | +12.0 / −11.2 V | 0.60–0.61 A, 17.1–17.5 mA/µm², 10.3–10.6 mA/µm, 268–310 nJ |\n| D2S | +6.29 / −2.62 V | +3.52 / −5.60 V | +11.2 / −12.0 V | 0.59–0.63 A, 7.0–7.4 mA/µm², 164–188 nJ |\n\nThe D2S 2 kΩ secondary-stage diodes carry ≤ 1.1 mA.\n\n**Gate oxides:** yes, they exceed the only rating the PDK gives (VGS ≤ 3.3 V, which is a hot-carrier lifetime limit, not a breakdown voltage).\n- **S2D input devices** (gate on the pad, no secondary protection): gate-to-drain 3.52 V at 500 V, 5.37 V at 1 kV, 8.83 V at 2 kV. That is 12.1 MV/cm across the 7.3 nm oxide.\n- **S2D clamp gates:** 9.49 V (MCN) and 8.03 V (MCP) at 2 kV.\n- **D2S at 2 kV:** feedback-input gates 5.98 V, output devices 6.36 / 5.31 V, Miller capacitors 4.40 / 4.06 V.\n- The PDK gives no oxide-breakdown or ESD rating, so whether these levels are destructive cannot be decided here.\n\n**Latch-up I-test** (3.6 V supply, pads enabled), with the stand-in diode model:\n- **S2D:** at ±100 mA the pad sits at +4.95 / −1.26 V. The current flows through the diodes plus the clamp transistors into the supply or the iovss pads. The outputs saturate, and the bias lines move ≤ 27 mV. Reaching 5.4 V takes 0.20 A (23 mA with the shipped diode model).\n- **D2S:** the enabled output stage sinks or sources the 100 mA itself, holding the pad at +2.02 / −0.79 V.\n- **5.4 V overvoltage:** supply current goes from 0.435 to 0.489 mA. The largest stress is |vds| 5.00 V, below BVDSS (5.3 V min), and |vgs| 4.49 V.\n- **Layout check:** KLayout latch-up DRC finds 0 violations for both pads and the slot. Both pads have double guard rings around every ESD device.\n- **Lumped thyristor estimate (all parameters assumed):** no latch when β_npn·β_pnp ≤ 1. Otherwise it triggers at 24 mA–0.70 A if 1 % of the injected carriers pass the guard rings, or 2.4–70 mA if
+… [1110 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 14:50:50 UTC
+
+**Tool result:**
+
+```
+{"success":true,"message":"Report delivered to your caller."}
+```
+
