@@ -16563,3 +16563,378 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin sudel_buecher && git log --oneline -1
 ```
 
+## Tool results / harness — 2026-11-25 13:02:24 UTC
+
+**Tool result:**
+
+```
+4ef0b78 docs: data book and digest rebuilt (US spelling, bandgap note, 7 paragraph, page breaks)
+2a0867a docs: US spelling in prose (behavior, color, center, artifact, license, modeled, labeled, gray); quotations, code and file names unchanged
+fe28b9d docs: HOW_IT_WORKS 5 'Why this reference' (bandgap instead of the Oguey-Aebischer core) and 7 (sizing relied on; proof of concept, specification after silicon); page breaks before 6.2 and glue logic 7
+0d28683 RUNLOG: data book nits round 3; chatlog regenerated
+```
+
+## Assistant — 2026-11-25 13:02:27 UTC
+
+**Tool call: `SendUserFile`**
+
+```json
+{
+ "files": [
+  "/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf"
+ ],
+ "caption": "Data book after round 3: US spelling, bandgap note (p. 30), §7 paragraph (p. 34), page breaks (pp. 33, 37)",
+ "status": "normal",
+ "display": "attach"
+}
+```
+
+## Tool results / harness — 2026-11-25 13:02:29 UTC
+
+**Tool result:**
+
+```
+1 file delivered to user.
+  /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf → file_uuid: 962045e3-e062-4d17-a039-243432255531
+```
+
+## Assistant — 2026-11-25 13:02:36 UTC
+
+All five nits are fixed in the rebuilt data book (attached, still 251 pages, pushed as `4ef0b78`). The link check found no problems.
+
+- **US spelling:** 35 replacements in running text across the data-book sources and the digest (behavior, color, center, artifact, license, modeled, labeled, gray).
+  - Code, file names, URLs and quotations stay as they are. That keeps a quoted "centre" in HOW_IT_WORKS and the CACE file's own description in the `pad_ref_rb` data sheet.
+  - The two reference copies of the short digests are also unchanged.
+- **§5 Bandgap reference (p. 30):** a new "Why this reference" box, without names:
+  - The slot was planned around your Oguey–Aebischer core, which was built, verified and used in the test platforms.
+  - The AI assistant recommended the Banba bandgap as the lower-risk choice, while the slot's place on the run seemed to depend on clearing the final review without open questions.
+  - You accepted it under that pressure without the scrutiny it deserved. So the Oguey–Aebischer core isn't on the chip, and it remains your preferred reference.
+
+  The remark about reporting this to Cem Özdemir is not in the documents.
+- **6.2 Fail-safe enables:** the heading and its sources line were stranded at the bottom of page 32. 6.2 now starts on page 33, with its figure, caption and text together; page 32 ends early as a result.
+- **§7 What the sources do not say (p. 34):** a closing paragraph saying three things:
+  - the sizes were chosen in the AI-assisted sessions, and you relied on them;
+  - the gaps listed are gaps in the recorded reasoning, not known defects;
+  - slot 7 is a proof of concept for a custom pad cell, so you characterize what was built and set specifications once silicon shows what the concept can do.
+- **Glue logic §7, "What was verified, and what was not":** the table now sits whole on page 37.
+
+The Chipalooza #4 proposal in the other repository still has British spellings; I didn't touch it. The chatlog and RUNLOG are updated (`0d28683`).
+
+## User (or harness) — 2026-11-25 13:39:46 UTC
+
+let's leave that one frozen for now.
+Does the tughra description have a place in the sg13cmos5l_cm_slot7 documentation hierarchy other than the databook?
+
+## Assistant — 2026-11-25 13:39:49 UTC
+
+**Tool call: `Bash`**
+
+_Find all tughra mentions in the repository docs_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && git grep -n -i "tughra\|art/" -- '*.md' | grep -v "^verification\|DIGEST_\|pdf" | cut -c1-170
+```
+
+## Tool results / harness — 2026-11-25 13:39:52 UTC
+
+**Tool result:**
+
+```
+README.md:42:**Tughra art (2026-11-08):** `final/gds/slot_7.gds` = v3 plus one instance of the cell `tughra_art` (`art/tughra_art.gds`,
+README.md:44:empty band between the TopMetal1 straps. Made by `art/add_art.py`; `art/check_art_only.py` proves nothing else changed:
+README.md:46:layer, and 0 against the design repo's `art/slot7_with_art.gds` (v2 + art); every art stroke is ≥ 1 µm from existing
+README.md:66:`V` = branch `claude/c4-replica-bias` @ `fa930b292f18d22967d04168d942377d439adc4d` (slot_7 v2), `V3` = same branch @ `9052bd35928c6d40344e8e686c9abbe736bfadb
+README.md:71:| `final/gds/slot_7.gds` | V3 + art | v3 `macros/slot_7/layout/klayout/slot_7.klay.gds` (`7394d0923c511631013ca4727579a73c9285adcac022ec3276889fa73aff2acc`) 
+README.md:76:| `art/tughra_art.gds` | A | `art/tughra_art.gds` | `73d8861dafe710ba59265c96bfb2c56aa7de00f8d32b0869a2b4731f1955cbb5` |
+docs/PROGRESS.md:9:## 2026-11-08T23:50Z — main: slot_7 v3 + tughra art (previous main v2 `454da6a` kept as branch `slot7-v2-tapeout`)
+docs/PROGRESS.md:12:v2) plus the cell `tughra_art` (design `toplevel`, art rev 4) at (88.5, 141.3) µm. Nothing else changed (`art/check_art_only.py`).
+docs/RULES_COMPLIANCE_chipalooza2.md:42:| 11 | all source files for all views in the repository; modifiable with open-source tools | gap | here: GDS, netlists, `art/` scr
+docs/chipalooza2_as_taped_out/README.md:125:"slot_7 v3 + tughra art"). The gitlink at the tip of `tapeout_nov_2026` points to a different, older commit; a
+docs/chipalooz
+… [4638 more characters cut]
+```
+
+## Assistant — 2026-11-25 13:40:04 UTC
+
+Yes. The data book doesn't hold any text of its own: it's built from the Markdown pages in the repository. The full tughra description, including §7.1 (the inscription) and §7.2 (why a tughra), lives in `docs/chipalooza2_as_taped_out/README.md` §7, the description page that the root README's "Start here" link points to. Anyone browsing the repository on GitHub sees it there. (Understood on the proposal: it stays frozen.)
+
+Shorter mentions elsewhere in the repository:
+
+- **Root `README.md`** has a provenance paragraph, "Tughra art (2026-11-08)": `slot_7.gds` is v3 plus one `tughra_art` instance, added by `art/add_art.py` and checked by `art/check_art_only.py`. Its file table also has a row for `art/tughra_art.gds` with its sha256.
+- **The description page itself** mentions the tughra twice more:
+  - §4.3 has a hierarchy table row ("decorative art … no device") and the note "see the aside at the end".
+  - §6 lists `art/` among the files.
+- **`pix/layout/README.md`** lists the KLayout render `slot_7_tughra_art.png`.
+- **`docs/PROGRESS.md`** has the hand-over entry of 2026-11-08 (v3 plus tughra art, rev 4).
+- **`docs/chipalooza2_as_taped_out/log.md`** records your "don't forget the tughra" and "the tughra is an aside".
+- **The sign-off READMEs** call the taped-out GDS "v3 + tughra art".
+
+There's one gap: `art/` itself (`tughra_art.gds`, `add_art.py`, `check_art_only.py`) has no README. That would be the natural standalone home for the description, next to the files it describes.
+
+So it could go two ways:
+- **Leave it as it is.** The full story stays in §7 of the main description page, the most visible place in the repository.
+- **Move it to a new `art/README.md`.** §7 of the description page and the data book would shrink to a short pointer, which makes the story quieter and keeps the main page about the circuit. The data book could reprint `art/README.md` as an appendix, so nothing is lost from the PDF.
+
+I haven't changed anything. Which do you want?
+
+## User (or harness) — 2026-11-25 13:50:09 UTC
+
+why not both? keep the story in §7 of the description page, and add an art/README.md
+This is important enough to say it twice — and make a point to keep it out of the digest for Belal.
+
+## Assistant — 2026-11-25 13:50:18 UTC
+
+Both, then. The story stays in §7 of the description page, and `art/README.md` gets the same text, adapted to sit next to the art files, plus a table of what's in `art/`. The two pages will point to each other, and the root README's tughra paragraph will point to the new file. Neither the data book's contents nor the digest change. First, what the two scripts in `art/` say about themselves, and a check that the digest has nothing about the art:
+
+## Assistant — 2026-11-25 13:50:20 UTC
+
+**Tool call: `Bash`**
+
+_Read art script headers; check digest; root README paragraph_
+
+```bash
+head -15 art/add_art.py; echo ---; head -20 art/check_art_only.py; echo ---; grep -n -i "tughra\|art/\|calligraph\|racism" docs/chipalooza2_as_taped_out/DIGEST.md; sed -n 40,48p README.md
+```
+
+## Tool results / harness — 2026-11-25 13:50:20 UTC
+
+**Tool result:**
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Insert the cell tughra_art (art/tughra_art.gds) into slot_7 (final/gds/slot_7.gds) at (88.5, 141.3) um, the
+placement of the design repo's art/slot7_with_art.gds, and write the result. Nothing else in slot_7 is touched:
+every existing cell is copied as read, the only additions are the cell tughra_art and one instance of it in slot_7.
+No KLayout context cell is written.  Usage: python3 -I add_art.py <slot_7.gds in> <tughra_art.gds> <slot_7.gds out>"""
+import sys
+import klayout.db as db
+src, art, out = sys.argv[1:4]
+ly = db.Layout(); ly.read(src)
+assert ly.cell('tughra_art') is None, 'slot_7 already has a cell tughra_art'
+top = ly.cell('slot_7'); assert top is not None and len(list(ly.top_cells())) == 1
+al = db.Layout(); al.read(art)
+assert al.dbu == ly.dbu and len(list(al.top_cells())) == 1 and al.cells() == 1
+ac = ly.create_cell('tughra_art')
+---
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Check that final/gds/slot_7.gds = <before> slot_7.gds + the cell tughra_art at (88.5, 141.3) um and nothing else.
+Usage: python3 -I check_art_only.py <before slot_7.gds> <tughra_art.gds> <after slot_7.gds> [<reference with art>]
+Exit 1 on any difference."""
+import sys
+import klayout.db as db
+before, art, after = sys.argv[1:4]; ref = sys.argv[4] if len(sys.argv) > 4 else None
+def load(p):
+    l = db.Layout(); l.read(p); return l
+B, A, N = load(before), load(art)
+… [1237 more characters cut]
+```
+
+## Assistant — 2026-11-25 13:50:25 UTC
+
+The digest has nothing about the art and stays that way. Generating `art/README.md` from §7, with every relative link rewritten for its new location:
+
+## Assistant — 2026-11-25 13:50:39 UTC
+
+**Tool call: `Bash`**
+
+_Generate art/README.md; add pointers; check links_
+
+```bash
+python3 - <<'EOF'
+import re, os, posixpath
+D='docs/chipalooza2_as_taped_out'
+s=open(f'{D}/README.md',encoding='utf-8').read()
+sec=s[s.index('## 7. Aside: the tughra'):s.index('## 8. About this document set')]
+def relink(m):
+    text,url=m.group(1),m.group(2)
+    if re.match(r'^[a-z]+:',url) : return m.group(0)
+    path,_,frag=url.partition('#')
+    if not path:  # anchor inside the description page
+        tgt=f'../{D}/README.md'
+    else:
+        tgt=posixpath.relpath(posixpath.normpath(posixpath.join(D,path)),'art')
+    return f'[{text}]({tgt}' + (f'#{frag}' if frag else '') + ')'
+body=re.sub(r'\[([^\]]*)\]\(([^)\s]+)\)', relink, sec)
+body=body.replace('## 7. Aside: the tughra','# tughra_art: die art of slot 7',1)
+body=body.replace('### 7.1 The inscription','## The inscription').replace('### 7.2 Why a tughra','## Why a tughra')
+body=body.replace('(art rev 4).','(art rev 4).',1)
+files='''## Files in this folder
+
+| file | what |
+|---|---|
+| [`tughra_art.gds`](tughra_art.gds) | the cell `tughra_art` as delivered (design repository `toplevel`, art rev 4); sha256 in the [repository README](../README.md) |
+| [`add_art.py`](add_art.py) | inserts `tughra_art` into `slot_7` at (88.5, 141.3) µm and touches nothing else: `python3 -I add_art.py <slot_7.gds in> <tughra_art.gds> <slot_7.gds out>` |
+| [`check_art_only.py`](check_art_only.py) | checks that the taped-out `final/gds/slot_7.gds` is the slot before the art plus that one instance and nothing else; exit 1 on any difference: `python3 -I check_art_only.py <before> <tughra_art.gds> <after> [<reference with art>]` |
+
+The build of the art itself (source picture, segmentation, layer assignment, previews, checks) is in the design repository's
+[`art/`](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single/tree/a45cbb555b9a64baebda7ad68f05b62a3dca288f/art)
+and [`ART_NOTES.md`](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single/blob/a45cbb555b9a64baebda7ad68f05b62a3dca288f/ART_NOTES.md)
+(`toplevel` at `a45cbb55`).
+
+'''
+head=('<!--\nSPDX-FileCopyrightText: 2026 Christoph Maier\nSPDX-License-Identifier: Apache-2.0\n-->\n')
+intro=('\nThe same description is section 7 of the slot 7 description page '
+       f'([{D}/README.md](../{D}/README.md#7-aside-the-tughra)); keep the two in step.\n\n')
+# split body after the H1 line
+h1,rest=body.split('\n',1)
+out=head+h1+'\n'+intro+rest.lstrip('\n')
+# insert the file table before "## The inscription"
+i=out.index('## The inscription'); out=out[:i]+files+out[i:]
+open('art/README.md','w',encoding='utf-8').write(out.rstrip('\n')+'\n')
+# pointers
+p=f'{D}/README.md'; s=open(p,encoding='utf-8').read()
+a="### 7.1 The inscription"
+s=s.replace(a,"The same description, next to the art files: [art/README.md](../../art/README.md).\n\n"+a,1)
+open(p,'w',encoding='utf-8').write(s)
+p='README.md'; s=open(p,encoding='utf-8').read()
+a="**Tughra art (2026-11-08):** "
+assert s.count(a)==1
+s=s.replace(a,a+"(description: [art/README.md](art/README.md)) ")
+open(p,'w',encoding='utf-8').write(s)
+EOF
+grep -o "\]([^)]*)" art/README.md | sort -u; python3 - <<'EOF'
+import sys,os,re
+os.chdir('/home/user/sg13cmos5l_cm_slot7')
+sys.path.insert(0,'docs/chipalooza2_as_taped_out/book'); import build_book as b
+book=b.Book('HEAD'*10)
+book.convert('art/README.md')
+print('problems:', b.problems)
+EOF
+python3 docs/chipalooza2_as_taped_out/book/build_book.py --check-only 2>&1 | grep -v "^warning\|^??\|^ M\|^$"
+```
+
+## Tool results / harness — 2026-11-25 13:50:48 UTC
+
+**Tool result:**
+
+```
+](../README.md)
+](../docs/chipalooza2_as_taped_out/README.md#7-aside-the-tughra)
+](../docs/chipalooza2_as_taped_out/pix/tughra_art_in_MPC9639.png)
+](../docs/chipalooza2_as_taped_out/pix/tughra_source.png)
+](add_art.py)
+](check_art_only.py)
+](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single/blob/a45cbb555b9a64baebda7ad68f05b62a3dca288f/ART_NOTES.md)
+](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single/tree/a45cbb555b9a64baebda7ad68f05b62a3dca288f/art)
+](tughra_art.gds)
+problems: []
+0 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+```
+
+## Assistant — 2026-11-25 13:50:52 UTC
+
+All links in `art/README.md` resolve, and the data book's link check is still clean. A look at the generated top of the file:
+
+## Assistant — 2026-11-25 13:50:53 UTC
+
+**Tool call: `Bash`**
+
+_Review generated art README_
+
+```bash
+sed -n 1,16p art/README.md | cut -c1-200; echo ...; grep -n "^#" art/README.md; wc -l art/README.md
+```
+
+## Tool results / harness — 2026-11-25 13:50:53 UTC
+
+**Tool result:**
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# tughra_art: die art of slot 7
+
+The same description is section 7 of the slot 7 description page ([docs/chipalooza2_as_taped_out/README.md](../docs/chipalooza2_as_taped_out/README.md#7-aside-the-tughra)); keep the two in step.
+
+The cell `tughra_art` is a calligraphic tughra drawn in metal and polysilicon on the otherwise empty band between the TopMetal1 straps
+of the slot: a deliberate piece of die art, not a circuit. It has no device and no pin, and is not connected to anything.
+
+![tughra_art as it is in the taped-out chip](../docs/chipalooza2_as_taped_out/pix/tughra_art_in_MPC9639.png)
+
+*Figure: the polygons of `tughra_art` read from the chip GDS `MPC9639.gds.gz` (cell `YX_tughra_art` inside `slot_7`), drawn per layer in slot-local
+coordinates. Made on 2026-11-22 with KLayout and matplotlib from the chip data, not taken from the design repository's preview.*
+
+...
+5:# tughra_art: die art of slot 7
+31:## Files in this folder
+44:## The inscription
+69:## Why a tughra
+80 art/README.md
+```
+
+## Assistant — 2026-11-25 13:51:06 UTC
+
+**Tool call: `Bash`**
+
+_Add digest guard; test it; restore_
+
+```bash
+python3 - <<'EOF'
+p='docs/chipalooza2_as_taped_out/book/build_book.py'
+s=open(p).read()
+a="""    h, _ = book.convert(DIGEST_SRC)
+"""
+b="""    # the digest is a data sheet of the circuit: no die art, no history of the art
+    md = open(os.path.join(ROOT, DIGEST_SRC), encoding='utf-8').read()
+    if re.search(r'tughra|art/|calligraph|latent', md, re.I):
+        sys.exit(f'{DIGEST_SRC} mentions the die art; the digest covers the circuit only')
+    h, _ = book.convert(DIGEST_SRC)
+"""
+assert s.count(a)==1; s=s.replace(a,b); open(p,'w').write(s)
+EOF
+python3 docs/chipalooza2_as_taped_out/book/build_book.py --digest-only 2>&1 | tail -1; git checkout -- docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf; printf '\n<!-- guard test -->tughra\n' >> /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/g.md; python3 - <<'EOF'
+import sys,subprocess,shutil
+p='/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/DIGEST.md'
+orig=open(p).read()
+open(p,'w').write(orig+'\ntughra test\n')
+r=subprocess.run(['python3','docs/chipalooza2_as_taped_out/book/build_book.py','--digest-only'],cwd='/home/user/sg13cmos5l_cm_slot7',capture_output=True,text=True)
+open(p,'w').write(orig)
+print('guard exit', r.returncode, (r.stderr.strip().splitlines() or [''])[-1])
+EOF
+git status --short
+```
+
+## Tool results / harness — 2026-11-25 13:51:13 UTC
+
+**Tool result:**
+
+```
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+guard exit 1 docs/chipalooza2_as_taped_out/DIGEST.md mentions the die art; the digest covers the circuit only
+ M README.md
+ M docs/chipalooza2_as_taped_out/README.md
+ M docs/chipalooza2_as_taped_out/book/build_book.py
+ M docs/chipalooza2_as_taped_out/book/build_report.txt
+?? art/README.md
+```
+
+## Assistant — 2026-11-25 13:51:15 UTC
+
+The guard works: the build stops when the digest source mentions the art, and it passes on the current digest. Committing:
+
+## Assistant — 2026-11-25 13:51:27 UTC
+
+**Tool call: `Bash`**
+
+_Commit, rebuild data book, push; update logs_
+
+```bash
+git checkout -- docs/chipalooza2_as_taped_out/book/build_report.txt && git add art/README.md README.md docs/chipalooza2_as_taped_out/README.md docs/chipalooza2_as_taped_out/book/build_book.py && git commit -q -m "art/README.md: the tughra description next to the art files (same text as description 7, plus a table of the files in art/); pointers from description 7 and the root README; digest build refuses any mention of the die art
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && python3 docs/chipalooza2_as_taped_out/book/build_book.py 2>&1 | grep -v "WARNING\|^$\|^warning\|^??\|^ M"; git checkout -- docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf; pdfinfo docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf | grep Pages; git add docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf docs/chipalooza2_as_taped_out/book/build_report.txt && git commit -q -m "docs: data book rebuilt (pointers to art/README.md)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin chipalooza2-documentation && git log --oneline -2 && git status --short; cd /home/user/sky130_cm_ip__single2diff2single_sudelbuecher && cat >> RUNLOG.md <<'EOF'
+- User: the Chipalooza #4 proposal stays frozen (no US-spelling pass there). Asked where the tughra description lives besides the data book: description page §7 (the data book's source; reached via the root README's "Start here"); shorter mentions in the root README (provenance paragraph, file table), description §4.3 / §6, pix/layout/README.md, docs/PROGRESS.md, log.md, sign-off READMEs; art/ had no README. User: "why not both? keep the story in §7 … and add an art/README.md … keep it out of the digest". Done ([S7] two commits after 4ef0b78): art/README.md generated from description §7 with links rewritten for art/ (all resolve), plus a table of the files in art/ and pointers to the design repository's art build; pointers from description §7 and from the root README's tughra paragraph; build_book.py refuses to build the digest if DIGEST.md mentions the die art (tested: exit 1 with a test word, restored). The data book does not reprint art/README.md (it already has §7); rebuilt for the two pointer lines, 251 pages. Digest PDF unchanged.
+EOF
+bash chatlog/tools/export_all.sh >/dev/null 2>&1; git add -A && git commit -q -m "RUNLOG: art/README.md, digest guard; chatlog regenerated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin sudel_buecher && git log --oneline -1
+```
+
