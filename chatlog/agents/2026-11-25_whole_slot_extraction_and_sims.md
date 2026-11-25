@@ -4697,3 +4697,3890 @@ mv sim.py.new sim.py; grep -n "OMP\|^import" sim.py
 cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && until grep -q "_pu " batch.log; do sleep 15; done; tail -2 batch.log
 ```
 
+## Tool results / harness — 2026-11-25 14:57:58 UTC
+
+**Tool result:**
+
+```
+Command did not complete within its 600s timeout and was moved to the background (ID: bmqaqxo9g). Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bmqaqxo9g.output. You will be notified when it completes. If it is still running after 30m in the background, it will be stopped and you will be notified. It is running now: do not start a second copy while it runs. If it is no longer needed, stop it with TaskStop. No output had been read from it when it was moved. A program that buffers its output, or a pipe into one such as tail, can keep the output file empty until the command finishes. To check interim output, use Read on that file path.
+Session cwd remains /home/user/sg13cmos5l_cm_slot7; directory changes made by the backgrounded command do not apply to subsequent commands.
+```
+
+## Assistant — 2026-11-25 14:58:15 UTC
+
+**Tool call: `Bash`**
+
+```bash
+ps -eo pid,ppid,etime,args | grep -E "runjobs|sim.py|ngspice -b c_" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 14:58:15 UTC
+
+**Tool result:**
+
+```
+10581 10580       26:29 bash ../runjobs.sh . ../jobs.txt
+10586 10581       26:29 bash ../runjobs.sh . ../jobs.txt
+11520 10586       21:31 python3 -I /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/sim.py /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work c:tt:27:3.3:pu
+11521 11520       21:31 ngspice -b c_tt_27_3.3_pu.spice
+```
+
+## Assistant — 2026-11-25 14:58:29 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && kill 10586 10581; sleep 1; ps -eo pid,args | grep -E "runjobs|sim.py" | grep -v grep; python3 - <<'EOF'
+pts=[('tt',27,3.3),('ss',-40,3.0),('ff',125,3.6),('fs',125,3.6),('sf',-40,3.0)]
+L=['# SPDX-FileCopyrightText: 2026 Christoph Maier','# SPDX-License-Identifier: Apache-2.0',
+ '# sim.py jobs, <view>:<mos>:<temp>:<vdd>:<analysis>[:<load>], priority order; run.sh runs them one at a time',
+ "# PVT = the five points of the designer's tier-1 deck (run_tier1.py POINTS). Power-up (pu) runs take 20 ... 60 min",
+ '# each on the extracted netlists (shared CPUs), so they come last and only at tt 27 C and ss -40 C']
+def block(view,c,t,v,full):
+    p=f'{view}:{c}:{t}:{v}'
+    return [f'{p}:op', f'{p}:ac', f'{p}:dc']+[f'{p}:step:{l}' for l in (('open','10p','100p') if full else ('open','100p'))]
+for view in ('c','prev','rc'):
+    L+=block(view,'tt',27,3.3,True)
+L+=['cc:tt:27:3.3:op','cc:tt:27:3.3:ac','cc:tt:27:3.3:dc','cc:tt:27:3.3:step:100p']
+L+=['# solver check: c with SPARSE instead of KLU','cs:tt:27:3.3:op','cs:tt:27:3.3:ac']
+L+=['# bias currents into the pads (iref lines), tt 27 C']+[f'{v}:tt:27:3.3:opi' for v in ('prev','c','cc','rc')]
+for (c,t,v) in pts[1:]:
+    for view in ('c','prev','rc'):
+        L+=block(view,c,t,v,False)
+L+=['# modes at tt 27 C (task 4)']
+for m in ('swap','mon','feed','ext'):
+    for view in ('c','prev','rc'):
+        L.append(f'{view}:tt:27:3.3:mode_{m}')
+L+=['# corrected pads at the other PVT points (AC and 100 pF step)']
+for (c,t,v) in pts[1:]:
+    L+=[f'cc:{c}:{t}:{v}:ac',f'cc:{c}:{t}:{v}:step:100p']
+L+=['# power-up / enable']+['c:tt:27:3.3:pu','prev:tt:27:3.3:pu','rc:tt:27:3.3:pu','prev:ss:-40:3.0:pu','c:ss:-40:3.0:pu']
+open('jobs.txt','w').write('\n'.join(L)+'\n')
+EOF
+grep -v '^#' jobs.txt | grep -vE '^c:tt:27:3.3:(op|ac|dc|step:open|step:10p|step:100p|pu)$' > _work/jobs_rest.txt; wc -l _work/jobs_rest.txt
+cd _work && nohup sh -c 'while kill -0 11520 2>/dev/null; do sleep 5; done; ../runjobs.sh . jobs_rest.txt' >> batch.log 2>&1 &
+echo ok
+```
+
+## Tool results / harness — 2026-11-25 14:58:32 UTC
+
+**Tool result:**
+
+```
+11520 python3 -I /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/sim.py /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work c:tt:27:3.3:pu
+106 _work/jobs_rest.txt
+ok
+```
+
+## Assistant — 2026-11-25 14:58:36 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && until grep -q "_pu " batch.log; do sleep 15; done; tail -3 batch.log
+```
+
+## Tool results / harness — 2026-11-25 15:08:37 UTC
+
+**Tool result:**
+
+```
+Command did not complete within its 600s timeout and was moved to the background (ID: b9bgksy0c). Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/b9bgksy0c.output. You will be notified when it completes. If it is still running after 30m in the background, it will be stopped and you will be notified. It is running now: do not start a second copy while it runs. If it is no longer needed, stop it with TaskStop. No output had been read from it when it was moved. A program that buffers its output, or a pipe into one such as tail, can keep the output file empty until the command finishes. To check interim output, use Read on that file path.
+Session cwd remains /home/user/sg13cmos5l_cm_slot7; directory changes made by the backgrounded command do not apply to subsequent commands.
+```
+
+## Assistant — 2026-11-25 15:08:44 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && until grep -q "_pu " batch.log; do sleep 15; done; tail -3 batch.log
+```
+
+## Tool results / harness — 2026-11-25 15:08:44 UTC
+
+**Tool result:**
+
+```
+Command running in background with ID: b5scggqyo. Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/b5scggqyo.output. You will be notified when it completes. To check interim output, use Read on that file path.
+Session cwd remains /home/user/sg13cmos5l_cm_slot7; directory changes made by the backgrounded command do not apply to subsequent commands.
+```
+
+## Assistant — 2026-11-25 15:08:46 UTC
+
+**Tool call: `TaskStop`**
+
+```json
+{
+ "task_id": "b9bgksy0c"
+}
+```
+
+## Tool results / harness — 2026-11-25 15:08:46 UTC
+
+**Tool result:**
+
+```
+{"message":"Successfully stopped task: b9bgksy0c (cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && until grep -q \"_pu \" batch.log; do sleep 15; done; tail -3 batch.log)","task_id":"b9bgksy0c","task_type":"local_bash","command":"cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && until grep -q \"_pu \" batch.log; do sleep 15; done; tail -3 batch.log"}
+```
+
+## Assistant — 2026-11-25 15:08:50 UTC
+
+**Tool call: `Bash`**
+
+```bash
+ls /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/runs/c_tt_27_3.3_pu/; ps -eo pid,etime,pcpu,args | grep "ngspice -b c_tt" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 15:08:50 UTC
+
+**Tool result:**
+
+```
+c_tt_27_3.3_pu.spice
+sg13cmos5l_IOPadDiff2Single_prev.spice
+sg13cmos5l_IOPadSingle2Diff_prev.spice
+11521       32:07  154 ngspice -b c_tt_27_3.3_pu.spice
+```
+
+## Assistant — 2026-11-25 15:08:56 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && until [ $(grep -c . batch.log) -ge 10 ]; do sleep 20; done; tail -3 batch.log
+```
+
+## Tool results / harness — 2026-11-25 15:18:47 UTC
+
+**Tool result:**
+
+```
+Command did not complete within its 590s timeout and was moved to the background (ID: bcsdtz2c7). Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bcsdtz2c7.output. You will be notified when it completes. If it is still running after 30m in the background, it will be stopped and you will be notified. It is running now: do not start a second copy while it runs. If it is no longer needed, stop it with TaskStop. No output had been read from it when it was moved. A program that buffers its output, or a pipe into one such as tail, can keep the output file empty until the command finishes. To check interim output, use Read on that file path.
+Session cwd remains /home/user/sg13cmos5l_cm_slot7; directory changes made by the backgrounded command do not apply to subsequent commands.
+```
+
+## Assistant — 2026-11-25 15:18:58 UTC
+
+**Tool call: `Bash`**
+
+```bash
+sleep 1; ps -eo pid,etime,args | grep "ngspice -b c_tt" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 15:18:59 UTC
+
+**Tool result:**
+
+```
+11521       42:16 ngspice -b c_tt_27_3.3_pu.spice
+```
+
+## Assistant — 2026-11-25 15:19:03 UTC
+
+**Tool call: `Bash`**
+
+```bash
+while kill -0 11521 2>/dev/null; do e=$(ps -o etimes= -p 11521); [ "$e" -gt 3600 ] && break; sleep 20; done; ps -o etimes= -p 11521; tail -2 /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/batch.log
+```
+
+## Tool results / harness — 2026-11-25 15:29:04 UTC
+
+**Tool result:**
+
+```
+Command did not complete within its 600s timeout and was moved to the background (ID: bifu9se7e). Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bifu9se7e.output. You will be notified when it completes. If it is still running after 30m in the background, it will be stopped and you will be notified. It is running now: do not start a second copy while it runs. If it is no longer needed, stop it with TaskStop. No output had been read from it when it was moved. A program that buffers its output, or a pipe into one such as tail, can keep the output file empty until the command finishes. To check interim output, use Read on that file path.
+```
+
+## Assistant — 2026-11-25 15:29:13 UTC
+
+**Tool call: `Bash`**
+
+```bash
+sleep 5; cat /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bifu9se7e.output; ps -o etimes= -p 11521
+```
+
+## Tool results / harness — 2026-11-25 15:29:18 UTC
+
+**Tool result:**
+
+```
+3154
+```
+
+## Assistant — 2026-11-25 15:29:23 UTC
+
+**Tool call: `Bash`**
+
+```bash
+while kill -0 11521 2>/dev/null; do e=$(ps -o etimes= -p 11521); [ "$e" -gt 3600 ] && break; sleep 15; done; ps -o etimes= -p 11521; tail -2 /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/batch.log
+```
+
+## Tool results / harness — 2026-11-25 15:36:54 UTC
+
+**Tool result:**
+
+```
+3610
+c_tt_27_3.3_step_10p ok 75 s
+c_tt_27_3.3_step_100p ok 73 s
+```
+
+## Assistant — 2026-11-25 15:36:57 UTC
+
+**Tool call: `Bash`**
+
+```bash
+kill 11521; sleep 3; tail -3 /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/batch.log; tail -c 1500 /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/out/c_tt_27_3.3_pu.log; ps -eo pid,args | grep "ngspice -b" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 15:37:01 UTC
+
+**Tool result:**
+
+```
+c_tt_27_3.3_step_10p ok 75 s
+c_tt_27_3.3_step_100p ok 73 s
+c_tt_27_3.3_pu FAILED 3615 s
+alue :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value :  2.77820e-06
+ Reference value
+… [151 more characters cut]
+```
+
+## Assistant — 2026-11-25 15:37:06 UTC
+
+**Tool call: `Bash`**
+
+```bash
+sleep 5; ps -eo pid,etime,args | grep -E "runjobs|sim.py|ngspice -b" | grep -v grep; tail -2 /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/batch.log; grep -c "Reference value" /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/out/c_tt_27_3.3_pu.log
+```
+
+## Tool results / harness — 2026-11-25 15:37:11 UTC
+
+**Tool result:**
+
+```
+16520       38:39 sh -c while kill -0 11520 2>/dev/null; do sleep 5; done; ../runjobs.sh . jobs_rest.txt
+19170       00:53 timeout 200 ngspice -b t3.spice
+19171       00:53 ngspice -b t3.spice
+19235       00:09 bash ../runjobs.sh . jobs_rest.txt
+19240       00:09 bash ../runjobs.sh . jobs_rest.txt
+19241       00:09 python3 -I /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/sim.py /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work prev:tt:27:3.3:op
+19242       00:09 ngspice -b prev_tt_27_3.3_op.spice
+c_tt_27_3.3_step_100p ok 73 s
+c_tt_27_3.3_pu FAILED 3615 s
+937
+```
+
+## Assistant — 2026-11-25 15:37:35 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='sim.py'; s=open(p).read()
+s=s.replace("""              0.5 V, pad out 1 Gohm + 10 pF (as ../slot_modes_bg 'pu'); tran to 40 us, 10 ns max step, uic
+""","""              0.5 V, pad out 1 Gohm + 10 pF (as ../slot_modes_bg 'pu'); tran to 40 us, 10 ns max step, uic
+              (the extracted slot stalls in the supply ramp: c tt 27 C at 2.778 us, i.e. ~0.92 V, after 60 min)
+        en    enable transient: supplies on, operating point with enable 0 V (no uic), enable 0 -> 1.2 V at 2 us
+              (100 ns edge), pad in 0.5 V, pad out 1 Gohm + 10 pF; tran to 20 us, 10 ns max step
+""")
+s=s.replace("""    opt = '.option gmin=1e-12 rshunt=1e12' + ('' if view == 'cs' else ' klu') + (' method=gear' if ana in ('step', 'pu') else '') + \\
+        (' cshunt=1e-15' if ana == 'pu' else '')""","""    opt = '.option gmin=1e-12 rshunt=1e12' + ('' if view == 'cs' else ' klu') + \\
+        (' method=gear' if ana in ('step', 'pu', 'en') else '') + (' cshunt=1e-15' if ana in ('pu', 'en') else '')""")
+s=s.replace("""    rl, cl = LOADS[load] if ana == 'step' else (('1e12', '10p') if ana == 'pu' else LOADS['open'])""",
+"""    rl, cl = LOADS[load] if ana == 'step' else (('1e12', '10p') if ana in ('pu', 'en') else LOADS['open'])""")
+s=s.replace("""    ven = 'pwl(0 0 20u 0 20.1u 1.2)' if ana == 'pu' else '1.2'""","""    ven = {'pu': 'pwl(0 0 20u 0 20.1u 1.2)', 'en': 'pwl(0 0 2u 0 2.1u 1.2)'}.get(ana, '1.2')""")
+s=s.replace("""    elif ana == 'pu':
+        ctl = f'tran 10n 40u 0 10n uic\\n{wr}linearize\\nwrdata {o}.pu {save} v(enable)\\n'""","""    elif ana == 'pu':
+        ctl = f'tran 10n 40u 0 10n uic\\n{wr}linearize\\nwrdata {o}.pu {save} v(enable)\\n'
+    elif ana == 'en':
+        ctl = f'tran 10n 20u 0 10n\\n{wr}linearize\\nwrdata {o}.en {save} v(enable)\\n'""")
+s=s.replace("""    pr = subprocess.run(['ngspice', '-b', f.name], cwd=rdir, capture_output=True, text=True, env=env)""",
+"""    tmo = float(os.environ.get('SIM_TIMEOUT', '2400'))  # s; a stalled transient is stopped and reported FAILED
+    try:
+        pr = subprocess.run(['ngspice', '-b', f.name], cwd=rdir, capture_output=True, text=True, env=env, timeout=tmo)
+    except subprocess.TimeoutExpired as e:
+        pr = subprocess.CompletedProcess(e.cmd, -9, (e.stdout or b'').decode(errors='replace') if isinstance(
+            e.stdout, bytes) else (e.stdout or ''), f'TIMEOUT after {tmo:.0f} s (SIM_TIMEOUT)')""")
+s=s.replace("""Writes <work_dir>/out/<tag>.<suffix> (wrdata) and <tag>.log; prints '<tag> ok|FAILED <seconds>'.""",
+"""Writes <work_dir>/out/<tag>.<suffix> (wrdata) and <tag>.log; prints '<tag> ok|FAILED <seconds>'. Environment:
+SIM_TIMEOUT = wall-clock limit per run in s (default 2400); ngspice runs with OMP_NUM_THREADS=1.""")
+open(p+'.new','w').write(s)
+EOF
+python3 -c "import ast;ast.parse(open('/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/sim.py.new').read())" && mv sim.py.new sim.py; grep -n "'en'\|SIM_TIMEOUT" sim.py | head; python3 - <<'EOF'
+p='/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/jobs.txt'; s=open(p).read()
+s=s.replace("""# power-up / enable
+c:tt:27:3.3:pu
+prev:tt:27:3.3:pu
+rc:tt:27:3.3:pu
+prev:ss:-40:3.0:pu
+c:ss:-40:3.0:pu""","""# enable transient from the disabled operating point
+c:tt:27:3.3:en
+prev:tt:27:3.3:en
+rc:tt:27:3.3:en
+c:ss:-40:3.0:en
+prev:ss:-40:3.0:en
+c:ff:125:3.6:en
+prev:ff:125:3.6:en
+# power-up from 0 V (supply ramp, uic): stalls on the extracted slot (c tt 27 C: at 2.778 us after 60 min); prev only
+prev:tt:27:3.3:pu
+c:tt:27:3.3:pu""")
+s=s.replace("""# PVT = the five points of the designer's tier-1 deck (run_tier1.py POINTS). Power-up (pu) runs take 20 ... 60 min
+# each on the extracted netlists (shared CPUs), so they come last and only at tt 27 C and ss -40 C""","""# PVT = the five points of the designer's tier-1 deck (run_tier1.py POINTS). Transients from enable (en) and power-up
+# (pu) come last""")
+open(p,'w').write(s)
+EOF
+tail -12 /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/jobs.txt
+```
+
+## Tool results / harness — 2026-11-25 15:37:35 UTC
+
+**Tool result:**
+
+```
+37:SIM_TIMEOUT = wall-clock limit per run in s (default 2400); ngspice runs with OMP_NUM_THREADS=1.
+95:        (' method=gear' if ana in ('step', 'pu', 'en') else '') + (' cshunt=1e-15' if ana in ('pu', 'en') else '')
+97:    rl, cl = LOADS[load] if ana == 'step' else (('1e12', '10p') if ana in ('pu', 'en') else LOADS['open'])
+99:    ven = {'pu': 'pwl(0 0 20u 0 20.1u 1.2)', 'en': 'pwl(0 0 2u 0 2.1u 1.2)'}.get(ana, '1.2')
+135:    elif ana == 'en':
+189:    tmo = float(os.environ.get('SIM_TIMEOUT', '2400'))  # s; a stalled transient is stopped and reported FAILED
+194:            e.stdout, bytes) else (e.stdout or ''), f'TIMEOUT after {tmo:.0f} s (SIM_TIMEOUT)')
+cc:sf:-40:3.0:step:100p
+# enable transient from the disabled operating point
+c:tt:27:3.3:en
+prev:tt:27:3.3:en
+rc:tt:27:3.3:en
+c:ss:-40:3.0:en
+prev:ss:-40:3.0:en
+c:ff:125:3.6:en
+prev:ff:125:3.6:en
+# power-up from 0 V (supply ramp, uic): stalls on the extracted slot (c tt 27 C: at 2.778 us after 60 min); prev only
+prev:tt:27:3.3:pu
+c:tt:27:3.3:pu
+```
+
+## Assistant — 2026-11-25 15:37:46 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && sed -i '/^c:tt:27:3.3:pu$/d; s/^# power-up from 0 V (supply ramp, uic): stalls on the extracted slot (c tt 27 C: at 2.778 us after 60 min); prev only$/# power-up from 0 V (supply ramp, uic): the extracted slot stalls (c tt 27 C: at 2.778 us after 60 min); prev only/' jobs.txt && cat > runjobs.sh.new <<'EOF'
+#!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# Run the sim.py jobs of a job file one at a time (one ngspice process), skipping jobs whose log in <work_dir>/out
+# already ends a complete run (SLOTDONE).
+# Usage: runjobs.sh <work_dir> <job_file>
+set -u
+HERE=$(cd "$(dirname "$0")" && pwd)
+WORK=$(realpath -m "$1")
+grep -v '^#' "$2" | while IFS= read -r j; do
+  [ -z "$j" ] && continue
+  IFS=: read -r view c t v ana load <<< "$j"
+  tag="${view}_${c}_${t}_${v}_${ana}"
+  [ "$ana" = step ] && tag="${tag}_${load:-open}"
+  if grep -q SLOTDONE "$WORK/out/$tag.log" 2>/dev/null; then continue; fi
+  python3 -I "$HERE/sim.py" "$WORK" "$j"
+done
+EOF
+chmod +x runjobs.sh.new; ps -eo pid,ppid,args | grep -E "runjobs|sim.py" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 15:37:46 UTC
+
+**Tool result:**
+
+```
+16520 16519 sh -c while kill -0 11520 2>/dev/null; do sleep 5; done; ../runjobs.sh . jobs_rest.txt
+19235 16520 bash ../runjobs.sh . jobs_rest.txt
+19240 19235 bash ../runjobs.sh . jobs_rest.txt
+19281 19240 python3 -I /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/sim.py /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work prev:tt:27:3.3:ac
+```
+
+## Assistant — 2026-11-25 15:37:51 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && kill 19240 19235 16520; sleep 1; mv runjobs.sh.new runjobs.sh; cd _work && nohup sh -c 'while kill -0 19281 2>/dev/null; do sleep 5; done; ../runjobs.sh . ../jobs.txt' >> batch.log 2>&1 & sleep 1; ps -eo pid,args | grep -E "runjobs|sim.py|while kill" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 15:37:54 UTC
+
+**Tool result:**
+
+```
+19281 python3 -I /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/sim.py /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work prev:tt:27:3.3:ac
+19305 sh -c while kill -0 19281 2>/dev/null; do sleep 5; done; ../runjobs.sh . ../jobs.txt
+```
+
+## Assistant — 2026-11-25 15:38:02 UTC
+
+**Tool call: `Monitor`**
+
+_slot_pex sim jobs (each completion or failure)_
+
+```json
+{
+ "command": "tail -n 0 -f /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/batch.log | grep --line-buffered -E \"ok|FAILED|Traceback|Error|rror\"",
+ "timeout_ms": 1800000
+}
+```
+
+## Tool results / harness — 2026-11-25 15:38:02 UTC
+
+**Tool result:**
+
+```
+Monitor started (task bi4wfjewu, expires in 30m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+```
+
+## Assistant — 2026-11-25 15:38:06 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && until grep -q "prev_tt_27_3.3_step_100p" _work/batch.log; do sleep 10; done; python3 -I evaluate.py _work . | tail -2; grep -E "tt 27" tables.md | head -40
+```
+
+## Tool results / harness — 2026-11-25 15:41:28 UTC
+
+**Tool result:**
+
+```
+36 comparison rows, failed: ['c_tt_27_3.3_pu']
+| vcm_V | tt 27 °C | 1.2566 | 1.2566 | 1.2615 | +4.93 mV | – | – | – |
+| vref_V | tt 27 °C | 0.4923 | 0.4923 | 0.4941 | +1.81 mV | – | – | – |
+| s2d_out_cm_V | tt 27 °C | – | 1.2683 | 1.2733 | +4.93 mV | – | – | – |
+| I_slot_uA | tt 27 °C | – | 49.75 | 49.63 | -0.2 % | – | – | – |
+| I_ring_uA | tt 27 °C | – | 420.00 | 420.04 | +0.0 % | – | – | – |
+| I_slot_off_nA | tt 27 °C | – | – | 8.73 | – | – | – | – |
+| I_ring_off_nA | tt 27 °C | – | – | 6.38 | – | – | – | – |
+| max_abs_err_0to1V_mV | tt 27 °C | 0.87 | 0.87 | 0.872 | +0.00 mV | – | – | – |
+| gain | tt 27 °C | 0.99875 | 0.99875 | 0.99875 | -1 ppm | – | – | – |
+| offset_mV | tt 27 °C | 0.064 | 0.0638 | 0.0638 | -0.00 mV | – | – | – |
+| in_lo_1mV_V | tt 27 °C | -0.1708 | -0.1708 | -0.1710 | -0.23 mV | – | – | – |
+| in_hi_1mV_V | tt 27 °C | 1.2812 | 1.2811 | 1.2874 | +6.25 mV | – | – | – |
+| f3dB_MHz (unloaded) | tt 27 °C | 1.356 | 1.356 | 1.322 | -2.5 % | – | – | – |
+| G_1k_dB (unloaded) | tt 27 °C | -0.0108 | -0.0108 | -0.0108 | -0.000 | – | – | – |
+| peak_dB (unloaded) | tt 27 °C | 0 | 0 | 0 | +0.000 | – | – | – |
+| f3dB_MHz (1 kΩ ∥ 10 pF) | tt 27 °C | 1.122 | 1.122 | 1.100 | -2.0 % | – | – | – |
+| G_1k_dB (1 kΩ ∥ 10 pF) | tt 27 °C | -0.0117 | -0.0117 | -0.0117 | -0.000 | – | – | – |
+| peak_dB (1 kΩ ∥ 10 pF) | tt 27 °C | 0 | 0 | 0 | +0.000 | – | – | – |
+| f3dB_MHz (1 kΩ ∥ 100 pF) | tt 27 °C | 1.325 | 1.325 | 1.294 | -2.4 % | – | – | – |
+| G_1k_dB (1 kΩ ∥ 100 pF) | tt 27 °C | 
+… [1397 more characters cut]
+```
+
+## Assistant — 2026-11-25 15:41:33 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/out && ls prev_tt_27_3.3_op.*; cat prev_tt_27_3.3_op.opoff | cut -c1-80; grep -iE "error|abort|singular|gmin" prev_tt_27_3.3_op.log | head
+```
+
+## Tool results / harness — 2026-11-25 15:41:34 UTC
+
+**Tool result:**
+
+```
+prev_tt_27_3.3_op.log
+prev_tt_27_3.3_op.op
+cat: prev_tt_27_3.3_op.opoff: No such file or directory
+Note: Starting dynamic gmin stepping
+Warning: Dynamic gmin stepping failed
+Note: Starting true gmin stepping
+Note: True gmin stepping completed
+Note: Starting dynamic gmin stepping
+Warning: Dynamic gmin stepping failed
+Note: Starting true gmin stepping
+Warning: singular matrix:  check node n.x2d.x270.nsg13_hv_pmos#NOI
+Warning: True gmin stepping failed
+Warning: singular matrix:  check node n.x2d.x80.nr1#i1
+```
+
+## Assistant — 2026-11-25 15:41:37 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/out && sed -n '/--- stderr/,$p' prev_tt_27_3.3_op.log | head -30; grep -iE "error|abort|source step|op " prev_tt_27_3.3_op.log | head
+```
+
+## Tool results / harness — 2026-11-25 15:41:37 UTC
+
+**Tool result:**
+
+```
+--- stderr ---
+Note: Starting dynamic gmin stepping
+Warning: Dynamic gmin stepping failed
+Note: Starting true gmin stepping
+Note: True gmin stepping completed
+Note: Starting dynamic gmin stepping
+Warning: Dynamic gmin stepping failed
+Note: Starting true gmin stepping
+Warning: singular matrix:  check node n.x2d.x270.nsg13_hv_pmos#NOI
+
+Warning: True gmin stepping failed
+Note: Starting source stepping
+Warning: source stepping failed
+Note: Transient op started
+Warning: singular matrix:  check node n.x2d.x80.nr1#i1
+
+Warning: singular matrix:  check node n.x2d.x80.nr1#i1
+
+Warning: singular matrix:  check node n.x2d.x80.nr1#i1
+
+Warning: singular matrix:  check node n.x2d.x80.nr1#i1
+
+Warning: singular matrix:  check node n.x2d.x80.nr1#i1
+
+Error: Transient op failed, timestep too small
+
+
+Error: The operating point could not be simulated successfully.
+    Any of the following steps may fail.!
+
+Note: Starting source stepping
+Warning: source stepping failed
+Note: Transient op started
+Error: Transient op failed, timestep too small
+Error: The operating point could not be simulated successfully.
+op simulation(s) aborted
+Error: no such vector v(padin)
+Error: incomplete or empty netlist
+```
+
+## Assistant — 2026-11-25 15:41:48 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && grep "prev_tt_27_3.3_op" _work/batch.log; python3 - <<'EOF'
+p='sim.py'; s=open(p).read()
+s=s.replace("    if view == 'prev':\n","    if view in ('prev', 'ps'):\n")
+s=s.replace("('' if view == 'cs' else ' klu')","('' if view in ('cs', 'ps') else ' klu')")
+s=s.replace("""              SPARSE the full-RC op took 282 s at tt 27 C, with KLU 63 s; the earlier runs used SPARSE)
+""","""              SPARSE the full-RC op took 282 s at tt 27 C, with KLU 63 s; the earlier runs used SPARSE)
+        ps    as prev, with SPARSE (the disabled operating point of prev does not converge with KLU)
+""")
+open(p+'.new','w').write(s)
+EOF
+mv sim.py.new sim.py; grep -n "'ps'" sim.py; python3 - <<'EOF'
+p='/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/jobs.txt'; s=open(p).read()
+s=s.replace("cs:tt:27:3.3:ac\n","cs:tt:27:3.3:ac\n# prev with SPARSE: its disabled op does not converge with KLU\nps:tt:27:3.3:op\nps:ss:-40:3.0:op\nps:ff:125:3.6:op\nps:fs:125:3.6:op\nps:sf:-40:3.0:op\n")
+open(p,'w').write(s)
+EOF
+grep -n "^ps" jobs.txt
+```
+
+## Tool results / harness — 2026-11-25 15:41:48 UTC
+
+**Tool result:**
+
+```
+prev_tt_27_3.3_op FAILED 35 s
+79:    if view in ('prev', 'ps'):
+95:    opt = '.option gmin=1e-12 rshunt=1e12' + ('' if view in ('cs', 'ps') else ' klu') + \
+32:ps:tt:27:3.3:op
+33:ps:ss:-40:3.0:op
+34:ps:ff:125:3.6:op
+35:ps:fs:125:3.6:op
+36:ps:sf:-40:3.0:op
+```
+
+## Assistant — 2026-11-25 15:42:12 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='evaluate.py'; s=open(p).read()
+s=s.replace("""def m_pu(d):
+    t = d['time']
+    i = int(np.searchsorted(t, 39.9e-6))""","""def m_pu(d, ten=20e-6, tend=39.9e-6):
+    t = d['time']
+    i = int(np.searchsorted(t, tend))""")
+s=s.replace("""        r[f't_{k}98_us'] = (last_cross(t, d[n], 0.98 * fin, 20e-6, 39.9e-6) - 20e-6) * 1e6""",
+"""        r[f't_{k}98_us'] = (last_cross(t, d[n], 0.98 * fin, ten, tend) - ten) * 1e6""")
+s=s.replace("""    r['t_out1mV_us'] = (last_cross(t, np.abs(o - o[i]), 1e-3, 20e-6, 39.9e-6) - 20e-6) * 1e6""",
+"""    r['t_out1mV_us'] = (last_cross(t, np.abs(o - o[i]), 1e-3, ten, tend) - ten) * 1e6""")
+s=s.replace("""    r['I_ring_peak_ramp_uA'] = float(ir[t < 20e-6].max())
+    r['I_ring_peak_enable_uA'] = float(ir[(t >= 20e-6) & (t < 40e-6)].max())
+    return r""","""    if ten > 10e-6:
+        r['I_ring_peak_ramp_uA'] = float(ir[t < ten].max())
+    r['I_ring_peak_enable_uA'] = float(ir[(t >= ten) & (t <= tend)].max())
+    r['I_ring_before_enable_nA'] = float(ir[t < ten - 0.1e-6][-1]) * 1e3
+    return r""")
+s=s.replace("""VIEWS = ['prev', 'c', 'cc', 'rc', 'cs']""","""VIEWS = ['prev', 'c', 'cc', 'rc', 'cs', 'ps']""")
+s=s.replace("""         'rc': 'slot + pads magic full-RC', 'cs': 'c with SPARSE solver'}""","""         'rc': 'slot + pads magic full-RC', 'cs': 'c with SPARSE solver', 'ps': 'prev with SPARSE solver'}""")
+s=s.replace("""VCOL = {'prev': '#52514e', 'c': '#2a78d6', 'cc': '#1baf7a', 'rc': '#eb6834', 'cs': '#e87ba4'}
+VLS = {'prev': '-', 'c': '--', 'cc': '-.', 'rc': ':', 'cs': '-'}""","""VCOL = {'prev': '#52514e', 'c': '#2a78d6', 'cc': '#1baf7a', 'rc': '#eb6834', 'cs': '#e87ba4', 'ps': '#8a8984'}
+VLS = {'prev': '-', 'c': '--', 'cc': '-.', 'rc': ':', 'cs': '-', 'ps': '-'}""")
+s=s.replace("""    rows = {k: [] for k in ('op', 'dc', 'ac', 'step', 'pu', 'mode')}""","""    rows = {k: [] for k in ('op', 'dc', 'ac', 'step', 'pu', 'en', 'opi', 'mode')}""")
+s=s.replace("""            elif (o / (tag(view, pt, 'pu') + '.log')).exists():
+                fails.append(tag(view, pt, 'pu'))""","""            elif (o / (tag(view, pt, 'pu') + '.log')).exists():
+                fails.append(tag(view, pt, 'pu'))
+            d = rd(o / (tag(view, pt, 'en') + '.en'))
+            if d is not None and ok(work, view, pt, 'en'):
+                r = {k + ('' if k.startswith('I_') or k.endswith('_V') else '_en'): x
+                     for k, x in m_pu(d, 2e-6, 19.9e-6).items()}
+                curves[(view, pt, 'en')] = d
+                rows['en'].append({**base, **r})
+                R.update({(view, pt, q, 'en'): x for q, x in r.items()})
+            elif (o / (tag(view, pt, 'en') + '.log')).exists():
+                fails.append(tag(view, pt, 'en'))
+            d = rd(o / (tag(view, pt, 'opi') + '.opi'))
+            if d is not None:
+                r = dict(I_iref_s2d_uA=d['i(vpi0)'][0] * 1e6, I_iref_d2s_uA=d['i(vpi1)'][0] * 1e6)
+                rows['opi'].append({**base, **r})
+                R.update({(view, pt, q, None): x for q, x in r.items()})""")
+s=s.replace("""                    ('pu', 'supply ramp 0 ... 10 us, enable at 20 us; times after enable'),""","""                    ('pu', 'supply ramp 0 ... 10 us, enable at 20 us; times after enable'),
+                    ('en', 'from the disabled op, enable at 2 us; times after enable, values at 19.9 us'),
+                    ('opi', 'current from the slot into the pads iref pins (0 V sources), op enabled'),""")
+# prev disabled currents from ps
+s=s.replace("""    C = committed()""","""    for pt in PTS:  # the disabled op of prev converges only with SPARSE (view ps)
+        for q in ('I_slot_off_nA', 'I_ring_off_nA'):
+            if R.get(('prev', pt, q, None)) is None and R.get(('ps', pt, q, None)) is not None:
+                R[('prev', pt, q, None)] = R[('ps', pt, q, None)]
+    C = committed()""")
+s=s.replace("""         ('op', 'I_ring_uA', None), ('op', 'I_slot_off_nA', None), ('op', 'I_ring_off_nA', None),""","""         ('op', 'I_ring_uA', None), ('op', 'I_slot_off_nA', None), ('op', 'I_ring_off_nA', None),
+         ('opi', 'I_iref_s2d_uA', None), ('opi', 'I_iref_d2s_uA', None),""")
+s=s.replace("""    Q += [('pu', q, None) for q in ('t_vcm98_us', 't_vref98_us', 't_out1mV_us', 'I_ring_39us_uA',
+                                    'I_ring_peak_ramp_uA', 'I_ring_peak_enable_uA')]""","""    Q += [('pu', q, None) for q in ('t_vcm98_us', 't_vref98_us', 't_out1mV_us', 'I_ring_39us_uA',
+                                    'I_ring_peak_ramp_uA', 'I_ring_peak_enable_uA')]
+    Q += [('en', q, 'en') for q in ('t_vcm98_us_en', 't_vref98_us_en', 't_out1mV_us_en', 'I_ring_39us_uA',
+                                    'I_ring_peak_enable_uA', 'I_ring_before_enable_nA')]""")
+s=s.replace("""            md_rows.append([q + (f' ({LN[ld]})' if ld else ''),""","""            md_rows.append([q.replace('39us', '19.9us' if ld == 'en' else '39us') + (f' ({LN[ld]})' if ld in LN else ''),""")
+open(p,'w').write(s)
+EOF
+python3 -I evaluate.py _work . | tail -1
+```
+
+## Tool results / harness — 2026-11-25 15:42:13 UTC
+
+**Tool result:**
+
+```
+36 comparison rows, failed: ['c_tt_27_3.3_pu']
+```
+
+## Assistant — 2026-11-25 15:42:25 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='evaluate.py'; s=open(p).read()
+s=s.replace("""    # power-up tt and ss
+    fig, axs = plt.subplots(2, 1, figsize=(7.4, 6.0), sharex=True)""","""    # enable transient from the disabled op: tt, ss, ff
+    if any(k[2] == 'en' for k in cv):
+        fig, axs = plt.subplots(2, 1, figsize=(7.4, 6.0), sharex=True)
+        for (view, pt, a), d in [(k, v) for k, v in cv.items() if k[2] == 'en' and k[0] in ('prev', 'c', 'rc')]:
+            axs[0].plot(d['time'] * 1e6, d['v(vcm_s2d)'], color=pc[pt], ls=VLS[view], lw=1.1)
+            axs[0].plot(d['time'] * 1e6, d['v(padout)'], color=pc[pt], ls=VLS[view], lw=0.8, alpha=0.6)
+            axs[1].plot(d['time'] * 1e6, -d['i(vio)'] * 1e6, color=pc[pt], ls=VLS[view], lw=1.0)
+        axs[0].set_ylabel('vcm (thick), pad out (thin) [V]')
+        axs[1].set_ylabel('pad ring iovdd current [µA]')
+        axs[1].set_xlabel('time [µs] (supplies on, enable 0 → 1.2 V at 2 µs)')
+        axs[0].set_xlim(1, 12)
+        pts = sorted({k[1] for k in cv if k[2] == 'en'}, key=PTS.index)
+        h = [plt.Line2D([], [], color=pc[p], label='%s %d °C %.1f V' % p) for p in pts]
+        h += [plt.Line2D([], [], color='#52514e', ls=VLS[v], label=VNAME[v]) for v in ('prev', 'c', 'rc')]
+        axs[0].legend(handles=h, loc='lower right', fontsize=6.5)
+        axs[0].set_title(f'{LABEL}\\nenable transient from the disabled operating point, pad in 0.5 V, pad out 1 GΩ + '
+                         '10 pF', fontsize=8.5)
+        fig.tight_layout()
+        DC.save(fig, str(dest / 'plots' / 'enable'), svg=False)
+    if not any(k[2] == 'pu' for k in cv):
+        return
+    # power-up tt and ss
+    fig, axs = plt.subplots(2, 1, figsize=(7.4, 6.0), sharex=True)""")
+open(p,'w').write(s)
+EOF
+python3 -I evaluate.py _work . | tail -1; ls plots
+```
+
+## Tool results / harness — 2026-11-25 15:42:26 UTC
+
+**Tool result:**
+
+```
+36 comparison rows, failed: ['c_tt_27_3.3_pu']
+bode_tt27.png
+dc_error.png
+powerup.png
+step_tt27.png
+```
+
+## Assistant — 2026-11-25 15:42:32 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/plots/bode_tt27.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 15:42:32 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 15:42:37 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && until grep -q "rc_tt_27_3.3_dc" _work/batch.log; do sleep 10; done; grep rc_tt _work/batch.log
+```
+
+## Tool results / harness — 2026-11-25 15:44:27 UTC
+
+**Tool result:**
+
+```
+rc_tt_27_3.3_op ok 70 s
+rc_tt_27_3.3_ac ok 83 s
+rc_tt_27_3.3_dc ok 22 s
+```
+
+## Assistant — 2026-11-25 15:44:30 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 -I evaluate.py _work . | tail -1; grep -E "tt 27" tables.md | head -24 | cut -c1-200
+```
+
+## Tool results / harness — 2026-11-25 15:44:31 UTC
+
+**Tool result:**
+
+```
+36 comparison rows, failed: ['c_tt_27_3.3_pu']
+| vcm_V | tt 27 °C | 1.2566 | 1.2566 | 1.2615 | +4.93 mV | – | 1.2616 | +5.03 mV |
+| vref_V | tt 27 °C | 0.4923 | 0.4923 | 0.4941 | +1.81 mV | – | 0.4949 | +2.60 mV |
+| s2d_out_cm_V | tt 27 °C | – | 1.2683 | 1.2733 | +4.93 mV | – | 1.2650 | -3.31 mV |
+| I_slot_uA | tt 27 °C | – | 49.75 | 49.63 | -0.2 % | – | 49.61 | -0.3 % |
+| I_ring_uA | tt 27 °C | – | 420.00 | 420.04 | +0.0 % | – | 419.95 | -0.0 % |
+| I_slot_off_nA | tt 27 °C | – | – | 8.73 | – | – | 13.01 | – |
+| I_ring_off_nA | tt 27 °C | – | – | 6.38 | – | – | 18.72 | – |
+| max_abs_err_0to1V_mV | tt 27 °C | 0.87 | 0.87 | 0.872 | +0.00 mV | – | 0.865 | -0.01 mV |
+| gain | tt 27 °C | 0.99875 | 0.99875 | 0.99875 | -1 ppm | – | 0.99889 | +141 ppm |
+| offset_mV | tt 27 °C | 0.064 | 0.0638 | 0.0638 | -0.00 mV | – | 0.119 | +0.06 mV |
+| in_lo_1mV_V | tt 27 °C | -0.1708 | -0.1708 | -0.1710 | -0.23 mV | – | -0.1688 | +1.97 mV |
+| in_hi_1mV_V | tt 27 °C | 1.2812 | 1.2811 | 1.2874 | +6.25 mV | – | 1.2778 | -3.34 mV |
+| f3dB_MHz (unloaded) | tt 27 °C | 1.356 | 1.356 | 1.322 | -2.5 % | – | 1.303 | -3.9 % |
+| G_1k_dB (unloaded) | tt 27 °C | -0.0108 | -0.0108 | -0.0108 | -0.000 | – | -0.00957 | +0.001 |
+| peak_dB (unloaded) | tt 27 °C | 0 | 0 | 0 | +0.000 | – | 0 | +0.000 |
+| f3dB_MHz (1 kΩ ∥ 10 pF) | tt 27 °C | 1.122 | 1.122 | 1.100 | -2.0 % | – | 1.081 | -3.7 % |
+| G_1k_dB (1 kΩ ∥ 10 pF) | tt 27 °C | -0.0117 | -0.0117 | -0.0117 | -0.000 | – | -0.0148 | -0.003 |
+| peak_dB (1 kΩ ∥ 10 pF) |
+… [554 more characters cut]
+```
+
+## Assistant — 2026-11-25 15:44:44 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='evaluate.py'; s=open(p).read()
+old=s[s.index("    # Bode tt, three loads"):s.index("    # step tt")]
+new='''    # Bode tt, three loads, with the difference to prev
+    fig, axs = plt.subplots(3, 1, figsize=(7.4, 7.6), sharex=True, gridspec_kw=dict(height_ratios=[3, 2, 3]))
+    lc = {'open': '#2a78d6', '10p': '#1baf7a', '100p': '#eb6834'}
+    for (view, pt, a, ld), d in [(k, v) for k, v in cv.items() if k[2] == 'ac' and k[1] == PTS[0]
+                                 and k[0] in ('prev', 'c', 'cc', 'rc')]:
+        axs[0].semilogx(d['frequency'], d['g_db'], color=lc[ld], ls=VLS[view], lw=1.1)
+        axs[2].semilogx(d['frequency'], d['g_ph'], color=lc[ld], ls=VLS[view], lw=1.1)
+        p = cv.get(('prev', pt, 'ac', ld))
+        if view != 'prev' and p is not None:
+            axs[1].semilogx(d['frequency'], d['g_db'] - np.interp(d['frequency'], p['frequency'], p['g_db']),
+                            color=lc[ld], ls=VLS[view], lw=1.1)
+    axs[0].set_ylim(-30, 3)
+    axs[1].set_ylim(-1.5, 0.5)
+    axs[2].set_ylim(-270, 10)
+    axs[0].set_xlim(1e4, 1e8)
+    axs[0].set_ylabel('pad_d2s / pad_s2d [dB]')
+    axs[1].set_ylabel('difference to\\nprevious deck [dB]')
+    axs[2].set_ylabel('phase [°]')
+    axs[2].set_xlabel('frequency [Hz]')
+    h = [plt.Line2D([], [], color=lc[l], label=LN[l]) for l in LOADS]
+    h += [plt.Line2D([], [], color='#52514e', ls=VLS[v], label=VNAME[v]) for v in ('prev', 'c', 'cc', 'rc')]
+    axs[0].legend(handles=h, loc='lower left', fontsize=6.5)
+    axs[0].set_title(f'{LABEL}\\nAC, tt 27 °C 3.3 V, pad in 0.5 V DC', fontsize=8.5)
+    fig.tight_layout()
+    DC.save(fig, str(dest / 'plots' / 'bode_tt27'), svg=False)
+'''
+s=s.replace(old,new)
+open(p,'w').write(s)
+EOF
+python3 -I evaluate.py _work . | tail -1
+```
+
+## Tool results / harness — 2026-11-25 15:44:45 UTC
+
+**Tool result:**
+
+```
+36 comparison rows, failed: ['c_tt_27_3.3_pu']
+```
+
+## Assistant — 2026-11-25 15:44:47 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/plots/bode_tt27.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 15:44:47 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 15:44:51 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && until grep -q "rc_tt_27_3.3_mode_ext" batch.log; do sleep 20; done; tail -5 batch.log
+```
+
+## Tool results / harness — 2026-11-25 15:44:51 UTC
+
+**Tool result:**
+
+```
+Command running in background with ID: bs272r2aj. Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bs272r2aj.output. You will be notified when it completes. To check interim output, use Read on that file path.
+Session cwd remains /home/user/sg13cmos5l_cm_slot7; directory changes made by the backgrounded command do not apply to subsequent commands.
+```
+
+## Assistant — 2026-11-25 15:44:52 UTC
+
+**Tool call: `TaskStop`**
+
+```json
+{
+ "task_id": "bi4wfjewu"
+}
+```
+
+## Tool results / harness — 2026-11-25 15:44:52 UTC
+
+**Tool result:**
+
+```
+{"message":"Successfully stopped task: bi4wfjewu (tail -n 0 -f /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/batch.log | grep --line-buffered -E \"ok|FAILED|Traceback|Error|rror\")","task_id":"bi4wfjewu","task_type":"local_bash","command":"tail -n 0 -f /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/batch.log | grep --line-buffered -E \"ok|FAILED|Traceback|Error|rror\""}
+```
+
+## Assistant — 2026-11-25 15:44:55 UTC
+
+**Tool call: `Monitor`**
+
+_slot_pex sim job failures_
+
+```json
+{
+ "command": "tail -n 0 -f /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/batch.log | grep --line-buffered -E \"FAILED|Traceback|Error\"",
+ "timeout_ms": 3600000
+}
+```
+
+## Tool results / harness — 2026-11-25 15:44:55 UTC
+
+**Tool result:**
+
+```
+Monitor started (task be8odw2yx, expires in 30m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+```
+
+## Assistant — 2026-11-25 15:44:59 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && until grep -q "opi" batch.log && [ $(grep -c opi batch.log) -ge 4 ]; do sleep 20; done; grep -E "opi|cs_|cc_" batch.log; for v in prev c cc rc; do cat out/${v}_tt_27_3.3_opi.opi | tail -1; done
+```
+
+## Tool results / harness — 2026-11-25 15:55:00 UTC
+
+**Tool result:**
+
+```
+Command did not complete within its 600s timeout and was moved to the background (ID: bvqv3vffx). Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvqv3vffx.output. You will be notified when it completes. If it is still running after 30m in the background, it will be stopped and you will be notified. It is running now: do not start a second copy while it runs. If it is no longer needed, stop it with TaskStop. No output had been read from it when it was moved. A program that buffers its output, or a pipe into one such as tail, can keep the output file empty until the command finishes. To check interim output, use Read on that file path.
+Session cwd remains /home/user/sg13cmos5l_cm_slot7; directory changes made by the backgrounded command do not apply to subsequent commands.
+```
+
+## Assistant — 2026-11-25 15:55:02 UTC
+
+**Tool call: `Bash`**
+
+```bash
+tail -8 /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/batch.log
+```
+
+## Tool results / harness — 2026-11-25 15:55:02 UTC
+
+**Tool result:**
+
+```
+rc_tt_27_3.3_step_10p ok 131 s
+rc_tt_27_3.3_step_100p ok 131 s
+cc_tt_27_3.3_op ok 16 s
+cc_tt_27_3.3_ac ok 56 s
+cc_tt_27_3.3_dc ok 17 s
+cc_tt_27_3.3_step_100p ok 84 s
+cs_tt_27_3.3_op ok 19 s
+cs_tt_27_3.3_ac ok 47 s
+```
+
+## Assistant — 2026-11-25 15:55:05 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && until [ $(grep -c "_opi " batch.log) -ge 4 ]; do sleep 10; done; for v in prev c cc rc; do tail -1 out/${v}_tt_27_3.3_opi.opi; done
+```
+
+## Tool results / harness — 2026-11-25 15:56:05 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+tail: cannot open 'out/prev_tt_27_3.3_opi.opi' for reading: No such file or directory
+tail: cannot open 'out/c_tt_27_3.3_opi.opi' for reading: No such file or directory
+tail: cannot open 'out/cc_tt_27_3.3_opi.opi' for reading: No such file or directory
+tail: cannot open 'out/rc_tt_27_3.3_opi.opi' for reading: No such file or directory
+```
+
+## Assistant — 2026-11-25 15:56:08 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && grep -iE "error|vector" out/c_tt_27_3.3_opi.log | head; grep -n "Vpi\|wrdata\|^save" runs/c_tt_27_3.3_opi/c_tt_27_3.3_opi.spice
+```
+
+## Tool results / harness — 2026-11-25 15:56:08 UTC
+
+**Tool result:**
+
+```
+Error: no such vector i(vpi0)
+32:Vpi0 iref0s iref0 0
+33:Vpi1 iref1s iref1 0
+39:save v(padin) v(padout) v(vcm_s2d) v(vref_s2d) v(vref_d2s) v(outp) v(outn) v(vinp) v(vinn) i(vio) i(vslot) v(b0) v(b1) v(b2) v(b3) v(enable)
+44:wrdata /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/out/c_tt_27_3.3_opi.opi i(vpi0) i(vpi1) v(iref0) v(iref1)
+```
+
+## Assistant — 2026-11-25 15:56:13 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='sim.py'; s=open(p).read()
+old="""save {save} v(enable)
+"""
+assert old in s
+s=s.replace(old,"""save {save} v(enable){' i(vpi0) i(vpi1) v(iref0) v(iref1)' if ana == 'opi' else ''}
+""")
+open(p+'.new','w').write(s)
+EOF
+mv sim.py.new sim.py; rm _work/out/*_opi.log; grep -n "i(vpi0) i(vpi1) v(iref0)" sim.py
+```
+
+## Tool results / harness — 2026-11-25 15:56:13 UTC
+
+**Tool result:**
+
+```
+109:        ctl = f'op\n{wr}wrdata {o}.opi i(vpi0) i(vpi1) v(iref0) v(iref1)\n'
+165:save {save} v(enable){' i(vpi0) i(vpi1) v(iref0) v(iref1)' if ana == 'opi' else ''}
+```
+
+## Assistant — 2026-11-25 15:56:21 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && sed -e 's/# already ends a complete run (SLOTDONE)./# exists (a job that was run once, also a failed one, is not repeated; delete its log to run it again)./' -e 's/  if grep -q SLOTDONE "$WORK\/out\/$tag.log" 2>\/dev\/null; then continue; fi/  [ -f "$WORK\/out\/$tag.log" ] \&\& continue/' runjobs.sh > runjobs.sh.new && chmod +x runjobs.sh.new && mv runjobs.sh.new runjobs.sh && cat runjobs.sh | tail -8
+```
+
+## Tool results / harness — 2026-11-25 15:56:21 UTC
+
+**Tool result:**
+
+```
+grep -v '^#' "$2" | while IFS= read -r j; do
+  [ -z "$j" ] && continue
+  IFS=: read -r view c t v ana load <<< "$j"
+  tag="${view}_${c}_${t}_${v}_${ana}"
+  [ "$ana" = step ] && tag="${tag}_${load:-open}"
+  [ -f "$WORK/out/$tag.log" ] && continue
+  python3 -I "$HERE/sim.py" "$WORK" "$j"
+done
+```
+
+## Assistant — 2026-11-25 15:56:24 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && until grep -q "rc_tt_27_3.3_mode_ext" batch.log; do sleep 20; done; tail -3 batch.log
+```
+
+## Tool results / harness — 2026-11-25 15:56:24 UTC
+
+**Tool result:**
+
+```
+Command running in background with ID: bhi6zkxru. Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bhi6zkxru.output. You will be notified when it completes. To check interim output, use Read on that file path.
+Session cwd remains /home/user/sg13cmos5l_cm_slot7; directory changes made by the backgrounded command do not apply to subsequent commands.
+```
+
+## Assistant — 2026-11-25 15:56:26 UTC
+
+**Tool call: `TaskStop`**
+
+```json
+{
+ "task_id": "bhi6zkxru"
+}
+```
+
+## Tool results / harness — 2026-11-25 15:56:26 UTC
+
+**Tool result:**
+
+```
+{"message":"Successfully stopped task: bhi6zkxru (cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && until grep -q \"rc_tt_27_3.3_mode_ext\" batch.log; do sleep 20; done; tail -3 batch.log)","task_id":"bhi6zkxru","task_type":"local_bash","command":"cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && until grep -q \"rc_tt_27_3.3_mode_ext\" batch.log; do sleep 20; done; tail -3 batch.log"}
+```
+
+## Assistant — 2026-11-25 15:56:29 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && timeout 580 sh -c 'until grep -q "rc_tt_27_3.3_mode_ext" batch.log; do sleep 15; done'; tail -4 batch.log
+```
+
+## Tool results / harness — 2026-11-25 16:06:09 UTC
+
+**Tool result:**
+
+```
+rc_ss_-40_3.0_op ok 36 s
+rc_ss_-40_3.0_ac FAILED 131 s
+rc_ss_-40_3.0_dc FAILED 52 s
+rc_ss_-40_3.0_step_open FAILED 68 s
+```
+
+## Assistant — 2026-11-25 16:06:13 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && grep ss_ batch.log; for f in c_ss_-40_3.0_dc c_ss_-40_3.0_step_open rc_ss_-40_3.0_ac; do echo "== $f"; sed -n '/--- stderr/,$p' out/$f.log | grep -vE "^$" | head -12; grep -E "doAnalyses|Error|abort|timestep" out/$f.log | head -5; done
+```
+
+## Tool results / harness — 2026-11-25 16:06:13 UTC
+
+**Tool result:**
+
+```
+c_ss_-40_3.0_op ok 13 s
+c_ss_-40_3.0_ac ok 11 s
+c_ss_-40_3.0_dc FAILED 24 s
+c_ss_-40_3.0_step_open FAILED 23 s
+c_ss_-40_3.0_step_100p ok 58 s
+prev_ss_-40_3.0_op FAILED 27 s
+prev_ss_-40_3.0_ac ok 17 s
+prev_ss_-40_3.0_dc ok 10 s
+prev_ss_-40_3.0_step_open ok 53 s
+prev_ss_-40_3.0_step_100p ok 53 s
+rc_ss_-40_3.0_op ok 36 s
+rc_ss_-40_3.0_ac FAILED 131 s
+rc_ss_-40_3.0_dc FAILED 52 s
+rc_ss_-40_3.0_step_open FAILED 68 s
+== c_ss_-40_3.0_dc
+--- stderr ---
+Warning: singular matrix:  check node n.x2s.x32.nr1#i1
+Note: Starting dynamic gmin stepping
+Warning: Dynamic gmin stepping failed
+Note: Starting true gmin stepping
+Warning: True gmin stepping failed
+Note: Starting source stepping
+Warning: singular matrix:  check node n.x2s.x187.nsg13_hv_pmos#NOI
+Warning: source stepping failed
+Note: Transient op started
+Warning: singular matrix:  check node n.x2s.x32.nr1#i1
+Warning: singular matrix:  check node n.x2s.x32.nr1#i1
+Error: Transient op failed, timestep too small
+Error: The operating point could not be simulated successfully.
+doAnalyses: DC:  Timestep too small;  vin = -0.3: trouble with dparea-instance d.x2s.x43.d1
+dc simulation(s) aborted
+Error: no such vector v(padin)
+== c_ss_-40_3.0_step_open
+--- stderr ---
+Note: Starting dynamic gmin stepping
+Warning: Dynamic gmin stepping failed
+Note: Starting true gmin stepping
+Warning: True gmin stepping failed
+Note: Starting source stepping
+Warning: singular matrix:  check node n.x2s.x105.nsg13_hv_pmos#NOI
+Warning: source stepping failed
+Note: Trans
+… [1225 more characters cut]
+```
+
+## Assistant — 2026-11-25 16:06:23 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && sed -n '/^def run(job)/,/^if __name__/p' sim.py
+```
+
+## Tool results / harness — 2026-11-25 16:06:23 UTC
+
+**Tool result:**
+
+```
+def run(job):
+    p = job.split(':')
+    view, c, t, v, ana = p[0], p[1], int(p[2]), float(p[3]), p[4]
+    load = p[5] if len(p) > 5 else 'open'
+    tag = f'{view}_{c}_{t}_{v}_{ana}' + (f'_{load}' if ana == 'step' else '')
+    rdir = RUNS / tag
+    rdir.mkdir(parents=True, exist_ok=True)
+    for s in suffixes(ana):
+        (OUT / f'{tag}.{s}').unlink(missing_ok=True)
+    f = rdir / f'{tag}.spice'
+    f.write_text(deck(view, c, t, v, ana, load, rdir, tag))
+    (rdir / '.spiceinit').write_text((Path(PDK) / 'libs.tech' / 'ngspice' / '.spiceinit').read_text())
+    t0 = time.time()
+    env = dict(os.environ, OMP_NUM_THREADS='1')  # one thread: the CPUs are shared with other jobs
+    tmo = float(os.environ.get('SIM_TIMEOUT', '2400'))  # s; a stalled transient is stopped and reported FAILED
+    try:
+        pr = subprocess.run(['ngspice', '-b', f.name], cwd=rdir, capture_output=True, text=True, env=env, timeout=tmo)
+    except subprocess.TimeoutExpired as e:
+        pr = subprocess.CompletedProcess(e.cmd, -9, (e.stdout or b'').decode(errors='replace') if isinstance(
+            e.stdout, bytes) else (e.stdout or ''), f'TIMEOUT after {tmo:.0f} s (SIM_TIMEOUT)')
+    dt = time.time() - t0
+    (OUT / f'{tag}.log').write_text(pr.stdout[-30000:] + '\n--- stderr ---\n' + pr.stderr[-20000:] +
+                                    f'\n--- wall time {dt:.1f} s\n')
+    ok = 'SLOTDONE' in pr.stdout and all((OUT / f'{tag}.{s}').exists() for s in suffixes(ana)) and \
+        'aborted' not in (pr.st
+… [114 more characters cut]
+```
+
+## Assistant — 2026-11-25 16:06:36 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='sim.py'; s=open(p).read()
+a=s.index("    t0 = time.time()\n    env = dict")
+b=s.index("\n\nif __name__ == '__main__':")
+new='''    deck0 = f.read_text()
+    m = re.search(r'^\\.option .*$', deck0, re.M)
+    # convergence aids, tried in this order only after a failed run (recorded in <tag>.aid and the log):
+    #   1. ngspice's default solver SPARSE 1.3 instead of KLU (the disabled op of prev converges only with SPARSE)
+    #   2. SPARSE plus more gmin / source steps and iterations (gminsteps=100 srcsteps=100 itl1=1000 itl6=1000)
+    aids = [('', m.group(0))]
+    if 'klu' in m.group(0):
+        aids.append(('SPARSE instead of KLU', m.group(0).replace(' klu', '')))
+    aids.append(('SPARSE, gminsteps=100 srcsteps=100 itl1=1000 itl6=1000',
+                 m.group(0).replace(' klu', '') + ' gminsteps=100 srcsteps=100 itl1=1000 itl6=1000'))
+    env = dict(os.environ, OMP_NUM_THREADS='1')  # one thread: the CPUs are shared with other jobs
+    tmo = float(os.environ.get('SIM_TIMEOUT', '2400'))  # s; a stalled transient is stopped and reported FAILED
+    if os.environ.get('SIM_NO_AIDS') or ana in ('pu', 'en'):
+        aids = aids[:1]  # long transients: one attempt only
+    (OUT / f'{tag}.aid').unlink(missing_ok=True)
+    log, t00 = '', time.time()
+    for k, (what, line) in enumerate(aids):
+        f.write_text(deck0.replace(m.group(0), line, 1))
+        t0 = time.time()
+        try:
+            pr = subprocess.run(['ngspice', '-b', f.name], cwd=rdir, capture_output=True, text=True, env=env,
+                                timeout=tmo)
+        except subprocess.TimeoutExpired as e:
+            pr = subprocess.CompletedProcess(e.cmd, -9, (e.stdout or b'').decode(errors='replace') if isinstance(
+                e.stdout, bytes) else (e.stdout or ''), f'TIMEOUT after {tmo:.0f} s (SIM_TIMEOUT)')
+        dt = time.time() - t0
+        log += (f'\\n=== attempt {k + 1}: {what or "as written"} ({line})\\n' + pr.stdout[-20000:] +
+                '\\n--- stderr ---\\n' + pr.stderr[-15000:] + f'\\n--- wall time {dt:.1f} s\\n')
+        ok = 'SLOTDONE' in pr.stdout and all((OUT / f'{tag}.{s}').exists() for s in suffixes(ana)) and \\
+            'aborted' not in (pr.stdout + pr.stderr)
+        if ok:
+            if k:
+                (OUT / f'{tag}.aid').write_text(what + '\\n')
+            break
+        for s in suffixes(ana):
+            (OUT / f'{tag}.{s}').unlink(missing_ok=True) if k + 1 < len(aids) else None
+    (OUT / f'{tag}.log').write_text(log + ('\\nSLOTDONE (final attempt ok)\\n' if ok else '\\nFINAL: FAILED\\n'))
+    print(tag, 'ok' if ok else 'FAILED', f'{time.time() - t00:.0f} s', f'(aid: {what})' if ok and what else '',
+          flush=True)'''
+s=s[:a]+new+s[b:]
+open(p+'.new','w').write(s)
+EOF
+python3 -c "import ast;ast.parse(open('/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/sim.py.new').read())" && mv sim.py.new sim.py && echo ok
+```
+
+## Tool results / harness — 2026-11-25 16:06:36 UTC
+
+**Tool result:**
+
+```
+ok
+```
+
+## Assistant — 2026-11-25 16:06:44 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='evaluate.py'; s=open(p).read()
+old="""    p = Path(work) / 'out' / (tag(view, pt, ana, load) + '.log')
+    return p.exists() and 'SLOTDONE' in p.read_text() and 'aborted' not in p.read_text()"""
+new="""    p = Path(work) / 'out' / (tag(view, pt, ana, load) + '.log')
+    if not p.exists():
+        return False
+    x = p.read_text()
+    if '=== attempt' in x:  # sim.py with retries: the final verdict is the last line
+        return 'SLOTDONE (final attempt ok)' in x
+    return 'SLOTDONE' in x and 'aborted' not in x"""
+assert old in s; s=s.replace(old,new); open(p,'w').write(s)
+EOF
+grep FAILED _work/batch.log
+```
+
+## Tool results / harness — 2026-11-25 16:06:44 UTC
+
+**Tool result:**
+
+```
+c_tt_27_3.3_pu FAILED 3615 s
+prev_tt_27_3.3_op FAILED 35 s
+prev_tt_27_3.3_opi FAILED 6 s
+c_tt_27_3.3_opi FAILED 12 s
+cc_tt_27_3.3_opi FAILED 14 s
+rc_tt_27_3.3_opi FAILED 31 s
+c_ss_-40_3.0_dc FAILED 24 s
+c_ss_-40_3.0_step_open FAILED 23 s
+prev_ss_-40_3.0_op FAILED 27 s
+rc_ss_-40_3.0_ac FAILED 131 s
+rc_ss_-40_3.0_dc FAILED 52 s
+rc_ss_-40_3.0_step_open FAILED 68 s
+rc_ss_-40_3.0_step_100p FAILED 59 s
+```
+
+## Assistant — 2026-11-25 16:06:48 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/out && for t in prev_tt_27_3.3_op c_ss_-40_3.0_dc c_ss_-40_3.0_step_open prev_ss_-40_3.0_op rc_ss_-40_3.0_ac rc_ss_-40_3.0_dc rc_ss_-40_3.0_step_open rc_ss_-40_3.0_step_100p; do mkdir -p ../failed_first; mv $t.log ../failed_first/; done; ls ../failed_first
+```
+
+## Tool results / harness — 2026-11-25 16:06:49 UTC
+
+**Tool result:**
+
+```
+c_ss_-40_3.0_dc.log
+c_ss_-40_3.0_step_open.log
+prev_ss_-40_3.0_op.log
+prev_tt_27_3.3_op.log
+rc_ss_-40_3.0_ac.log
+rc_ss_-40_3.0_dc.log
+rc_ss_-40_3.0_step_100p.log
+rc_ss_-40_3.0_step_open.log
+```
+
+## Assistant — 2026-11-25 16:06:53 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && sed -i '/^# prev with SPARSE: its disabled op does not converge with KLU$/d; /^ps:/d' jobs.txt; grep -c "^ps" jobs.txt; ps -eo pid,ppid,args | grep -E "runjobs|while kill" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 16:06:54 UTC
+
+**Tool result:**
+
+```
+0
+19305 19303 sh -c while kill -0 19281 2>/dev/null; do sleep 5; done; ../runjobs.sh . ../jobs.txt
+19325 19305 bash ../runjobs.sh . ../jobs.txt
+19330 19325 bash ../runjobs.sh . ../jobs.txt
+```
+
+## Assistant — 2026-11-25 16:06:56 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && nohup sh -c 'while kill -0 19305 2>/dev/null; do sleep 5; done; echo "=== second pass $(date -u +%H:%M)"; ../runjobs.sh . ../jobs.txt' >> batch.log 2>&1 & echo ok
+```
+
+## Tool results / harness — 2026-11-25 16:06:57 UTC
+
+**Tool result:**
+
+```
+ok
+```
+
+## Assistant — 2026-11-25 16:07:02 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 -I evaluate.py _work . | tail -1
+```
+
+## Tool results / harness — 2026-11-25 16:07:03 UTC
+
+**Tool result:**
+
+```
+74 comparison rows, failed: ['c_tt_27_3.3_pu']
+```
+
+## Assistant — 2026-11-25 16:07:05 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/plots/dc_error.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 16:07:05 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 16:07:14 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='evaluate.py'; s=open(p).read()
+a=s.index("    # DC error, all PVT, prev vs c vs rc")
+b=s.index("    # Bode tt, three loads")
+new='''    # DC error, all PVT, prev vs c vs rc, and the difference to prev
+    fig, axs = plt.subplots(2, 1, figsize=(7.4, 7.0), sharex=True, gridspec_kw=dict(height_ratios=[3, 2]))
+    for (view, pt, a), d in [(k, v) for k, v in cv.items() if k[2] == 'dc' and k[0] in ('prev', 'c', 'cc', 'rc')]:
+        s_ = (d['x'] >= -0.05) & (d['x'] <= 1.05)
+        if view != 'cc':
+            axs[0].plot(d['x'][s_], d['err'][s_] * 1e3, color=pc[pt], ls=VLS[view], lw=1.1)
+        p = cv.get(('prev', pt, 'dc'))
+        if view != 'prev' and p is not None:
+            axs[1].plot(d['x'][s_], (d['err'][s_] - np.interp(d['x'][s_], p['x'], p['err'])) * 1e3, color=pc[pt],
+                        ls=VLS[view], lw=1.1)
+    h = [plt.Line2D([], [], color=pc[p], label='%s %d °C %.1f V' % p) for p in PTS]
+    h += [plt.Line2D([], [], color='#52514e', ls=VLS[v], label=VNAME[v]) for v in ('prev', 'c', 'cc', 'rc')]
+    axs[0].legend(handles=h, loc='lower left', ncol=2, fontsize=6.3)
+    axs[1].set_xlabel('S2D pad input (pad in) [V]')
+    axs[0].set_ylabel('pad out − (vcm + pad in − vref) [mV]')
+    axs[1].set_ylabel('error − error of the\\nprevious deck [mV]')
+    axs[0].set_xlim(-0.05, 1.05)
+    axs[0].set_title(f'{LABEL}\\nDC error vs expected (replica vcm / vref as simulated), pad out unloaded (1 GΩ); '
+                     'cc only in the lower panel', fontsize=8.5)
+    fig.tight_layout()
+    DC.save(fig, str(dest / 'plots' / 'dc_error'), svg=False)
+'''
+s=s[:a]+new+s[b:]
+open(p,'w').write(s)
+EOF
+python3 -I evaluate.py _work . | tail -1
+```
+
+## Tool results / harness — 2026-11-25 16:07:16 UTC
+
+**Tool result:**
+
+```
+77 comparison rows, failed: ['c_tt_27_3.3_pu']
+```
+
+## Assistant — 2026-11-25 16:07:18 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/plots/dc_error.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 16:07:18 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 16:07:21 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && timeout 590 sh -c 'until grep -q "rc_sf_-40_3.0_step_100p" batch.log; do sleep 15; done'; tail -15 batch.log
+```
+
+## Tool results / harness — 2026-11-25 16:17:11 UTC
+
+**Tool result:**
+
+```
+rc_ss_-40_3.0_step_100p FAILED 59 s
+c_ff_125_3.6_op ok 16 s 
+c_ff_125_3.6_ac ok 34 s 
+c_ff_125_3.6_dc ok 10 s 
+c_ff_125_3.6_step_open ok 58 s 
+c_ff_125_3.6_step_100p ok 71 s 
+prev_ff_125_3.6_op ok 33 s (aid: SPARSE instead of KLU)
+prev_ff_125_3.6_ac ok 9 s 
+prev_ff_125_3.6_dc ok 10 s 
+prev_ff_125_3.6_step_open ok 54 s 
+prev_ff_125_3.6_step_100p ok 51 s 
+rc_ff_125_3.6_op ok 25 s 
+rc_ff_125_3.6_ac ok 65 s 
+rc_ff_125_3.6_dc ok 39 s 
+rc_ff_125_3.6_step_open ok 149 s
+```
+
+## Assistant — 2026-11-25 16:17:15 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && timeout 590 sh -c 'until grep -q "rc_sf_-40_3.0_step_100p" batch.log; do sleep 15; done'; tail -12 batch.log
+```
+
+## Tool results / harness — 2026-11-25 16:27:05 UTC
+
+**Tool result:**
+
+```
+c_fs_125_3.6_op ok 17 s 
+c_fs_125_3.6_ac ok 33 s 
+c_fs_125_3.6_dc ok 9 s 
+c_fs_125_3.6_step_open ok 63 s 
+c_fs_125_3.6_step_100p ok 64 s 
+prev_fs_125_3.6_op ok 5 s 
+prev_fs_125_3.6_ac ok 7 s 
+prev_fs_125_3.6_dc ok 8 s 
+prev_fs_125_3.6_step_open ok 48 s 
+prev_fs_125_3.6_step_100p ok 48 s 
+rc_fs_125_3.6_op ok 48 s 
+rc_fs_125_3.6_ac ok 97 s
+```
+
+## Assistant — 2026-11-25 16:27:09 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && timeout 590 sh -c 'until grep -q "mode_swap" batch.log; do sleep 15; done'; tail -8 batch.log
+```
+
+## Tool results / harness — 2026-11-25 16:36:59 UTC
+
+**Tool result:**
+
+```
+prev_fs_125_3.6_step_100p ok 48 s 
+rc_fs_125_3.6_op ok 48 s 
+rc_fs_125_3.6_ac ok 97 s 
+rc_fs_125_3.6_dc ok 37 s 
+rc_fs_125_3.6_step_open ok 155 s 
+rc_fs_125_3.6_step_100p ok 144 s 
+c_sf_-40_3.0_op ok 43 s (aid: SPARSE instead of KLU)
+c_sf_-40_3.0_ac ok 75 s (aid: SPARSE instead of KLU)
+```
+
+## Assistant — 2026-11-25 16:37:02 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && timeout 590 sh -c 'until grep -q "mode_swap" batch.log; do sleep 15; done'; tail -8 batch.log
+```
+
+## Tool results / harness — 2026-11-25 16:46:53 UTC
+
+**Tool result:**
+
+```
+c_sf_-40_3.0_op ok 43 s (aid: SPARSE instead of KLU)
+c_sf_-40_3.0_ac ok 75 s (aid: SPARSE instead of KLU)
+c_sf_-40_3.0_dc FAILED 568 s 
+c_sf_-40_3.0_step_open ok 59 s 
+c_sf_-40_3.0_step_100p ok 60 s 
+prev_sf_-40_3.0_op ok 13 s 
+prev_sf_-40_3.0_ac ok 14 s 
+prev_sf_-40_3.0_dc ok 14 s
+```
+
+## Assistant — 2026-11-25 16:47:07 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='sim.py'; s=open(p).read()
+old="""    env = dict(os.environ, OMP_NUM_THREADS='1')  # one thread: the CPUs are shared with other jobs"""
+new="""    #   3. (dc only) as 2, the sweep split at pad in 0.5 V (0.5 -> 3.3 V and 0.5 -> -0.3 V), so that the first
+    #      operating point is the one the ac runs find; both halves are joined into <tag>.dc
+    split = ''
+    if ana == 'dc':
+        sw = re.search(r'^dc Vin -0\\.3 3\\.3 0\\.005\\n.*?wrdata (\\S+) (.*)$', deck0, re.M | re.S)
+        split = (f'dc Vin 0.5 3.3 0.005\\nset wr_singlescale\\nset wr_vecnames\\noption numdgt=9\\n'
+                 f'wrdata {sw.group(1)}_up {sw.group(2)}\\ndc Vin 0.5 -0.3 -0.005\\nwrdata {sw.group(1)}_dn {sw.group(2)}')
+        aids.append(('SPARSE, more steps, sweep split at 0.5 V', aids[-1][1]))
+    env = dict(os.environ, OMP_NUM_THREADS='1')  # one thread: the CPUs are shared with other jobs"""
+assert old in s; s=s.replace(old,new)
+old2="""        f.write_text(deck0.replace(m.group(0), line, 1))"""
+new2="""        dk = deck0.replace(m.group(0), line, 1)
+        if what.endswith('sweep split at 0.5 V'):
+            dk = dk.replace(sw.group(0), split, 1)
+        f.write_text(dk)"""
+assert old2 in s; s=s.replace(old2,new2)
+old3="""        dt = time.time() - t0
+        log += """
+new3="""        dt = time.time() - t0
+        up, dn = OUT / f'{tag}.dc_up', OUT / f'{tag}.dc_dn'
+        if up.exists() and dn.exists():  # join the split sweep: down half reversed (without 0.5 V), then up half
+            lu, ld = up.read_text().splitlines(), dn.read_text().splitlines()
+            (OUT / f'{tag}.dc').write_text('\\n'.join([lu[0]] + ld[:0:-1][:-1] + lu[1:]) + '\\n')
+            up.unlink()
+            dn.unlink()
+        log += """
+assert old3 in s; s=s.replace(old3,new3)
+open(p+'.new','w').write(s)
+EOF
+python3 -c "import ast;ast.parse(open('/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/sim.py.new').read())" && mv sim.py.new sim.py; grep -n "split" sim.py | head
+```
+
+## Tool results / harness — 2026-11-25 16:47:07 UTC
+
+**Tool result:**
+
+```
+93:    bits = [float(b) * 1.2 for b in MODES[mode][0].split()]
+177:    p = job.split(':')
+198:    #   3. (dc only) as 2, the sweep split at pad in 0.5 V (0.5 -> 3.3 V and 0.5 -> -0.3 V), so that the first
+200:    split = ''
+203:        split = (f'dc Vin 0.5 3.3 0.005\nset wr_singlescale\nset wr_vecnames\noption numdgt=9\n'
+205:        aids.append(('SPARSE, more steps, sweep split at 0.5 V', aids[-1][1]))
+214:        if what.endswith('sweep split at 0.5 V'):
+215:            dk = dk.replace(sw.group(0), split, 1)
+226:        if up.exists() and dn.exists():  # join the split sweep: down half reversed (without 0.5 V), then up half
+227:            lu, ld = up.read_text().splitlines(), dn.read_text().splitlines()
+```
+
+## Assistant — 2026-11-25 16:47:16 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && sed -i "s/sw = re.search(r'^dc Vin -0\\\\.3 3\\\\.3 0\\\\.005\\\\n.\*?wrdata (\\\\S+) (.\*)\$', deck0, re.M | re.S)/sw = re.search(r'^dc Vin -0\\\\.3 3\\\\.3 0\\\\.005\\\\n.*?wrdata (\\\\S+) ([^\\\\n]*)\$', deck0, re.M | re.S)/" sim.py; grep -n "sw = re.search" sim.py; mv _work/out/c_sf_-40_3.0_dc.log _work/failed_first/; python3 - <<'EOF'
+import re
+deck0="x\ndc Vin -0.3 3.3 0.005\nset wr_singlescale\nset wr_vecnames\noption numdgt=9\nwrdata /a/b.dc v(padin) v(x)\necho \"SLOTDONE\"\n.endc\n"
+sw = re.search(r'^dc Vin -0\.3 3\.3 0\.005\n.*?wrdata (\S+) ([^\n]*)$', deck0, re.M | re.S)
+print(repr(sw.group(0)), sw.group(1), sw.group(2))
+EOF
+```
+
+## Tool results / harness — 2026-11-25 16:47:16 UTC
+
+**Tool result:**
+
+```
+202:        sw = re.search(r'^dc Vin -0\.3 3\.3 0\.005\n.*?wrdata (\S+) ([^\n]*)$', deck0, re.M | re.S)
+'dc Vin -0.3 3.3 0.005\nset wr_singlescale\nset wr_vecnames\noption numdgt=9\nwrdata /a/b.dc v(padin) v(x)' /a/b.dc v(padin) v(x)
+[This command modified 1 file you've previously read: verification/c2_gaps/slot_pex/sim.py. Call Read before editing.]
+```
+
+## Assistant — 2026-11-25 16:47:18 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && timeout 590 sh -c 'until grep -q "rc_tt_27_3.3_mode_ext" batch.log; do sleep 15; done'; tail -14 batch.log
+```
+
+## Tool results / harness — 2026-11-25 16:57:08 UTC
+
+**Tool result:**
+
+```
+c_sf_-40_3.0_op ok 43 s (aid: SPARSE instead of KLU)
+c_sf_-40_3.0_ac ok 75 s (aid: SPARSE instead of KLU)
+c_sf_-40_3.0_dc FAILED 568 s 
+c_sf_-40_3.0_step_open ok 59 s 
+c_sf_-40_3.0_step_100p ok 60 s 
+prev_sf_-40_3.0_op ok 13 s 
+prev_sf_-40_3.0_ac ok 14 s 
+prev_sf_-40_3.0_dc ok 14 s 
+prev_sf_-40_3.0_step_open ok 54 s 
+prev_sf_-40_3.0_step_100p ok 55 s 
+rc_sf_-40_3.0_op ok 82 s 
+rc_sf_-40_3.0_ac ok 176 s 
+rc_sf_-40_3.0_dc ok 75 s 
+rc_sf_-40_3.0_step_open ok 135 s
+```
+
+## Assistant — 2026-11-25 16:57:12 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && timeout 590 sh -c 'until grep -q "rc_tt_27_3.3_mode_ext" batch.log; do sleep 15; done'; tail -14 batch.log
+```
+
+## Tool results / harness — 2026-11-25 17:07:02 UTC
+
+**Tool result:**
+
+```
+c_sf_-40_3.0_step_open ok 59 s 
+c_sf_-40_3.0_step_100p ok 60 s 
+prev_sf_-40_3.0_op ok 13 s 
+prev_sf_-40_3.0_ac ok 14 s 
+prev_sf_-40_3.0_dc ok 14 s 
+prev_sf_-40_3.0_step_open ok 54 s 
+prev_sf_-40_3.0_step_100p ok 55 s 
+rc_sf_-40_3.0_op ok 82 s 
+rc_sf_-40_3.0_ac ok 176 s 
+rc_sf_-40_3.0_dc ok 75 s 
+rc_sf_-40_3.0_step_open ok 135 s 
+rc_sf_-40_3.0_step_100p ok 134 s 
+c_tt_27_3.3_mode_swap ok 4 s 
+prev_tt_27_3.3_mode_swap ok 4 s
+```
+
+## Assistant — 2026-11-25 17:07:05 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && timeout 300 sh -c 'until grep -q "rc_tt_27_3.3_mode_ext" batch.log; do sleep 5; done'; tail -10 batch.log; cd .. && python3 -I evaluate.py _work . | tail -1; cat csv/mode_summary.csv
+```
+
+## Tool results / harness — 2026-11-25 17:12:07 UTC
+
+**Tool result:**
+
+```
+prev_sf_-40_3.0_dc ok 14 s 
+prev_sf_-40_3.0_step_open ok 54 s 
+prev_sf_-40_3.0_step_100p ok 55 s 
+rc_sf_-40_3.0_op ok 82 s 
+rc_sf_-40_3.0_ac ok 176 s 
+rc_sf_-40_3.0_dc ok 75 s 
+rc_sf_-40_3.0_step_open ok 135 s 
+rc_sf_-40_3.0_step_100p ok 134 s 
+c_tt_27_3.3_mode_swap ok 4 s 
+prev_tt_27_3.3_mode_swap ok 4 s 
+161 comparison rows, failed: ['c_tt_27_3.3_pu']
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# IHP sg13cmos5l simulation, slot 7 default mode, round trip pad_s2d → pad_d2s; evaluate.py; tt 27 C, designer run_modes.py definitions
+view,point,mode,err_max_mV
+prev,tt 27 C 3.3 V,swap,0.980275
+c,tt 27 C 3.3 V,swap,0.98614
+```
+
+## Assistant — 2026-11-25 17:12:11 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && grep -E "^\| (vcm_V|vref_V|I_slot_uA|I_ring_uA|max_abs|in_lo|in_hi|f3dB_MHz \(unloaded\)|f3dB_MHz \(1 kΩ ∥ 100|ts1_rise_ns \(unloaded\)|ts1_rise_ns \(1 kΩ ∥ 100|gain |offset)" tables.md
+```
+
+## Tool results / harness — 2026-11-25 17:12:11 UTC
+
+**Tool result:**
+
+```
+| vcm_V | tt 27 °C | 1.2566 | 1.2566 | 1.2615 | +4.93 mV | 1.2615 | 1.2616 | +5.03 mV |
+| vcm_V | ss -40 °C | 1.1148 | 1.1147 | 1.1195 | +4.81 mV | – | 1.1194 | +4.64 mV |
+| vcm_V | ff 125 °C | 1.2991 | 1.2991 | 1.3234 | +24.29 mV | – | 1.3239 | +24.85 mV |
+| vcm_V | fs 125 °C | 1.3655 | 1.3655 | 1.3786 | +13.18 mV | – | 1.3788 | +13.37 mV |
+| vcm_V | sf -40 °C | 1.1377 | 1.1376 | 1.1412 | +3.53 mV | – | 1.1411 | +3.46 mV |
+| vref_V | tt 27 °C | 0.4923 | 0.4923 | 0.4941 | +1.81 mV | 0.4941 | 0.4949 | +2.60 mV |
+| vref_V | ss -40 °C | 0.4475 | 0.4475 | 0.4493 | +1.85 mV | – | 0.4501 | +2.63 mV |
+| vref_V | ff 125 °C | 0.5709 | 0.5709 | 0.5727 | +1.77 mV | – | 0.5735 | +2.53 mV |
+| vref_V | fs 125 °C | 0.5757 | 0.5756 | 0.5775 | +1.82 mV | – | 0.5782 | +2.57 mV |
+| vref_V | sf -40 °C | 0.4441 | 0.4441 | 0.4459 | +1.81 mV | – | 0.4467 | +2.58 mV |
+| I_slot_uA | tt 27 °C | – | 49.75 | 49.63 | -0.2 % | 49.63 | 49.61 | -0.3 % |
+| I_slot_uA | ss -40 °C | – | 48.39 | 48.26 | -0.3 % | – | 48.25 | -0.3 % |
+| I_slot_uA | ff 125 °C | – | 49.42 | 49.31 | -0.2 % | – | 49.29 | -0.3 % |
+| I_slot_uA | fs 125 °C | – | 49.24 | 49.13 | -0.2 % | – | 49.11 | -0.3 % |
+| I_slot_uA | sf -40 °C | – | 48.61 | 48.48 | -0.3 % | – | 48.47 | -0.3 % |
+| I_ring_uA | tt 27 °C | – | 420.00 | 420.04 | +0.0 % | 420.04 | 419.95 | -0.0 % |
+| I_ring_uA | ss -40 °C | – | 398.36 | 398.39 | +0.0 % | – | 398.33 | -0.0 % |
+| I_ring_uA | ff 125 °C | – | 423.16 | 423.31 | +0.0 % | – | 423.20 | +0.0 % |
+| I_ring_uA | fs 12
+… [3976 more characters cut]
+```
+
+## Assistant — 2026-11-25 17:12:19 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='jobs.txt'; s=open(p).read()
+s=s.replace("rc:tt:27:3.3:opi\n","rc:tt:27:3.3:opi\nprev:ff:125:3.6:opi\nc:ff:125:3.6:opi\nprev:ss:-40:3.0:opi\nc:ss:-40:3.0:opi\n")
+s=s.replace("# bias currents into the pads (iref lines), tt 27 C","# bias currents into the pads (iref lines)")
+open(p,'w').write(s)
+EOF
+grep -n opi jobs.txt; tail -3 _work/batch.log
+```
+
+## Tool results / harness — 2026-11-25 17:12:19 UTC
+
+**Tool result:**
+
+```
+32:prev:tt:27:3.3:opi
+33:c:tt:27:3.3:opi
+34:cc:tt:27:3.3:opi
+35:rc:tt:27:3.3:opi
+36:prev:ff:125:3.6:opi
+37:c:ff:125:3.6:opi
+38:prev:ss:-40:3.0:opi
+39:c:ss:-40:3.0:opi
+rc_sf_-40_3.0_step_100p ok 134 s 
+c_tt_27_3.3_mode_swap ok 4 s 
+prev_tt_27_3.3_mode_swap ok 4 s
+```
+
+## Assistant — 2026-11-25 17:12:21 UTC
+
+**Tool call: `Bash`**
+
+```bash
+ps -eo pid,etime,args | grep "ngspice -b" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 17:12:21 UTC
+
+**Tool result:**
+
+```
+26950       13:06 ngspice -b rc_tt_27_3.3_mode_swap.spice
+28420       00:48 ngspice -b fs_tt_-40_3.6.spice
+```
+
+## Assistant — 2026-11-25 17:12:28 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='sim.py'; s=open(p).read()
+old="""    tmo = float(os.environ.get('SIM_TIMEOUT', '2400'))  # s; a stalled transient is stopped and reported FAILED"""
+new="""    # s per attempt; a stalled run is stopped and counts as failed (then the next aid is tried)
+    tmo = float(os.environ.get('SIM_TIMEOUT', '2400' if ana in ('step', 'pu', 'en') else '900'))"""
+assert old in s; s=s.replace(old,new)
+s=s.replace("SIM_TIMEOUT = wall-clock limit per run in s (default 2400)","SIM_TIMEOUT = wall-clock limit per attempt in s (default 2400 for transients, 900 otherwise)")
+open(p+'.new','w').write(s)
+EOF
+mv sim.py.new sim.py; grep -n "SIM_TIMEOUT" sim.py
+```
+
+## Tool results / harness — 2026-11-25 17:12:28 UTC
+
+**Tool result:**
+
+```
+38:SIM_TIMEOUT = wall-clock limit per attempt in s (default 2400 for transients, 900 otherwise); ngspice runs with OMP_NUM_THREADS=1.
+208:    tmo = float(os.environ.get('SIM_TIMEOUT', '2400' if ana in ('step', 'pu', 'en') else '900'))
+224:                e.stdout, bytes) else (e.stdout or ''), f'TIMEOUT after {tmo:.0f} s (SIM_TIMEOUT)')
+```
+
+## Assistant — 2026-11-25 17:12:30 UTC
+
+**Tool call: `Bash`**
+
+```bash
+ps -o etimes=,args= -p 26950; kill 26950; sleep 2; ps -eo pid,etime,args | grep "ngspice -b rc" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 17:12:33 UTC
+
+**Tool result:**
+
+```
+796 ngspice -b rc_tt_27_3.3_mode_swap.spice
+28521       00:01 ngspice -b rc_tt_27_3.3_mode_swap.spice
+```
+
+## Assistant — 2026-11-25 17:12:37 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && timeout 590 sh -c 'until grep -q "rc_tt_27_3.3_mode_mon" batch.log; do sleep 15; done'; tail -4 batch.log; ps -eo pid,etime,args | grep "ngspice -b" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 17:22:27 UTC
+
+**Tool result:**
+
+```
+rc_sf_-40_3.0_step_open ok 135 s 
+rc_sf_-40_3.0_step_100p ok 134 s 
+c_tt_27_3.3_mode_swap ok 4 s 
+prev_tt_27_3.3_mode_swap ok 4 s 
+28521       09:56 ngspice -b rc_tt_27_3.3_mode_swap.spice
+29052       01:16 ngspice -b fs_ss_-40_3.3.spice
+```
+
+## Assistant — 2026-11-25 17:22:36 UTC
+
+**Tool call: `Bash`**
+
+```bash
+ps -eo pid,ppid,args | grep -E "runjobs|while kill|sim.py" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 17:22:37 UTC
+
+**Tool result:**
+
+```
+19305 19303 sh -c while kill -0 19281 2>/dev/null; do sleep 5; done; ../runjobs.sh . ../jobs.txt
+19325 19305 bash ../runjobs.sh . ../jobs.txt
+19330 19325 bash ../runjobs.sh . ../jobs.txt
+21486     1 /bin/bash -c source /root/.claude/shell-snapshots/snapshot-bash-1795613989982-5p0vjm.sh 2>/dev/null || true && \builtin export BUN_OPTIONS="--smol${BUN_OPTIONS:+ $BUN_OPTIONS}" && \builtin shopt -u extglob 2>/dev/null || true && { \builtin unalias -- 'which'; \builtin unset -f -- 'which'; } >/dev/null 2>&1 || true && { \builtin unalias -- 'unsetenv'; \builtin unset -f -- 'unsetenv'; } >/dev/null 2>&1 || true && { { \builtin test -x /root/.claude/rm-guard/ad4027c50867b2ef2492a56005ee5445/refuse/rm && \builtin test -x /bin/sh && \builtin export PATH=/root/.claude/rm-guard/ad4027c50867b2ef2492a56005ee5445/refuse"${PATH:+:$PATH}" && \builtin shopt -s checkhash; } 2>/dev/null || :; } && { { \builtin echo 0 >| /sys/fs/cgroup/pids/process_api/cc-shell/tasks; } 2>/dev/null || :; } && eval 'cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && nohup sh -c '"'"'while kill -0 19305 2>/dev/null; do sleep 5; done; echo "=== second pass $(date -u +%H:%M)"; ../runjobs.sh . ../jobs.txt'"'"' >> batch.log 2>&1 & echo ok' < /dev/null && pwd -P >| /tmp/claude-8235-cwd
+21487 21486 sh -c while kill -0 19305 2>/dev/null; do sleep 5; done; echo "=== second pass $(date -u +%H:%M)"; ../runjobs.sh . ../jobs.txt
+26899 19330 python3 -I /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slo
+… [102 more characters cut]
+```
+
+## Assistant — 2026-11-25 17:22:41 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && kill 21487 21486 2>/dev/null; kill 19330 19325 19305; sleep 1; sed -i '/^rc:tt:27:3.3:mode_/d' jobs.txt; sed -i 's/^# modes at tt 27 C (task 4)$/# modes at tt 27 C (task 4); full-RC: only swap was tried (its op needed > 25 min per solver attempt)/' jobs.txt; sed -i 's/^c:tt:27:3.3:mode_swap$/c:tt:27:3.3:mode_swap\nrc:tt:27:3.3:mode_swap/' jobs.txt; grep -n "mode" jobs.txt; cd _work && nohup sh -c 'while kill -0 26899 2>/dev/null; do sleep 5; done; echo "=== second pass $(date -u +%H:%M)"; ../runjobs.sh . ../jobs.txt' >> batch.log 2>&1 & sleep 1; ps -eo pid,args | grep -E "runjobs|while kill|sim.py" | grep -v grep | cut -c1-120
+```
+
+## Tool results / harness — 2026-11-25 17:22:43 UTC
+
+**Tool result:**
+
+```
+100:# modes at tt 27 C (task 4); full-RC: only swap was tried (its op needed > 25 min per solver attempt)
+101:c:tt:27:3.3:mode_swap
+102:rc:tt:27:3.3:mode_swap
+103:prev:tt:27:3.3:mode_swap
+104:c:tt:27:3.3:mode_mon
+105:prev:tt:27:3.3:mode_mon
+106:c:tt:27:3.3:mode_feed
+107:prev:tt:27:3.3:mode_feed
+108:c:tt:27:3.3:mode_ext
+109:prev:tt:27:3.3:mode_ext
+26899 python3 -I /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/sim.py /home/user/sg13cmos5l_cm_slot7/veri
+29152 sh -c while kill -0 26899 2>/dev/null; do sleep 5; done; echo "=== second pass $(date -u +%H:%M)"; ../runjobs.sh .
+```
+
+## Assistant — 2026-11-25 17:22:49 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && sed -i '/^rc:tt:27:3.3:mode_swap$/d; s/^# modes at tt 27 C (task 4); full-RC: only swap was tried (its op needed > 25 min per solver attempt)$/# modes at tt 27 C (task 4); full-RC swap was tried and stopped (op not converged after 13 min with KLU and 12 min with SPARSE)/' jobs.txt; ps -o etimes=,args= -p 28521; kill 26899; sleep 1; kill 28521; sleep 3; ps -eo pid,args | grep -E "ngspice -b|runjobs|sim.py" | grep -v grep | cut -c1-100; tail -3 _work/batch.log
+```
+
+## Tool results / harness — 2026-11-25 17:22:53 UTC
+
+**Tool result:**
+
+```
+618 ngspice -b rc_tt_27_3.3_mode_swap.spice
+29052 ngspice -b fs_ss_-40_3.3.spice
+29152 sh -c while kill -0 26899 2>/dev/null; do sleep 5; done; echo "=== second pass $(date -u +%H:%
+29175 bash ../runjobs.sh . ../jobs.txt
+29180 bash ../runjobs.sh . ../jobs.txt
+29181 python3 -I /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/sim.py /home/user/sg13
+29182 ngspice -b prev_tt_27_3.3_op.spice
+c_tt_27_3.3_mode_swap ok 4 s 
+prev_tt_27_3.3_mode_swap ok 4 s 
+=== second pass 17:22
+[This command modified 1 file you've previously read: verification/c2_gaps/slot_pex/_work/batch.log. Call Read before editing.]
+```
+
+## Assistant — 2026-11-25 17:22:57 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && sed -i 's/op not converged after 13 min with KLU and 12 min with SPARSE/no operating point after 796 s with KLU and 618 s with SPARSE, stopped by hand/' jobs.txt && grep -n "full-RC swap" jobs.txt
+```
+
+## Tool results / harness — 2026-11-25 17:22:57 UTC
+
+**Tool result:**
+
+```
+100:# modes at tt 27 C (task 4); full-RC swap was tried and stopped (no operating point after 796 s with KLU and 618 s with SPARSE, stopped by hand)
+```
+
+## Assistant — 2026-11-25 17:23:01 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && timeout 590 sh -c 'until grep -q "c_ss_-40_3.0_opi" batch.log; do sleep 15; done'; sed -n '/second pass/,$p' batch.log
+```
+
+## Tool results / harness — 2026-11-25 17:26:02 UTC
+
+**Tool result:**
+
+```
+=== second pass 17:22
+prev_tt_27_3.3_op ok 68 s (aid: SPARSE instead of KLU)
+prev_tt_27_3.3_opi ok 6 s 
+c_tt_27_3.3_opi ok 15 s 
+cc_tt_27_3.3_opi ok 15 s 
+rc_tt_27_3.3_opi ok 33 s 
+prev_ff_125_3.6_opi ok 4 s 
+c_ff_125_3.6_opi ok 4 s 
+prev_ss_-40_3.0_opi ok 6 s 
+c_ss_-40_3.0_opi ok 30 s (aid: SPARSE instead of KLU)
+```
+
+## Assistant — 2026-11-25 17:26:03 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/out && for f in *_opi.opi; do echo "$f $(tail -1 $f)"; done
+```
+
+## Tool results / harness — 2026-11-25 17:26:04 UTC
+
+**Tool result:**
+
+```
+c_ff_125_3.6_opi.opi  5.000000000e-01  4.971634055e-06  4.971634056e-06  8.265572448e-01  8.265571077e-01 
+c_ss_-40_3.0_opi.opi  5.000000000e-01  4.896784216e-06  4.896784217e-06  9.962912017e-01  9.962911069e-01 
+c_tt_27_3.3_opi.opi  5.000000000e-01  5.019828200e-06  5.019828201e-06  9.221034510e-01  9.221033569e-01 
+cc_tt_27_3.3_opi.opi  5.000000000e-01  5.019828200e-06  5.019828201e-06  9.221034510e-01  9.221033569e-01 
+prev_ff_125_3.6_opi.opi  5.000000000e-01  4.971242371e-06  4.971242372e-06  8.265404607e-01  8.265403237e-01 
+prev_ss_-40_3.0_opi.opi  5.000000000e-01  4.896619163e-06  4.896619163e-06  9.962855864e-01  9.962854916e-01 
+prev_tt_27_3.3_opi.opi  5.000000000e-01  5.019577468e-06  5.019577469e-06  9.220943352e-01  9.220942411e-01 
+rc_tt_27_3.3_opi.opi  5.000000000e-01  5.017739440e-06  5.017788251e-06  9.231160232e-01  9.233556608e-01
+```
+
+## Assistant — 2026-11-25 17:26:23 UTC
+
+**Tool call: `Bash`**
+
+```bash
+mkdir -p /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_pad_ref_rb && cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_pad_ref_rb && cat > pex.tcl <<EOF
+crashbackups stop
+drc off
+gds read /home/user/sg13cmos5l_cm_slot7/final/gds/slot_7.gds
+load pad_ref_rb
+select top cell
+flatten prb_flat
+load prb_flat
+cellname delete pad_ref_rb
+cellname rename prb_flat pad_ref_rb
+select top cell
+extract path .
+ext2spice lvs
+extract all
+ext2spice cthresh 0.01
+ext2spice -p . -o hier.spice
+ext2spice hierarchy off
+ext2spice -p . -o flat.spice
+quit -noprompt
+EOF
+magic -dnull -noconsole -rcfile /foss/pdks/ihp-sg13cmos5l/libs.tech/magic/ihp-sg13cmos5l.magicrc pex.tcl > magic.log 2>&1; python3 -I ../../pexfix.py c hier.spice flat.spice pad_ref_rb.pex.spice; grep -A2 '^.subckt' hier.spice; grep -c '^X' flat.spice; sed -n '/SRC_PORTS/,/^}/p' ../tier1/docs/slot7_hookup/tier1/run_tier1.py | head -3; sed -n '/^def wrapped/,/^def /p' ../tier1/docs/slot7_hookup/tier1/run_tier1.py
+```
+
+## Tool results / harness — 2026-11-25 17:26:24 UTC
+
+**Tool result:**
+
+```
+pad_ref_rb.pex.spice: 63 devices, 88 capacitors (hierarchical output had 77)
+.subckt prb_flat vref vcm en_3v3 en_3v3_b iref vssh vddh
+X0 rb_tree_n_0.ni en_3v3_b vssh vssh sg13_hv_nmos ad=0.34p pd=2.68u as=0.34p ps=2.68u w=1u l=0.45u
+X1 vcm vcm rb_tails_0.bt rb_tails_0.bt sg13_hv_pmos ad=1.9p pd=10.38u as=3.4p ps=20.68u w=10u l=1u
+63
+SRC_PORTS = {
+    "sg13cmos5l_IOPadSingle2Diff": "iovdd iovss vdd vss pad outp outn vcm vref iref en_3v3 en_3v3_b",
+    "sg13cmos5l_IOPadDiff2Single": "iovdd iovss vdd vss pad vinp vinn vref iref en_3v3 en_3v3_b",
+def wrapped(cell):
+    RS.RUNS = RUNS
+    flat = RUNS / RS.convert(cell)
+    txt = flat.read_text()
+    m = re.search(r"^\.SUBCKT\s+(\S+)\s+(.*)$", txt, re.M | re.I)
+    lay_ports = m.group(2).split()
+    txt = txt.replace(m.group(0), f".SUBCKT {cell}_lay {' '.join(lay_ports)}", 1)
+    src = SRC_PORTS[cell].split()
+    missing = [p for p in lay_ports if p not in src]
+    assert not missing, (cell, missing)
+    wrap = f"\n.subckt {cell} {' '.join(src)}\nXlay {' '.join(lay_ports)} {cell}_lay\n.ends {cell}\n"
+    flat.write_text(txt + wrap)
+    return flat.name
+
+
+def main():
+```
+
+## Assistant — 2026-11-25 17:26:38 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='extract.sh'; s=open(p).read()
+s=s.replace('''echo "netgen LVS"''','''# pad_ref_rb alone, cut from slot_7.gds, C-coupled (for the hybrid view 'hyb' of sim.py: the earlier deck with only
+# this block replaced by its magic extraction)
+d=$WORK/x_pad_ref_rb; rm -rf "$d"; mkdir -p "$d"
+{ head_tcl "$SLOT/final/gds/slot_7.gds" pad_ref_rb pad_ref_rb "$d"
+  echo "extract all"; echo "ext2spice cthresh 0.01"; echo "ext2spice -p $d -o $d/hier.spice"
+  echo "ext2spice hierarchy off"; echo "ext2spice -p $d -o $d/flat.spice"; echo "quit -noprompt"; } > "$d/pex.tcl"
+magic -dnull -noconsole -rcfile "$RCFILE" "$d/pex.tcl" > "$d/magic.log" 2>&1
+python3 -I "$HERE/pexfix.py" c "$d/hier.spice" "$d/flat.spice" "$d/pad_ref_rb.pex.spice"
+
+echo "netgen LVS"''')
+open(p,'w').write(s)
+p='prep.py'; s=open(p).read()
+s=s.replace('''if __name__ == '__main__':
+    NETS.mkdir(parents=True, exist_ok=True)''','''def prb():
+    """pad_ref_rb alone (magic C-coupled, cut from slot_7.gds), wrapped to the port order of run_tier1.SRC_PORTS"""
+    src = WORK / 'x_pad_ref_rb' / 'pad_ref_rb.pex.spice'
+    out = NETS / 'pad_ref_rb_c.spice'
+    subprocess.run([sys.executable, '-I', str(SCR / 'cace' / 'pex_for_sim.py'), str(src), str(out), '--tie', 'vssh',
+                    '1e12'], check=True)
+    txt = out.read_text()
+    m = re.search(r'^\\.subckt\\s+(\\S+)\\s+(.*)$', txt, re.M | re.I)
+    txt = txt.replace(m.group(0), f'.subckt pad_ref_rb_lay {m.group(2)}', 1)
+    src_ports = 'vddh vssh iref vcm vref en_3v3 en_3v3_b'
+    assert sorted(src_ports.split()) == sorted(m.group(2).split()), m.group(2)
+    out.write_text(SPDX + txt + f'\\n.subckt pad_ref_rb {src_ports}\\nXlay {m.group(2)} pad_ref_rb_lay\\n.ends pad_ref_rb\\n')
+    print(out)
+
+
+if __name__ == '__main__':
+    NETS.mkdir(parents=True, exist_ok=True)
+    prb()''')
+open(p,'w').write(s)
+p='sim.py'; s=open(p).read()
+s=s.replace("""        ps    as prev, with SPARSE""","""        hyb   as prev, with pad_ref_rb replaced by its magic C-coupled extraction (cut from slot_7.gds; prep.py)
+        ps    as prev, with SPARSE""")
+s=s.replace("""    if view in ('prev', 'ps'):""","""    if view in ('prev', 'ps', 'hyb'):""")
+s=s.replace("""        other = [str(rdir / T.wrapped(c)) for c in ('pad_ref_rb', 'bias_dist_pd')]""","""        other = [str(rdir / T.wrapped(c)) for c in ('pad_ref_rb', 'bias_dist_pd')]
+        if view == 'hyb':
+            other[0] = str(NETS / 'pad_ref_rb_c.spice')""")
+open(p+'.new','w').write(s)
+EOF
+mv sim.py.new sim.py; grep -n "hyb" sim.py; grep -n "pex_for_sim.*--tie" prep.py | head -2
+```
+
+## Tool results / harness — 2026-11-25 17:26:38 UTC
+
+**Tool result:**
+
+```
+19:        hyb   as prev, with pad_ref_rb replaced by its magic C-coupled extraction (cut from slot_7.gds; prep.py)
+80:    if view in ('prev', 'ps', 'hyb'):
+85:        if view == 'hyb':
+14:tughra_art and of unused pins) get 1 Tohm to vss_3v3 (scripts/cace/pex_for_sim.py --tie, as the pads); a wrapper
+22:ports in symbol order, capacitor-only nodes 1 Tohm to iovss (pex_for_sim.py --tie iovss 1e12), subckt named as the cell.
+```
+
+## Assistant — 2026-11-25 17:26:46 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && bash -c 'set -e; HERE=$PWD; SLOT=$(cd ../../.. && pwd); WORK=$PWD/_work; RCFILE=/foss/pdks/ihp-sg13cmos5l/libs.tech/magic/ihp-sg13cmos5l.magicrc; eval "$(sed -n "/^head_tcl()/,/^}/p" extract.sh)"; eval "$(sed -n "/^d=\$WORK\/x_pad_ref_rb/,/pad_ref_rb.pex.spice\"$/p" extract.sh)"' && python3 -I -c "
+import sys; sys.argv=['prep.py','_work']
+src=open('prep.py').read().split(\"if __name__ == '__main__':\")[0]
+exec(src); prb()" && tail -4 _work/nets/pad_ref_rb_c.spice && grep -c '^X' _work/nets/pad_ref_rb_c.spice && printf '# hybrid: the earlier deck with only pad_ref_rb as its magic extraction (cause of the vcm / vref shift)\nhyb:tt:27:3.3:op\nhyb:ff:125:3.6:op\nhyb:ss:-40:3.0:op\n' >> jobs.txt
+```
+
+## Tool results / harness — 2026-11-25 17:26:47 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_pad_ref_rb/pad_ref_rb.pex.spice: 63 devices, 88 capacitors (hierarchical output had 77)
+Traceback (most recent call last):
+  File "<string>", line 4, in <module>
+    exec(src); prb()
+    ~~~~^^^^^
+  File "<string>", line 29, in <module>
+NameError: name '__file__' is not defined. Did you mean: '__name__'?
+```
+
+## Assistant — 2026-11-25 17:26:50 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 -I -c "
+import sys; sys.argv=['prep.py','_work']; __file__='prep.py'
+src=open('prep.py').read().split(\"if __name__ == '__main__':\")[0]
+exec(src); prb()" && tail -4 _work/nets/pad_ref_rb_c.spice && grep -c '^X' _work/nets/pad_ref_rb_c.spice && printf '# hybrid: the earlier deck with only pad_ref_rb as its magic extraction (cause of the vcm / vref shift)\nhyb:tt:27:3.3:op\nhyb:ff:125:3.6:op\nhyb:ss:-40:3.0:op\n' >> jobs.txt; head -3 _work/x_pad_ref_rb/pad_ref_rb.pex.spice | cut -c1-120; sed -n 4p _work/x_pad_ref_rb/pad_ref_rb.pex.spice
+```
+
+## Tool results / harness — 2026-11-25 17:26:51 UTC
+
+**Tool result:**
+
+```
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_pad_ref_rb/pad_ref_rb.pex.spice -> /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/nets/pad_ref_rb_c.spice: 0 capacitor-only nodes tied to vssh through 1e12 Ohm
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/nets/pad_ref_rb_c.spice
+
+.subckt pad_ref_rb vddh vssh iref vcm vref en_3v3 en_3v3_b
+Xlay vref vcm en_3v3 en_3v3_b iref vssh vddh pad_ref_rb_lay
+.ends pad_ref_rb
+64
+* magic C-coupled extraction, flat output (ext2spice hierarchy off) with the port order of the hierarchical output; pexf
+* devices 63, capacitors 88
+.subckt pad_ref_rb_flat vref vcm en_3v3 en_3v3_b iref vssh vddh
+X0 rb_tree_n_0.ni en_3v3_b vssh vssh sg13_hv_nmos ad=0.34p pd=2.68u as=0.34p ps=2.68u w=1u l=0.45u
+```
+
+## Assistant — 2026-11-25 17:26:56 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && sed -n '/second pass/,$p' batch.log | tail -12
+```
+
+## Tool results / harness — 2026-11-25 17:26:56 UTC
+
+**Tool result:**
+
+```
+=== second pass 17:22
+prev_tt_27_3.3_op ok 68 s (aid: SPARSE instead of KLU)
+prev_tt_27_3.3_opi ok 6 s 
+c_tt_27_3.3_opi ok 15 s 
+cc_tt_27_3.3_opi ok 15 s 
+rc_tt_27_3.3_opi ok 33 s 
+prev_ff_125_3.6_opi ok 4 s 
+c_ff_125_3.6_opi ok 4 s 
+prev_ss_-40_3.0_opi ok 6 s 
+c_ss_-40_3.0_opi ok 30 s (aid: SPARSE instead of KLU)
+```
+
+## Assistant — 2026-11-25 17:26:59 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && sleep 1; timeout 580 sh -c 'n=$(grep -c . batch.log); until [ $(grep -c . batch.log) -ge $((n+4)) ]; do sleep 15; done'; sed -n '/second pass/,$p' batch.log | tail -6; ps -eo etime,args | grep "ngspice -b" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 17:36:40 UTC
+
+**Tool result:**
+
+```
+cc_tt_27_3.3_opi ok 15 s 
+rc_tt_27_3.3_opi ok 33 s 
+prev_ff_125_3.6_opi ok 4 s 
+c_ff_125_3.6_opi ok 4 s 
+prev_ss_-40_3.0_opi ok 6 s 
+c_ss_-40_3.0_opi ok 30 s (aid: SPARSE instead of KLU)
+      01:16 ngspice -b pu_ss_125_3.6.spice
+      00:52 ngspice -b c_ss_-40_3.0_dc.spice
+```
+
+## Assistant — 2026-11-25 17:36:45 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && grep -E "^slot_7,(c|rc)," csv/pex_nets.csv; grep -E "^sg13cmos5l_IOPad(Single2Diff|Diff2Single),(sak|c|rc),pad," csv/pex_nets.csv; head -12 csv/rnode_caps_sg13cmos5l_IOPadDiff2Single.csv | tail -6
+```
+
+## Tool results / harness — 2026-11-25 17:36:45 UTC
+
+**Tool result:**
+
+```
+slot_7,c,s7_an_0_outp,10.67,3.473,0,nan
+slot_7,c,s7_an_0_outn,11.49,3.879,0,nan
+slot_7,c,s7_an_1_vinp,26.05,2.364,0,nan
+slot_7,c,s7_an_1_vinn,23.34,3.395,0,nan
+slot_7,c,s7_an_0_vcm,51.96,19.59,0,nan
+slot_7,c,analog_bus3,39.52,28.44,0,nan
+slot_7,c,s7_an_0_iref,15.97,5.277,0,nan
+slot_7,c,s7_an_1_iref,17.63,8.768,0,nan
+slot_7,c,analog_bus0,38.97,26.64,0,nan
+slot_7,c,analog_bus1,36.59,15.46,0,nan
+slot_7,c,s7_an_1_en_3v3,76.85,31.97,0,nan
+slot_7,c,s7_an_1_en_3v3_b,75.51,19.1,0,nan
+slot_7,c,enable,53.97,33.77,0,nan
+slot_7,c,vdd_3v3,463.7,119.3,0,nan
+slot_7,c,vss_3v3,1029,1029,0,nan
+slot_7,c,pad_ref_rb_0.iref,18.57,3.738,0,nan
+slot_7,c,s7_ctrl_0.vcm_rb,109.3,91.07,0,nan
+slot_7,c,s7_ctrl_0.vref_rb,174.3,147,0,nan
+slot_7,c,bias_dist_pd_0.iin0,43.06,2.241,0,nan
+slot_7,c,bg_core_pd_0.bg_n4_0.g,87.38,26.95,0,nan
+slot_7,c,bg_core_pd_0.bg_pmir_pcas_c_0.vpg,84.81,0.2327,0,nan
+slot_7,c,bg_core_pd_0.bg_n4_0.vpc,89.67,2.787,0,nan
+slot_7,rc,s7_an_0_outp,10.67,3.473,11,72.32
+slot_7,rc,s7_an_0_outn,11.49,3.879,11,73.76
+slot_7,rc,s7_an_1_vinp,26.05,2.364,11,119.8
+slot_7,rc,s7_an_1_vinn,23.34,3.395,11,119.6
+slot_7,rc,s7_an_0_vcm,51.96,19.59,1,2.079
+slot_7,rc,analog_bus2,0,0,6,124.7
+slot_7,rc,s7_an_1_vref,0,0,0,nan
+slot_7,rc,s7_an_0_vref,0,0,1,21.38
+slot_7,rc,analog_bus3,39.52,28.44,4,72.38
+slot_7,rc,s7_an_0_iref,15.97,5.277,3,111.9
+slot_7,rc,s7_an_1_iref,17.63,8.768,3,117.5
+slot_7,rc,analog_bus0,38.97,26.64,7,94.93
+slot_7,rc,analog_bus1,36.59,15.46,7,94.16
+slot_7,rc,s7_an_1_en_3v3,76.85,31.97,36,15
+… [1151 more characters cut]
+```
+
+## Assistant — 2026-11-25 17:36:51 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && timeout 580 sh -c 'until grep -q "c_ss_-40_3.0_dc\|c_ss_-40_3.0_step_open" <(sed -n "/second pass/,\$p" batch.log); do sleep 15; done'; sed -n '/second pass/,$p' batch.log | tail -4; ps -eo etime,args | grep "ngspice -b" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 17:36:51 UTC
+
+**Tool result:**
+
+```
+sh: 1: Syntax error: "(" unexpected
+prev_ff_125_3.6_opi ok 4 s 
+c_ff_125_3.6_opi ok 4 s 
+prev_ss_-40_3.0_opi ok 6 s 
+c_ss_-40_3.0_opi ok 30 s (aid: SPARSE instead of KLU)
+      01:27 ngspice -b pu_ss_125_3.6.spice
+      01:03 ngspice -b c_ss_-40_3.0_dc.spice
+```
+
+## Assistant — 2026-11-25 17:36:54 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && timeout 580 bash -c 'until sed -n "/second pass/,\$p" batch.log | grep -q "c_ss_-40_3.0_dc"; do sleep 15; done'; sed -n '/second pass/,$p' batch.log | tail -4; ps -eo etime,args | grep "ngspice -b" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 17:44:09 UTC
+
+**Tool result:**
+
+```
+c_ff_125_3.6_opi ok 4 s 
+prev_ss_-40_3.0_opi ok 6 s 
+c_ss_-40_3.0_opi ok 30 s (aid: SPARSE instead of KLU)
+c_ss_-40_3.0_dc FAILED 1087 s 
+      00:31 ngspice -b off_ff_125_3.6.spice
+      00:08 ngspice -b c_ss_-40_3.0_step_open.spice
+```
+
+## Assistant — 2026-11-25 17:44:11 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/out && grep -E "=== attempt|doAnalyses|TIMEOUT|Error: Trans|wall time" c_ss_-40_3.0_dc.log
+```
+
+## Tool results / harness — 2026-11-25 17:44:11 UTC
+
+**Tool result:**
+
+```
+=== attempt 1: as written (.option gmin=1e-12 rshunt=1e12 klu)
+Error: Transient op failed, timestep too small
+doAnalyses: DC:  Timestep too small;  vin = -0.3: trouble with dparea-instance d.x2s.x43.d1
+--- wall time 23.2 s
+=== attempt 2: SPARSE instead of KLU (.option gmin=1e-12 rshunt=1e12)
+Error: Transient op failed, timestep too small
+doAnalyses: DC:  Timestep too small;  vin = -0.3: trouble with dparea-instance d.x2s.x43.d1
+--- wall time 313.3 s
+=== attempt 3: SPARSE, gminsteps=100 srcsteps=100 itl1=1000 itl6=1000 (.option gmin=1e-12 rshunt=1e12 gminsteps=100 srcsteps=100 itl1=1000 itl6=1000)
+Error: Transient op failed, timestep too small
+doAnalyses: DC:  Timestep too small;  vin = -0.3: trouble with dparea-instance d.x2s.x43.d1
+--- wall time 257.9 s
+=== attempt 4: SPARSE, more steps, sweep split at 0.5 V (.option gmin=1e-12 rshunt=1e12 gminsteps=100 srcsteps=100 itl1=1000 itl6=1000)
+Error: Transient op failed, timestep too small
+doAnalyses: DC:  Timestep too small;  vin = 0.5: trouble with dparea-instance d.x2s.x43.d1
+Error: Transient op failed, timestep too small
+doAnalyses: DC:  Timestep too small;  vin = 0.5: trouble with dparea-instance d.x2s.x43.d1
+--- wall time 492.8 s
+```
+
+## Assistant — 2026-11-25 17:44:22 UTC
+
+**Tool call: `Bash`**
+
+```bash
+ps -eo pid,ppid,args | grep -E "runjobs|while kill|sim.py" | grep -v grep | cut -c1-150
+```
+
+## Tool results / harness — 2026-11-25 17:44:22 UTC
+
+**Tool result:**
+
+```
+29152 29150 sh -c while kill -0 26899 2>/dev/null; do sleep 5; done; echo "=== second pass $(date -u +%H:%M)"; ../runjobs.sh . ../jobs.txt
+29175 29152 bash ../runjobs.sh . ../jobs.txt
+29180 29175 bash ../runjobs.sh . ../jobs.txt
+30373 29180 python3 -I /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/sim.py /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pe
+```
+
+## Assistant — 2026-11-25 17:44:26 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && kill 29180 29175 29152; sleep 1; for t in rc_ss_-40_3.0_ac rc_ss_-40_3.0_dc rc_ss_-40_3.0_step_open rc_ss_-40_3.0_step_100p; do cp failed_first/$t.log out/$t.log; done; nohup sh -c 'while kill -0 30373 2>/dev/null; do sleep 5; done; echo "=== third pass $(date -u +%H:%M)"; ../runjobs.sh . ../jobs.txt' >> batch.log 2>&1 & sleep 1; ps -eo pid,args | grep -E "runjobs|while kill|sim.py" | grep -v grep | cut -c1-100
+```
+
+## Tool results / harness — 2026-11-25 17:44:28 UTC
+
+**Tool result:**
+
+```
+30373 python3 -I /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/sim.py /home/user/sg13
+30444 sh -c while kill -0 30373 2>/dev/null; do sleep 5; done; echo "=== third pass $(date -u +%H:%M
+```
+
+## Assistant — 2026-11-25 17:44:33 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='jobs.txt'; s=open(p).read()
+hyb="# hybrid: the earlier deck with only pad_ref_rb as its magic extraction (cause of the vcm / vref shift)\nhyb:tt:27:3.3:op\nhyb:ff:125:3.6:op\nhyb:ss:-40:3.0:op\n"
+assert hyb in s
+s=s.replace(hyb,'')
+s=s.replace("# bias currents into the pads (iref lines)\n", hyb+"# bias currents into the pads (iref lines)\n")
+open(p,'w').write(s)
+EOF
+sed -n 25,45p jobs.txt; tail -12 jobs.txt
+```
+
+## Tool results / harness — 2026-11-25 17:44:33 UTC
+
+**Tool result:**
+
+```
+cc:tt:27:3.3:ac
+cc:tt:27:3.3:dc
+cc:tt:27:3.3:step:100p
+# solver check: c with SPARSE instead of KLU
+cs:tt:27:3.3:op
+cs:tt:27:3.3:ac
+# hybrid: the earlier deck with only pad_ref_rb as its magic extraction (cause of the vcm / vref shift)
+hyb:tt:27:3.3:op
+hyb:ff:125:3.6:op
+hyb:ss:-40:3.0:op
+# bias currents into the pads (iref lines)
+prev:tt:27:3.3:opi
+c:tt:27:3.3:opi
+cc:tt:27:3.3:opi
+rc:tt:27:3.3:opi
+prev:ff:125:3.6:opi
+c:ff:125:3.6:opi
+prev:ss:-40:3.0:opi
+c:ss:-40:3.0:opi
+c:ss:-40:3.0:op
+c:ss:-40:3.0:ac
+cc:sf:-40:3.0:ac
+cc:sf:-40:3.0:step:100p
+# enable transient from the disabled operating point
+c:tt:27:3.3:en
+prev:tt:27:3.3:en
+rc:tt:27:3.3:en
+c:ss:-40:3.0:en
+prev:ss:-40:3.0:en
+c:ff:125:3.6:en
+prev:ff:125:3.6:en
+# power-up from 0 V (supply ramp, uic): the extracted slot stalls (c tt 27 C: at 2.778 us after 60 min); prev only
+prev:tt:27:3.3:pu
+```
+
+## Assistant — 2026-11-25 17:44:37 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && cp failed_first/c_sf_-40_3.0_dc.log out/; ls out/*.log | wc -l
+```
+
+## Tool results / harness — 2026-11-25 17:44:37 UTC
+
+**Tool result:**
+
+```
+93
+```
+
+## Assistant — 2026-11-25 17:44:40 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && timeout 590 bash -c 'until grep -q "hyb_ss" batch.log; do sleep 10; done'; sed -n '/third pass/,$p' batch.log; tail -3 batch.log; for f in out/hyb_*_op.op out/prev_*_op.op out/c_*_op.op; do [ -f $f ] && echo "$f $(tail -1 $f | awk '{print $4, $5}')"; done
+```
+
+## Tool results / harness — 2026-11-25 17:47:01 UTC
+
+**Tool result:**
+
+```
+=== third pass 17:45
+hyb_tt_27_3.3_op ok 39 s (aid: SPARSE instead of KLU)
+hyb_ff_125_3.6_op ok 39 s (aid: SPARSE instead of KLU)
+hyb_ss_-40_3.0_op ok 13 s 
+hyb_tt_27_3.3_op ok 39 s (aid: SPARSE instead of KLU)
+hyb_ff_125_3.6_op ok 39 s (aid: SPARSE instead of KLU)
+hyb_ss_-40_3.0_op ok 13 s 
+out/hyb_ff_125_3.6_op.op 1.323333368e+00 5.726788112e-01
+out/hyb_ss_-40_3.0_op.op 1.119548804e+00 4.493250700e-01
+out/hyb_tt_27_3.3_op.op 1.261529316e+00 4.940517017e-01
+out/prev_ff_125_3.6_op.op 1.299076428e+00 5.709251770e-01
+out/prev_fs_125_3.6_op.op 1.365467097e+00 5.756450861e-01
+out/prev_sf_-40_3.0_op.op 1.137627796e+00 4.441282234e-01
+out/prev_tt_27_3.3_op.op 1.256598633e+00 4.922534971e-01
+out/c_ff_125_3.6_op.op 1.323362251e+00 5.726966016e-01
+out/c_fs_125_3.6_op.op 1.378644300e+00 5.774604556e-01
+out/c_sf_-40_3.0_op.op 1.141156251e+00 4.459374320e-01
+out/c_ss_-40_3.0_op.op 1.119548798e+00 4.493308931e-01
+out/c_tt_27_3.3_op.op 1.261531749e+00 4.940613183e-01
+```
+
+## Assistant — 2026-11-25 17:47:06 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && ls runs/prev_tt_27_3.3_op/; f=$(ls runs/prev_tt_27_3.3_op/pad_ref_rb* | head -1); head -30 $f | cut -c1-160
+```
+
+## Tool results / harness — 2026-11-25 17:47:06 UTC
+
+**Tool result:**
+
+```
+bias_dist_pd_flat.spice
+pad_ref_rb_flat.spice
+prev_tt_27_3.3_op.spice
+sg13cmos5l_IOPadDiff2Single_prev.spice
+sg13cmos5l_IOPadSingle2Diff_prev.spice
+.SUBCKT pad_ref_rb_lay en_3v3 en_3v3_b iref vcm vddh vref vssh
+X$1 vcm en_3v3_b vssh vssh sg13_hv_nmos l=0.45u w=1u as=0.34p ad=0.19p ps=2.68u pd=1.38u
+X$2 vssh en_3v3_b vref vssh sg13_hv_nmos l=0.45u w=1u as=0.19p ad=0.34p ps=1.38u pd=2.68u
+X$3 vssh en_3v3_b n_17 vssh sg13_hv_nmos l=0.45u w=1u as=0.34p ad=0.34p ps=2.68u pd=2.68u
+X$4 n_17 en_3v3 iref vssh sg13_hv_nmos l=0.45u w=1u as=0.34p ad=0.34p ps=2.68u pd=2.68u
+X$5 vssh vcm vssh vssh sg13_hv_nmos l=12u w=12u as=4.08p ad=4.08p ps=24.68u pd=24.68u
+X$6 vssh vref vssh vssh sg13_hv_nmos l=12u w=12u as=4.08p ad=4.08p ps=24.68u pd=24.68u
+X$7 vssh vcm vssh vssh sg13_hv_nmos l=12.66u w=38.48u as=13.0832p ad=13.0832p ps=78.32u pd=78.32u
+X$9 vssh vcm vssh vssh sg13_hv_nmos l=12.4u w=2.9u as=0.986p ad=0.986p ps=6.48u pd=6.48u
+X$10 vssh vcm vssh vssh sg13_hv_nmos l=3.25u w=16.36u as=5.5624p ad=5.5624p ps=34.08u pd=34.08u
+X$12 iref en_3v3_b n_17 vddh sg13_hv_pmos l=0.45u w=1u as=0.34p ad=0.34p ps=2.68u pd=2.68u
+X$13 vddh n_13 n_6 vddh sg13_hv_pmos l=6u w=2u as=0.68p ad=0.68p ps=4.68u pd=4.68u
+X$14 vddh n_13 n_13 vddh sg13_hv_pmos l=6u w=2u as=0.68p ad=0.68p ps=4.68u pd=4.68u
+X$15 vddh n_13 vddh vddh sg13_hv_pmos l=6u w=15u as=5.1p ad=5.1p ps=32.04u pd=32.04u
+X$18 vddh n_13 n_25 vddh sg13_hv_pmos l=6u w=5u as=1.7p ad=1.7p ps=10.68u pd=10.68u
+X$19 vddh n_13 n_24 vddh sg13_hv_pmos l=6u w=5u a
+… [1253 more characters cut]
+```
+
+## Assistant — 2026-11-25 17:47:12 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/replica_bias && ls; grep -rn "1\.26\|vcm" results.md | head -20
+```
+
+## Tool results / harness — 2026-11-25 17:47:12 UTC
+
+**Tool result:**
+
+```
+README.md
+analyze.py
+bias_dist_copy.py
+bias_dist_mc.py
+gds_cell_compare.py
+lvs_check.sh
+mc_collect.py
+results
+results.md
+run.sh
+run_cace.sh
+spdx_stamp.py
+15:**Result: the PEX view gives the schematic's numbers.** Largest difference of one run: 0.1 mV in Vcm (vcm_dc_params
+27:| vcm_dc_params (3.3 / 3.6 V, 5 corners, −40 / 27 / 125 °C) | Vcm | 1.031 .. 1.53 V | 1.242 .. 1.395 V |
+28:| vcm_dc_3v0_params (3.0 V, 5 corners, 3 T) | Vcm | 1.031 .. 1.262 V | 1.120 .. 1.193 V |
+43:| vcm_dc_params | 30 / 30 | Vcm [V] | 1.242 .. 1.395 | 1.242 .. 1.395 | 0.0001 V | 7e-05 V |
+44:| vcm_dc_params | 30 / 30 | Vref [V] | 0.4374 .. 0.5964 | 0.4374 .. 0.5964 | 0 V | 0 V |
+45:| vcm_dc_params | 30 / 30 | Ib [uA] | 18.99 .. 19.26 | 18.99 .. 19.26 | 0 uA | 0 uA |
+46:| vcm_dc_3v0_params | 15 / 15 | Vcm [V] | 1.12 .. 1.193 | 1.12 .. 1.193 | 0 V | 0 V |
+47:| vcm_dc_3v0_params | 15 / 15 | Vref [V] | 0.4363 .. 0.5941 | 0.4363 .. 0.5941 | 0 V | 0 V |
+48:| vcm_dc_3v0_params | 15 / 15 | Ib [uA] | 18.93 .. 19.16 | 18.93 .. 19.16 | 0 uA | 0 uA |
+65:the design repository (min / typ / max 1.247 / 1.261 / 1.274 V for Vcm, 0.481 / 0.493 / 0.502 V for Vref), so these
+184:- Dynamic behavior on the PEX view (enable time, supply rejection, the pads' kick-back on vcm / vref): no AC or
+186:- Full-RC extraction (wiring resistance) not done; `vcm_sel_params` not run on the PEX view.
+```
+
+## Assistant — 2026-11-25 17:47:14 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/replica_bias && sed -n 55,75p results.md
+```
+
+## Tool results / harness — 2026-11-25 17:47:14 UTC
+
+**Tool result:**
+
+```
+| vref_cold_params | 15 / 15 | Vcm [V] | 1.12 .. 1.352 | 1.12 .. 1.352 | 0.0001 V | 7e-05 V |
+| vref_cold_params | 15 / 15 | Vref [V] | 0.4363 .. 0.4553 | 0.4363 .. 0.4553 | 0 V | 0 V |
+| vref_cold_params | 15 / 15 | Ib [uA] | 18.93 .. 19.08 | 18.93 .. 19.08 | 0 uA | 0 uA |
+| pd_params | 4 / 4 | Vcm [V] | 1.897e-09 .. 3.051e-07 | 1.897e-09 .. 3.051e-07 | 2.5e-12 V | 7e-13 V |
+| pd_params | 4 / 4 | Vref [V] | 9.403e-08 .. 1.651e-05 | 9.401e-08 .. 1.651e-05 | 1.2e-10 V | 4e-11 V |
+| pd_params | 4 / 4 | Ib [uA] | 7.060e-05 .. 9.877e-03 | 7.059e-05 .. 9.877e-03 | 9.9e-08 uA | 2.8e-08 uA |
+
+## 2. pad_ref_rb: mismatch Monte Carlo (schematic, 100 runs)
+
+The per-run CSV is `results/mc/mm_params_runs.csv`; the CACE summary of this run is identical to the one committed in
+the design repository (min / typ / max 1.247 / 1.261 / 1.274 V for Vcm, 0.481 / 0.493 / 0.502 V for Vref), so these
+are the runs behind the committed summary (same seeds, 12345 + iteration). Limits of the group: Vcm 1.2 … 1.32 V,
+Vref 0.47 … 0.52 V: all 100 runs pass, and mean ± 3 sigma is inside both.
+
+#### pad_ref_rb: local-mismatch Monte Carlo (IHP sg13cmos5l simulation, schematic, tt_mismatch, 27 C, 3.3 V, 100 runs)
+
+| quantity | n | mean | sigma | min | max | mean - 3 sigma .. mean + 3 sigma |
+|---|---|---|---|---|---|---|
+| Vcm | 100 | 1260.86 mV | 5.415 mV | 1246.91 mV | 1273.95 mV | 1244.61 .. 1277.10 mV |
+| Vref | 100 | 493.05 mV | 3.788 mV | 481.36 mV | 501.81 mV | 481.69 .. 504.42 mV |
+| Ib | 100 | 19.06 uA
+… [55 more characters cut]
+```
+
+## Assistant — 2026-11-25 17:47:18 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && sed -n '/third pass/,$p' batch.log | tail -20; ps -eo etime,args | grep "ngspice -b" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 17:47:18 UTC
+
+**Tool result:**
+
+```
+=== third pass 17:45
+hyb_tt_27_3.3_op ok 39 s (aid: SPARSE instead of KLU)
+hyb_ff_125_3.6_op ok 39 s (aid: SPARSE instead of KLU)
+hyb_ss_-40_3.0_op ok 13 s 
+      01:38 ngspice -b mode_ff_125_3.6.spice
+      00:19 ngspice -b prev_ss_-40_3.0_op.spice
+```
+
+## Assistant — 2026-11-25 17:47:22 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && timeout 590 bash -c 'until grep -q "_en " batch.log; do sleep 10; done'; sed -n '/third pass/,$p' batch.log | tail -24
+```
+
+## Tool results / harness — 2026-11-25 17:57:13 UTC
+
+**Tool result:**
+
+```
+=== third pass 17:45
+hyb_tt_27_3.3_op ok 39 s (aid: SPARSE instead of KLU)
+hyb_ff_125_3.6_op ok 39 s (aid: SPARSE instead of KLU)
+hyb_ss_-40_3.0_op ok 13 s 
+prev_ss_-40_3.0_op ok 71 s (aid: SPARSE instead of KLU)
+c_tt_27_3.3_mode_mon ok 31 s (aid: SPARSE instead of KLU)
+prev_tt_27_3.3_mode_mon ok 4 s 
+c_tt_27_3.3_mode_feed ok 5 s 
+prev_tt_27_3.3_mode_feed ok 4 s 
+c_tt_27_3.3_mode_ext ok 28 s (aid: SPARSE instead of KLU)
+prev_tt_27_3.3_mode_ext ok 4 s 
+cc_ss_-40_3.0_ac ok 12 s 
+cc_ss_-40_3.0_step_100p ok 55 s 
+cc_ff_125_3.6_ac ok 32 s 
+cc_ff_125_3.6_step_100p ok 64 s 
+cc_fs_125_3.6_ac ok 30 s 
+cc_fs_125_3.6_step_100p ok 60 s
+```
+
+## Assistant — 2026-11-25 17:57:17 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 -I evaluate.py _work . | tail -1; cat csv/mode_summary.csv | tail -8; grep -E "^\| (ts1_rise_ns|ts0.1_rise_ns|f3dB_MHz \(1 kΩ ∥ 10 pF|I_iref|I_slot_off|I_ring_off|s2d_out)" tables.md
+```
+
+## Tool results / harness — 2026-11-25 17:57:19 UTC
+
+**Tool result:**
+
+```
+170 comparison rows, failed: ['c_tt_27_3.3_pu', 'c_ss_-40_3.0_step_open', 'rc_ss_-40_3.0_step_open', 'rc_ss_-40_3.0_step_100p']
+prev,tt 27 C 3.3 V,swap,0.980275
+prev,tt 27 C 3.3 V,mon,0.917715
+prev,tt 27 C 3.3 V,feed,0.040828
+prev,tt 27 C 3.3 V,ext,0.882617
+c,tt 27 C 3.3 V,swap,0.98614
+c,tt 27 C 3.3 V,mon,0.920176
+c,tt 27 C 3.3 V,feed,0.037423
+c,tt 27 C 3.3 V,ext,0.882664
+| s2d_out_cm_V | tt 27 °C | – | 1.2683 | 1.2733 | +4.93 mV | 1.2733 | 1.2650 | -3.31 mV |
+| s2d_out_cm_V | ss -40 °C | – | 1.1300 | 1.1348 | +4.80 mV | – | 1.1250 | -5.08 mV |
+| s2d_out_cm_V | ff 125 °C | – | 1.3067 | 1.3310 | +24.28 mV | – | 1.3254 | +18.70 mV |
+| s2d_out_cm_V | fs 125 °C | – | 1.3731 | 1.3862 | +13.17 mV | – | 1.3804 | +7.32 mV |
+| s2d_out_cm_V | sf -40 °C | – | 1.1529 | 1.1564 | +3.52 mV | – | 1.1464 | -6.48 mV |
+| I_slot_off_nA | tt 27 °C | – | 7.35 | 8.73 | +18.8 % | 8.73 | 13.01 | +77.1 % |
+| I_slot_off_nA | ss -40 °C | – | 6.37 | 7.34 | +15.3 % | – | 11.24 | +76.5 % |
+| I_slot_off_nA | ff 125 °C | – | 33.19 | 35.15 | +5.9 % | – | 39.98 | +20.4 % |
+| I_slot_off_nA | fs 125 °C | – | 17.66 | 19.54 | +10.6 % | – | 24.36 | +37.9 % |
+| I_slot_off_nA | sf -40 °C | – | 6.50 | 7.53 | +15.9 % | – | 11.43 | +75.9 % |
+| I_ring_off_nA | tt 27 °C | – | 6.38 | 6.38 | +0.0 % | 6.38 | 18.72 | +193.2 % |
+| I_ring_off_nA | ss -40 °C | – | 5.45 | 5.45 | +0.0 % | – | 16.66 | +205.5 % |
+| I_ring_off_nA | ff 125 °C | – | 50.73 | 50.73 | -0.0 % | – | 65.72 | +29.5 % |
+| I_ring_off_nA | fs 125 °C | – | 23.58 
+… [2942 more characters cut]
+```
+
+## Assistant — 2026-11-25 17:57:31 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='evaluate.py'; s=open(p).read()
+rep=[("""            d = rd(o / (tag(view, pt, 'op') + '.op'))
+            if d:""","""            d = rd(o / (tag(view, pt, 'op') + '.op'))
+            if d and ok(work, view, pt, 'op'):"""),
+("""            d = rd(o / (tag(view, pt, 'dc') + '.dc'))
+            if d:""","""            d = rd(o / (tag(view, pt, 'dc') + '.dc'))
+            if d and ok(work, view, pt, 'dc'):"""),
+("""                d = rd(o / (tag(view, pt, 'ac') + f'.ac_{ld}'))
+                if d:""","""                d = rd(o / (tag(view, pt, 'ac') + f'.ac_{ld}'))
+                if d and ok(work, view, pt, 'ac'):"""),
+("""                d = rd(o / (tag(view, pt, f'mode_{m}') + f'.mode_{m}'))
+                if d is not None:""","""                d = rd(o / (tag(view, pt, f'mode_{m}') + f'.mode_{m}'))
+                if d is not None and ok(work, view, pt, f'mode_{m}'):"""),
+("""            d = rd(o / (tag(view, pt, 'opi') + '.opi'))
+            if d is not None:""","""            d = rd(o / (tag(view, pt, 'opi') + '.opi'))
+            if d is not None and ok(work, view, pt, 'opi'):"""),
+]
+for a,b in rep:
+    assert a in s, a; s=s.replace(a,b)
+# failed list for op/dc/ac too
+s=s.replace("""            d = rd(o / (tag(view, pt, 'dc') + '.dc'))
+            if d and ok(work, view, pt, 'dc'):""","""            for an in ('op', 'dc', 'ac'):
+                if (o / (tag(view, pt, an) + '.log')).exists() and not ok(work, view, pt, an):
+                    fails.append(tag(view, pt, an))
+            d = rd(o / (tag(view, pt, 'dc') + '.dc'))
+            if d and ok(work, view, pt, 'dc'):""")
+s=s.replace("""                rows['dc'].append({**base, **r, 'complete': ok(work, view, pt, 'dc')})""","""                rows['dc'].append({**base, **r})""")
+open(p,'w').write(s)
+EOF
+python3 -I evaluate.py _work . | tail -1
+```
+
+## Tool results / harness — 2026-11-25 17:57:33 UTC
+
+**Tool result:**
+
+```
+170 comparison rows, failed: ['c_tt_27_3.3_pu', 'c_ss_-40_3.0_dc', 'c_ss_-40_3.0_step_open', 'c_sf_-40_3.0_dc', 'rc_ss_-40_3.0_dc', 'rc_ss_-40_3.0_ac', 'rc_ss_-40_3.0_step_open', 'rc_ss_-40_3.0_step_100p']
+```
+
+## Assistant — 2026-11-25 17:57:36 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && timeout 590 bash -c 'until grep -q "_en " batch.log; do sleep 10; done'; tail -4 batch.log; ps -eo etime,args | grep "ngspice -b" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 18:07:26 UTC
+
+**Tool result:**
+
+```
+cc_ff_125_3.6_ac ok 32 s 
+cc_ff_125_3.6_step_100p ok 64 s 
+cc_fs_125_3.6_ac ok 30 s 
+cc_fs_125_3.6_step_100p ok 60 s 
+      07:33 ngspice -b cc_sf_-40_3.0_ac.spice
+      00:56 ngspice -b mode_sf_-40_3.6.spice
+```
+
+## Assistant — 2026-11-25 18:07:30 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && grep -E "^\| (max_abs|in_lo|in_hi|gain|offset)" tables.md | grep -v "–.*–.*–.*–.*–"; grep -E "^\| (peak_dB|overshoot)" tables.md | awk -F'|' '$6!~/^ 0 $/ || $9!~/^ 0 $/' | head
+```
+
+## Tool results / harness — 2026-11-25 18:07:30 UTC
+
+**Tool result:**
+
+```
+| max_abs_err_0to1V_mV | tt 27 °C | 0.87 | 0.87 | 0.872 | +0.00 mV | 0.872 | 0.865 | -0.01 mV |
+| max_abs_err_0to1V_mV | ff 125 °C | 6.11 | 6.11 | 6.11 | -0.00 mV | – | 6.14 | +0.03 mV |
+| max_abs_err_0to1V_mV | fs 125 °C | 3.11 | 3.11 | 3.12 | +0.00 mV | – | 3.1 | -0.01 mV |
+| max_abs_err_0to1V_mV | sf -40 °C | 1.09 | 1.09 | – | – | – | 0.924 | -0.16 mV |
+| gain | tt 27 °C | 0.99875 | 0.99875 | 0.99875 | -1 ppm | 0.99875 | 0.99889 | +141 ppm |
+| gain | ff 125 °C | 0.99870 | 0.99870 | 0.99870 | -4 ppm | – | 0.99887 | +164 ppm |
+| gain | fs 125 °C | 0.99882 | 0.99882 | 0.99882 | -1 ppm | – | 0.99899 | +166 ppm |
+| gain | sf -40 °C | 0.99855 | 0.99855 | – | – | – | 0.99866 | +116 ppm |
+| offset_mV | tt 27 °C | 0.064 | 0.0638 | 0.0638 | -0.00 mV | 0.0638 | 0.119 | +0.06 mV |
+| offset_mV | ff 125 °C | 1.73 | 1.73 | 1.72 | -0.00 mV | – | 1.79 | +0.07 mV |
+| offset_mV | fs 125 °C | 1.07 | 1.07 | 1.07 | -0.00 mV | – | 1.12 | +0.05 mV |
+| offset_mV | sf -40 °C | 0.046 | 0.0455 | – | – | – | 0.144 | +0.10 mV |
+| in_lo_1mV_V | tt 27 °C | -0.1708 | -0.1708 | -0.1710 | -0.23 mV | -0.1710 | -0.1688 | +1.97 mV |
+| in_lo_1mV_V | ff 125 °C | 0.0964 | 0.0964 | 0.0965 | +0.08 mV | – | 0.0979 | +1.57 mV |
+| in_lo_1mV_V | fs 125 °C | 0.0285 | 0.0285 | 0.0285 | +0.01 mV | – | 0.0304 | +1.89 mV |
+| in_lo_1mV_V | sf -40 °C | -0.2469 | -0.2469 | – | – | – | -0.2400 | +6.93 mV |
+| in_hi_1mV_V | tt 27 °C | 1.2812 | 1.2811 | 1.2874 | +6.25 mV | 1.2874 | 1.2778 | -3.34 mV |
+| in_hi_1mV_V | ff 125 °C | 1
+… [1115 more characters cut]
+```
+
+## Assistant — 2026-11-25 18:07:36 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && timeout 590 bash -c 'until [ $(grep -c "_en " batch.log) -ge 2 ]; do sleep 10; done'; tail -4 batch.log; ps -eo etime,args | grep "ngspice -b" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 18:14:06 UTC
+
+**Tool result:**
+
+```
+cc_sf_-40_3.0_ac FAILED 1115 s 
+cc_sf_-40_3.0_step_100p ok 58 s 
+c_tt_27_3.3_en ok 27 s 
+prev_tt_27_3.3_en FAILED 22 s 
+      00:08 ngspice -b off_fs_125_3.6.spice
+      00:04 ngspice -b rc_tt_27_3.3_en.spice
+```
+
+## Assistant — 2026-11-25 18:14:09 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/out && grep -E "Error|doAnalyses|aborted|gmin|source stepping" prev_tt_27_3.3_en.log | sort | uniq -c | head; grep -E "=== attempt|Error|doAnalyses" cc_sf_-40_3.0_ac.log | head
+```
+
+## Tool results / harness — 2026-11-25 18:14:09 UTC
+
+**Tool result:**
+
+```
+1 === attempt 1: as written (.option gmin=1e-12 rshunt=1e12 klu method=gear cshunt=1e-15)
+      1 Error: Finding the operating point for transient simulation failed 
+      1 Error: The operating point could not be simulated successfully.
+      1 Error: Transient op failed, timestep too small
+      1 Error: can't interpolate b0
+      1 Error: can't interpolate b1
+      1 Error: can't interpolate b2
+      1 Error: can't interpolate b3
+      1 Error: can't interpolate enable
+      1 Error: can't interpolate outn
+=== attempt 1: as written (.option gmin=1e-12 rshunt=1e12 klu)
+Error: Transient op failed, timestep too small
+Error: The operating point could not be simulated successfully.
+doAnalyses: AC:  Timestep too small; frequency = 0: trouble with dparea-instance d.x2s.x43.d1
+Error: RHS "db(v(padout))" invalid
+Error: RHS "180/pi*cph(v(padout))" invalid
+Error: RHS "db(v(outp) - v(outn))" invalid
+Error: RHS "db(v(vinp) - v(vinn))" invalid
+Error: no such vector g_db
+Error: Transient op failed, timestep too small
+```
+
+## Assistant — 2026-11-25 18:14:15 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && sed -i "s/    if os.environ.get('SIM_NO_AIDS') or ana in ('pu', 'en'):\n        aids = aids\[:1\]  # long transients: one attempt only//" sim.py && python3 - <<'EOF'
+p='/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/sim.py'; s=open(p).read()
+old="""    if os.environ.get('SIM_NO_AIDS') or ana in ('pu', 'en'):
+        aids = aids[:1]  # long transients: one attempt only"""
+assert old in s
+s=s.replace(old,"""    if os.environ.get('SIM_NO_AIDS') or ana == 'pu':
+        aids = aids[:1]  # power-up from 0 V: one attempt only (long)""")
+open(p+'.new','w').write(s)
+EOF
+mv sim.py.new sim.py; mv _work/out/prev_tt_27_3.3_en.log _work/failed_first/; grep -n "aids\[:1\]" sim.py
+```
+
+## Tool results / harness — 2026-11-25 18:14:16 UTC
+
+**Tool result:**
+
+```
+213:        aids = aids[:1]  # power-up from 0 V: one attempt only (long)
+[This command modified 1 file you've previously read: verification/c2_gaps/slot_pex/sim.py. Call Read before editing.]
+```
+
+## Assistant — 2026-11-25 18:14:19 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && P=$(ps -eo pid,args | grep "while kill -0 30373" | grep -v grep | awk '{print $1}'); echo $P; nohup sh -c "while kill -0 $P 2>/dev/null; do sleep 5; done; echo \"=== fourth pass \$(date -u +%H:%M)\"; ../runjobs.sh . ../jobs.txt" >> batch.log 2>&1 & echo started
+```
+
+## Tool results / harness — 2026-11-25 18:14:20 UTC
+
+**Tool result:**
+
+```
+30444
+started
+```
+
+## Assistant — 2026-11-25 18:14:21 UTC
+
+Now let me write results.md while the remaining transients run.
+
+## Assistant — 2026-11-25 18:14:22 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 -I evaluate.py _work . | tail -1; cat csv/en_summary.csv 2>/dev/null; grep -E "^\| (I_slot_uA|I_ring_uA|vcm_V|vref_V)" tables.md | head -3; grep -c . tables.md
+```
+
+## Tool results / harness — 2026-11-25 18:14:24 UTC
+
+**Tool result:**
+
+```
+176 comparison rows, failed: ['c_tt_27_3.3_pu', 'c_ss_-40_3.0_dc', 'c_ss_-40_3.0_step_open', 'c_sf_-40_3.0_dc', 'cc_sf_-40_3.0_ac', 'rc_ss_-40_3.0_dc', 'rc_ss_-40_3.0_ac', 'rc_ss_-40_3.0_step_open', 'rc_ss_-40_3.0_step_100p']
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# IHP sg13cmos5l simulation, slot 7 default mode, round trip pad_s2d → pad_d2s; evaluate.py; from the disabled op, enable at 2 us; times after enable, values at 19.9 us
+view,point,vcm_39us_V,t_vcm98_us_en,vref_39us_V,t_vref98_us_en,padout_39us_V,t_out1mV_us_en,I_slot_39us_uA,I_ring_39us_uA,I_ring_peak_enable_uA,I_ring_before_enable_nA
+c,tt 27 C 3.3 V,1.26153,1.68288,0.494061,1.74407,1.26753,2.2063,49.6277,420.037,967.184,6.3827
+| vcm_V | tt 27 °C | 1.2566 | 1.2566 | 1.2615 | +4.93 mV | 1.2615 | 1.2616 | +5.03 mV |
+| vcm_V | ss -40 °C | 1.1148 | 1.1147 | 1.1195 | +4.81 mV | – | 1.1194 | +4.64 mV |
+| vcm_V | ff 125 °C | 1.2991 | 1.2991 | 1.3234 | +24.29 mV | – | 1.3239 | +24.85 mV |
+185
+```
+
+## Assistant — 2026-11-25 18:14:29 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && sed -i "s/_39us_/_end_/g; s/q.replace('39us', '19.9us' if ld == 'en' else '39us')/q/" evaluate.py && sed -i "s/currents at 39.9 us;/currents at the end (pu 39.9 us, en 19.9 us: *_end_*);/" evaluate.py && grep -n "_end_\|39.9" evaluate.py | head; python3 -I evaluate.py _work . | tail -1
+```
+
+## Tool results / harness — 2026-11-25 18:14:30 UTC
+
+**Tool result:**
+
+```
+20:  pu    enable at 20 us: t_vcm98 / t_vref98 = last time v(vcm_s2d) / v(vref_s2d) cross 98 % of their value at 39.9 us,
+21:        minus 20 us; t_out1mV = last time |pad out - its value at 39.9 us| > 1 mV, minus 20 us; currents at the end (pu 39.9 us, en 19.9 us: *_end_*);
+143:def m_pu(d, ten=20e-6, tend=39.9e-6):
+149:        r[f'{k}_end_V'] = fin
+152:    r['padout_end_V'] = o[i]
+155:    r['I_slot_end_uA'] = -d['i(vslot)'][i] * 1e6
+156:    r['I_ring_end_uA'] = ir[i]
+344:    Q += [('pu', q, None) for q in ('t_vcm98_us', 't_vref98_us', 't_out1mV_us', 'I_ring_end_uA',
+346:    Q += [('en', q, 'en') for q in ('t_vcm98_us_en', 't_vref98_us_en', 't_out1mV_us_en', 'I_ring_end_uA',
+176 comparison rows, failed: ['c_tt_27_3.3_pu', 'c_ss_-40_3.0_dc', 'c_ss_-40_3.0_step_open', 'c_sf_-40_3.0_dc', 'cc_sf_-40_3.0_ac', 'rc_ss_-40_3.0_dc', 'rc_ss_-40_3.0_ac', 'rc_ss_-40_3.0_step_open', 'rc_ss_-40_3.0_step_100p']
+[This command modified 1 file you've previously read: verification/c2_gaps/slot_pex/evaluate.py. Call Read before editing.]
+```
+
+## Assistant — 2026-11-25 18:14:35 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='evaluate.py'; s=open(p).read()
+s=s.replace("""        minus 20 us; t_out1mV = last time |pad out - its value at 39.9 us| > 1 mV, minus 20 us; currents at the end (pu 39.9 us, en 19.9 us: *_end_*);""",
+"""        minus 20 us; t_out1mV = last time |pad out - its value at 39.9 us| > 1 mV, minus 20 us; currents at the
+        end (*_end_*: pu 39.9 us, en 19.9 us);""")
+open(p,'w').write(s)
+EOF
+awk 'length > 120 {print FILENAME": "FNR": "length}' *.py *.sh | head
+```
+
+## Tool results / harness — 2026-11-25 18:14:35 UTC
+
+**Tool result:**
+
+```
+pexfix.py: 140: 139
+pexfix.py: 156: 123
+pexstats.py: 113: 124
+pexstats.py: 138: 124
+prep.py: 37: 122
+prep.py: 41: 123
+prep.py: 90: 123
+prep.py: 147: 122
+sim.py: 36: 135
+sim.py: 39: 130
+```
+
+## Assistant — 2026-11-25 18:14:42 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && grep -A14 "IOPadSingle2Diff, extraction c$" lvs_summary.txt; grep -A16 "IOPadDiff2Single, extraction rc" lvs_summary.txt | tail -6; awk -F, 'NR>4 && $6+0>0 {n++; s+=$6; a+=$3} END {print n, s, a}' csv/rnode_caps_slot_7.csv
+```
+
+## Tool results / harness — 2026-11-25 18:14:42 UTC
+
+**Tool result:**
+
+```
+== sg13cmos5l_IOPadSingle2Diff, extraction c
+Subcircuit summary:
+Circuit 1: sg13cmos5l_IOPadSingle2Diff     |Circuit 2: sg13cmos5l_IOPadSingle2Diff     
+-------------------------------------------|-------------------------------------------
+sg13_hv_pmos (120->42)                     |sg13_hv_pmos (53->42)                      
+rhigh (26->7)                              |rhigh (26->7)                              
+sg13_hv_nmos (73->23)                      |sg13_hv_nmos (34->23)                      
+rppd (2)                                   |rppd (2)                                   
+dpantenna (2->1)                           |dpantenna (2->1)                           
+dantenna (2->1)                            |dantenna (2->1)                            
+Number of devices: 76                      |Number of devices: 76                      
+Number of nets: 37                         |Number of nets: 37                         
+Final result: Circuits match uniquely.
+Netlists match with 7 symmetries with property errors.
+property errors: 118
+rhigh (18->5)                              |rhigh (18->5)                              
+Number of devices: 76                      |Number of devices: 76                      
+Number of nets: 36                         |Number of nets: 36                         
+Final result: Circuits match uniquely.
+Netlists match with 7 symmetries with property errors.
+property errors: 118
+146 800.497 1900.88
+```
+
+## Assistant — 2026-11-25 18:14:45 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && grep -B1 -A2 "^Property" x_sg13cmos5l_IOPadSingle2Diff/lvs_c/lvs.out | grep -v "^--" | awk '{print $1,$2,$3}' | sort | uniq -c | sort -rn | head -8; grep -i "property" ../../d2s_pex/lvs_summary.txt
+```
+
+## Tool results / harness — 2026-11-25 18:14:45 UTC
+
+**Tool result:**
+
+```
+117 Property mm_ok in
+      3 sg13_hv_pmos:0 vs. bias_tree_noab_pd:t/sg13_hv_pmos:MDBP:
+      3 sg13_hv_nmos:12 vs. s2d_mpdda_pd:a/sg13_hv_nmos:MDSK[3]:
+      2 sg13_hv_pmos:86 vs. bias_tree_noab_pd:t/sg13_hv_pmos:PBNC:
+      2 sg13_hv_pmos:84 vs. s2d_mpdda_pd:a/s2d_mpdda:s/unit_r2:A2/sg13_hv_pmos:Ta:
+      2 sg13_hv_pmos:77 vs. s2d_mpdda_pd:a/s2d_mpdda:s/unit_r2:A1/sg13_hv_pmos:Ta:
+      2 sg13_hv_pmos:61 vs. s2d_mpdda_pd:a/s2d_mpdda:s/unit_r2:F1/sg13_hv_pmos:Tb:
+      2 sg13_hv_pmos:58 vs. s2d_mpdda_pd:a/s2d_mpdda:s/unit_r2:M2/sg13_hv_pmos:Tb:
+Property errors were found.
+property errors other than mm_ok: 0 (117 lines, all 'Property mm_ok in circuit2 has no matching property in circuit1')
+```
+
+## Assistant — 2026-11-25 18:14:49 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && grep -E "^\| (f3dB_MHz|ts1_fall|G_1k)" tables.md | head -40; grep -h "aid" _work/batch.log | grep -v "^===" | sort | uniq | head -30
+```
+
+## Tool results / harness — 2026-11-25 18:14:49 UTC
+
+**Tool result:**
+
+```
+| f3dB_MHz (unloaded) | tt 27 °C | 1.356 | 1.356 | 1.322 | -2.5 % | 1.304 | 1.303 | -3.9 % |
+| f3dB_MHz (unloaded) | ss -40 °C | 1.332 | 1.332 | 1.294 | -2.9 % | 1.276 | – | – |
+| f3dB_MHz (unloaded) | ff 125 °C | 1.466 | 1.466 | 1.429 | -2.5 % | 1.412 | 1.410 | -3.8 % |
+| f3dB_MHz (unloaded) | fs 125 °C | 1.519 | 1.519 | 1.481 | -2.5 % | 1.461 | 1.459 | -4.0 % |
+| f3dB_MHz (unloaded) | sf -40 °C | 1.283 | 1.283 | 1.249 | -2.6 % | – | 1.231 | -4.0 % |
+| G_1k_dB (unloaded) | tt 27 °C | -0.0108 | -0.0108 | -0.0108 | -0.000 | -0.0108 | -0.00957 | +0.001 |
+| G_1k_dB (unloaded) | ss -40 °C | -0.0132 | -0.0132 | -0.0132 | -0.000 | -0.0132 | – | – |
+| G_1k_dB (unloaded) | ff 125 °C | -0.0129 | -0.0129 | -0.013 | -0.000 | -0.013 | -0.0115 | +0.001 |
+| G_1k_dB (unloaded) | fs 125 °C | -0.0115 | -0.0115 | -0.0115 | -0.000 | -0.0115 | -0.0101 | +0.001 |
+| G_1k_dB (unloaded) | sf -40 °C | -0.0128 | -0.0128 | -0.0128 | -0.000 | – | -0.0117 | +0.001 |
+| f3dB_MHz (1 kΩ ∥ 10 pF) | tt 27 °C | 1.122 | 1.122 | 1.100 | -2.0 % | 1.082 | 1.081 | -3.7 % |
+| f3dB_MHz (1 kΩ ∥ 10 pF) | ss -40 °C | 1.117 | 1.117 | 1.092 | -2.3 % | 1.073 | – | – |
+| f3dB_MHz (1 kΩ ∥ 10 pF) | ff 125 °C | 1.166 | 1.166 | 1.144 | -1.9 % | 1.125 | 1.123 | -3.6 % |
+| f3dB_MHz (1 kΩ ∥ 10 pF) | fs 125 °C | 1.210 | 1.210 | 1.189 | -1.8 % | 1.166 | 1.165 | -3.8 % |
+| f3dB_MHz (1 kΩ ∥ 10 pF) | sf -40 °C | 1.082 | 1.082 | 1.059 | -2.1 % | – | 1.040 | -3.8 % |
+| G_1k_dB (1 kΩ ∥ 10 pF) | tt 27 °C | -0.0117 | -0.0117 | -0.0117 | -0.0
+… [2849 more characters cut]
+```
+
+## Assistant — 2026-11-25 18:14:53 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && timeout 590 bash -c 'until [ $(grep -c "_en " batch.log) -ge 7 ]; do sleep 10; done'; grep "_en \|_pu " batch.log; ps -eo etime,args | grep "ngspice -b" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 18:18:04 UTC
+
+**Tool result:**
+
+```
+c_tt_27_3.3_pu FAILED 3615 s
+c_tt_27_3.3_en ok 27 s 
+prev_tt_27_3.3_en FAILED 22 s 
+rc_tt_27_3.3_en ok 72 s 
+c_ss_-40_3.0_en ok 31 s 
+prev_ss_-40_3.0_en ok 57 s (aid: SPARSE instead of KLU)
+c_ff_125_3.6_en ok 30 s 
+prev_ff_125_3.6_en ok 50 s (aid: SPARSE instead of KLU)
+      01:46 ngspice -b mode_fs_125_3.6.spice
+      00:02 ngspice -b prev_tt_27_3.3_pu.spice
+```
+
+## Assistant — 2026-11-25 18:18:08 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 -I evaluate.py _work . | tail -1; cat csv/en_summary.csv | cut -d, -f1-12; grep -E "^\| (t_|I_ring_end|I_ring_peak|I_ring_before)" tables.md
+```
+
+## Tool results / harness — 2026-11-25 18:18:10 UTC
+
+**Tool result:**
+
+```
+188 comparison rows, failed: ['c_tt_27_3.3_pu', 'c_ss_-40_3.0_dc', 'c_ss_-40_3.0_step_open', 'c_sf_-40_3.0_dc', 'cc_sf_-40_3.0_ac', 'rc_ss_-40_3.0_dc', 'rc_ss_-40_3.0_ac', 'rc_ss_-40_3.0_step_open', 'rc_ss_-40_3.0_step_100p']
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# IHP sg13cmos5l simulation, slot 7 default mode, round trip pad_s2d → pad_d2s; evaluate.py; from the disabled op, enable at 2 us; times after enable, values at 19.9 us
+view,point,vcm_end_V,t_vcm98_us_en,vref_end_V,t_vref98_us_en,padout_end_V,t_out1mV_us_en,I_slot_end_uA,I_ring_end_uA,I_ring_peak_enable_uA,I_ring_before_enable_nA
+prev,ss -40 C 3.0 V,1.11474,1.3414,0.447477,1.47867,1.16723,1.96477,48.3889,398.356,931.826,5.45321
+prev,ff 125 C 3.6 V,1.29908,1.96914,0.570925,1.92953,1.22997,2.22738,49.4196,423.157,942.448,50.7349
+c,tt 27 C 3.3 V,1.26153,1.68288,0.494061,1.74407,1.26753,2.2063,49.6277,420.037,967.184,6.3827
+c,ss -40 C 3.0 V,1.11955,1.60319,0.449331,2.08034,1.17018,2.58987,48.2608,398.389,734.11,5.45322
+c,ff 125 C 3.6 V,1.32336,2.05929,0.572697,2.04863,1.25249,2.31164,49.3114,423.315,921.811,50.7344
+rc,tt 27 C 3.3 V,1.26155,1.75156,0.494851,1.7274,1.26681,2.01978,49.6117,419.951,1032.69,18.6658
+| t_vcm98_us_en | tt 27 °C | – | – | 1.68 | – | – | 1.75 | – |
+| t_vcm98_us_en | ss -40 °C | – | 1.34 | 1.6 | +19.5 % | – | – | – |
+| t_vcm98_us_en | ff 125 °C | – | 1.97 | 2.06 | +4.6 % | – | – | – |
+| t_vref98_us_en | tt 27 °C | – | – | 1.74 | – | – | 1.73 | – |
+| t_
+… [1027 more characters cut]
+```
+
+## Assistant — 2026-11-25 18:18:15 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && grep -c "Reference value" out/prev_tt_27_3.3_pu.log 2>/dev/null; ps -eo etime,args | grep "ngspice -b prev" | grep -v grep; ls runs/prev_tt_27_3.3_pu/
+```
+
+## Tool results / harness — 2026-11-25 18:18:15 UTC
+
+**Tool result:**
+
+```
+26
+bias_dist_pd_flat.spice
+pad_ref_rb_flat.spice
+prev_tt_27_3.3_pu.spice
+sg13cmos5l_IOPadDiff2Single_prev.spice
+sg13cmos5l_IOPadSingle2Diff_prev.spice
+```
+
+## Assistant — 2026-11-25 18:18:17 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && tail -5 batch.log; grep -E "=== attempt|wall|Error|abort" out/prev_tt_27_3.3_pu.log | head; ps -eo etime,args | grep "ngspice -b" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 18:18:17 UTC
+
+**Tool result:**
+
+```
+prev_ss_-40_3.0_en ok 57 s (aid: SPARSE instead of KLU)
+c_ff_125_3.6_en ok 30 s 
+prev_ff_125_3.6_en ok 50 s (aid: SPARSE instead of KLU)
+prev_tt_27_3.3_pu FAILED 10 s 
+=== fourth pass 18:18
+=== attempt 1: as written (.option gmin=1e-12 rshunt=1e12 klu method=gear cshunt=1e-15)
+tran simulation(s) aborted
+Error: incomplete or empty netlist
+--- wall time 9.7 s
+      02:00 ngspice -b mode_fs_125_3.6.spice
+      00:02 ngspice -b prev_tt_27_3.3_en.spice
+```
+
+## Assistant — 2026-11-25 18:18:20 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && grep -vE "Reference value|^$|OSDI|vmax" out/prev_tt_27_3.3_pu.log | head -30
+```
+
+## Tool results / harness — 2026-11-25 18:18:20 UTC
+
+**Tool result:**
+
+```
+=== attempt 1: as written (.option gmin=1e-12 rshunt=1e12 klu method=gear cshunt=1e-15)
+Note: No compatibility mode selected!
+Circuit: * slot-7 round trip, slot view prev, pu open, tt 27 c, 3.3 v (verification/c2_gaps/slot_pex/sim.py)
+Option cshunt: 490 capacitors added with 1e-15 F each
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+Using KLU as Direct Linear Solver
+Operating point simulation skipped by 'uic',
+  now using transient initial conditions.
+No. of Data Rows : 316
+SLOTDONE
+--- stderr ---
+doAnalyses: TRAN:  Timestep too small; time = 2.78062e-06, timestep = 1.25e-20: trouble with node "xs.en_b"
+tran simulation(s) aborted
+Error: incomplete or empty netlist
+       or no ".plot", ".print", or ".fourier" lines in batch mode;
+no simulations run!
+--- wall time 9.7 s
+FINAL: FAILED
+```
+
+## Assistant — 2026-11-25 18:18:25 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && timeout 300 bash -c 'while ps -eo args | grep -q "[r]unjobs.sh"; do sleep 5; done'; tail -3 batch.log; cd .. && python3 -I evaluate.py _work . | tail -1; grep -E "^\| (t_|I_ring_peak_enable|I_ring_before)" tables.md | grep "tt 27"
+```
+
+## Tool results / harness — 2026-11-25 18:19:22 UTC
+
+**Tool result:**
+
+```
+prev_tt_27_3.3_pu FAILED 10 s 
+=== fourth pass 18:18
+prev_tt_27_3.3_en ok 62 s (aid: SPARSE instead of KLU)
+188 comparison rows, failed: ['prev_tt_27_3.3_pu', 'c_tt_27_3.3_pu', 'c_ss_-40_3.0_dc', 'c_ss_-40_3.0_step_open', 'c_sf_-40_3.0_dc', 'cc_sf_-40_3.0_ac', 'rc_ss_-40_3.0_dc', 'rc_ss_-40_3.0_ac', 'rc_ss_-40_3.0_step_open', 'rc_ss_-40_3.0_step_100p']
+| t_vcm98_us_en | tt 27 °C | – | 1.59 | 1.68 | +5.7 % | – | 1.75 | +10.0 % |
+| t_vref98_us_en | tt 27 °C | – | 1.57 | 1.74 | +10.9 % | – | 1.73 | +9.9 % |
+| t_out1mV_us_en | tt 27 °C | – | 1.86 | 2.21 | +18.3 % | – | 2.02 | +8.3 % |
+| I_ring_peak_enable_uA | tt 27 °C | – | 1031.67 | 967.18 | -6.3 % | – | 1032.69 | +0.1 % |
+| I_ring_before_enable_nA | tt 27 °C | – | 6.38 | 6.38 | +0.0 % | – | 18.67 | +192.4 % |
+```
+
+## Assistant — 2026-11-25 18:19:27 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && rm -f plots/powerup.png && ls -la plots csv; grep -E "=== attempt|doAnalyses" _work/out/c_ss_-40_3.0_step_open.log _work/out/cc_sf_-40_3.0_ac.log | head
+```
+
+## Tool results / harness — 2026-11-25 18:19:27 UTC
+
+**Tool result:**
+
+```
+csv:
+total 84
+drwxr-xr-x 2 root root  4096 Nov 25 18:14 .
+drwxr-xr-x 5 root root  4096 Nov 25 18:14 ..
+-rw-r--r-- 1 root root  3238 Nov 25 18:19 ac_summary.csv
+-rw-r--r-- 1 root root 13871 Nov 25 18:19 compare.csv
+-rw-r--r-- 1 root root  1078 Nov 25 18:19 dc_summary.csv
+-rw-r--r-- 1 root root  1105 Nov 25 18:19 en_summary.csv
+-rw-r--r-- 1 root root   497 Nov 25 18:19 mode_summary.csv
+-rw-r--r-- 1 root root  1722 Nov 25 18:19 op_summary.csv
+-rw-r--r-- 1 root root   562 Nov 25 18:19 opi_summary.csv
+-rw-r--r-- 1 root root  5892 Nov 25 14:36 pex_nets.csv
+-rw-r--r-- 1 root root  1787 Nov 25 14:36 pex_totals.csv
+-rw-r--r-- 1 root root  3725 Nov 25 14:36 rnode_caps_sg13cmos5l_IOPadDiff2Single.csv
+-rw-r--r-- 1 root root  3904 Nov 25 14:36 rnode_caps_sg13cmos5l_IOPadSingle2Diff.csv
+-rw-r--r-- 1 root root  8580 Nov 25 14:36 rnode_caps_slot_7.csv
+-rw-r--r-- 1 root root  3147 Nov 25 18:19 step_summary.csv
+
+plots:
+total 708
+drwxr-xr-x 2 root root   4096 Nov 25 18:19 .
+drwxr-xr-x 5 root root   4096 Nov 25 18:14 ..
+-rw-r--r-- 1 root root 201669 Nov 25 18:19 bode_tt27.png
+-rw-r--r-- 1 root root 208524 Nov 25 18:19 dc_error.png
+-rw-r--r-- 1 root root 156114 Nov 25 18:19 enable.png
+-rw-r--r-- 1 root root 140306 Nov 25 18:19 step_tt27.png
+_work/out/c_ss_-40_3.0_step_open.log:=== attempt 1: as written (.option gmin=1e-12 rshunt=1e12 klu method=gear)
+_work/out/c_ss_-40_3.0_step_open.log:doAnalyses: TRAN:  Timestep too small; initial timepoint: trouble with dparea-instance d.x2s.x43.d1
+_work/out/c
+… [1053 more characters cut]
+```
+
+## Assistant — 2026-11-25 18:19:29 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/plots/enable.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 18:19:29 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 18:19:29 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/plots/step_tt27.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 18:19:29 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 18:19:35 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && cat csv/opi_summary.csv | tail -8; grep -E "hyb" csv/op_summary.csv; grep -E "^cs|^c," csv/ac_summary.csv | grep "tt 27" ; grep -E "^(cs|c),tt" csv/op_summary.csv
+```
+
+## Tool results / harness — 2026-11-25 18:19:35 UTC
+
+**Tool result:**
+
+```
+prev,tt 27 C 3.3 V,5.01958,5.01958
+prev,ss -40 C 3.0 V,4.89662,4.89662
+prev,ff 125 C 3.6 V,4.97124,4.97124
+c,tt 27 C 3.3 V,5.01983,5.01983
+c,ss -40 C 3.0 V,4.89678,4.89678
+c,ff 125 C 3.6 V,4.97163,4.97163
+cc,tt 27 C 3.3 V,5.01983,5.01983
+rc,tt 27 C 3.3 V,5.01774,5.01779
+c,tt 27 C 3.3 V,open,-0.0108203,1.3219,0,-71.7537
+c,tt 27 C 3.3 V,10p,-0.0117078,1.10016,0,-70.831
+c,tt 27 C 3.3 V,100p,-0.0117068,1.29364,0,-86.8294
+cs,tt 27 C 3.3 V,open,-0.0108279,1.3219,0,-71.7537
+cs,tt 27 C 3.3 V,10p,-0.0117278,1.10016,0,-70.8312
+cs,tt 27 C 3.3 V,100p,-0.0117255,1.29364,0,-86.8294
+c,tt 27 C 3.3 V,1.26153,0.494061,1.26153,1.27326,49.6277,420.037,8.72574,6.38277
+cs,tt 27 C 3.3 V,1.26153,0.494061,1.26153,1.27326,49.6277,420.037,8.7257,6.38269
+```
+
+## Assistant — 2026-11-25 18:19:42 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && sed -i "s/VIEWS = \['prev', 'c', 'cc', 'rc', 'cs', 'ps'\]/VIEWS = ['prev', 'c', 'cc', 'rc', 'cs', 'ps', 'hyb']/; s/'cs': 'c with SPARSE solver', 'ps': 'prev with SPARSE solver'}/'cs': 'c with SPARSE solver', 'ps': 'prev with SPARSE solver',\n         'hyb': 'prev with pad_ref_rb magic C'}/" evaluate.py && sed -i "s/VCOL = {'prev': '#52514e', 'c': '#2a78d6', 'cc': '#1baf7a', 'rc': '#eb6834', 'cs': '#e87ba4', 'ps': '#8a8984'}/VCOL = {'prev': '#52514e', 'c': '#2a78d6', 'cc': '#1baf7a', 'rc': '#eb6834', 'cs': '#e87ba4', 'ps': '#8a8984', 'hyb': '#eda100'}/; s/VLS = {'prev': '-', 'c': '--', 'cc': '-.', 'rc': ':', 'cs': '-', 'ps': '-'}/VLS = {'prev': '-', 'c': '--', 'cc': '-.', 'rc': ':', 'cs': '-', 'ps': '-', 'hyb': '-'}/" evaluate.py && python3 -I evaluate.py _work . | tail -1 && grep hyb csv/op_summary.csv; grep -n "Views:" tables.md | cut -c1-300
+```
+
+## Tool results / harness — 2026-11-25 18:19:44 UTC
+
+**Tool result:**
+
+```
+188 comparison rows, failed: ['prev_tt_27_3.3_pu', 'c_tt_27_3.3_pu', 'c_ss_-40_3.0_dc', 'c_ss_-40_3.0_step_open', 'c_sf_-40_3.0_dc', 'cc_sf_-40_3.0_ac', 'rc_ss_-40_3.0_dc', 'rc_ss_-40_3.0_ac', 'rc_ss_-40_3.0_step_open', 'rc_ss_-40_3.0_step_100p']
+hyb,tt 27 C 3.3 V,1.26153,0.494052,1.26153,1.27326,49.6247,420.017,8.03702,6.3827
+hyb,ss -40 C 3.0 V,1.11955,0.449325,1.11955,1.13484,48.2587,398.376,6.72072,5.4532
+hyb,ff 125 C 3.6 V,1.32333,0.572679,1.32333,1.33092,49.307,423.283,34.3688,50.7348
+7:Views: `prev` = previous deck (schematic / KLayout blocks, pads sak-pex C); `c` = slot magic C, pads as previous; `cc` = slot magic C, pads magic C with substrate C; `rc` = slot + pads magic full-RC; `cs` = c with SPARSE solver; `ps` = prev with SPARSE solver; `hyb` = prev with pad_ref_rb magic C.
+[This command modified 1 file you've previously read: verification/c2_gaps/slot_pex/evaluate.py. Call Read before editing.]
+```
+
+## Assistant — 2026-11-25 18:19:47 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && grep -E "^\| (max_abs|vcm_V|vref_V|I_slot_uA|I_ring_uA|in_hi|in_lo)" tables.md | grep -E "ss -40|sf -40"; grep -E "^(prev|c|rc),(ss|sf)" csv/dc_summary.csv
+```
+
+## Tool results / harness — 2026-11-25 18:19:48 UTC
+
+**Tool result:**
+
+```
+| vcm_V | ss -40 °C | 1.1148 | 1.1147 | 1.1195 | +4.81 mV | – | 1.1194 | +4.64 mV |
+| vcm_V | sf -40 °C | 1.1377 | 1.1376 | 1.1412 | +3.53 mV | – | 1.1411 | +3.46 mV |
+| vref_V | ss -40 °C | 0.4475 | 0.4475 | 0.4493 | +1.86 mV | – | 0.4501 | +2.63 mV |
+| vref_V | sf -40 °C | 0.4441 | 0.4441 | 0.4459 | +1.81 mV | – | 0.4467 | +2.58 mV |
+| I_slot_uA | ss -40 °C | – | 48.39 | 48.26 | -0.3 % | – | 48.25 | -0.3 % |
+| I_slot_uA | sf -40 °C | – | 48.61 | 48.48 | -0.3 % | – | 48.47 | -0.3 % |
+| I_ring_uA | ss -40 °C | – | 398.35 | 398.39 | +0.0 % | – | 398.33 | -0.0 % |
+| I_ring_uA | sf -40 °C | – | 404.94 | 404.97 | +0.0 % | – | 404.89 | -0.0 % |
+| max_abs_err_0to1V_mV | ss -40 °C | 1.32 | 1.32 | – | – | – | – | – |
+| max_abs_err_0to1V_mV | sf -40 °C | 1.09 | 1.09 | – | – | – | 0.924 | -0.16 mV |
+| in_lo_1mV_V | ss -40 °C | -0.2426 | -0.2426 | – | – | – | – | – |
+| in_lo_1mV_V | sf -40 °C | -0.2469 | -0.2469 | – | – | – | -0.2400 | +6.93 mV |
+| in_hi_1mV_V | ss -40 °C | 1.0554 | 1.0554 | – | – | – | – | – |
+| in_hi_1mV_V | sf -40 °C | 1.1145 | 1.1144 | – | – | – | 1.1108 | -3.66 mV |
+prev,ss -40 C 3.0 V,0.998522,0.0431444,1.31799,-0.242614,1.05538
+prev,sf -40 C 3.0 V,0.998545,0.045506,1.08698,-0.246908,1.11445
+rc,sf -40 C 3.0 V,0.998661,0.14418,0.924209,-0.239978,1.11079
+```
+
+## Assistant — 2026-11-25 18:19:49 UTC
+
+Now writing results.md.
+
+## Assistant — 2026-11-25 18:21:07 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/results.md`
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Slot 7 whole-slot PEX: results
+
+**IHP sg13cmos5l post-layout (magic PEX) simulation.** Method, versions and limits: [README.md](README.md). Every
+value in the comparison is in [tables.md](tables.md) and [csv/compare.csv](csv/compare.csv). Per-run values are in
+`csv/*_summary.csv`.
+
+## 1. LVS: the extraction is the taped-out circuit
+
+netgen 1.5.324 compared each extraction, with capacitors dropped and parasitic resistors shorted
+([lvs_summary.txt](lvs_summary.txt)):
+
+| cell, extraction | layout devices (extracted → after merging) | reference | nets | result |
+|---|---|---|---|---|
+| `slot_7`, C-coupled | 497 → 371 (`sg13_hv_nmos` 179, `sg13_hv_pmos` 268, `rhigh` 41, `pnpMPA` 9) | `netlist/slot_7_netgen.spice`: 443 → 371 | 222 = 222 | **Netlists match** (11 symmetries, resolved by property / name), 0 property errors |
+| `slot_7`, full-RC | the same 497 → 371 (9 427 resistors shorted) | same | 222 = 222 | Netlists match, 0 property errors |
+| S2D pad, C / full-RC | 225 → 76 | `pads/…/sg13cmos5l_IOPadSingle2Diff.spice` | 37 = 37 | Circuits match uniquely; property errors only the schematic's `mm_ok` |
+| D2S pad, C / full-RC | 293 → 76 | `pads/…/sg13cmos5l_IOPadDiff2Single.spice` | 36 = 36 | Circuits match uniquely; property errors only `mm_ok` |
+
+The slot's top level still reports "failed pin matching", for the same reasons as the hierarchical check of
+[`signoff/taped_out_158afc5`](../../../signoff/taped_out_158afc5/README.md):
+
+- The reference's comma ports (`analog_bus3,s7_an_0_vref`, `s7_an_0_en_3v3,s7_an_1_en_3v3`) are single nets in the
+  layout, so the names cannot pair.
+- `vss_1v2_uq0` has no partner.
+- In the full-RC check, shorting the resistors also merges the port names that magic keeps as separate resistive
+  pieces of one net (`s7_an_0_vcm`, `s7_an_0_vref`, `s7_an_1_vref`, `s7_an_1_en_3v3*`), so those ports appear as "no
+  matching pin" as well.
+
+The unused harness pins (`dig_in[6..23]`, `clk`, `reset`, `ibias0/1`, `vbias`) are disconnected in both netlists.
+
+**Verdict:** the whole-slot extraction from `final/gds/slot_7.gds` is the circuit of `netlist/slot_7_netgen.spice`.
+
+## 2. Parasitics
+
+Totals from [csv/pex_totals.csv](csv/pex_totals.csv). Ground is the substrate node: `vss_3v3` in the slot, `iovss` in
+the pads. "Floating" means nodes without a device or resistor: the `tughra_art` metal and poly, and unused metal.
+
+| cell | extraction | capacitors | C total [pF] | to ground [pF] | coupling [pF] | floating nodes [pF] | resistors |
+|---|---|---|---|---|---|---|---|
+| `slot_7` | `sak-pex.sh -m 2` (as the earlier pads) | 1568 | 1.889 | 0.760 | 1.128 | 0.160 (101 nodes) | – |
+| `slot_7` | **C-coupled (with substrate C)** | 1636 | **2.158** | 1.029 | 1.128 | 0.160 | – |
+| `slot_7` | **full-RC** | 3461 | 2.166 | 1.037 | 1.128 | 0.160 | **9 427** (169 of 388 nets) |
+| S2D | `sak-pex.sh` (earlier pad PEX) | 573 | 1.447 | 0.562 | 0.886 | 0.019 | – |
+| S2D | C-coupled / full-RC | 589 / 3436 | 1.889 / 1.889 | 1.003 | 0.886 | 0.019 | – / 12 048 |
+| D2S | `sak-pex.sh` (earlier pad PEX) | 482 | 1.339 | 0.345 | 0.995 | 0.015 | – |
+| D2S | C-coupled / full-RC | 503 / 3592 | 1.995 / 1.997 | 1.000 / 1.002 | 0.995 | 0.015 | – / 9 835 |
+
+- The `.ext` files hold 2.162 pF (slot), 1.893 pF (S2D) and 1.999 pF (D2S). The flat output reproduces these totals
+  to within the 0.01 fF threshold. **The hierarchical `sak-pex.sh` output, which all earlier pad PEX runs used, lacks
+  0.27 pF in the slot, 0.44 pF in S2D and 0.66 pF in D2S.** All of that missing part is node-to-substrate
+  capacitance: the bond pad's 116 fF (S2D) and 223 fF (D2S) are absent, and `enable` (33.8 fF) is absent. Some nets
+  also get a value the `.ext` does not have: `s7_an_0_outp` has 11.6 fF instead of 3.5 fF.
+- **Magic's own full-RC netlist double-counts capacitance.** It totals 3.90 pF for the slot, against 2.16 pF in the
+  `.ext`. The resistor-node capacitances of a resistive 
+… [14171 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 18:21:07 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/results.md (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 18:21:28 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && grep -E "^\| step_gain \(unloaded\) \| tt" tables.md; python3 - <<'EOF'
+import csv
+rows=[r for r in csv.DictReader(l for l in open('csv/compare.csv') if not l.startswith('#'))]
+def f(x):
+    try: return float(x)
+    except: return None
+ov=[(r['quantity'],r['load'],r['point'],v,f(r['v_'+v])) for r in rows if r['quantity'].startswith('overshoot') for v in ('prev','c','cc','rc') if f(r['v_'+v]) is not None]
+print(max(ov,key=lambda x:x[4]))
+for r in rows:
+    if r['quantity']=='max_abs_err_0to1V_mV':
+        p,c,rc=f(r['v_prev']),f(r['v_c']),f(r['v_rc'])
+        print(r['point'], p, c, rc, (c-p) if c and p else None, (rc-p) if rc and p else None)
+EOF
+```
+
+## Tool results / harness — 2026-11-25 18:21:29 UTC
+
+**Tool result:**
+
+```
+| step_gain (unloaded) | tt 27 °C | 0.99872 | 0.99871 | 0.99871 | -2 ppm | – | 0.99885 | +139 ppm |
+('overshoot_rise_pct', '100p', 'fs 125 C 3.6 V', 'prev', 0.0150224)
+tt 27 C 3.3 V 0.869988 0.872259 0.86488 0.002271000000000023 -0.005108000000000001
+ss -40 C 3.0 V 1.31799 None None None None
+ff 125 C 3.6 V 6.11385 6.11344 6.14202 -0.00041000000000046555 0.028169999999999362
+fs 125 C 3.6 V 3.11287 3.11515 3.1001 0.0022799999999998377 -0.01277000000000017
+sf -40 C 3.0 V 1.08698 None 0.924209 None -0.1627710000000001
+```
+
+## Assistant — 2026-11-25 18:21:32 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+import csv
+rows=[r for r in csv.DictReader(l for l in open('csv/compare.csv') if not l.startswith('#'))]
+def f(x):
+    try: return float(x)
+    except: return None
+for v in ('prev','c','cc','rc'):
+    ov=[(r['quantity'],r['load'],r['point'],f(r['v_'+v])) for r in rows if r['quantity'].startswith('overshoot') and f(r['v_'+v]) is not None]
+    print(v, max(ov,key=lambda x:x[3]))
+EOF
+```
+
+## Tool results / harness — 2026-11-25 18:21:32 UTC
+
+**Tool result:**
+
+```
+prev ('overshoot_rise_pct', '100p', 'fs 125 C 3.6 V', 0.0150224)
+c ('overshoot_rise_pct', '100p', 'fs 125 C 3.6 V', 0.0106104)
+cc ('overshoot_rise_pct', '100p', 'fs 125 C 3.6 V', 0.00950019)
+rc ('overshoot_rise_pct', '100p', 'fs 125 C 3.6 V', 0.00948656)
+```
+
+## Assistant — 2026-11-25 18:21:34 UTC
+
+Fixing the inaccurate statements in results.md.
+
+## Assistant — 2026-11-25 18:21:44 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='results.md'; s=open(p).read()
+rep=[
+("| step gain (0.5 V step), unloaded | 0.99872 | 0.99871 | 0.99871 | −2 ppm | – | (see tables.md) | |",
+ "| step gain (0.5 V step), unloaded | 0.99872 | 0.99871 | 0.99871 | −2 ppm | – | 0.99885 | +139 ppm |"),
+("Overshoot in the step is ≤ 0.0012 % in every view.",
+ "Overshoot in the step is ≤ 0.015 % at every point and in every view (largest: fs 125 °C, 1 kΩ ∥ 100 pF, prev 0.015 %, c 0.011 %, rc 0.009 %)."),
+("     converge with KLU); prev enable at tt / ss / ff; c op / ac / opi at sf and ss −40 °C; c modes mon / ext; and\n     hyb op at tt / ff.",
+ "     converge with KLU); prev enable at tt / ss / ff; c op and ac at sf −40 °C; c opi at ss −40 °C; c modes mon /\n     ext; and hyb op at tt / ff."),
+("- The `cs` check (c with SPARSE instead of KLU, tt) agrees with c to ≤ 2·10⁻⁵ dB and ≤ 0.1 mV.",
+ "- The `cs` check (c with SPARSE instead of KLU, tt 27 °C, op and ac) agrees with c to ≤ 2·10⁻⁵ dB in gain, the\n  same f−3dB to 4 digits, and the same operating point to 0.01 mV."),
+("  the pads it is 99 Ω (S2D `pad`) and 102 Ω (D2S `pad`). The `vss_3v3` / `iovss` networks show 7 kΩ / 13 kΩ, which is\n  the resistance to the substrate-tie fragments of the ground net. The substrate itself is not resistive in magic.",
+ "  the pads it is 99 Ω (S2D `pad`) and 102 Ω (D2S `pad`). The ground networks show 7.3 kΩ (`vss_3v3`) and 13 … 14 kΩ\n  (`iovss`) to their most remote resistor node. Which piece of the ground net that is was not examined. The\n  substrate itself is not resistive in magic."),
+("  ≤ 2 ns in settling.", "  ≤ 2 ns in settling (f−3dB: ≤ 0.15 %)."),
+("  `rc` and `cc` agree to 0.1 % in f−3dB and to\n  ≤ 2 ns in settling (f−3dB: ≤ 0.15 %).", "  `rc` and `cc` agree to ≤ 0.15 % in f−3dB and\n  to ≤ 2 ns in settling."),
+("  series with the load. The max \\|error\\| over 0 … 1 V changes by ≤ 0.16 mV.",
+ "  series with the load. The max \\|error\\| over 0 … 1 V changes by −0.16 … +0.03 mV."),
+("4. **DC:** the round-trip transfer and error are unchanged (≤ 0.03 mV in max \\|err\\| with C, ≤ 0.16 mV with RC). The\n   supply currents change by ≤ 0.3 %.",
+ "4. **DC:** the round-trip transfer and error are unchanged (max \\|err\\| over 0 … 1 V within 0.003 mV with C, −0.16 …\n   +0.03 mV with RC). The supply currents change by ≤ 0.3 %."),
+("   round trip stays first-order: no peaking, overshoot ≤ 0.0012 %.",
+ "   round trip stays first-order: no peaking, overshoot ≤ 0.015 %."),
+]
+for a,b in rep:
+    if a not in s: print('MISSING', a[:60]); continue
+    s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+grep -n "rc. and .cc. agree" results.md
+```
+
+## Tool results / harness — 2026-11-25 18:21:44 UTC
+
+**Tool result:**
+
+```
+MISSING   `rc` and `cc` agree to 0.1 % in f−3dB and to
+  ≤ 2 ns in s
+162:  capacitance (`cc`), and next to nothing from wire resistance.** `rc` and `cc` agree to 0.1 % in f−3dB and to
+```
+
+## Assistant — 2026-11-25 18:21:46 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && sed -n 160,166p results.md
+```
+
+## Tool results / harness — 2026-11-25 18:21:46 UTC
+
+**Tool result:**
+
+```
+was not found here (compare `../klayout_pad_diodes`, where the same converter drops the diode sizes).
+- **Bandwidth and settling: −2.5 % / +2.5 % from the slot's wiring capacitance, −1.4 % more from the pads' substrate
+  capacitance (`cc`), and next to nothing from wire resistance.** `rc` and `cc` agree to 0.1 % in f−3dB and to
+  ≤ 2 ns in settling (f−3dB: ≤ 0.15 %). At these impedances (≤ 125 Ω of wire, tens of fF) the resistance does not matter for the
+  1.3 MHz loop.
+- **Full-RC DC:** the gain moves +116 … +166 ppm toward 1 and the S2D output common mode moves −3 … −6 mV at
+  −40 / 27 °C. The gain with 1 kΩ load drops by 0.003 dB, which is the D2S output wiring (102 Ω `pad` net) in
+```
+
+## Assistant — 2026-11-25 18:21:49 UTC
+
+**Tool call: `Edit`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/results.md`
+
+old:
+```
+`rc` and `cc` agree to 0.1 % in f−3dB and to
+  ≤ 2 ns in settling (f−3dB: ≤ 0.15 %). At these impedances (≤ 125 Ω of wire, tens of fF) the resistance does not matter for the
+  1.3 MHz loop.
+```
+
+new:
+```
+`rc` and `cc` agree to ≤ 0.15 % in f−3dB and
+  to ≤ 2 ns in settling. At these impedances (≤ 125 Ω of wire, tens of fF) the resistance does not matter for the
+  1.3 MHz loop.
+```
+
+## Tool results / harness — 2026-11-25 18:21:49 UTC
+
+**Tool result:**
+
+```
+The file /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/results.md has been updated successfully.
+```
+
+## Assistant — 2026-11-25 18:22:03 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='results.md'; s=open(p).read()
+a="""The gain with 1 kΩ load drops by 0.003 dB, which is the D2S output wiring (102 Ω `pad` net) in
+  series with the load."""
+assert a in s
+s=s.replace(a,"""The gain with 1 kΩ load drops by a further 0.003 dB (0.035 %, as if about 0.35 Ω were in series
+  with the 1 kΩ load); where in the pad's output wiring this comes from was not isolated.""")
+open(p,'w').write(s)
+p='README.md'; s=open(p).read()
+rep=[("""   | `cs` | as `c`, solver SPARSE (check) | as `prev` |
+""","""   | `cs` | as `c`, solver SPARSE (check) | as `prev` |
+   | `hyb` | as `prev`, but `pad_ref_rb` = its magic C-coupled extraction (cut from `slot_7.gds`) | as `prev` |
+"""),
+("""   `c` vs `prev` isolates the slot's layout. `cc` vs `c` isolates the pads' missing substrate capacitance. `rc` adds
+   wire resistance everywhere.""","""   `c` vs `prev` isolates the slot's layout. `cc` vs `c` isolates the pads' missing substrate capacitance. `rc` adds
+   wire resistance everywhere. `hyb` locates the `vcm` / `vref` shift.
+
+   Analyses ([jobs.txt](jobs.txt)): operating point enabled and disabled, bias currents into the pads, DC round trip,
+   AC with three loads, and the 0.25 → 0.75 V step with three loads at tt and two (unloaded, 1 kΩ ∥ 100 pF) at the
+   other four points. The enable transient starts from the disabled operating point. Power-up from 0 V was tried at
+   tt and stalls (results.md §4). The modes swap / mon / feed / ext were run at tt 27 °C."""),
+("""   gmin stepping completed"), as the earlier PEX-pad decks did. No `.nodeset` and no `.ic` are used anywhere.""",
+"""   gmin stepping completed"), as the earlier PEX-pad decks did. No `.nodeset` and no `.ic` are used anywhere. After a
+   failed run, `sim.py` retries with SPARSE, then with more gmin / source steps and iterations, then (DC only) with
+   the sweep split at 0.5 V. Each retry is recorded in the run's log, in `<tag>.aid` and in results.md §4."""),
+("""time. Wall clock in this task, on 4 CPUs shared with other jobs, was about 4 h for the jobs that were run (see
+results.md). Extraction and LVS take about 15 s.""","""time. Wall clock in this task, on 4 CPUs shared with other jobs, was about 4 h. Most runs take 10 s … 3 min. The
+failing −40 °C retries take up to 20 min each, and the power-up attempt was stopped after 60 min (`SIM_TIMEOUT` now
+limits each attempt to 15 min, or 40 min for transients). Extraction and LVS take about 15 s."""),
+]
+for a,b in rep:
+    assert a in s, a[:50]; s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+echo ok
+```
+
+## Tool results / harness — 2026-11-25 18:22:04 UTC
+
+**Tool result:**
+
+```
+ok
+```
+
+## Assistant — 2026-11-25 18:22:10 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+import re
+for f in ['README.md','results.md','tables.md']:
+    lines=open(f).read().split('\n')
+    i=0
+    while i<len(lines):
+        if lines[i].lstrip().startswith('|'):
+            blk=[]
+            while i<len(lines) and lines[i].lstrip().startswith('|'):
+                blk.append(lines[i].strip()); i+=1
+            cnt=[len(re.split(r'(?<!\\)\|', l))-2 for l in blk]
+            if len(set(cnt))>1: print(f,'mismatch',cnt[:5], blk[0][:60])
+        else: i+=1
+print('checked')
+EOF
+grep -n "pad_ref_rb" README.md | head -5
+```
+
+## Tool results / harness — 2026-11-25 18:22:10 UTC
+
+**Tool result:**
+
+```
+checked
+13:`pad_ref_rb` and `bias_dist_pd` KLayout-extracted, `bg_core_pd`, `s7_ctrl`, `ls_up_fs` and `s7_doutpd` from schematic
+74:   | `prev` | earlier deck: source netlist with KLayout-extracted `pad_ref_rb` / `bias_dist_pd`, schematic `bg_core_pd` | earlier magic PEX (`sak-pex.sh`, no substrate C) |
+79:   | `hyb` | as `prev`, but `pad_ref_rb` = its magic C-coupled extraction (cut from `slot_7.gds`) | as `prev` |
+```
+
+## Assistant — 2026-11-25 18:22:17 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && for f in $(find . -path ./_work -prune -o -type f -print | sort); do case $f in *.png) continue;; esac; head -4 "$f" | grep -q "SPDX-License-Identifier: Apache-2.0" || echo "NO SPDX: $f"; done; find . -path ./_work -prune -o -type f -print | sort; du -sh --exclude=_work .; ls ../dc_curves ../ac_tran | grep -c pycache; cd /home/user/sg13cmos5l_cm_slot7 && git status --short | head
+```
+
+## Tool results / harness — 2026-11-25 18:22:17 UTC
+
+**Tool result:**
+
+```
+./.gitignore
+./README.md
+./csv/ac_summary.csv
+./csv/compare.csv
+./csv/dc_summary.csv
+./csv/en_summary.csv
+./csv/mode_summary.csv
+./csv/op_summary.csv
+./csv/opi_summary.csv
+./csv/pex_nets.csv
+./csv/pex_totals.csv
+./csv/rnode_caps_sg13cmos5l_IOPadDiff2Single.csv
+./csv/rnode_caps_sg13cmos5l_IOPadSingle2Diff.csv
+./csv/rnode_caps_slot_7.csv
+./csv/step_summary.csv
+./evaluate.py
+./extract.sh
+./jobs.txt
+./lvs_collapse.py
+./lvs_summary.txt
+./pexfix.py
+./pexstats.py
+./plots/bode_tt27.png
+./plots/dc_error.png
+./plots/enable.png
+./plots/step_tt27.png
+./prep.py
+./results.md
+./run.sh
+./runjobs.sh
+./sim.py
+./tables.md
+948K	.
+2
+?? verification/c2_gaps/slot_pex/
+?? verification/c2_gaps/voltage_stress/
+```
+
+## Assistant — 2026-11-25 18:22:21 UTC
+
+**Tool call: `Bash`**
+
+```bash
+ls -la --time-style=+%H:%M /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/__pycache__/ /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/ac_tran/__pycache__/
+```
+
+## Tool results / harness — 2026-11-25 18:22:21 UTC
+
+**Tool result:**
+
+```
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/ac_tran/__pycache__/:
+total 76
+drwxr-xr-x 2 root root  4096 14:31 .
+drwxr-xr-x 6 root root  4096 04:07 ..
+-rw-r--r-- 1 root root 12810 04:48 common.cpython-313.pyc
+-rw-r--r-- 1 root root 36521 14:31 rt.cpython-313.pyc
+-rw-r--r-- 1 root root 12442 04:07 slot.cpython-313.pyc
+
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/__pycache__/:
+total 44
+drwxr-xr-x 2 root root  4096 14:31 .
+drwxr-xr-x 6 root root  4096 02:44 ..
+-rw-r--r-- 1 root root  7484 02:44 common.cpython-313.pyc
+-rw-r--r-- 1 root root  9638 04:07 roundtrip.cpython-313.pyc
+-rw-r--r-- 1 root root 12938 14:31 rt.cpython-313.pyc
+```
+
+## Assistant — 2026-11-25 18:22:39 UTC
+
+**Tool call: `SubagentHandback`**
+
+```json
+{
+ "message": "I extracted the whole slot with magic, both C-coupled and full-RC, and it passes LVS. The slot extraction moves `vcm` up by 3.5–24 mV and cuts round-trip bandwidth by about 2.5 %. Everything is in `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/`; I wrote nothing else and committed nothing.\n\n**LVS (netgen):** the extraction matches `netlist/slot_7_netgen.spice`.\n- 371 = 371 devices after merging (497 extracted), 222 = 222 nets, 0 property errors, both for C-coupled and for full-RC with the resistors shorted.\n- Only the known pin messages remain (the comma ports and `vss_1v2_uq0`), plus port names that shorting the resistors merges in the RC check.\n- Both pads, C and RC: \"Circuits match uniquely\" (76/76 devices); the only property errors are `mm_ok`.\n\n**Parasitics:** the slot has 2.158 pF in total: 1.029 pF to substrate, 1.128 pF coupling, 0.16 pF on the floating art. Full-RC adds 9 427 resistors on 169 of 388 nets. Analog nets carry 10–52 fF and at most 125 Ω.\n\n**Two magic problems found:**\n- **Earlier pad PEX netlists lack substrate capacitance.** `sak-pex.sh` uses hierarchical `ext2spice lvs` output, which leaves most substrate C out: 0.27 pF in the slot, 0.44 pF in S2D, 0.66 pF in D2S. The pad PEX netlists used by `d2s_pex`, `dc_curves` and `ac_tran` have this gap, so `d2s_pex` bandwidth/slew is somewhat optimistic; I did not rerun it.\n- **Magic's own full-RC netlist double-counts coupling.** It totals 3.90 pF for the slot instead of 2.16 pF. I fixed both in `pexfix.py` (flat output for C; capacitors taken from the C extraction for RC).\n\n**Changes vs the previous runs:** my rerun of the previous deck reproduces the committed CSVs exactly.\n- **`vcm` / `vref`:** `vcm` rises 3.5–4.9 mV at −40/27 °C and 13 / 24 mV at fs / ff 125 °C; `vref` rises 1.8 mV.\n  - It comes from `pad_ref_rb` alone: the previous deck with only that block swapped for its magic extraction reproduces it to 0.03 mV.\n  - The new values agree with the `pad_ref_rb` schematic in `replica_bias`. So the earlier tier-1/data-sheet `vcm`/`vref` were low, because of the KLayout-converted `pad_ref_rb` netlist; I did not find the root cause inside that conversion.\n- **Bandwidth and settling:** bandwidth −2.5 % and settling +2.5 % from the slot; −3.9 % and up to +4.6 % with corrected pads or full-RC. Wire resistance adds essentially nothing.\n- **DC:** round-trip transfer and error unchanged (within 0.003 mV with C, −0.16 to +0.03 mV with RC); enabled supply currents within 0.3 %.\n- **Enable time:** up 18 % at tt and 32 % at ss −40 °C (1.96 → 2.59 µs).\n- **Modes at tt 27 °C:** swap, mon, feed and ext all change by under 0.01 mV.\n\n**Convergence aids:** every run uses gmin=1e-12 and rshunt=1e12; transients add method=gear, and enable also cshunt=1e-15. I used the KLU solver; on failure the script retried automatically with SPARSE, which rescued the prev disabled op, several −40 °C runs and the hybrid runs.\n\n**What could not be done:**\n- 
+… [746 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 18:22:39 UTC
+
+**Tool result:**
+
+```
+{"success":true,"message":"Report delivered to your caller."}
+```
+
