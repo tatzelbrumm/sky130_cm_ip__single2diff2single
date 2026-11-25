@@ -22,4 +22,5 @@ reminders, private e-mail addresses. Times are UTC (CET = UTC+1). Regenerated at
 | [agents/2026-11-23_ihp_slot_modes_ss_40_fix.md](agents/2026-11-23_ihp_slot_modes_ss_40_fix.md) | background agent "IHP slot modes ss/-40 fix", started 2026-11-23 20:41 UTC  |
 | [agents/2026-11-25_limitations_achieved_table_test_plan.md](agents/2026-11-25_limitations_achieved_table_test_plan.md) | background agent "Limitations, achieved table, test plan", started 2026-11-25 03:42 UTC  |
 | [agents/2026-11-25_re_run_d2s_schematic_cace.md](agents/2026-11-25_re_run_d2s_schematic_cace.md) | background agent "Re-run D2S schematic CACE", started 2026-11-25 02:48 UTC  |
+| [agents/2026-11-25_investigate_klayout_pad_sine_abort.md](agents/2026-11-25_investigate_klayout_pad_sine_abort.md) | background agent "Investigate KLayout-pad sine abort", started 2026-11-25 04:03 UTC  |
 | [agents/2026-11-24_dc_performance_graphs_ihp_slot_7.md](agents/2026-11-24_dc_performance_graphs_ihp_slot_7.md) | background agent "DC performance graphs IHP slot 7", started 2026-11-24 22:02 UTC  |

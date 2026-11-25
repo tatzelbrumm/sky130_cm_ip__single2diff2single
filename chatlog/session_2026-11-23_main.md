@@ -9450,3 +9450,136 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push 2>&1 | tail -1
 ```
 
+## Tool results / harness — 2026-11-25 04:02:27 UTC
+
+**Tool result:**
+
+```
+docs/SOURCES.md:2
+docs/PROPOSAL.md:4
+   0249e9e..079e75f  main -> main
+   240ecef..83c1a31  sudel_buecher -> sudel_buecher
+```
+
+## Assistant — 2026-11-25 04:02:38 UTC
+
+All the open items are done and pushed; nothing is running now.
+
+The S2D mismatch results were stale too. Its committed mismatch summaries (2026-10-26) predate the layout and 8 later schematic changes. The re-run (`d5b2086`, `verification/c2_gaps/s2d_mismatch/`) has 395 runs, keeps the per-run data and includes the extracted layout. Before running, it checked that its netlist is the taped-out pad's. All other S2D results are current: the DC group reproduced exactly.
+
+New spread, all inside the working limits:
+
+| quantity | schematic | extracted layout |
+|---|---|---|
+| input offset σ | 5.25 mV | 6.15 mV |
+| gain σ | 0.0167 (0.83 %) | 0.0164 |
+| output common-mode error σ | 11.0 mV | 12.7 mV |
+| supply / common-mode rejection | 83 … 132 dB | — |
+
+**Updated everywhere the stale values appeared:**
+- **S2D data sheet:** new values in its specification table, a note on the stale summaries, and the histogram.
+- **The rest of the slot 7 docs:** the front page, `HOW_IT_WORKS.md` (gain σ is 0.83 %, not the README's 0.74 %), `TEST_PLAN.md` and `ACHIEVED_VS_LIMITS.md`. This is commit `28c6ea7`.
+- **Proposal rows 4, 5, 7 and 12:** cited as source S14, all still inside their targets (`079e75f`, PDF re-rendered).
+
+**Tonight's commits:**
+
+| commit | what |
+|---|---|
+| `0249e9e` (main) | row 14: the discrepancy stated openly, target kept |
+| `cd1e561` | limitations section on the front page, `ACHIEVED_VS_LIMITS.md`, equipment and acceptance table in the test plan |
+| `17b2228` | sign-off of the taped-out GDS (DRC / LVS clean as recorded; 48 magic markers in the bandgap, attributed to the tool version) |
+| `d5b2086`, `28c6ea7` | S2D mismatch re-run and the updates it caused |
+| `079e75f` (main) | proposal rows 4, 5, 7, 12 |
+
+Each change is its own commit, so `git log -p` or `git diff <before> <after>` shows exactly what changed. The run log and the chat logs are pushed (`83c1a31` on `sudel_buecher`).
+
+**Things worth knowing when you're back:**
+- **Both pads had stale committed results:** the D2S schematic results and the S2D mismatch summaries. Both are now replaced by fresh runs on the taped-out circuit. The data sheets and the proposal say where each number came from.
+- **Pad density:** each pad has 4 density violations in Metal1–Metal4 that were never recorded before.
+- **Not done:** antenna DRC, ESD / latch-up simulation, extraction of the whole slot, and extraction with resistances.
+
+## User (or harness) — 2026-11-25 04:03:17 UTC
+
+A while ago you mentioned a simulation run with a sine that didn't converge. Still an open problem?
+
+## Assistant — 2026-11-25 04:03:20 UTC
+
+Checking the records before answering:
+
+## Assistant — 2026-11-25 04:03:21 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps && grep -n -i -B2 -A6 "timestep too small\|does not converge\|aborts" ac_tran/results.md ac_tran/README.md | cut -c1-260 | head -50
+```
+
+## Tool results / harness — 2026-11-25 04:03:21 UTC
+
+**Tool result:**
+
+```
+ac_tran/results.md-47-  1 mV-linear S2D input range (`../dc_curves`: ff 125 °C from +0.096 V, fs 125 °C from +0.028 V), so the bottom of the
+ac_tran/results.md-48-  sine is distorted there.
+ac_tran/results.md:49:- Not obtained: the sine through the KLayout-extracted pads (tt 27 °C) aborts with "timestep too small" at 66 µs
+ac_tran/results.md-50-  (pad_s2d ≈ 0.078 V on the falling slope; the same input level when the sine phase is shifted, also with cshunt
+ac_tran/results.md-51-  1 fF / 10 fF and rshunt; no node moves faster there in the saved waveforms: a numerical problem of that netlist
+ac_tran/results.md-52-  combination, not found). The schematic and PEX pads run through. TBD.
+ac_tran/results.md-53-- Solver aids: PEX pads always rshunt=1e12; schematic pads only in the runs marked `*` / `aid=rshunt` in the CSVs
+ac_tran/results.md-54-  (ss −40 °C AC / step / sine, sf −40 °C step: operating point not found without it). Its effect, measured on the tt
+ac_tran/results.md-55-  27 °C schematic AC run forced with it: f−3dB +0.0005 %, gain −4e-6 dB (`tables/rt_consistency.md`).
+--
+ac_tran/README.md-13-
+ac_tran/README.md-14-Status: complete (all figures, tables and checks below from the runs of 2026-11-25), except the 10 kHz sine
+ac_tran/README.md:15:through the KLayout-extracted pads (aborts, see results.md section 1).
+ac_tran/README.md-16-
+ac_tran/README.md-17-## Figures (plots/, PNG 150 dpi; SVG too where it stays below 60 kB; PNGs re-encoded with a 256-color palette)
+ac_tran/REA
+… [1980 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:03:50 UTC
+
+**Tool call: `Agent`**
+
+_Investigate KLayout-pad sine abort_
+
+```
+Investigate an open simulation failure in the IHP sg13cmos5l Chipalooza #2 slot 7 documentation, and test one specific hypothesis. Repository /home/user/sg13cmos5l_cm_slot7, branch `chipalooza2-documentation`. Do NOT run git commands that change state; I commit. Do not modify existing files except to append a dated "Follow-up" section to `verification/c2_gaps/ac_tran/results.md` with your result.
+
+The failure: the 10 kHz round-trip sine (0 … 1 V) through the slot with the KLayout-extracted pads (the designer's tier-1 view) aborts with "timestep too small" at 66 µs, pad_s2d ≈ 0.078 V on the falling slope, at the same input level when the phase is shifted, also with cshunt 1 / 10 fF and rshunt; schematic and magic-PEX pads run through. See `verification/c2_gaps/ac_tran/results.md` §1 and README.md (slot.py, how the tier-1 deck is built from design-repo commit 9052bd35928c6d40344e8e686c9abbe736bfadb9 `docs/slot7_hookup/tier1/run_tier1.py`), run.sh.
+Related unexplained items: (a) `verification/c2_gaps/slot_modes_bg/results.md` and README: at ss −40 °C the designer's mode runs failed with "timestep too small" in the pads' antenna diodes (`d.x2d.xlay.x$3.d1`, `d.x2s.xlay.x$63.d1`), and that job noted: "the converted pad netlists pass `a=`/`p=` to `dpantenna`, which takes `l`/`w`, so those diodes are simulated at default size"; (b) `verification/c2_gaps/dc_curves/results.md`: KLayout-extracted pads shift the round-trip range ends by up to 55 mV vs schematic / PEX, and the round-trip PEX run at sf −40 °C stopped at pad in 1.435 V.
+
+Hypothesis to test: the antenna / ESD diodes of the KLayout-extracted pads are mis-sized (default size because a=/p= are ignored by the dpantenna model card that expects l/w; check the actual model / subckt definition in the IHP PDK under /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice and what the converted netlist passes), and that is what makes the sine abort and possibly shifts the range ends.
+Steps: (1) establish exactly how the KLayout-extracted pad netlists are produced / converted (design repo, slot.py) and what parameters the diode instances get vs. what the model reads (ngspice may warn about unknown instance parameters: check the log); (2) compute the correct l/w (or area/perimeter mapping) from the extracted a/p and fix the converted netlist in a copy (scratch only); (3) re-run the 10 kHz sine at tt 27 °C with the fixed netlist; (4) if it converges, re-run the round-trip DC range at tt 27 °C and compare range ends with schematic / PEX, and the ss −40 °C mode runs if cheap; (5) if the hypothesis fails, find the real cause (e.g. ngspice `.option` diagnostics, which device's state oscillates; trace the last timesteps) within ~60 min, then stop and report.
+Environment: IHP PDK /foss/pdks/ihp-sg13cmos5l (PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l), ngspice-47 + OSDI. 4 CPUs free. Scratch: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine. Design repo: https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single (do NOT clone whole; blob-less shallow + `git fetch --depth 1 origin <commit>` + `git show`/`git archive`).
+
+Deliverables: `verification/c2_gaps/klayout_pad_diodes/` (new folder): README.md (question, hypothesis, evidence, result, what it means for the documented results, commands, versions), the netlist fix as a script (not a hand edit), run.sh, small CSVs / plots (sine through the fixed netlist, overlay with schematic / PEX). No invented results. SPDX headers (`SPDX-FileCopyrightText: 2026 Christoph Maier`, `SPDX-License-Identifier: Apache-2.0`). If the netlist conversion bug is real, state precisely where it lives (file and commit in the design repository) so the designer can fix it at the source.
+
+Report in under 300 words: hypothesis confirmed or not, evidence, effect on the sine / range ends / ss −40 °C runs.
+```
+
+## Tool results / harness — 2026-11-25 04:03:50 UTC
+
+**Tool result:**
+
+```
+Async agent launched successfully. (This tool result is internal metadata — never quote or paste any part of it, including the agentId below, into a user-facing reply.)
+agentId: af36f6109b1074b33 (internal ID - do not mention to user. Use SendMessage with to: 'af36f6109b1074b33', summary: '<5-10 word recap>' to continue this agent.)
+The agent is working in the background. You will be notified automatically when it completes. You know nothing about its results until that notification arrives — do not report, assume, or predict them; continue other work or respond to the user in the meantime.
+Do not duplicate this agent's work — avoid working with the same files or topics it is using.
+output_file: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/af36f6109b1074b33.output
+Do NOT Read or tail this file via the shell tool — it is the full subagent JSONL transcript and reading it will overflow your context. If the user asks for progress, say the agent is still running; you'll get a completion notification.
+```
+
+## Assistant — 2026-11-25 04:03:55 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sky130_cm_ip__single2diff2single_sudelbuecher && echo "- User asked whether the non-converging sine is still open: yes (round-trip 10 kHz sine through the KLayout-extracted pads aborts at pad_s2d ≈ 0.078 V; cause not found). Lead: the converted KLayout-extracted pad netlists pass a= / p= to dpantenna, which reads l / w (diodes at default size; noted by the slot-modes job), and the ss −40 °C failures stalled in the same antenna diodes. Background agent started to test that hypothesis (results to [S7] verification/c2_gaps/klayout_pad_diodes/), including whether it explains the 55 mV range-end shift of the KLayout-extracted pads." >> RUNLOG.md && chatlog/tools/export_all.sh && git add -A && git commit -q -m "Run log: KLayout-pad sine investigation started; chat logs
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push 2>&1 | tail -1
+```
+
