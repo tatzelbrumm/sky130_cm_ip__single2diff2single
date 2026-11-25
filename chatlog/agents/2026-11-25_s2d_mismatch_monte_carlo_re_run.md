@@ -3111,3 +3111,183 @@ W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_m
 140 results.md
 ```
 
+## Assistant — 2026-11-25 04:00:54 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/README.md`
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# S2D pad: Monte Carlo groups re-run with the per-run data kept
+
+**IHP sg13cmos5l simulation** of `sg13cmos5l_IOPadSingle2Diff` (S2D pad, `s7_an[0]`): the CACE groups `mm_params`
+(local mismatch: input offset, gain, output-CM error; 100 iterations), `ac_mm_params` (PSRR / CMRR under mismatch,
+30 iterations) and `mc_params` (process MC, 30 iterations) on the taped-out schematic, `mm_params` also on the magic
+C-coupled PEX netlist, and one `dc_params` run as a check of the committed results; run on 2026-11-25.
+Numbers and reading: **[results.md](results.md)**.
+
+Status: complete (2026-11-25, 03:48 … 03:58 UTC). 395 of 395 runs have a result (100 + 30 + 30 + 135 schematic,
+100 PEX); no solver aid.
+
+## Outcome (numbers: results.md)
+
+- The simulated schematic netlist is the taped-out cell (below).
+- The committed mismatch / MC summaries are **stale**: written 2026-10-26 (pre-layout design), while the S2D
+  schematic changed until 2026-11-05. The other committed schematic results are not: `dc_params` re-run here
+  reproduces all 135 committed runs exactly.
+- σ on the taped-out schematic (100 runs): input offset **5.25 mV**, gain **0.0167** (0.83 %), output CM error
+  **11.0 mV** (mean 7.9 mV); every run inside the working limits. PEX with mm_ok=1: 6.15 mV, 0.0164, 12.7 mV
+  (σ confidence intervals overlap the schematic's).
+- PSRR / CMRR under mismatch (30 runs): worst PSRR iovdd 83.8 dB (1 kHz) / 82.3 dB (100 kHz), iovss 83.4 / 66.0 dB,
+  CMRR 90.1 dB (1 kHz); every run inside the working limits.
+- Process MC: no offset (−8.6 nV systematic, σ 0.13 nV), gain σ 8.6 ppm, CM error σ 0.17 mV; as the committed
+  summary.
+
+## Why
+
+The committed CSVs of the three Monte Carlo groups in the design repository
+(tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single, `macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/results/sg13cmos5l_IOPadSingle2Diff/`,
+commit 91a7da8b67ac56a26c605501146667a1fde28c32) have a header only: CACE (2.11 here; the design README names 2.13.0
+for the 2026-10-25/26 run) nests the iterations of a collated group one level deeper (`parameters/<group>/run_0/run_<k>/`)
+than `scripts/cace/cace_to_csv.py` looks. Only CACE's min / typ / max summary survived, so the data sheet
+`docs/chipalooza2_as_taped_out/datasheets/sg13cmos5l_IOPadSingle2Diff.md` can show no σ and no histogram ("CACE summary
+values (per-run CSV not committed)"). This folder re-runs those groups with the per-run data collected
+(`mm_collect.py`, as ../d2s_schematic_rerun/mm_collect.py and ../replica_bias/mc_collect.py).
+
+## Which netlist, and why it is the taped-out one ([netcheck.txt](netcheck.txt))
+
+CACE 2.11 regenerates the schematic netlist on every call (xschem `-n -s -r -x -q --tcl "set top_is_subckt 1"` in
+`macros/<cell>/schematic/xschem` with the project xschemrc). `run.sh netcheck` netlists the schematic of 91a7da8b
+that way and compares it with `pads/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.spice` of this repository:
+
+- the pad netlist is, below its 4-line provenance header, byte-identical (sha256 5a4e67f9…) to the design's
+  `netlist/schematic/sg13cmos5l_IOPadSingle2Diff_magic.spice` (the LVS netlist);
+- the CACE netlist equals it line by line (122 lines without the xschem `**` comments) except for **one line**,
+  `Rsub iovss vss 1` in the top cell: Rsub carries `lvs_ignore=open` in the schematic (vss and iovss share the
+  p-substrate), the same simulation-only tie as in the D2S pad; the PEX netlist has the same tie (`Rport_vss vss iovss 1`,
+  `pex_add_port.py`);
+- every MOSFET / rhigh / rppd instance of the CACE netlist carries `mm_ok=1` (75 instances, none without);
+- the pad GDS `pads/…/sg13cmos5l_IOPadSingle2Diff.gds` is byte-identical (sha256 f4b0e073…) to the design's
+  `layout/klayout/sg13cmos5l_IOPadSingle2Diff.klay.gds`, from which the PEX netlist was extracted (2026-11-05). The
+  design's magic / netgen LVS of that GDS against the LVS netli
+… [6539 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 04:00:54 UTC
+
+**Tool result:**
+
+```
+The file /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/README.md has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 04:00:58 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cat /foss/pdks/IHP-Open-PDK/.git/HEAD; cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch; ls -la figures; ls -R | head -40; grep -L 'SPDX' $(find . -type f ! -name '*.png') ; git -C /home/user/sg13cmos5l_cm_slot7 status --short | head
+```
+
+## Tool results / harness — 2026-11-25 04:00:58 UTC
+
+**Tool result:**
+
+```
+df4c5054ee8ca481c3eb873687274f28cdb50b1e
+total 296
+drwxr-xr-x 2 root root   4096 Nov 25 03:55 .
+drwxr-xr-x 5 root root   4096 Nov 25 04:00 ..
+-rw-r--r-- 1 root root 111156 Nov 25 03:59 s2d_ac_mm_hist.png
+-rw-r--r-- 1 root root  76577 Nov 25 03:59 s2d_mc_hist.png
+-rw-r--r-- 1 root root  99632 Nov 25 03:59 s2d_mm_hist.png
+.:
+README.md
+analyze.py
+cace_run.sh
+csv
+figures
+mm_collect.py
+netcheck.txt
+results.md
+results_head.md
+run.sh
+staleness.txt
+tables
+
+./csv:
+ac_mm_params.csv
+dc_params.csv
+mc_params.csv
+mm_params.csv
+mm_params_pex.csv
+pex_for_sim.log
+summary_ac_mm_params.md
+summary_dc_params.md
+summary_mc_params.md
+summary_mm_params.md
+summary_mm_params_pex.md
+
+./figures:
+s2d_ac_mm_hist.png
+s2d_mc_hist.png
+s2d_mm_hist.png
+
+./tables:
+compare_committed.md
+stats.csv
+stats.md
+?? verification/c2_gaps/s2d_mismatch/
+```
+
+## Assistant — 2026-11-25 04:01:01 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch; grep -n '^#' results.md; sed -n 1,8p csv/summary_mm_params_pex.md
+```
+
+## Tool results / harness — 2026-11-25 04:01:01 UTC
+
+**Tool result:**
+
+```
+5:# S2D pad Monte Carlo groups: results
+12:## 1. Runs
+26:## 2. Reading
+70:## 3. Statistics per group, view and quantity (= tables/stats.md)
+107:## 4. Comparison with the committed results (= tables/compare_committed.md)
+109:### Monte Carlo groups: committed CACE summary (min / typ / max) vs this run
+130:### dc_params (check of the committed non-Monte-Carlo schematic results, 2026-11-05)
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+CACE 2.11 summary of this run (IHP sg13cmos5l simulation, design 91a7da8b)
+-->
+
+# CACE Summary for sg13cmos5l_IOPadSingle2Diff
+```
+
+## Assistant — 2026-11-25 04:01:10 UTC
+
+**Tool call: `SubagentHandback`**
+
+```json
+{
+ "message": "All five groups ran: 395 of 395 runs gave a result, with no failures and no solver aid. Everything is in /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/ (README.md, results.md, run.sh, csv/, tables/, figures/), nothing committed.\n\n**Netlist check (netcheck.txt):** the S2D pad netlist (below its 4-line header) is byte-identical to the design's `_magic.spice`. The CACE netlist matches it line for line except `Rsub iovss vss 1` (`lvs_ignore=open`), same as for the D2S. All 75 MOSFET / rhigh / rppd instances carry `mm_ok=1`. The pad GDS equals the macro GDS that the PEX netlist was extracted from.\n\n**Staleness (staleness.txt):** the committed `mm_params`, `ac_mm_params` and `mc_params` results date from 2026-10-26 (pre-layout); 8 schematic commits followed, up to 2026-11-05, so they are stale. The other schematic groups were committed after the last schematic change, and the `dc_params` re-run reproduces all 135 committed runs exactly.\n\n**σ per quantity:**\n\n| group (runs) | view | quantity | σ | mean / worst |\n|---|---|---|---|---|\n| mm_params (100) | schematic | input offset | 5.25 mV | 95 % CI 4.61 … 6.10 |\n| | | gain | 0.0167 (0.83 %) | |\n| | | output-CM error | 11.0 mV | mean 7.9 mV |\n| mm_params (100) | magic PEX, `mm_ok=1` added | offset / gain / CM error | 6.15 mV / 0.0164 / 12.7 mV | CIs overlap the schematic's |\n| ac_mm_params (30) | schematic | PSRR iovdd, iovss, CMRR | 6.8 … 9.8 dB | worst 83.8 / 82.3 dB (iovdd 1k / 100k), 83.4 / 66.0 dB (iovss), CMRR 90.1 dB |\n| mc_params (30) | schematic | output-CM error | 0.17 mV | |\n| | | gain | 8.6 ppm | |\n| | | input offset | none | stays at −8.6 nV systematic |\n\nEvery run is inside the working limits. The PEX mismatch run worked: `pex_for_sim.py --mm-ok` put `mm_ok=1` on 221 extracted devices, and it took 3 min.\n\n**Figures:** `s2d_mm_hist.png` (offset, gain, CM error; schematic and PEX), `s2d_ac_mm_hist.png` (PSRR / CMRR) and `s2d_mc_hist.png` (process MC), all 150 dpi, 75–111 kB.\n\n**Errors:** only CACE's documentation step after the PEX group failed (KLayout can't find the PDK's `sg13g2.lyp`). It runs after the results are written and doesn't affect them."
+}
+```
+
+## Tool results / harness — 2026-11-25 04:01:10 UTC
+
+**Tool result:**
+
+```
+{"success":true,"message":"Report delivered to your caller."}
+```
+
