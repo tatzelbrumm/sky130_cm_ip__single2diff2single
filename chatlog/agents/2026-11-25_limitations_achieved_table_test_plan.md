@@ -71,3 +71,1593 @@ tughra_art_in_MPC9639.png
   1613 total
 ```
 
+## Assistant — 2026-11-25 03:42:54 UTC
+
+**Tool call: `Bash`**
+
+_Read front page README_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && cat -n docs/chipalooza2_as_taped_out/README.md
+```
+
+## Tool results / harness — 2026-11-25 03:42:54 UTC
+
+**Tool result:**
+
+```
+<persisted-output>
+Output too large (46.9KB). Full output saved to: /root/.claude/projects/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tool-results/bw1zpj0na.txt
+
+Preview (start and end):
+     1	<!--
+     2	SPDX-FileCopyrightText: 2026 Christoph Maier
+     3	SPDX-License-Identifier: Apache-2.0
+     4	-->
+     5	# Slot 7: custom S2D / D2S pad pair with a bandgap-referenced replica bias (as taped out, November 2026)
+     6	
+     7	Designer: Christoph Maier. Chipalooza Challenge #2 (IHP sg13cmos5l), slot 7, taped out on 2026-11-09 as commit `158afc5` of
+[… 45.2KB omitted …]
+   395	> `../glue_logic.md`; the chat-log link in `log.md` was replaced by a path citation (chat logs are not copied); in
+   396	> `characterization_candidates.md` the cross-reference "README's section 6" was corrected to section 2.5. The measurement plan for
+   397	> the fabricated chip is [TEST_PLAN.md](TEST_PLAN.md); sign-off reports are in [`../../signoff/`](../../signoff/README.md).
+   398	
+   399	Original introduction: Slot 7 turns a single-ended pad signal into a differential pair and back: two custom analog pads, a bandgap, a
+   400	bias distribution and replica-bias block that give the pads their reference currents and common-mode / reference voltages, and a small
+   401	3.3 V control block with fail-safe enables. Sections 2 and 3 are the electrical documentation and the state of readiness of each block (the glue logic, which is as important as the circuits, has its own page: [glue_logic.md](glue
+… [482 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:42:56 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/root/.claude/projects/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tool-results/bw1zpj0na.txt"
+}
+```
+
+## Tool results / harness — 2026-11-25 03:42:57 UTC
+
+**Tool result:**
+
+```
+1	     1	<!--
+2	     2	SPDX-FileCopyrightText: 2026 Christoph Maier
+3	     3	SPDX-License-Identifier: Apache-2.0
+4	     4	-->
+5	     5	# Slot 7: custom S2D / D2S pad pair with a bandgap-referenced replica bias (as taped out, November 2026)
+6	     6	
+7	     7	Designer: Christoph Maier. Chipalooza Challenge #2 (IHP sg13cmos5l), slot 7, taped out on 2026-11-09 as commit `158afc5` of
+8	     8	this repository. No silicon results exist yet: every number below is a **simulation** (IHP sg13cmos5l; schematic or extracted
+9	     9	layout as stated), and the design had no specification before it was characterized (proof of concept).
+10	    10	
+11	    11	## Slot 7 at a glance
+12	    12	
+13	    13	**What it is.** Two custom analog I/O pads that turn a single-ended pad voltage into a differential pair inside the chip
+14	    14	(**S2D**, input pad `s7_an[0]`) and a differential pair back into a pad voltage (**D2S**, output pad `s7_an[1]`), with the gain
+15	    15	set by matched devices (2 and ½), not by resistors. A small on-slot bandgap, a bias distribution and a replica-bias block give
+16	    16	both pads their 5 µA references and their common-mode / reference voltages; 3.3 V glue with fail-safe enables selects the modes.
+17	    17	In the default mode the D2S pad reproduces the S2D pad voltage, shifted by `vcm − vref` ≈ 0.77 V.
+18	    18	
+19	    19	![Signal and current flow of slot 7](pix/slot7_signal_flow.svg)
+20	    20	
+21	    21	*Figure 1: blocks, references and signal path (details in
+… [47577 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:42:59 UTC
+
+**Tool call: `Bash`**
+
+_Read test plan_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && cat docs/chipalooza2_as_taped_out/TEST_PLAN.md
+```
+
+## Assistant — 2026-11-25 03:43:00 UTC
+
+**Tool call: `Bash`**
+
+_List verification folders_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && ls verification/c2_gaps/ verification/c2_gaps/*/ signoff/; wc -l verification/c2_gaps/*/results.md signoff/README.md docs/chipalooza2_as_taped_out/datasheets/*.md
+```
+
+## Tool results / harness — 2026-11-25 03:43:01 UTC
+
+**Tool result:**
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Slot 7 test plan: measuring the fabricated chip through the Chipalooza #2 harness
+
+Designer: Christoph Maier. Scope: the slot 7 circuit **as taped out** (this repository at `158afc5`; see [README.md](README.md)
+section 1) on the Chipalooza #2 harness chip (`MPC9639`, harness branch `tapeout_nov_2026`). No chip has been measured yet.
+Every expected value below is a **simulated interval** (a corner table, a CACE result range or a single simulated point), copied
+with its source; none of them is a guaranteed limit, and the design had no specification (proof of concept; see
+[datasheets/README.md](datasheets/README.md)). The verdict for a measurement is therefore "inside the simulated interval" or
+"outside the simulated interval", never "pass / fail against a specification".
+
+## 0. Sources
+
+| key | file | repository @ commit |
+|---|---|---|
+| FT | [`docs/FOR_TIM.md`](../FOR_TIM.md) (harness settings, modes, expected values) | this repository @ `158afc5` |
+| S7 | [`docs/slot_7.md`](../slot_7.md) (modes, registers) | this repository @ `158afc5` |
+| GL | [glue_logic.md](glue_logic.md) (logic equations and truth table, derived from `netlist/slot_7.spice`) | this set |
+| T1 | `docs/slot7_hookup/tier1/results.txt` (five corners), copied verbatim in [datasheets/slot_7_system.md](datasheets/slot_7_system.md) §1 | design repository `tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single` @ `9052bd35` |
+| M
+… [17610 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 03:43:01 UTC
+
+**Tool result:**
+
+```
+signoff/:
+README.md
+bg_core_pd
+en_ctrl_3v3
+sg13cmos5l_IOPadDiff2Single
+sg13cmos5l_IOPadSingle2Diff
+slot_7
+
+verification/c2_gaps/:
+ac_tran
+d2s_pex
+d2s_schematic_rerun
+dc_curves
+replica_bias
+slot_modes_bg
+
+verification/c2_gaps/ac_tran/:
+README.md
+cace_at.sh
+collect.py
+common.py
+crosscheck.py
+csv
+d2s.py
+jobs_slot.txt
+mkgroups.py
+plots
+results.md
+rshunt.py
+rt.py
+run.sh
+s2d.py
+slot.py
+tables
+
+verification/c2_gaps/d2s_pex/:
+README.md
+cace_pex.sh
+compare.py
+csv
+lvs_summary.txt
+pex_sense.py
+plots
+plots.py
+results.md
+run.sh
+sg13cmos5l_IOPadDiff2Single_magic_pex_2.spice
+
+verification/c2_gaps/d2s_schematic_rerun/:
+README.md
+cace_sch.sh
+compare.py
+csv
+datasheet_intro.md
+datasheet_notes.md
+ds_post.py
+mm_collect.py
+netcheck.txt
+results.md
+results_head.md
+run.sh
+sg13cmos5l_IOPadDiff2Single.regenerated.md
+tables
+
+verification/c2_gaps/dc_curves/:
+README.md
+__pycache__
+cace_dc.sh
+collect.py
+common.py
+crosscheck.py
+csv
+d2s.py
+fetch.sh
+jobs_rt.txt
+mkgroups.py
+plots
+results.md
+roundtrip.py
+rt.py
+run.sh
+s2d.py
+tables
+vrefvcm.py
+
+verification/c2_gaps/replica_bias/:
+README.md
+analyze.py
+bias_dist_copy.py
+bias_dist_mc.py
+gds_cell_compare.py
+lvs_check.sh
+mc_collect.py
+results
+results.md
+run.sh
+run_cace.sh
+spdx_stamp.py
+
+verification/c2_gaps/slot_modes_bg/:
+README.md
+bg_core.py
+bg_core_dc.csv
+bg_core_diag.csv
+bg_core_ramp.csv
+bg_core_ramp.png
+designer_modes_rerun_ss.txt
+jobs_modes.txt
+plots.py
+results.md
+results_tables.md
+run.sh
+slot_modes.py
+slot_modes_dc_diag.csv
+slot_modes_powerup.csv
+slot_powerup_s
+… [784 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:03 UTC
+
+**Tool call: `Bash`**
+
+_Read DC curves results_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && cat verification/c2_gaps/dc_curves/results.md
+```
+
+## Assistant — 2026-11-25 03:43:04 UTC
+
+**Tool call: `Bash`**
+
+_Read AC/tran results_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && cat verification/c2_gaps/ac_tran/results.md
+```
+
+## Tool results / harness — 2026-11-25 03:43:04 UTC
+
+**Tool result:**
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# AC / transient / noise curves: key numbers and cross-check
+
+**IHP sg13cmos5l simulation (schematic | magic PEX)**. Figures, method, conditions and limits: [README.md](README.md).
+Every number here is evaluated by the scripts of this folder from the plotted curves (`csv/*_summary.csv`, one row per
+run) with the CACE template definitions; ranges are over the runs named. Units SI-prefixed as stated.
+
+## 1. Slot round trip (tier-1 slot deck, default mode, replica bias, pad_s2d at 0.5 V DC)
+
+Five tier-1 PVT points (corner, temperature, iovdd = vdd_3v3). Loads: unloaded = only the deck's 1 GΩ; 1 kΩ to an
+ideal copy of vref_d2s with 10 or 100 pF. `csv/rt_*_summary.csv`; `*` = schematic run that needed the rshunt retry.
+
+Round-trip −3 dB bandwidth [MHz] (relative to the gain at 1 kHz; `rt_bode_tt27`, `rt_bode_pvt`, `rt_f3db`):
+
+| PVT | unloaded: sch / PEX / KLayout | 1 kΩ ∥ 10 pF | 1 kΩ ∥ 100 pF |
+|---|---|---|---|
+| tt 27 °C 3.3 V | 1.532 / 1.356 / 1.514 | 1.265 / 1.122 / 1.220 | 1.523 / 1.325 / 1.487 |
+| ss -40 °C 3.0 V | 1.536* / 1.332 / 1.514 | 1.283* / 1.117 / 1.229 | 1.553* / 1.318 / 1.509 |
+| ff 125 °C 3.6 V | 1.627 / 1.466 / 1.607 | 1.292 / 1.166 / 1.254 | 1.588 / 1.408 / 1.548 |
+| fs 125 °C 3.6 V | 1.694 / 1.519 / 1.673 | 1.348 / 1.210 / 1.308 | 1.677 / 1.478 / 1.637 |
+| sf -40 °C 3.0 V | 1.470 / 1.283 / 1.451 | 1.235 / 1.082 / 1.185 | 1.473 / 1.262 / 1.434 |
+
+- Gain at 1 kHz −0.011 …
+… [11852 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 03:43:04 UTC
+
+**Tool result:**
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Results: DC curves of the S2D and D2S pads
+
+IHP sg13cmos5l simulation (schematic | magic PEX), ngspice-47, CACE 2.11, 2026-11-24. Method, criteria, conditions and
+limits: [README.md](README.md). Every number here is from the runs of `run.sh` in this folder (tables generated into
+`tables/`, per-run values in `csv/`).
+
+Status: complete.
+
+## Key numbers
+
+| quantity | conditions | result |
+|---|---|---|
+| S2D linear input range (1 mV, input-referred) | vref 0.5 V, vcm 1.2 V, 5 corners × 3 T × 3.0 / 3.3 / 3.6 V | high end 1.057 (ss −40 °C 3.0 V) … 1.299 V; low end ≤ 0 V except 125 °C (≤ 0.087 V); tt 27 °C 3.3 V: −0.149 … 1.245 V |
+| S2D at the slot's vref 0.49 V / vcm 1.26 V | same grid | high end 0.980 (ss −40 °C 3.0 V) … 1.351 V; tt 27 °C 3.3 V: −0.157 … 1.296 V |
+| D2S linear output range (10 mV, output-referred) | vicm = vref 1.65 V (CACE), 1 kΩ | 3.3 V: worst 1.121 … 2.180 V (ss −40 °C), tt 27 °C 0.985 … 2.314 V; 3.0 V: worst 1.449 … 1.851 V; 3.6 V: worst 0.737 … 2.558 V |
+| D2S at the slot's vicm = vref 1.26 V | 1 kΩ to 1.26 V | 3.3 V: worst ends 0.328 / 2.258 V (ff 125 °C), tt 27 °C 0.211 … 2.317 V; 3.0 V: worst 0.627 … 1.894 V (ss −40 °C) |
+| D2S INL (±1 V, CACE definition) | vicm 1.65 V / 1.26 V | 3.0 V: ≤ 88.4 / ≤ 1.38 mV; 3.3 V: ≤ 7.50 / ≤ 0.56 mV; 3.6 V: ≤ 0.49 / ≤ 0.50 mV |
+| D2S swing at vinp − vinn = ∓3 V | vicm 1.65 V, 1 kΩ, 3.3 V | 0.635 … 0.736 V / 3.266 … 3.283 V (unloade
+… [16225 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:07 UTC
+
+**Tool call: `Bash`**
+
+_Read D2S schematic rerun results_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && cat verification/c2_gaps/d2s_schematic_rerun/results.md
+```
+
+## Assistant — 2026-11-25 03:43:08 UTC
+
+**Tool call: `Bash`**
+
+_Read D2S PEX results_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && cat verification/c2_gaps/d2s_pex/results.md
+```
+
+## Tool results / harness — 2026-11-25 03:43:08 UTC
+
+**Tool result:**
+
+```
+<!-- SPDX-FileCopyrightText: 2026 Christoph Maier -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+# sg13cmos5l_IOPadDiff2Single: schematic vs post-layout (magic PEX) CACE results
+
+> **Note added 2026-11-25:** the "schematic" columns below are the committed CACE results of 2026-10-21, which predate the final D2S schematic; the schematic-vs-PEX changes below therefore mix layout effects with schematic changes. **Against the taped-out schematic** (re-run, `../d2s_schematic_rerun/results.md` §3 and §5) the layout leaves DC unchanged (currents ≤ 0.02 %, INL ≤ 0.75 %) and lowers bandwidth and slew rate by about 11 %; the +5 % current shifts reported below are not layout effects. The PEX columns are current.
+
+
+**IHP sg13cmos5l post-layout (magic PEX) simulation** of the taped-out cell
+(`pads/sg13cmos5l_IOPadDiff2Single/sg13cmos5l_IOPadDiff2Single.gds`), magic C-coupled extraction, compared with the
+committed schematic results. Method and caveats: [README.md](README.md).
+
+Sources of the numbers:
+- schematic: design repository tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single commit
+  91a7da8b67ac56a26c605501146667a1fde28c32,
+  `macros/sg13cmos5l_IOPadDiff2Single/verification/cace/results/sg13cmos5l_IOPadDiff2Single/<group>.csv`
+- PEX: `csv/<group>_pex_rshunt1e12.csv` (pass 2) and `csv/dc_params_pex_norshunt.csv` (pass 1) in this folder,
+  from run.sh in this task (CACE 2.11.0, ngspice-47).
+
+Values are SI (V, A, Hz, s, V/s, Ohm, dB) as cace_to_csv.py writes them, whatever the [unit] l
+… [13128 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 03:43:08 UTC
+
+**Tool result:**
+
+```
+<persisted-output>
+Output too large (30.6KB). Full output saved to: /root/.claude/projects/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tool-results/b6xhzjlqh.txt
+
+Preview (first 2KB):
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# D2S schematic re-run: results, old (committed) vs new
+
+**IHP sg13cmos5l schematic simulation**, `sg13cmos5l_IOPadDiff2Single`, all 15 CACE groups of the design repository's
+yaml at 91a7da8b (templates unchanged), CACE 2.11, ngspice-47 + OSDI, 2026-11-25. Old = the committed results
+(`macros/sg13cmos5l_IOPadDiff2Single/verification/cace/results/sg13cmos5l_IOPadDiff2Single/`, last written
+2026-10-21, before the final schematic); new = this run on the taped-out schematic ([README](README.md): which netlist
+and why). Method, commands and versions: README.md. Status: complete.
+
+## 1. Runs
+
+| group | runs (new) | runs with a result | solver aid | runs (old CSV) | wall clock |
+|---|---:|---:|---|---:|---|
+| dc_params | 30 | 30 | none | 30 | 32 s |
+| dc_3v0_params | 15 | 15 | none | 15 | 16 s |
+| dc_sel_params | 9 | 9 | none | 9 | 12 s |
+| dc_sel3_params | 3 | 3 | none | 3 | 5 s |
+| dc_ibias_params | 3 | 3 | none | 3 | 6 s |
+| ac_params | 15 | 15 | none | 15 | 36 s |
+| ac_load_params | 6 | 6 | none | 6 | 16 s |
+| ac_1nF_params | 2 | 2 | none | 2 | 8 s |
+| tran_params | 9 | 9 | none | 9 | 45 s |
+| thd_params | 3 | 3 | none | 3 | 15 s |
+| noise_params | 3 | 3 | none | 3 | 14 s |
+| drive_params | 10 | 10 | **rsh
+… [708 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:11 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/root/.claude/projects/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tool-results/b6xhzjlqh.txt"
+}
+```
+
+## Tool results / harness — 2026-11-25 03:43:11 UTC
+
+**Tool result:**
+
+```
+1	<!--
+2	SPDX-FileCopyrightText: 2026 Christoph Maier
+3	SPDX-License-Identifier: Apache-2.0
+4	-->
+5	# D2S schematic re-run: results, old (committed) vs new
+6	
+7	**IHP sg13cmos5l schematic simulation**, `sg13cmos5l_IOPadDiff2Single`, all 15 CACE groups of the design repository's
+8	yaml at 91a7da8b (templates unchanged), CACE 2.11, ngspice-47 + OSDI, 2026-11-25. Old = the committed results
+9	(`macros/sg13cmos5l_IOPadDiff2Single/verification/cace/results/sg13cmos5l_IOPadDiff2Single/`, last written
+10	2026-10-21, before the final schematic); new = this run on the taped-out schematic ([README](README.md): which netlist
+11	and why). Method, commands and versions: README.md. Status: complete.
+12	
+13	## 1. Runs
+14	
+15	| group | runs (new) | runs with a result | solver aid | runs (old CSV) | wall clock |
+16	|---|---:|---:|---|---:|---|
+17	| dc_params | 30 | 30 | none | 30 | 32 s |
+18	| dc_3v0_params | 15 | 15 | none | 15 | 16 s |
+19	| dc_sel_params | 9 | 9 | none | 9 | 12 s |
+20	| dc_sel3_params | 3 | 3 | none | 3 | 5 s |
+21	| dc_ibias_params | 3 | 3 | none | 3 | 6 s |
+22	| ac_params | 15 | 15 | none | 15 | 36 s |
+23	| ac_load_params | 6 | 6 | none | 6 | 16 s |
+24	| ac_1nF_params | 2 | 2 | none | 2 | 8 s |
+25	| tran_params | 9 | 9 | none | 9 | 45 s |
+26	| thd_params | 3 | 3 | none | 3 | 15 s |
+27	| noise_params | 3 | 3 | none | 3 | 14 s |
+28	| drive_params | 10 | 10 | **rshunt=1e12** (see below) | 10 | 21 s (with rshunt) |
+29	| pd_params | 48 | 48 | none added (the template's own rshu
+… [30372 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:14 UTC
+
+**Tool call: `Bash`**
+
+_Read D2S datasheet_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/datasheets && cat README.md && cat sg13cmos5l_IOPadDiff2Single.md
+```
+
+## Tool results / harness — 2026-11-25 03:43:14 UTC
+
+**Tool result:**
+
+```
+<persisted-output>
+Output too large (36.6KB). Full output saved to: /root/.claude/projects/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tool-results/br1pbm791.txt
+
+Preview (start and end):
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Slot 7: characterization data sheets (first step)
+
+**No specification existed:** the design is a proof of concept, so the CACE files carry the designer's *working limits* (partly derived from earlier measured bands), not pass / fail criteria. Each data sheet therefore leads with an **ex post facto specification**: for every characterized quantity the minimum and maximum over the characterization grid, the
+[… 35KB omitted …]
+- **mm_params** now has its per-iteration data (the committed CSV had a header only, because CACE 2.11 nests the iterations one level deeper than the design repository's `cace_to_csv.py` expects), so its specification rows are min / median / max over the iterations of the CSV, not CACE's summary.
+- **Units:** the CSV column labels are those of the design repository's `cace_to_csv.py` and are not reliable (several hold SI values under a display-unit label, e.g. `Vos_out[mV]` and `t_on[us]` hold V and s); the generator rescales each column to the unit of CACE's own summary.
+
+## What is not in this sheet
+
+- Any group that has no CSV or summary in the results directory (not run, or run in another view).
+- Post-layout values (magic PEX of the taped-out GDS): [D2S post-layout](../../
+… [388 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:17 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/root/.claude/projects/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tool-results/br1pbm791.txt"
+}
+```
+
+## Tool results / harness — 2026-11-25 03:43:17 UTC
+
+**Tool result:**
+
+```
+1	<!--
+2	SPDX-FileCopyrightText: 2026 Christoph Maier
+3	SPDX-License-Identifier: Apache-2.0
+4	-->
+5	# Slot 7: characterization data sheets (first step)
+6	
+7	**No specification existed:** the design is a proof of concept, so the CACE files carry the designer's *working limits* (partly derived from earlier measured bands), not pass / fail criteria. Each data sheet therefore leads with an **ex post facto specification**: for every characterized quantity the minimum and maximum over the characterization grid, the value at typical conditions, the median, the number of runs and the corner where each extreme occurs. These intervals describe what was simulated; they are not guaranteed limits. If a range should be *defined* (rather than observed), it should be chosen from these tables.
+8	
+9	Data sheets of the circuits in the **taped-out** `slot_7` ([../README.md](../README.md)), built from characterization data that already exist in the design repository. **No simulation was run for any of them**;
+10	they are generated or copied from committed files, and each states which taped-out cell it covers and where the data differ from the taped-out circuit. Below the specification, every CACE sheet reproduces, per parameter group, the rows of CACE's own `summary_<group>.md` (working limits, measured min / typ / max, CACE's status against those limits) with the group's run count and swept conditions.
+11	Generator: [tools/make_datasheet.py](tools/make_datasheet.py) (reads `<cell>.yaml` and the 
+… [37344 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:21 UTC
+
+**Tool call: `Bash`**
+
+_Read S2D datasheet head and headings_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/datasheets && sed -n 1,60p sg13cmos5l_IOPadSingle2Diff.md; grep -n '^#' sg13cmos5l_IOPadSingle2Diff.md
+```
+
+## Tool results / harness — 2026-11-25 03:43:21 UTC
+
+**Tool result:**
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# sg13cmos5l_IOPadSingle2Diff (S2D pad, s7_an[0]): characterization data sheet
+
+> **Scope: only what was taped out.** `sg13cmos5l_IOPadSingle2Diff` is the pad cell that replaces `s7_an[0]` in the taped-out slot 7; the delivery repository's `pads/` GDS and netlist are byte copies from the design repository's `toplevel` at `91a7da8b`, the commit used here, and the chip GDS contains the cell unchanged (checked). Two results views exist: the schematic netlist and the magic C-coupled extraction (`_pex`, post-layout, 2026-11-05); both are given. The pad's own bias tree takes `iref` from the slot (`bias_gen_pd` and `en_ctrl_3v3` are outside the cell since 2026-11-04; the CACE fixture `s2d_mpdda_pd_sel` supplies them, including a selection that can pick the Oguey–Aebischer core: in the taped-out slot `iref` comes from `bg_core_pd` through `bias_dist_pd`).
+
+**Cell:** `sg13cmos5l_IOPadSingle2Diff`  
+**Description (from the CACE file):** Single-ended-in, differential-out buffered input pad (matched-pair DDA, gain 2) with selectable bias and fail-safe enable  
+**PDK:** ihp-sg13cmos5l  
+**Designer:** Christoph Maier, CACE file created October 20, 2026  
+**Source:** [`macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/sg13cmos5l_IOPadSingle2Diff.yaml`](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single/blob/91a7da8b67ac56a26c605501146667a1fde28c32/macros/sg13cmos5l_IOPadSingle2Diff/
+… [4094 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:24 UTC
+
+**Tool call: `Bash`**
+
+_Read S2D CACE summaries_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/datasheets && sed -n 60,90p sg13cmos5l_IOPadSingle2Diff.md; sed -n 201,521p sg13cmos5l_IOPadSingle2Diff.md
+```
+
+## Tool results / harness — 2026-11-25 03:43:25 UTC
+
+**Tool result:**
+
+```
+*Difference and error vs the ideal 2 (pad − vref) over 5 corners × 3 temperatures, extracted layout*
+
+![Linear input range per corner and supply at the slot's vref 0.49 V / vcm 1.26 V (schematic)](../../../verification/c2_gaps/dc_curves/plots/s2d_range_slot.png)
+
+*Linear input range per corner and supply at the slot's vref 0.49 V / vcm 1.26 V (schematic)*
+
+![Linear input range vs the vref and vcm settings (schematic)](../../../verification/c2_gaps/dc_curves/plots/s2d_vrefvcm_range.png)
+
+*Linear input range vs the vref and vcm settings (schematic)*
+
+![Closed-loop frequency response of (outp − outn)/(pad − vref), schematic and extracted, over corners](../../../verification/c2_gaps/ac_tran/plots/s2d_bode.png)
+
+*Closed-loop frequency response of (outp − outn)/(pad − vref), schematic and extracted, over corners: 1.24 … 1.81 MHz*
+
+![Step response (outp, outn, difference) at the CACE loads 0.001 and 0.5 pF](../../../verification/c2_gaps/ac_tran/plots/s2d_step.png)
+
+*Step response (outp, outn, difference) at the CACE loads 0.001 and 0.5 pF*
+
+![Input-referred noise density](../../../verification/c2_gaps/ac_tran/plots/s2d_noise.png)
+
+*Input-referred noise density: 680 nV/√Hz at 1 kHz, 153 nV/√Hz at 100 kHz*
+
+Schematics: [pad top](../pix/schematics/sg13cmos5l_IOPadSingle2Diff.svg), [core amplifier s2d_mpdda](../pix/schematics/s2d_mpdda.svg), [with power-down s2d_mpdda_pd](../pix/schematics/s2d_mpdda_pd.svg), [matched unit unit_r2](../pix/schematics/unit_r2.svg), [bias tree](../pix/schem
+… [19415 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:33 UTC
+
+**Tool call: `Bash`**
+
+_Read pad_ref_rb datasheet_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/datasheets && sed -n 1,30p pad_ref_rb.md; grep -n '^#' pad_ref_rb.md; sed -n '/## CACE run summaries/,$p' pad_ref_rb.md
+```
+
+## Tool results / harness — 2026-11-25 03:43:33 UTC
+
+**Tool result:**
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# pad_ref_rb: replica bias of the custom pads (slot 7), characterization data sheet
+
+> **Scope: only what was taped out.** `pad_ref_rb` is a block of the taped-out `slot_7` (73.8 × 76.26 µm at (450, 150) µm; cells `bias_tree_rb`, `vcm_rb`, `vref_s2d_rb`, bypass capacitors). The data below were simulated on its **schematic** netlist in the CACE fixture of the design repository (with `en_ctrl_3v3` and `bias_gen_pd` next to it, as in the pads' templates), 2026-11-07. Two points differ from the slot: the fixture's reference current comes from `bias_gen_pd`, which can select the Oguey–Aebischer core (present in the fixture, **not in the taped-out slot**, whose only reference is `bg_core_pd`); and the group `vcm_sel_params` is the one that exercises that selection. No extracted (PEX) view of this suite exists in the results directory (mismatch on extracted netlists is vacuous, per the CACE file's header). Whether the schematic equals the block as laid out after 2026-11-07 was not checked.
+
+**Cell:** `pad_ref_rb`  
+**Description (from the CACE file):** Replica bias of the custom pads: shared tree bias_tree_rb, vcm_rb (S2D vcm = D2S vref, centre of the linear band) and vref_s2d_rb (S2D vref, about 0.5 V), one enable  
+**PDK:** ihp-sg13cmos5l  
+**Designer:** Christoph Maier, CACE file created November 6, 2026  
+**Source:** [`macros/pad_ref_rb/verification/cace/pad_ref_rb.yaml`](https://github.com
+… [7369 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:38 UTC
+
+**Tool call: `Bash`**
+
+_Read replica bias results_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && cat verification/c2_gaps/replica_bias/results.md
+```
+
+## Tool results / harness — 2026-11-25 03:43:38 UTC
+
+**Tool result:**
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Results: pad_ref_rb post-layout and mismatch, bias_dist_pd copy accuracy
+
+IHP sg13cmos5l simulation (ngspice-47, PSP 103 OSDI, CACE 2.11), 2026-11-23. Layout: the cells of
+`final/gds/slot_7.gds` (slot commit `158afc5`), XOR-identical to the macro GDS at design commit `9052bd35`; extraction
+magic C-coupled (`sak-pex.sh -m 2`), netgen LVS of the extractions against the source netlists: match uniquely. Method,
+commands and limits: [README.md](README.md). All numbers below are copied from `results/tables.md` as written by
+`run.sh` (JOBS=1 run); the CSVs behind them are in `results/`.
+
+## 1. pad_ref_rb: PEX view vs schematic
+
+**Result: the PEX view gives the schematic's numbers.** Largest difference of one run: 0.1 mV in Vcm (vcm_dc_params
+and vref_cold_params, tt −40 °C 3.3 V: committed 1.24742 V, schematic rerun 1.24749 V, PEX 1.24752 V); every other DC
+quantity agrees to the 6 significant digits of the CSVs. The same 0.07 mV appears between the schematic rerun and the
+committed CSV, so 0.1 mV is the numerical resolution of that operating point, not a layout effect. This is expected:
+the C-coupled extraction adds only capacitances (77 in pad_ref_rb, 181 fF in total) to the same devices, and every group
+here is a DC operating point. In pd_params the disabled outputs differ by at most 0.12 nV (Vref) and the supply current
+by 0.1 pA, from the extracted junction areas / perimeters (ad, as, pd
+… [11286 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:41 UTC
+
+**Tool call: `Bash`**
+
+_Read signoff README and slot modes results_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && cat signoff/README.md; sed -n 1,80p verification/c2_gaps/slot_modes_bg/results.md
+```
+
+## Tool results / harness — 2026-11-25 03:43:41 UTC
+
+**Tool result:**
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Sign-off reports of slot 7 and its blocks
+
+Designer: Christoph Maier. This directory collects the DRC and LVS reports that are **committed in the design repository**
+[`tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single`](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single) for the
+taped-out slot 7 (this repository at `158afc5`), its blocks and the two custom pads. The files are byte copies, collected on
+2026-11-23; each keeps its path below the macro directory, so `signoff/<macro>/<path>` comes from `macros/<macro>/<path>` of the
+commit named in the table. Nothing was re-run to produce them.
+
+Commits: **V** = branch `claude/c4-replica-bias` @ `9052bd35928c6d40344e8e686c9abbe736bfadb9` (slot_7 v3 and its blocks),
+**T** = branch `toplevel` @ `91a7da8b67ac56a26c605501146667a1fde28c32` (the pad cells; the pad GDS files in `../pads/` are byte
+copies from T, see `../README.md`; the S2D GDS at T has sha256 `f4b0e073…`, equal to `../pads/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.gds`).
+
+Summaries were read from the files on 2026-11-23: magic / netgen text as written; KLayout `.lyrdb` by counting the `<item>`
+entries (violations); KLayout `.lvsdb` with `klayout.db.LayoutVsSchematic` (KLayout 0.30.12), cross-reference status of the circuit
+and of each device pair.
+
+## Files
+
+| file here | commit | source path | bytes | sha256 | result (one line) |
+|---|---|---|---:|--
+… [14147 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:47 UTC
+
+**Tool call: `Bash`**
+
+_Read slot system datasheet and HOW_IT_WORKS headings_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && cat datasheets/slot_7_system.md | head -109; grep -n '^#' HOW_IT_WORKS.md
+```
+
+## Tool results / harness — 2026-11-25 03:43:47 UTC
+
+**Tool result:**
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# slot_7 as a whole (taped-out circuit): tier-1 simulation data sheet
+
+> **Scope.** This is the only characterization of the **slot circuit as a system** and not a CACE suite: the designer's tier-1 simulation
+> of the slot-7 netlist with the two custom pads and the replica bias, from the design repository at `9052bd35` (v3, the version the delivery cites; the delivery states v3 has the same geometry as the v2 these runs
+> were started on, with renamed bandgap cells, and the taped-out `slot_7.gds` is v3 plus the tughra art, which has no devices or pins).
+> Blocks with a layout were simulated **from their extracted layout netlists** (both pads, `pad_ref_rb`, `bias_dist_pd`); `bg_core_pd` from its schematic netlist; `ls_up_fs` from its source netlist
+> (it had no layout at the time of the run). The slot's `s7_ctrl` glue was simulated in the mode runs. Slot `vdd_3v3` and pad-ring `iovdd` both 3.3 V (3.0 / 3.6 V at the corners), harness enable 1.2 V, S2D input swept 0 … 1.0 V, D2S output unloaded (1 GΩ);
+> expected D2S out = `vcm` + (in − `vref`). Source files: [`docs/slot7_hookup/tier1/results.txt`](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single/blob/9052bd35928c6d40344e8e686c9abbe736bfadb9/docs/slot7_hookup/tier1/results.txt), [`modes.txt`](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single/blob/9052bd35928c6d40344e8e686c9abbe736bfadb9/docs/slot7_hookup
+… [6617 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:50 UTC
+
+**Tool call: `Bash`**
+
+_Read relevant HOW_IT_WORKS sections_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && sed -n 1,30p HOW_IT_WORKS.md; sed -n 107,175p HOW_IT_WORKS.md; sed -n 260,296p HOW_IT_WORKS.md; sed -n 540,551p HOW_IT_WORKS.md
+```
+
+## Tool results / harness — 2026-11-25 03:43:51 UTC
+
+**Tool result:**
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Slot 7: how it works, and why it is sized the way it is
+
+For a reviewer who knows analog design but not this project. Back to [README.md](README.md); numbers in the data sheets
+([datasheets/](datasheets/README.md)); measured-in-simulation curves in [`../../verification/c2_gaps/`](../../verification/c2_gaps/).
+No silicon exists yet: every number here is an IHP sg13cmos5l **simulation** quoted from the files named next to it.
+
+**Sources and conventions.**
+
+- **P** = design repository [`tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single`](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single)
+  at commit [`91a7da8b`](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single/tree/91a7da8b67ac56a26c605501146667a1fde28c32)
+  (the two pads, as taped out); **S** = the same repository at [`9052bd35`](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single/tree/9052bd35928c6d40344e8e686c9abbe736bfadb9)
+  (`slot_7` and the blocks it places). Paths below are relative to that repository's root. Statements of fact and of
+  design intent come from the READMEs and the comment headers of the source netlists named in each section.
+- Sizing tables are copied from the **source netlists** (`netlist/source/*.spice`); for every cell the READMEs state that
+  the xschem sheet netlists to the same devices (checked device by device by the designer). Layout dummies (D = S on a
+  
+… [9559 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:55 UTC
+
+**Tool call: `Bash`**
+
+_Read sky130 equipment list_
+
+```bash
+cat /home/user/sky130_cm_ip__single2diff2single/docs/EQUIPMENT_NEEDED.md
+```
+
+## Tool results / harness — 2026-11-25 03:43:55 UTC
+
+**Tool result:**
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Equipment the test plan needs
+
+A list of instrument *types* for [TEST_PLAN.md](TEST_PLAN.md) (no availability, no persons; the list of equipment available
+is sent separately from the proposal, as the rules ask).
+
+| instrument | used for (test-plan step) | minimum capability |
+|---|---|---|
+| harness test board with its SPI / control host | all steps: project select, `dig_in` routing, `analog_ena`, read-back | as provided by the harness |
+| source-measure unit, 2 channels | supply currents, disabled and unpowered leakage, reference currents into 0.7 V, D2S short-circuit and output impedance | pA resolution, ±100 mA range |
+| precision DC voltage source | S2D DC sweep 0 … 1 V, D2S differential drive around `vcm` (2 channels or 1 + `vcm` tracking) | 0 … 3.3 V, µV resolution |
+| digital multimeters, high input impedance, 2 units | `vcm`, `vref`, S2D `outp` / `outn` on the shared lines, INL | 6½ digits, ≥ 10 GΩ input option |
+| function generator | sine and step into the S2D pad | ≥ 10 MHz, low distortion (THD < −70 dB at 100 kHz) |
+| oscilloscope | step response, slew, settling, enable / disable timing | ≥ 100 MHz, 4 channels |
+| audio / dynamic-signal analyzer or 24-bit ADC with FFT | THD, noise spectrum | 10 Hz … 1 MHz |
+| low-noise preamplifier | output noise | < 5 nV/√Hz |
+| programmable supply with ripple injection (or a bias-T) | PSRR of both supplies | 3.0 … 3.6 V |
+| temperature ch
+… [117 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:44:33 UTC
+
+**Tool call: `Bash`**
+
+_Find source of 10-30x slower claim_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && grep -rn "30×\|30x\|10–30\|10-30" --include=*.md . | grep -v "^./verification/c2_gaps/.*/csv" | head -20
+```
+
+## Tool results / harness — 2026-11-25 03:44:33 UTC
+
+**Tool result:**
+
+```
+./README.md:25:  S2D → D2S loop while closed (stable, 10–30× slower).
+./docs/chipalooza2_as_taped_out/TEST_PLAN.md:113:| M2 mon | `0x23 = 0x0E`, `0x21 = 0x0E` | `0x3F` (bus switches 0, 1) | `s7_an[0]` 0 … 1.0 V; `analog[0]` / `[1]` high-impedance | `analog[0]` = `outp`, `analog[1]` = `outn`; `s7_an[1]` | loop unchanged: max deviation tt 27 °C 0.94 mV, ff 125 °C 6.55 mV; `v(bus0) − v(outp)` = `v(bus1) − v(outn)` = 0.01 mV (into 1 GΩ). Pad relation `outp − outn` = 2 (in − `vref`), (`outp` + `outn`)/2 = `vcm` (README §2.3); S2D gain 1.998 … 1.999, output common-mode error 5.003 … 18.05 mV (SD, `dc_params`, both views). The loop is slower while the bus switches are closed (FT); "stable, 10–30× slower" (this repository's `README.md`). ss −40 °C: no simulated value (as swap) |
+./docs/chipalooza2_as_taped_out/README.md:177:| `[1]` | mon | S2D `outp` / `outn` → `analog_bus0` / `analog_bus1` (loop stays on; it is 10–30× slower while the bus switches are closed) |
+./docs/chipalooza2_as_taped_out/glue_logic.md:128:| mon / bus load | with the bus switches closed the S2D → D2S loop is 10–30× slower, stable; the bus taps add a shared chip pad on `outp` / `outn` | `slot_7` README, RUNLOG |
+./docs/RULES_COMPLIANCE_chipalooza2.md:35:| 20 | shared analog pins through multiplexers; state resistance limits; sole access needs approval | partly | buses through the harness's per-slot switches (`docs/FOR_TIM.md`); effect stated qualitatively ("slow the S2D → D2S loop while closed (stable, 10–30× slo
+… [218 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:44:37 UTC
+
+**Tool call: `Bash`**
+
+_Check README context and rshunt docs_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && sed -n 15,40p README.md; sed -n 120,140p docs/chipalooza2_as_taped_out/glue_logic.md; grep -n "rshunt" verification/c2_gaps/dc_curves/README.md verification/c2_gaps/d2s_pex/README.md | head
+```
+
+## Tool results / harness — 2026-11-25 03:44:37 UTC
+
+**Tool result:**
+
+```
+`main` until this branch is merged, and on branch `claude/slot7-stage-a`). The frame and all 63 pin names, layers and
+positions are unchanged; only the stand-in's Metal4 stub pins are gone.
+
+- **Supplies:** `vdd_3v3` / `vss_3v3`; `vdd_1v2` only for the `dig_out` pull-downs.
+- **Enable:** `enable` = 1 turns the slot on in the default mode: bandgap → replica bias → pads, loop S2D → D2S direct,
+  vcm / vref on `analog_bus2` / `analog_bus3`.
+- **Modes:** `dig_in[0..5]` select modes only with the key `dig_in[3]` = 1, `dig_in[4]` = 0; route the dig_in
+  registers to 0 (0x0D) first. `dig_in[0]` swap (loop crossed), `[1]` S2D outputs → `analog_bus0/1`, `[2]`
+  `analog_bus0/1` → D2S (loop off), `[5]` external vcm / vref on `analog_bus2/3`.
+- **Buses:** close the harness's bus switches (reg 0x51 bits 4..7) for the buses in use; `analog_bus0/1` slow the
+  S2D → D2S loop while closed (stable, 10–30× slower).
+- **Disable:** `enable` = 0; with the slot's supplies off, the pads draw leakage only (≤ 67 nA at 125 °C).
+- **dig_out[11:0]:** held low.
+
+Checks here (2026-11-08, KLayout 0.30.12, PDK `ihp-sg13cmos5l` decks): `run_drc.py --no_density`: no violations,
+0 "exception" lines; maximal deck with `-rd latchUpRules=true`: 0; `run_lvs.py --run_mode=deep
+--disable_tap_extraction` against [`netlist/slot_7.cdl`](netlist/slot_7.cdl): netlists match, strict port mode, 0 errors,
+497 devices. In the CDL, pins that share one net are one port named with KLayout's comma list (for example
+`analog_bus2,s
+… [5235 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:44:46 UTC
+
+**Tool call: `Bash`**
+
+_Check pending folders and plot names_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && ls -d signoff/taped_out_158afc5 verification/c2_gaps/s2d_mismatch 2>&1; ls verification/c2_gaps/ac_tran/plots | head -40; ls verification/c2_gaps/dc_curves/plots | head -50
+```
+
+## Tool results / harness — 2026-11-25 03:44:46 UTC
+
+**Tool result:**
+
+```
+ls: cannot access 'signoff/taped_out_158afc5': No such file or directory
+ls: cannot access 'verification/c2_gaps/s2d_mismatch': No such file or directory
+d2s_bode_corners.png
+d2s_bode_loads.png
+d2s_enable.png
+d2s_noise.png
+d2s_psrr.png
+d2s_slot_vs_cace.png
+d2s_step.png
+d2s_step.svg
+d2s_zout.png
+rt_bode_pvt.png
+rt_bode_tt27.png
+rt_f3db.png
+rt_f3db.svg
+rt_sine_tt27.png
+rt_step_pvt.png
+rt_step_pvt.svg
+rt_step_tt27.png
+s2d_bode.png
+s2d_cm_response.png
+s2d_enable.png
+s2d_noise.png
+s2d_settling.png
+s2d_step.png
+d2s_corners_3v0_schematic.png
+d2s_corners_noload_schematic.png
+d2s_corners_pex.png
+d2s_corners_schematic.png
+d2s_corners_slot_3v0_schematic.png
+d2s_corners_slot_schematic.png
+d2s_linearity_criterion.png
+d2s_range.png
+d2s_range.svg
+d2s_range_noload.png
+d2s_range_noload.svg
+d2s_range_slot.png
+d2s_range_slot.svg
+d2s_transfer_tt27_pex.png
+d2s_transfer_tt27_pex.svg
+d2s_transfer_tt27_schematic.png
+d2s_transfer_tt27_schematic.svg
+rt_error_corners.png
+rt_error_corners.svg
+rt_transfer_tt27.png
+rt_transfer_tt27.svg
+s2d_corners_pex.png
+s2d_corners_pex.svg
+s2d_corners_schematic.png
+s2d_corners_schematic.svg
+s2d_linearity_criterion.png
+s2d_range.png
+s2d_range.svg
+s2d_range_slot.png
+s2d_range_slot.svg
+s2d_transfer_tt27_pex.png
+s2d_transfer_tt27_pex.svg
+s2d_transfer_tt27_schematic.png
+s2d_transfer_tt27_schematic.svg
+s2d_vrefvcm_range.png
+s2d_vrefvcm_range.svg
+```
+
+## Assistant — 2026-11-25 03:48:25 UTC
+
+Now I have enough. Let me write the ACHIEVED_VS_LIMITS.md file.
+
+## Assistant — 2026-11-25 03:49:26 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md`
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Achieved vs working limits: S2D pad, D2S pad, `pad_ref_rb`
+
+Back to [README.md](README.md). **The limits below are the designer's working limits, not a specification.** The design is a
+proof of concept and had no specification before it was characterized; the CACE files carry working limits, in part set from
+earlier simulated bands, and were written while the design was being made ([datasheets/README.md](datasheets/README.md)). A
+specification, if one is wanted, would be set ex post facto from the observed intervals. "Inside" therefore means "inside the
+designer's working limit in simulation", not "meets a specification" and not a guarantee; nothing here was measured on silicon.
+
+**How to read the tables.** *Working limit*: as the data sheet shows it from the CACE yaml ("no limit" where both sides are
+`any`). *Schematic* / *post-layout*: min … max over the runs of the group, copied from the sources named under each table
+(post-layout = magic C-coupled extraction). *Margin*: distance from the worse of the two views to the nearest working limit, in
+the limit's unit, computed here from the values shown; negative = outside. *Verdict*: inside / outside / no limit. "—" = no
+run in that view. Groups that exercise the CACE fixtures' bias selection (`dc_sel*`, `vcm_sel` at the S2D / D2S;
+it can pick the Oguey–Aebischer core, which is not in the slot) are left out except where noted; they are in the data sheets.
+
+(*) The CACE yaml labels S2D `Vcm_dev` and D2S `Glitch_max` / `Glitch_min` as mV, but the templates compute them in V, so
+CACE compared a value in V with 50 / 400 as if both were in V (effectively 50 V / 400 V)
+([AC / transient results](../../verification/c2_gaps/ac_tran/results.md) §4). The data sheets show the values in mV; the margin
+and verdict here are those of the physical value against the limit read as mV.
+
+## S2D pad (`sg13cmos5l_IOPadSingle2Diff`, `s7_an[0]`)
+
+Sources: [S2D data sheet](datasheets/sg13cmos5l_IOPadSingle2Diff.md), sections "CACE run summaries" (schematic and
+post-layout; committed CACE results of design commit `91a7da8b`, 2026-11-05, reproduced to 0.000 % in
+[AC / transient](../../verification/c2_gaps/ac_tran/results.md) §4). CACE conditions: `vref` = `vcm` = 1.2 V (window:
+`vref` 0.5 V), 50 Ω source, 0.5 pF per output.
+
+| group (runs) | quantity | working limit | schematic | post-layout | margin | verdict |
+|---|---|---|---|---|---|---|
+| dc_params (135) | gain | 1.99 … 2.01 | 1.99849 … 1.99930 | 1.99849 … 1.99930 | 0.0085 | inside |
+| dc_params | input offset (systematic) | −1 … 1 mV | −0.000 … 0.001 mV | −0.000 … 0.001 mV | 0.999 mV | inside |
+| dc_params | INL | ≤ 2 mV | 0.087 … 1.069 mV | 0.087 … 1.069 mV | 0.931 mV | inside |
+| dc_params | output common-mode error | −30 … 30 mV | 5.003 … 18.050 mV | 5.003 … 18.050 mV | 11.95 mV | inside |
+| dc_params | IO ring current | ≤ 135 µA | 114.64 … 116.86 µA | 114.64 … 116.86 µA | 18.14 µA | inside |
+| range_params (96) | gain / INL vs `vref`, `vcm` | no limit | 1.94975 … 2.03771 / 0.189 … 172.31 mV | 1.94975 … 2.03771 / 0.189 … 172.31 mV | — | no limit |
+| window_params (27) | input range, low end | ≤ 0.1 V | 0.000 … 0.087 V | 0.000 … 0.087 V | 0.013 V | inside |
+| window_params | input range, high end | ≥ 1.0 V | 1.057 … 1.299 V | 1.058 … 1.299 V | 0.057 V | inside |
+| *not CACE:* high end at the slot's `vref` 0.49 V / `vcm` 1.26 V (45 runs, [DC curves](../../verification/c2_gaps/dc_curves/results.md) §1b) | input range, high end | 1.0 V, the window_params limit applied for comparison | 0.980 … 1.351 V | — | −0.020 V | outside at ss −40 °C 3.0 V only (comparison; with the replica's own `vcm` there, 1.115 V, the round trip keeps −0.243 … 1.055 V, same source) |
+| dc_ibias_params (15; 3 … 7 µA) | gain | 1.99 … 2.01 | 1.99871 … 1.99924 | 1.99871 … 1.99924 | 0.0087 | inside |
+| dc_ibias_params | output common-mode error | −30 … 30 mV | 8.667 … 11.682 mV | 8.667 … 11.6
+… [11528 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 03:49:26 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 03:49:59 UTC
+
+**Tool call: `Bash`**
+
+_Fix wording in achieved-vs-limits file_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && python3 - <<'EOF'
+p='ACHIEVED_VS_LIMITS.md'
+s=open(p).read()
+old="""proof of concept and had no specification before it was characterized; the CACE files carry working limits, in part set from
+earlier simulated bands, and were written while the design was being made ([datasheets/README.md](datasheets/README.md)). A"""
+new="""proof of concept and had no specification before it was characterized; the CACE files carry the designer's working limits,
+"partly derived from earlier measured bands" ([datasheets/README.md](datasheets/README.md)), not pass / fail criteria. A"""
+assert old in s; s=s.replace(old,new)
+old2="""post-layout; committed CACE results of design commit `91a7da8b`, 2026-11-05, reproduced to 0.000 % in
+[AC / transient](../../verification/c2_gaps/ac_tran/results.md) §4). CACE conditions"""
+new2="""post-layout; committed CACE results of design commit `91a7da8b`, 2026-11-05; the ac / tran / noise / enable groups are
+reproduced to 0.000 % in [AC / transient](../../verification/c2_gaps/ac_tran/results.md) §4, window_params within 0.62 mV in
+[DC curves](../../verification/c2_gaps/dc_curves/results.md) §1). CACE conditions"""
+assert old2 in s; s=s.replace(old2,new2)
+s=s.replace("| 46.1 mV | inside |","| 46.05 mV | inside |")
+open(p,'w').write(s)
+EOF
+grep -n "46.05\|measured bands\|0.62 mV" ACHIEVED_VS_LIMITS.md
+```
+
+## Tool results / harness — 2026-11-25 03:49:59 UTC
+
+**Tool result:**
+
+```
+9:"partly derived from earlier measured bands" ([datasheets/README.md](datasheets/README.md)), not pass / fail criteria. A
+29:reproduced to 0.000 % in [AC / transient](../../verification/c2_gaps/ac_tran/results.md) §4, window_params within 0.62 mV in
+147:| mm_params (100 MC, tt 27 °C 3.3 V) | `vcm` | 1.2 … 1.32 V | 1246.91 … 1273.95 mV (σ 5.415 mV) | — (mismatch on extraction not run) | 46.05 mV | inside |
+```
+
+## Assistant — 2026-11-25 03:50:05 UTC
+
+**Tool call: `Bash`**
+
+_Adjust mismatch note and locate README insertion point_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && python3 - <<'EOF'
+p='ACHIEVED_VS_LIMITS.md'
+s=open(p).read()
+old="| — (mismatch on extraction not run) |"
+new="| — (not run; mismatch on an extracted netlist is vacuous per the yaml header, [data sheet](datasheets/pad_ref_rb.md)) |"
+assert old in s; s=s.replace(old,new); open(p,'w').write(s)
+EOF
+grep -n "^### Key numbers\|^## Where to find what\|Details: \[§5\]" README.md
+```
+
+## Tool results / harness — 2026-11-25 03:50:06 UTC
+
+**Tool result:**
+
+```
+53:### Key numbers (simulation)
+74:**not** in the taped-out slot (see [§8](#8-about-this-document-set)). Details: [§5](#5-verification-state), [signoff](../../signoff/README.md).
+76:## Where to find what
+```
+
+## Assistant — 2026-11-25 03:50:08 UTC
+
+Now the front-page section.
+
+## Assistant — 2026-11-25 03:50:29 UTC
+
+**Tool call: `Edit`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/README.md`
+
+old:
+```
+**not** in the taped-out slot (see [§8](#8-about-this-document-set)). Details: [§5](#5-verification-state), [signoff](../../signoff/README.md).
+
+## Where to find what
+```
+
+new:
+```
+**not** in the taped-out slot (see [§8](#8-about-this-document-set)). Details: [§5](#5-verification-state), [signoff](../../signoff/README.md).
+
+## Known limitations and use in a system
+
+For reuse in a system. All simulation, no silicon; "limits" are the designer's working limits, not a specification
+([achieved vs working limits](ACHIEVED_VS_LIMITS.md)).
+
+- **S2D input range** (1 mV linear): −0.157 … 1.296 V at tt 27 °C 3.3 V with the replica's `vref` 0.49 V / `vcm` 1.26 V; high end ≥ 0.980 V at every corner, low end above 0 V (≤ 0.086 V) at 125 °C. It moves with `vref` and `vcm` and shrinks at 3.0 V (e.g. `vref` 0.5 V, `vcm` 1.65 V: 0.371 … 0.630 V); above about 1.5 V the outputs saturate ([DC curves](../../verification/c2_gaps/dc_curves/results.md) §1, §1b, §4).
+- **D2S output range and linearity depend on the input common mode:** at the slot's `vicm` = `vref` = 1.26 V, 0.211 … 2.317 V at tt 27 °C, worst 0.328 … 2.258 V (3.3 V, 1 kΩ), INL ≤ 0.56 mV (≤ 1.38 mV at 3.0 V); at `vicm` 1.65 V (CACE condition) the 3.0 V range shrinks to 1.449 … 1.851 V and the INL reaches 88.4 mV ([DC curves](../../verification/c2_gaps/dc_curves/results.md) §2, §2b).
+- **Loads:** simulated with 1 kΩ or open and 10 … 300 pF (the designer's load range, [HOW_IT_WORKS.md §3.3](HOW_IT_WORKS.md#33-miller-compensation-and-bandwidth)); at 1 nF the D2S peaks by 4.8 dB with 1 kΩ and 7.4 dB unloaded; at 300 pF the step overshoots up to 9.1 % ([AC / transient](../../verification/c2_gaps/ac_tran/results.md) §3
+… [3958 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 03:50:29 UTC
+
+**Tool result:**
+
+```
+The file /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/README.md has been updated successfully.
+```
+
+## Assistant — 2026-11-25 03:50:30 UTC
+
+**Tool call: `Edit`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/README.md`
+
+old:
+```
+| What was verified, and what is open? |
+```
+
+new:
+```
+| Which working limits were met, and by what margin? | [ACHIEVED_VS_LIMITS.md](ACHIEVED_VS_LIMITS.md) (per pad and `pad_ref_rb`; working limits, not a specification) |
+| What was verified, and what is open? |
+```
+
+## Tool results / harness — 2026-11-25 03:50:30 UTC
+
+**Tool result:**
+
+```
+The file /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/README.md has been updated successfully.
+```
+
+## Assistant — 2026-11-25 03:50:49 UTC
+
+**Tool call: `Bash`**
+
+_Refine limitation bullets_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && python3 - <<'EOF'
+p='README.md'
+s=open(p).read()
+reps=[
+("- **Loads:** simulated with 1 kΩ or open and 10 … 300 pF (the designer's load range, [HOW_IT_WORKS.md §3.3](HOW_IT_WORKS.md#33-miller-compensation-and-bandwidth));",
+ "- **Loads:** simulated with 1 kΩ or open and 10 pF … 1 nF; the designer's load range is 10 … 300 pF ([HOW_IT_WORKS.md §3.3](HOW_IT_WORKS.md#33-miller-compensation-and-bandwidth));"),
+("round trip 1.08 … 1.69 MHz, 1 % settling 453 … 623 ns, D2S slew",
+ "round trip 1.08 … 1.69 MHz, 1 % settling 453 … 623 ns (tt 27 °C), D2S slew"),
+("ESD and latch-up simulation of the pads (only the latch-up DRC rules: 0), PEX of the whole slot, full-RC extraction (every extraction here is C-coupled), silicon",
+ "ESD and latch-up simulation of the pads (the slot's latch-up DRC rules report 0, a rule check), PEX of the whole slot, full-RC extraction of the pads and `pad_ref_rb` (C-coupled only), silicon"),
+("more than the corner errors of the loop (≤ 6.5 mV)", "more than the corner errors of the default loop (≤ 6.5 mV)"),
+]
+for a,b in reps:
+    assert a in s, a; s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+sed -n '/^## Known limitations/,/^## Where to find/p' README.md | wc -w
+```
+
+## Tool results / harness — 2026-11-25 03:50:50 UTC
+
+**Tool result:**
+
+```
+735
+```
+
+## Assistant — 2026-11-25 03:50:53 UTC
+
+Now the test plan: source rows and superseded D2S numbers first.
+
+## Assistant — 2026-11-25 03:51:05 UTC
+
+**Tool call: `Bash`**
+
+_Update superseded D2S numbers and sources in test plan_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && python3 - <<'EOF'
+p='TEST_PLAN.md'
+s=open(p).read()
+reps=[
+("| DS | [datasheets/sg13cmos5l_IOPadDiff2Single.md](datasheets/sg13cmos5l_IOPadDiff2Single.md) (CACE, schematic; results predate the layout) | design repository @ `91a7da8b` |",
+ "| DS | [datasheets/sg13cmos5l_IOPadDiff2Single.md](datasheets/sg13cmos5l_IOPadDiff2Single.md) (CACE, schematic, re-run on 2026-11-25 on the taped-out schematic; replaces the committed results of 2026-10-21, which predated the final schematic) | yaml: design repository @ `91a7da8b`; results: [d2s_schematic_rerun](../../verification/c2_gaps/d2s_schematic_rerun/results.md) |\n"
+ "| DP | [verification/c2_gaps/d2s_pex/results.md](../../verification/c2_gaps/d2s_pex/results.md) (D2S, CACE on the magic PEX of the taped-out cell) | this repository |\n"
+ "| DC | [verification/c2_gaps/dc_curves/results.md](../../verification/c2_gaps/dc_curves/results.md) (DC curves of both pads and of the round trip) | this repository |\n"
+ "| AT | [verification/c2_gaps/ac_tran/results.md](../../verification/c2_gaps/ac_tran/results.md) (AC, transient, noise of both pads and of the round trip) | this repository |\n"
+ "| RP | [verification/c2_gaps/replica_bias/results.md](../../verification/c2_gaps/replica_bias/results.md) (`pad_ref_rb` PEX and mismatch) | this repository |\n"
+ "| SM | [verification/c2_gaps/slot_modes_bg/results.md](../../verification/c2_gaps/slot_modes_bg/results.md) (modes at ss −40 °C from power-up, `bg_core_pd` alone) | this repository |"),
+("high end 1.057 … 1.299 V (SD, `window_params`); D2S output swing, minimum output 0.6396 … 0.7386 V, maximum 3.266 … 3.283 V (DS,\n`drive_params`). With `vcm` ≈ 1.26 V and `vref` ≈ 0.49 V an input of 0 V maps to about 0.77 V at the D2S output, close to that minimum.",
+ "high end 1.057 … 1.299 V (SD, `window_params`); D2S output swing, minimum output 0.6354 … 0.7359 V, maximum 3.266 … 3.283 V (DS,\n`drive_params`, at the CACE input common mode 1.65 V). With `vcm` ≈ 1.26 V and `vref` ≈ 0.49 V an input of 0 V maps to about 0.77 V at\nthe D2S output; at the slot's own operating point (D2S `vicm` = `vref` = 1.26 V) the D2S is linear (10 mV) over 0.211 … 2.317 V at\ntt 27 °C 3.3 V, worst 0.328 … 2.258 V (DC §2b), so 0.77 V is well inside it."),
+("D2S alone: gain 0.4981 … 0.5, output offset 0.03487 … 1.947 mV (DS, `dc_params`, 3.3 / 3.6 V)",
+ "D2S alone: gain 0.4983 … 0.5000, output offset 0.032 … 1.737 mV (DS, `dc_params`, 3.3 / 3.6 V)"),
+("D2S pad leakage −36.83 … 9.71 nA (DS, `pd_params`)",
+ "D2S pad leakage −36.83 … 14.94 nA (DS, `pd_params`; PEX −36.85 … 14.95 nA, DP)"),
+("D2S turn-on 0.8054 … 1.228 µs (DS)",
+ "D2S turn-on 0.982 … 1.819 µs (DS), 1.109 … 2.387 µs (DP)"),
+("Bench: SMU or precision source on `s7_an[0]`;",
+ "Bench (minimum capabilities: §8; acceptance intervals per step: §9): SMU or precision source on `s7_an[0]`;"),
+]
+for a,b in reps:
+    assert a in s, a[:60]; s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+grep -n "^## " TEST_PLAN.md
+```
+
+## Tool results / harness — 2026-11-25 03:51:06 UTC
+
+**Tool result:**
+
+```
+14:## 0. Sources
+36:## 1. What can be observed where
+53:## 2. Harness registers used (HK, quoted from the RTL)
+80:## 3. Sequence
+145:## 4. Temperature points
+152:## 5. Inside / outside the simulated interval
+164:## 6. What from the stage A / B procedure applies
+181:## 7. Record per measurement
+```
+
+## Assistant — 2026-11-25 03:52:17 UTC
+
+Now update the ss −40 °C mode entries that the slot_modes_bg run superseded.
+
+## Assistant — 2026-11-25 03:52:18 UTC
+
+**Tool call: `Bash`**
+
+_Find ss -40 entries in test plan_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && grep -n "ss −40" TEST_PLAN.md | cut -c1-400
+```
+
+## Tool results / harness — 2026-11-25 03:52:19 UTC
+
+**Tool result:**
+
+```
+31:| SM | [verification/c2_gaps/slot_modes_bg/results.md](../../verification/c2_gaps/slot_modes_bg/results.md) (modes at ss −40 °C from power-up, `bg_core_pd` alone) | this repository |
+104:| D2 | as D1 (or `0x51 = 0x0F` to keep the buses off the references) | `s7_an[0]` swept 0 … 1.0 V (T1, MO: "Pad in swept 0 ... 1.0 V") | `s7_an[1]` | D2S out = `vcm` + (in − `vref`) with the `vcm` / `vref` of D1 (FT; README §2.1). Maximum deviation from that line over 0 … 1 V: tt 27 °C 0.90 mV, ss −40 °C 1.31 mV, sf −40 °C 1.11 mV, fs 125 °C 3.37 mV, ff 125 °C 6.49 mV (T1); FT:
+119:| M1 swap | `0x23 = 0x0E`, `0x20 = 0x0E` | `0x0F` | `s7_an[0]` 0 … 1.0 V | `s7_an[1]` | D2S out = `vcm` − (in − `vref`) (FT). Max deviation: tt 27 °C 0.99 mV, ff 125 °C 2.88 mV; **ss −40 °C: no simulated value** (no DC result; in the power-up transient swap stalls at the bandgap's start-up node, RL rows 121–122) |
+120:| M2 mon | `0x23 = 0x0E`, `0x21 = 0x0E` | `0x3F` (bus switches 0, 1) | `s7_an[0]` 0 … 1.0 V; `analog[0]` / `[1]` high-impedance | `analog[0]` = `outp`, `analog[1]` = `outn`; `s7_an[1]` | loop unchanged: max deviation tt 27 °C 0.94 mV, ff 125 °C 6.55 mV; `v(bus0) − v(outp)` = `v(bus1) − v(outn)` = 0.01 mV (into 1 GΩ). Pad relation `outp − outn` = 2 (in − `vref`), (`outp` + `outn`)/
+121:| M3 feed | `0x23 = 0x0E`, `0x22 = 0x0E` | `0x3F` | `analog[0]` = `vcm` + 0.2 V, `analog[1]` = `vcm` − 0.2 V (MO: sources at `vcm` ± 0.2 V through 10 kΩ); `s7_an[0]` fixed 0.5 V | `s7_an[1]` | D2S out = `vcm` + (`v(bu
+… [1400 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:52:27 UTC
+
+**Tool call: `Bash`**
+
+_Update superseded ss -40 C mode entries_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && grep -n "ss −40 °C: no simulated value (as swap)" TEST_PLAN.md | cut -c1-20; python3 - <<'EOF'
+p='TEST_PLAN.md'
+s=open(p).read()
+reps=[
+("**ss −40 °C: no simulated value** (no DC result; in the power-up transient swap stalls at the bandgap's start-up node, RL rows 121–122) |",
+ "ss −40 °C 3.0 V: no DC result; power-up transient from 0 V 1.12 mV (SM §1, pad out 1 GΩ ∥ 10 pF; the stall reported in RL rows 121–122 is traced there to the solver at the pads' antenna diodes, not to the bandgap) |"),
+("ss −40 °C: no simulated value (as swap) |",
+ "ss −40 °C 3.0 V: no DC result; power-up transient 1.43 mV (SM §1) |"),
+("ss −40 °C: no DC result, power-up transient 0.24 mV (RL row 122).",
+ "ss −40 °C: no DC result, power-up transient 0.24 mV (RL row 122; SM §1 the same)."),
+("ss −40 °C: no DC result, power-up transient 0.04 mV (RL row 122).",
+ "ss −40 °C: no DC result, power-up transient 0.04 mV (RL row 122); SM §1: 4.92 mV, there taken against the source values 1.30 / 0.50 V behind their 10 kΩ."),
+("tt 27 °C 0.05 mV, ff 125 °C 2.22 mV; ss −40 °C: no simulated value |",
+ "tt 27 °C 0.05 mV, ff 125 °C 2.22 mV; ss −40 °C: no DC result, power-up transient 0.24 mV (SM §1) |"),
+("  swap + feed at ss −40 °C in DC (MO, RL rows 121–122);",
+ "  swap + feed at ss −40 °C in DC (MO, RL rows 121–122; power-up transients exist for all 8 modes there, SM §1);"),
+]
+for a,b in reps:
+    assert s.count(a)==1, a[:70]; s=s.replace(a,b)
+s=s.replace("tt 27 °C 3.3 V, worst 0.328 … 2.258 V (DC §2b), so 0.77 V is well inside it.","tt 27 °C 3.3 V, worst 0.328 … 2.258 V (DC §2b, 1 kΩ to 1.26 V), so 0.77 V is well inside it.")
+open(p,'w').write(s)
+EOF
+```
+
+## Tool results / harness — 2026-11-25 03:52:28 UTC
+
+**Tool result:**
+
+```
+120:| M2 mon | `0x23
+```
+
+## Assistant — 2026-11-25 03:52:43 UTC
+
+Now append the Equipment and Acceptance sections.
+
+## Assistant — 2026-11-25 03:53:35 UTC
+
+**Tool call: `Bash`**
+
+_Append equipment and acceptance sections to test plan_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && tail -5 TEST_PLAN.md && cat >> TEST_PLAN.md <<'EOF'
+
+## 8. Equipment needed
+
+Instrument *types* and the minimum capability each step needs (no availability, no persons). Adapted from the equipment list
+of the sky130 proposal of the same pads; the capabilities here are derived from this chip's simulated values (column 4), so
+they are working estimates for a bench, not requirements of a specification.
+
+| instrument | used in steps | minimum capability | derived from |
+|---|---|---|---|
+| harness test board with its SPI / control host | all | writes of `0x50`, `0x51`, `0x20 … 0x37`; reads of `0x38`, `0x39`, `0x01 … 0x07` | §2, §7 (HK) |
+| chip supplies (3.3 V slot supply, pad ring) | all | as the harness board provides; 3.0 / 3.6 V settable if the 3.0 / 3.6 V corner intervals are to be compared at their own supply | T1 simulates −40 °C at 3.0 V and 125 °C at 3.6 V |
+| current meters on the chip's 3.3 V supply and on the pad-ring supply (SMU or ammeter in series) | P1, P3, P5, F1, F3, F4 | µA range with ≤ 0.1 µA resolution for the enabled step; ≤ 1 nA resolution for the disabled and unpowered states; stable over the minutes of a state change, because the slot is seen only as a difference on supplies shared with the rest of the chip (§1) | enabled 48.38 … 49.74 µA (slot), 364.58 … 395.62 µA (ring); disabled 25.36 … 56.20 nA / 9.01 … 58.22 nA (T1); unpowered ≤ 67 nA (FT) |
+| source-measure unit on `s7_an[0]` | D2, M1, M2, M4, M6, M7 (sweep 0 … 1.0 V, optionally to 1.5 V for the range ends, §9), M3 (fixed 0.5 V), F5 (0 / 3.3 V), D3–D5 (DC level) | 0 … 3.3 V; low source impedance (the S2D was characterized from 50 Ω, SD); current resolution ≤ 0.1 nA for F5 | S2D pad leakage −7.640 … 5.876 nA (SD) |
+| DC voltmeters, high input impedance, at least 3 (`s7_an[1]`; `analog[2]` and `analog[3]`, or `analog[0]` and `analog[1]` in mon; and the applied `s7_an[0]` level) | D1, D2, M1–M7, F2 | 6½ digits (10 µV resolution on the 0 … 3.3 V range), input impedance ≥ 1 GΩ | smallest simulated deviation 0.05 mV (M3, MO); bus vs pad difference 0.01 mV into 1 GΩ (MO); FT: "read them with a high-impedance voltmeter" |
+| DC voltage sources, 2 channels, each behind a 10 kΩ series resistor | M3 (`analog[0]` / `[1]` at `vcm` ± 0.2 V), M4 (`analog[2]` / `[3]` at 1.30 / 0.50 V) | 0 … 3.3 V; set to 0 V before power-down (§3.4) | the mode simulations drive the buses through 10 kΩ (MO) |
+| oscilloscope | F6; D4 (optional) | 2 channels plus a trigger from the SPI write (F6); ≥ 20 MHz bandwidth (≥ 10× the highest round-trip bandwidth; derived here); able to resolve 5 mV on a 0.5 V step (the 1 % band) and excursions of 0.1 … 0.3 V | round trip 1.08 … 1.69 MHz, 1 % settling 399 … 623 ns (AT §1); D2S enable excursion +228.1 / −224.8 mV (DP) |
+| function generator | D3–D5 (optional) | sine 1 kHz … 10 MHz with DC offset; step 0.25 ↔ 0.75 V with edges ≤ 10 ns; sine distortion at 10 kHz below the −78.2 dB to be measured | AT §1 (10 ns edges as simulated, THD −78.2 dB at tt 27 °C) |
+| frequency-response analyzer, or the generator with the oscilloscope / a lock-in amplifier | D3 (optional) | magnitude and phase from 1 kHz to ≥ 5 MHz | round trip 1.08 … 1.69 MHz, gain at 1 kHz −0.011 … −0.048 dB (AT §1) |
+| FFT analyzer, audio analyzer or ≥ 24-bit ADC with FFT | D5 (optional) | > 80 dB dynamic range at 10 kHz … 70 kHz (harmonics 2–7) | THD −78.2 … −53.4 dB (AT §1) |
+| loads for `s7_an[1]` | D2 (open), D3, D4 | open (≥ 1 GΩ); 1 kΩ to a source set to the measured `vcm`, with 10 pF and 100 pF; the board's and probe's own capacitance counted in the load | AT §1: "1 kΩ to an ideal copy of vref_d2s with 10 or 100 pF"; T1: 1 GΩ |
+| SMU with pA resolution on a shared pin (only for bus-current measurements) | §4 leak subtraction | pA resolution | PL §5 |
+| temperature chamber or thermal forcer, with a die or board temperature reading | §4 | −40, 27, 125 °C | the simulated temperatures (§4) |
+
+## 9. Acceptance table
+
+One row per measurement step: the quantity, the conditions, the **simulated** interval with its source, and how to classify
+the reading. The intervals are the current ones (DC curves of 2026-11-24, AC / transient, the D2S re-run of 2026-11-25, the
+ss −40 °C power-up runs); none is a guaranteed limit, and the design had no specification. "Inside" / "outside" always means
+**inside / outside the simulated interval** of §5, not pass / fail. A die sits at one process point, so compare with the
+interval over all simulated corners at the measured temperature; where only one corner was simulated at a temperature (27 °C:
+tt only), a reading outside it says little by itself. Mismatch is in none of the slot-level intervals (§5; D2S output offset
+σ 6.28 mV, DR §2; S2D input offset −17.25 … 18.17 mV over 100 samples, SD), so a loop deviation above its corner interval is
+recorded as outside and then checked against the mismatch spread before the circuit is suspected. DR = the D2S re-run
+([d2s_schematic_rerun](../../verification/c2_gaps/d2s_schematic_rerun/results.md)); other keys: §0.
+
+| step | quantity | conditions | simulated interval (source) | classify |
+|---|---|---|---|---|
+| P1, F3, F4 | pad-ring current, slot supplies off (difference to the same state with the pads unpowered is not available, so as a baseline) | `0x51` = 0 (or another slot selected), pads at 0 V | ≤ 67 nA at 125 °C (FT); per pad S2D ≤ 0.4 nA (−40 / 27 °C), ≤ 25 nA (125 °C), D2S ≤ 4.3 nA / ≤ 67 nA (EC) | inside if the change attributable to slot 7 is ≤ the value at the nearest simulated temperature |
+| P3, F1 | slot `vdd_3v3` and ring current, `enable` = 0 | 150–170 µs or later after the enable falls | −40 °C (ss, sf, 3.0 V): 25.36 … 25.55 nA / 9.01 … 9.09 nA; 27 °C (tt, 3.3 V): 31.63 / 12.24 nA; 125 °C (ff, fs, 3.6 V): 48.64 … 56.20 nA / 32.10 … 58.22 nA (T1) | inside / outside the interval at that temperature |
+| P4 | `0x38`, `0x39` low nibble | `dig_ena` = 1, all `dig_in` = 0, `vdd_1v2` on | `0x00` / 0 (logic expectation, GL §6; no simulation of `s7_doutpd`) | equal / not equal |
+| P5 | enabled current step from P4 | `s7_an[1]` open, `s7_an[0]` at 0 V | −40 °C (3.0 V): slot 48.38 … 48.61 µA, ring 364.58 … 369.44 µA; 27 °C (tt): 49.74 / 387.56 µA; 125 °C (3.6 V): 49.23 … 49.40 / 392.13 … 395.62 µA (T1, D2S at 1 GΩ) | inside / outside; a load on `s7_an[1]` adds its own current to the ring |
+| D1 | `vcm` on `analog[2]`, `vref` on `analog[3]` | default mode, high-impedance meters | slot (T1): `vcm` −40 °C 1.115 … 1.138 V, 27 °C 1.257 V, 125 °C 1.299 … 1.366 V; `vref` 0.444 … 0.447 / 0.492 / 0.571 … 0.576 V. `pad_ref_rb` alone, 5 corners × 3.0 / 3.3 / 3.6 V (RP §1, schematic = PEX): `vcm` 1.242 … 1.395 V (3.3 / 3.6 V), 1.120 … 1.193 V (3.0 V); `vref` 0.4363 … 0.4553 V (−40 °C), 0.4832 … 0.5038 V (27 °C), 0.5724 … 0.5964 V (125 °C). Mismatch, tt 27 °C 3.3 V, 100 samples: `vcm` 1246.91 … 1273.95 mV (σ 5.415 mV), `vref` 481.36 … 501.81 mV (σ 3.788 mV) (RP §2) | inside the corner interval at that temperature and supply; outside it but within the mismatch spread: record as "outside the corner interval, within the mismatch range" (corners and mismatch were not simulated together) |
+| D2 | max \|`s7_an[1]` − (`vcm` + `s7_an[0]` − `vref`)\| over `s7_an[0]` = 0 … 1 V, with the `vcm` / `vref` measured in D1 | default mode, `s7_an[1]` open | per PVT point, envelope of the schematic / magic PEX pads (DC §3), the KLayout-extracted pads (DC §3) and T1: tt 27 °C 3.3 V 0.86 … 0.90 mV; ss −40 °C 3.0 V 1.31 … 1.37 mV; sf −40 °C 3.0 V 1.10 … 1.13 mV; fs 125 °C 3.6 V 3.10 … 3.37 mV; ff 125 °C 3.6 V 6.10 … 6.49 mV | inside if ≤ the largest value at that temperature (−40 °C 1.37 mV, 27 °C 0.90 mV, 125 °C 6.49 mV) |
+| D2 | round-trip gain (slope of `s7_an[1]` vs `s7_an[0]` near `s7_an[0]` = `vref`) | as above | 0.99848 … 0.99882 over the five PVT points (DC §3) | inside / outside (insensitive to offsets) |
+| D2 | 1 mV-linear input range (contiguous around `s7_an[0]` = `vref`, error from the straight line < 1 mV), sweep extended to 1.5 V | as above | high end: −40 °C 1.055 … 1.114 V, 27 °C 1.281 V, 125 °C 1.367 … 1.440 V; low end above 0 V only at 125 °C: 0.028 … 0.096 V (DC §3, schematic pads; the KLayout-extracted pads give high ends up to 55.2 mV lower) | inside / outside |
+| D3 (optional) | round-trip −3 dB bandwidth (relative to 1 kHz), peaking | `s7_an[0]` 0.5 V DC plus a small sine; loads open, 1 kΩ ∥ 10 pF, 1 kΩ ∥ 100 pF (1 kΩ to `vcm`) | tt 27 °C: 1.122 … 1.532 MHz; −40 °C (ss, sf, 3.0 V): 1.082 … 1.553 MHz; 125 °C (ff, fs, 3.6 V): 1.166 … 1.694 MHz; no peaking above the 1 kHz gain in any run (AT §1; three pad views, three loads) | inside / outside the interval at that temperature; state the actual load (board + probe) |
+| D4 (optional) | settling of `s7_an[1]` to 1 % after a 0.25 → 0.75 V step (10 ns edges), overshoot, output step | loads as D3 | 1 %: tt 27 °C 453 … 623 ns (three views, three loads); over the five PVT points 399 … 499 ns (schematic, open and 1 kΩ ∥ 100 pF), 474 … 551 ns (PEX, tt / ss −40 °C / ff 125 °C); overshoot ≤ 0.05 %; output step 497.99 … 499.36 mV (AT §1) | inside / outside |
+| D5 (optional) | THD (harmonics 2–7) of a 10 kHz sine 0 … 1 V | open or 1 kΩ ∥ 100 pF | tt 27 °C: −78.2 … −72.0 dB; open, schematic: −40 °C −70.6 … −67.9 dB, 125 °C −61.7 … −53.4 dB (AT §1; at 125 °C the bottom of the sine lies below the linear input range) | inside if not worse than the worst value at that temperature |
+| M1 swap | max \|`s7_an[1]` − (`vcm` − (`s7_an[0]` − `vref`))\| | as D2 | tt 27 °C 0.99 mV, ff 125 °C 2.88 mV (MO); ss −40 °C 1.12 mV (SM §1, power-up transient) | inside if ≤ the value at that temperature; a non-inverted output is a logic fault, not a deviation |
+| M2 mon | deviation as D2; `analog[0]` − `outp` relation via `analog[0]` − `analog[1]` = 2 (`s7_an[0]` − `vref`) | bus switches 0, 1 closed, high-impedance meters | loop: tt 27 °C 0.94 mV, ff 125 °C 6.55 mV (MO), ss −40 °C 1.43 mV (SM §1); S2D gain 1.99849 … 1.99930, output CM error 5.003 … 18.050 mV (SD, `dc_params`); bus − pin 0.01 mV into 1 GΩ (MO) | inside / outside; the loop is 10–30× slower here, so let readings settle |
+| M3 feed | `s7_an[1]` − (`vcm` + (`v(analog[0])` − `v(analog[1])`)/2) | sources at `vcm` ± 0.2 V through 10 kΩ, `s7_an[0]` 0.5 V | tt 27 °C 0.05 mV, ff 125 °C 2.22 mV (MO); ss −40 °C 0.24 mV (RL row 122, SM §1); D2S alone at `vicm` 1.65 V: gain 0.4983 … 0.5000, offset 0.032 … 1.737 mV (DS) | inside / outside |
+| M4 ext | deviation as D2 with the measured `v(analog[2])` / `v(analog[3])` | sources 1.30 / 0.50 V through 10 kΩ | tt 27 °C 0.91 mV, ff 125 °C 6.39 mV (MO); ss −40 °C 0.04 mV (RL row 122) or 4.92 mV when taken against the source values behind the 10 kΩ (SM §1) | inside / outside; state which reference voltages were used |
+| M5 swap + feed | as M3 | as M3 | as M3: tt 27 °C 0.05 mV, ff 125 °C 2.22 mV (MO), ss −40 °C 0.24 mV (SM §1) | inside / outside; a crossed output means feed did not win (GL §3) |
+| M6, M7 | as D2 (key invalid → default) | as D2 | tt 27 °C 0.90 mV, ff 125 °C 6.50 mV, ss −40 °C 1.31 mV (MO; SM §1 1.37 mV) | inside / outside; a crossed or opened loop is a logic fault |
+| F2 | D1 and D2 with `vdd_1v2` off | `0x51 = 0x0B` | as D1, D2 (FT: the slot works with only `vdd_3v3`; not simulated separately) | inside / outside the D1, D2 intervals |
+| F5 | pad current, pads disabled | F3 state; each pad at 0 V and 3.3 V | S2D −7.640 … 5.876 nA (SD schematic; PEX −7.647 … 5.869 nA); D2S −36.83 … 14.94 nA (DS; PEX −36.85 … 14.95 nA, DP); CACE power-down states at 27 / 125 °C | inside / outside at 27 / 125 °C; at −40 °C only EC (P1 row) |
+| F6 | time from the enable write to `s7_an[1]` within 1 mV / 1 % of its final value; excursion of `s7_an[1]` | `s7_an[0]` fixed, `s7_an[1]` open or 1 kΩ | no slot-level interval except ss −40 °C (`vcm` at 98 % 1.6 µs after enable, bandgap at 90 % after 0.80 … 0.83 µs, SM §1). Block values: `pad_ref_rb` `vcm` 0.79 … 1.81 µs, `vref` 1.03 … 2.02 µs (README §2.3); S2D 1.359 … 1.524 µs (SD, schematic … PEX); D2S 0.982 … 2.387 µs, excursion +121.6 … +228.1 / −104.3 … −224.8 mV with 1 kΩ (DS … DP) | outside §5's coverage at 27 / 125 °C: record and compare with the block values |
+| F6 (ext) | kick on `analog[2]` / `analog[3]` at the S2D enable | ext mode, tt 27 °C | `vcm` +118 / −63 mV, `vref` +85 / −62 mV (S7) | inside / outside at 27 °C; no value at other temperatures |
+EOF
+grep -n "^## " TEST_PLAN.md
+```
+
+## Tool results / harness — 2026-11-25 03:53:35 UTC
+
+**Tool result:**
+
+```
+## 7. Record per measurement
+
+Chip identity (SPI reads of `0x01 … 0x07`, HK), die / board, temperature, supply readings, the `0x51` value and route writes, the bench
+settings (source values and impedances), raw readings, and the step key of this plan. Keep raw data in a plain-text or CSV file next to the
+summary.
+14:## 0. Sources
+36:## 1. What can be observed where
+53:## 2. Harness registers used (HK, quoted from the RTL)
+80:## 3. Sequence
+145:## 4. Temperature points
+152:## 5. Inside / outside the simulated interval
+164:## 6. What from the stage A / B procedure applies
+181:## 7. Record per measurement
+187:## 8. Equipment needed
+209:## 9. Acceptance table
+```
+
+## Assistant — 2026-11-25 03:53:54 UTC
+
+**Tool call: `Bash`**
+
+_Polish acceptance table wording_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && python3 - <<'EOF'
+p='TEST_PLAN.md'
+s=open(p).read()
+reps=[
+("| P1, F3, F4 | pad-ring current, slot supplies off (difference to the same state with the pads unpowered is not available, so as a baseline) | `0x51` = 0 (or another slot selected), pads at 0 V | ≤ 67 nA at 125 °C (FT); per pad S2D ≤ 0.4 nA (−40 / 27 °C), ≤ 25 nA (125 °C), D2S ≤ 4.3 nA / ≤ 67 nA (EC) | inside if the change attributable to slot 7 is ≤ the value at the nearest simulated temperature |",
+ "| P1, F3, F4 | pad-ring current, slot supplies off | `0x51` = 0 (F4: another slot selected), bench sources at 0 V | ≤ 67 nA at 125 °C (FT); per pad S2D ≤ 0.4 nA (−40 / 27 °C), ≤ 25 nA (125 °C), D2S ≤ 4.3 nA / ≤ 67 nA (EC) | inside if ≤ the value at the nearest simulated temperature; the ring also supplies the other pads of the chip, so only the part attributable to slot 7's pads can be compared |"),
+("| M2 mon | deviation as D2; `analog[0]` − `outp` relation via `analog[0]` − `analog[1]` = 2 (`s7_an[0]` − `vref`) |",
+ "| M2 mon | deviation as D2; `v(analog[0])` − `v(analog[1])` against 2 (`s7_an[0]` − `vref`), (`v(analog[0])` + `v(analog[1])`)/2 against `vcm` |"),
+("| inside / outside; the loop is 10–30× slower here, so let readings settle |",
+ "| inside / outside; the loop is 10–30× slower while the bus switches are closed (this repository's `README.md`), so let readings settle |"),
+("| outside §5's coverage at 27 / 125 °C: record and compare with the block values |",
+ "| no slot-level interval at 27 / 125 °C (\"not covered\", §5): record and compare with the block values; at −40 °C compare with SM |"),
+("Adapted from the equipment list\nof the sky130 proposal of the same pads;",
+ "Adapted from the equipment list\nof the sky130 proposal repository `sky130_cm_ip__single2diff2single` (`docs/EQUIPMENT_NEEDED.md`);"),
+("| 6½ digits (10 µV resolution on the 0 … 3.3 V range), input impedance ≥ 1 GΩ |",
+ "| 6½ digits, 10 µV resolution or better over 0 … 3.3 V, input impedance ≥ 1 GΩ |"),
+]
+for a,b in reps:
+    assert s.count(a)==1, a[:70]; s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+```
+
+## Tool results / harness — 2026-11-25 03:53:54 UTC
+
+**Tool result:**
+
+```
+(Bash completed with no output)
+```
+
+## Assistant — 2026-11-25 03:53:59 UTC
+
+Now the link check.
+
+## Assistant — 2026-11-25 03:54:06 UTC
+
+**Tool call: `Bash`**
+
+_Check relative links and anchors in edited files_
+
+```bash
+mkdir -p /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad && cat > /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/checklinks.py <<'EOF'
+import re, sys, os
+def slug(h):
+    h = h.strip().lower()
+    h = re.sub(r'[`*_]', '', h)
+    h = re.sub(r'[^\w\- ]', '', h, flags=re.UNICODE)
+    return h.replace(' ', '-')
+def anchors(path):
+    out=set(); counts={}
+    in_code=False
+    for line in open(path, encoding='utf-8'):
+        if line.startswith('ʼʼʼ'): in_code = not in_code; continue
+        if in_code: continue
+        m=re.match(r'^(#{1,6})\s+(.*?)\s*#*\s*$', line)
+        if m:
+            s=slug(m.group(2)); n=counts.get(s,0); counts[s]=n+1
+            out.add(s if n==0 else f"{s}-{n}")
+    return out
+bad=0
+for f in sys.argv[1:]:
+    txt=open(f,encoding='utf-8').read()
+    txt=re.sub(r'ʼʼʼ.*?ʼʼʼ','',txt,flags=re.S)
+    for m in re.finditer(r'\]\(([^)\s]+)\)', txt):
+        link=m.group(1)
+        if re.match(r'^[a-z]+:', link): continue
+        path, _, frag = link.partition('#')
+        tgt = os.path.normpath(os.path.join(os.path.dirname(f), path)) if path else f
+        if not os.path.exists(tgt):
+            print(f"MISSING {f}: {link}"); bad+=1; continue
+        if frag and tgt.endswith('.md'):
+            if frag not in anchors(tgt):
+                print(f"BAD ANCHOR {f}: {link}"); bad+=1
+print("problems:", bad)
+EOF
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && python3 -I /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/checklinks.py README.md ACHIEVED_VS_LIMITS.md TEST_PLAN.md
+```
+
+## Tool results / harness — 2026-11-25 03:54:06 UTC
+
+**Tool result:**
+
+```
+problems: 0
+```
+
+## Assistant — 2026-11-25 03:54:11 UTC
+
+**Tool call: `Bash`**
+
+_Confirm pending folders now exist and git state_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && ls -d signoff/taped_out_158afc5 verification/c2_gaps/s2d_mismatch; grep -o '\](\.\./\.\./[^)]*s2d_mismatch[^)]*)\|\](\.\./\.\./signoff/taped_out[^)]*)' docs/chipalooza2_as_taped_out/*.md; git status --short
+```
+
+## Tool results / harness — 2026-11-25 03:54:11 UTC
+
+**Tool result:**
+
+```
+signoff/taped_out_158afc5
+verification/c2_gaps/s2d_mismatch
+docs/chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md:](../../verification/c2_gaps/s2d_mismatch/)
+docs/chipalooza2_as_taped_out/README.md:](../../verification/c2_gaps/s2d_mismatch/)
+docs/chipalooza2_as_taped_out/README.md:](../../signoff/taped_out_158afc5/)
+ M docs/chipalooza2_as_taped_out/README.md
+ M docs/chipalooza2_as_taped_out/TEST_PLAN.md
+?? docs/chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md
+?? signoff/taped_out_158afc5/
+?? verification/c2_gaps/s2d_mismatch/
+```
+
+## Assistant — 2026-11-25 03:54:16 UTC
+
+**Tool call: `Bash`**
+
+_Sanity-test the link checker_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad && mkdir -p t && printf '# A\n## 2.3 The blocks\n[x](#23-the-blocks) [y](#nope) [z](missing.md)\n' > t/a.md && python3 -I checklinks.py t/a.md
+```
+
+## Tool results / harness — 2026-11-25 03:54:16 UTC
+
+**Tool result:**
+
+```
+BAD ANCHOR t/a.md: #nope
+MISSING t/a.md: missing.md
+problems: 2
+```
+
+## Assistant — 2026-11-25 03:54:29 UTC
+
+I added all three pieces. Every number in them is copied from a file and cited there, and all relative links and anchors in the three files resolve (checked by script). I ran no simulations and no git commands that change state.
+
+1. **Front page** (`docs/chipalooza2_as_taped_out/README.md`): added `## Known limitations and use in a system` between the verification-status paragraph and "Where to find what". It has 12 bullets covering everything you listed, each linked to its evidence. The S2D mismatch re-run and the taped-out sign-off are marked "pending" with links. It is about 735 words, so dense for one screen. "Where to find what" has one new row pointing to the new limits file.
+2. **New file `docs/chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md`** (SPDX header): one table each for S2D, D2S and `pad_ref_rb`, with the columns you asked for. It says up front that these are the designer's working limits, not a specification. The D2S mismatch gain sample is the only row outside its limit. Groups that test the CACE fixture's bias selection (which can pick the OA core) are left out.
+3. **`docs/chipalooza2_as_taped_out/TEST_PLAN.md`**: new §8 "Equipment needed" and §9 "Acceptance table", plus new source keys in §0. In §9 I added optional steps D3–D5 (round-trip bandwidth, step, 10 kHz sine), because the plan had no dynamic steps to attach the AC / transient numbers to.
+
+Beyond what you asked: I replaced outdated numbers in the existing plan. The D2S values now come from the 25 November re-run, the ss −40 °C mode results from the newer power-up runs, and I corrected the claim that 0.77 V out is "close to the minimum".
+
+Where the sources fall short:
+- The slot's enable-to-settled time is simulated only at ss −40 °C.
+- The ext mode at ss −40 °C has two values that use different references: 0.04 mV (designer's run) and 4.92 mV (newer run).
+- The bandgap current tops out at 6.37 µA, slightly above the D2S `dc_ibias` grid's 6.25 µA.
+- The `pad_ref_rb` enable times have no working limit.
+
+The two pending folders appeared while I worked; I left them alone.
+
+## User (or harness) — 2026-11-25 03:54:29 UTC
+
+[handback-send-enforce] Your report has not been delivered. Call SubagentHandback({message: <your full report>}) now; the call ends your run.
+
+## Assistant — 2026-11-25 03:54:37 UTC
+
+**Tool call: `SubagentHandback`**
+
+```json
+{
+ "message": "I added all three pieces. Every number in them is copied from a file and cited there, and all relative links and anchors in the three files resolve (checked by script). I ran no simulations and no git commands that change state.\n\n1. **Front page** (`docs/chipalooza2_as_taped_out/README.md`): added `## Known limitations and use in a system` between the verification-status paragraph and \"Where to find what\". It has 12 bullets covering everything you listed, each linked to its evidence. The S2D mismatch re-run and the taped-out sign-off are marked \"pending\" with links. It is about 735 words, so dense for one screen. \"Where to find what\" has one new row pointing to the new limits file.\n2. **New file `docs/chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md`** (SPDX header): one table each for S2D, D2S and `pad_ref_rb`, with the columns you asked for. It says up front that these are the designer's working limits, not a specification. The D2S mismatch gain sample is the only row outside its limit. Groups that test the CACE fixture's bias selection (which can pick the OA core) are left out.\n3. **`docs/chipalooza2_as_taped_out/TEST_PLAN.md`**: new §8 \"Equipment needed\" and §9 \"Acceptance table\", plus new source keys in §0. In §9 I added optional steps D3–D5 (round-trip bandwidth, step, 10 kHz sine), because the plan had no dynamic steps to attach the AC / transient numbers to.\n\nBeyond what you asked: I replaced outdated numbers in the existing plan. The D2S values now come from the 25 November re-run, the ss −40 °C mode results from the newer power-up runs, and I corrected the claim that 0.77 V out is \"close to the minimum\".\n\nWhere the sources fall short:\n- The slot's enable-to-settled time is simulated only at ss −40 °C.\n- The ext mode at ss −40 °C has two values that use different references: 0.04 mV (designer's run) and 4.92 mV (newer run).\n- The bandgap current tops out at 6.37 µA, slightly above the D2S `dc_ibias` grid's 6.25 µA.\n- The `pad_ref_rb` enable times have no working limit.\n\nThe two pending folders appeared while I worked; I left them alone."
+}
+```
+
+## Tool results / harness — 2026-11-25 03:54:38 UTC
+
+**Tool result:**
+
+```
+{"success":true,"message":"Report delivered to your caller."}
+```
+

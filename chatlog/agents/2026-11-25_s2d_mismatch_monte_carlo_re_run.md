@@ -121,3 +121,2398 @@ solver aid rshunt=1e12, every other group ran as the templates are.
 … [15986 more characters cut]
 ```
 
+## Assistant — 2026-11-25 03:42:54 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/d2s_schematic_rerun && cat run.sh; cat netcheck.txt | head -60; ls csv
+```
+
+## Tool results / harness — 2026-11-25 03:42:54 UTC
+
+**Tool result:**
+
+```
+#!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+#
+# IHP sg13cmos5l schematic simulation: full CACE suite of the D2S pad sg13cmos5l_IOPadDiff2Single on its current
+# (taped-out) schematic, design repository commit 91a7da8b, yaml and templates unchanged; comparison with the
+# committed (stale) schematic results and a regenerated data-sheet candidate.
+# Usage: run.sh [<work_dir>] [fetch|netcheck|sim|csv|compare|results|datasheet|all]   (default ./_work next to this script, all)
+# Environment: JOBS = parallel ngspice runs per group (default 3); RSHUNT_GROUPS = groups to run with ngspice
+# rshunt=1e12 (default drive_params, the only group that did not converge without it, see README.md).
+# Needs: PDK_ROOT with ihp-sg13cmos5l, ngspice-47 with the IHP OSDI models, xschem, CACE 2.11, python3 with pyyaml,
+# git with network access to github.com (shallow, blobless fetch of one commit; only the needed paths are extracted).
+set -euo pipefail
+HERE=$(cd "$(dirname "$0")" && pwd)
+SLOT=$(cd "$HERE/../../.." && pwd)
+WORK=$(realpath -m "${1:-$HERE/_work}")
+STEP=${2:-all}
+export PDK_ROOT=${PDK_ROOT:-/foss/pdks} PDK=ihp-sg13cmos5l
+export JOBS=${JOBS:-3}
+export PYTHONDONTWRITEBYTECODE=1
+T=sg13cmos5l_IOPadDiff2Single
+URL=https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single
+C=91a7da8b67ac56a26c605501146667a1fde28c32
+GROUPS_="dc_params dc_3v0_params dc_sel_params dc_sel3_params dc_ibias_params ac_params ac_load_params ac_1nF_par
+… [7991 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:42:59 UTC
+
+**Tool call: `Bash`**
+
+```bash
+ls /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/d2s_schematic_rerun/_work 2>&1 | head; ls /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/ 2>&1; ls /tmp/claude-0/-home-user/*/scratchpad/ 2>/dev/null | head -50; cat /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/replica_bias/README.md | head -80
+```
+
+## Tool results / harness — 2026-11-25 03:42:59 UTC
+
+**Tool result:**
+
+```
+ls: cannot access '/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/d2s_schematic_rerun/_work': No such file or directory
+actran
+award_docs
+chk_s2d.png
+d2s_sch
+dcgraphs
+gapA
+gapB
+gapC
+me
+p2
+p4-4.png
+pads
+pics
+rationale
+sf.png
+sim
+tbchk.png
+tbpics
+work
+yac.txt
+actran
+award_docs
+chk_s2d.png
+d2s_sch
+dcgraphs
+gapA
+gapB
+gapC
+me
+p2
+p4-4.png
+pads
+pics
+rationale
+sf.png
+sim
+tbchk.png
+tbpics
+work
+yac.txt
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Replica bias gaps: pad_ref_rb post-layout and mismatch, bias_dist_pd copy accuracy
+
+IHP sg13cmos5l simulation. Gap-filling characterization (2026-11-23) of two blocks of slot 7 as taped out
+(slot repository commit `158afc5afab0056bd6d216a4db3833e34a364949`, design repository
+[`tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single`](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single)
+commit `9052bd35928c6d40344e8e686c9abbe736bfadb9`). Results and their reading: [results.md](results.md).
+
+## What and why
+
+| gap | what was there | what this adds |
+|---|---|---|
+| `pad_ref_rb` post-layout | schematic CACE, 8 / 8 groups (2026-11-07); layout v2 LVS-clean, used extracted in the slot tier-1 run; no PEX CACE suite | magic C-coupled PEX of the cell as taped out, CACE groups `vcm_dc_params`, `vcm_dc_3v0_params`, `vref_room/hot/cold_params`, `pd_params` on the PEX view, compared with the committed schematic CSVs (and a schematic rerun with the same tools) |
+| `pad_ref_rb` mismatch | `mm_param
+… [4983 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:03 UTC
+
+**Tool call: `Bash`**
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad; ls $S/d2s_sch $S/work $S/actran $S/gapC 2>&1 | head -40; du -sh $S/* 2>/dev/null
+```
+
+## Tool results / harness — 2026-11-25 03:43:03 UTC
+
+**Tool result:**
+
+```
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran:
+chain1.log
+chain1.sh
+chain2.log
+chain2.sh
+chain3.log
+chain3.sh
+chain4.log
+jobs_nopex.txt
+jobs_pex.txt
+md5_before.txt
+slot1.log
+t
+w
+
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch:
+c.csv
+c.md
+design
+ds
+netcheck
+netcmp
+out
+pexres
+progress.log
+repo
+runs
+
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/gapC:
+bd
+dr
+final_res
+lvs
+mw
+out
+rerun
+rerun.log
+rerun2
+rerun2.log
+res
+147M	/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran
+31M	/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_docs
+88K	/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/chk_s2d.png
+73M	/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch
+257M	/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs
+130M	/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/gapA
+88M	/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/gapB
+221M	/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/gapC
+396K	/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/me
+9.9M	/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/p2
+124K	/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/p4-4.png
+736K	/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea5
+… [701 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:09 UTC
+
+**Tool call: `Bash`**
+
+```bash
+R=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/repo; cd $R; git log --oneline -1 FETCH_HEAD 2>&1; git cat-file -t 91a7da8b67ac56a26c605501146667a1fde28c32; git ls-tree -r --name-only 91a7da8b67ac56a26c605501146667a1fde28c32 macros/sg13cmos5l_IOPadSingle2Diff | grep -v '/runs/' | head -150
+```
+
+## Tool results / harness — 2026-11-25 03:43:09 UTC
+
+**Tool result:**
+
+```
+91a7da8 docs/launch/custom_pad_harness_test.md : shortened by Claude
+commit
+macros/sg13cmos5l_IOPadSingle2Diff/FILL_IN.md
+macros/sg13cmos5l_IOPadSingle2Diff/Makefile
+macros/sg13cmos5l_IOPadSingle2Diff/README.md
+macros/sg13cmos5l_IOPadSingle2Diff/layout/klayout/sg13cmos5l_IOPadSingle2Diff.klay.gds
+macros/sg13cmos5l_IOPadSingle2Diff/layout/klayout/template/IOPadAnalog.png
+macros/sg13cmos5l_IOPadSingle2Diff/layout/klayout/template/README.md
+macros/sg13cmos5l_IOPadSingle2Diff/layout/klayout/template/build_template.py
+macros/sg13cmos5l_IOPadSingle2Diff/layout/klayout/template/sg13cmos5l_IOPadSingle2Diff_template.gds
+macros/sg13cmos5l_IOPadSingle2Diff/layout/klayout/template/sg13cmos5l_IOPadSingle2Diff_template.png
+macros/sg13cmos5l_IOPadSingle2Diff/layout/klayout/template/sg13cmos5l_IOPadSingle2Diff_template_esd.png
+macros/sg13cmos5l_IOPadSingle2Diff/netlist/layout/sg13cmos5l_IOPadSingle2Diff_klayout.cir
+macros/sg13cmos5l_IOPadSingle2Diff/netlist/pex/sg13cmos5l_IOPadSingle2Diff_magic_pex_2.spice
+macros/sg13cmos5l_IOPadSingle2Diff/netlist/schematic/sg13cmos5l_IOPadSingle2Diff_klayout.cdl
+macros/sg13cmos5l_IOPadSingle2Diff/netlist/schematic/sg13cmos5l_IOPadSingle2Diff_magic.spice
+macros/sg13cmos5l_IOPadSingle2Diff/netlist/source/s2d_bias.spice
+macros/sg13cmos5l_IOPadSingle2Diff/netlist/source/s2d_mpdda.spice
+macros/sg13cmos5l_IOPadSingle2Diff/netlist/source/s2d_pd.spice
+macros/sg13cmos5l_IOPadSingle2Diff/netlist/source/sg13cmos5l_IOPadSingle2Diff.spice
+macros/sg13cmos5l_IOPadSingle2
+… [9145 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:15 UTC
+
+**Tool call: `Bash`**
+
+```bash
+R=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/repo; cd $R; C=91a7da8b67ac56a26c605501146667a1fde28c32; M=macros/sg13cmos5l_IOPadSingle2Diff; git show $C:$M/verification/cace/sg13cmos5l_IOPadSingle2Diff.yaml > /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_yaml.txt 2>&1; wc -l /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_yaml.txt; head -80 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_yaml.txt
+```
+
+## Tool results / harness — 2026-11-25 03:43:15 UTC
+
+**Tool result:**
+
+```
+1056 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_yaml.txt
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+#
+#--------------------------------------------------------------
+# CACE circuit characterization file: sg13cmos5l_IOPadSingle2Diff
+#--------------------------------------------------------------
+# Single-ended pad in, differential out: outp - outn = 2 (pad - vref), (outp + outn)/2 = vcm.
+# Input buffer s2d_mpdda_pd (the matched-pair DDA of sudelbuecher/design_considerations/s2d_input_buffer,
+# s2d_input_buffer.md), selectable bias bias_gen_pd + bias_tree_noab_pd (until 2026-10-28 one bias_sel_noab_pd,
+# before 2026-10-27 bias_sel_pd), fail-safe enable en_ctrl_3v3 (bias_gen_pd and en_ctrl_3v3 outside the cell since
+# 2026-11-04, placed next to it in the templates), input protection as drawn (s2d_pad_esd: primary diodes, gate-tied
+# clamps; until 2026-11-04 IHP's IOPadAnalog cells with the 587 Ohm secondary protection, now none).
+# Everything on the ring rails iovdd / iovss; the 1.2 V core ring vdd only feeds the level shifters.
+# vfbp / vfbn are tied to outp / outn inside the cell: the loop gain is characterized on the fixture
+# s2d_mpdda_pd_sel (s2d_mpdda_pd_sel.yaml).
+# The groups follow the design's suite (sudelbuecher .../s2d_input_buffer/verification/cace/s2d_mpdda_biased.yaml,
+# DUT s2d_mpdda + ideal bias fixture); here the DUT is the whole pad with its real bias.
+#
+# Conditions: vref (pad referen
+… [2595 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:20 UTC
+
+**Tool call: `Bash`**
+
+```bash
+F=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_yaml.txt; grep -n '^  [a-z_]*_params:' $F; awk '/^  mm_params:/,/^  [a-z]*_params_end/' $F | head -0; sed -n "$(grep -n '^  mm_params:' $F | cut -d: -f1),\$p" $F | head -260
+```
+
+## Tool results / harness — 2026-11-25 03:43:21 UTC
+
+**Tool result:**
+
+```
+165:  dc_params:
+262:  range_params:
+321:  window_params:
+365:  dc_sel_params:
+501:  dc_ibias_params:
+575:  ac_params:
+624:  ac_mm_params:
+693:  tran_params:
+752:  noise_params:
+799:  pd_params:
+886:  enable_params:
+955:  mm_params:
+1005:  mc_params:
+  mm_params:
+    spec:
+      Vos_in:
+        display: Input offset - Mismatch
+        unit: mV
+        minimum:
+          value: -20
+        typical:
+          value: any
+        maximum:
+          value: 20
+      Gain:
+        display: Gain - Mismatch
+        minimum:
+          value: 1.93
+        typical:
+          value: any
+        maximum:
+          value: 2.07
+      Vcm_err:
+        display: Output common-mode error - Mismatch
+        unit: mV
+        minimum:
+          value: -60
+        typical:
+          value: any
+        maximum:
+          value: 60
+    tool:
+      ngspice:
+        template: sg13cmos5l_IOPadSingle2Diff_tb_dc.sch
+        collate: iterations
+        format: ascii
+        suffix: .data
+        variables: [Gain, Vos_in, INL, Vcm_err, Iio]
+    conditions:
+      iterations:
+        description: Iterations to run
+        display: Iterations
+        minimum: 1
+        maximum: 100
+        step: linear
+        stepsize: 1
+      corner_mos:
+        typical: tt_mismatch
+      corner_r:
+        typical: typ_mismatch
+      temp:
+        typical: 27
+  #------------------------------------------------------------ process Monte Carlo
+  mc_params:
+    spec:
+      Vos_in:
+        display: Input offset - Process MC
+     
+… [1241 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:24 UTC
+
+**Tool call: `Bash`**
+
+```bash
+F=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_yaml.txt; sed -n 100,165p $F; sed -n 575,693p $F
+```
+
+## Tool results / harness — 2026-11-25 03:43:24 UTC
+
+**Tool result:**
+
+```
+description: Complement of en_3v3, 3.3 V logic (from en_ctrl_3v3 next to the cell)
+    type: digital
+    direction: input
+
+default_conditions:
+  vdd:
+    description: IO ring supply voltage
+    display: IOVDD
+    unit: V
+    typical: 3.3
+  vddl:
+    description: Core ring supply voltage
+    display: VDD core
+    unit: V
+    typical: 1.2
+  vref:
+    description: Pad reference
+    display: Vref
+    unit: V
+    typical: 1.2
+  vcm:
+    description: Internal common mode
+    display: Vcm
+    unit: V
+    typical: 1.2
+  corner_mos:
+    description: Process corner MOSFET
+    display: Corner MOSFET
+    typical: tt
+  corner_r:
+    description: Process corner resistor (rhigh, rppd)
+    display: Corner R
+    typical: typ
+  corner_pnp:
+    description: Process corner PNP (bandgap core)
+    display: Corner PNP
+    typical: typ
+  temp:
+    description: Ambient temperature
+    display: Temperature
+    unit: °C
+    typical: 27
+  sel:
+    description: Bias selection (0 harness, 1 OA core, 2 bandgap, 3 both)
+    display: Bias select
+    typical: 0
+  ibias:
+    description: Harness bias current
+    display: Ibias
+    unit: A
+    typical: 5e-06
+  rsrc:
+    description: Source resistance into the pad
+    display: Rsrc
+    unit: Ω
+    typical: 50
+  cload:
+    description: External load per output, to ground (next stage, routing)
+    display: Cload
+    unit: pF
+    typical: 0.5
+
+parameters:
+
+  #------------------------------------------------------------ DC, PVT
+  dc_params:
+  ac_params:
+    spec:
+  
+… [2992 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:29 UTC
+
+**Tool call: `Bash`**
+
+```bash
+R=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch; cat $R/design/scripts/cace/cace_to_csv.py; ls $R/design/scripts/cace/
+```
+
+## Assistant — 2026-11-25 03:43:30 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/datasheets/; wc -l sg13cmos5l_IOPadSingle2Diff.md; grep -n -i -E 'mismatch|mc_params|process MC|ac_mm|PSRR|CMRR|^#' sg13cmos5l_IOPadSingle2Diff.md | head -80
+```
+
+## Tool results / harness — 2026-11-25 03:43:30 UTC
+
+**Tool result:**
+
+```
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Collect the per-run results of one CACE parameter group into a CSV file.
+
+Usage: cace_to_csv.py <cell.yaml> <group> <run_dir> <out.csv>
+  <run_dir> is verification/cace/_runs/RUN_<date>/ ; every parameters/<group>/run_*/ holds conditions.yaml and
+  a <testbench>_<N>.data file whose columns follow `variables:` of the group in the cell yaml.
+CSV columns: the conditions of the group, then the variables (SI units: s, V, A, C, J).
+"""
+import csv, glob, os, re, sys
+import yaml
+
+def main(ycell, group, rundir, out):
+    d = yaml.safe_load(open(ycell))
+    g = d['parameters'][group]
+    variables = g['tool']['ngspice']['variables']
+    conds = [c for c in g['conditions']]
+    # the testbench writes SI values; the yaml units are display units, so label the columns with the SI unit
+    si = {'ns': 's', 'ps': 's', 'pA': 'A', 'nA': 'A', 'uA': 'A', 'fC': 'C', 'pC': 'C', 'fW\u22c5s': 'J', 'pW\u22c5s': 'J'}
+    units = {k: si.get(v.get('unit', ''), v.get('unit', '')) for k, v in g['spec'].items()}
+    runs = sorted(glob.glob(os.path.join(rundir, 'parameters', group, 'run_*')), key=lambda p: int(re.search(r'run_(\d+)', p).group(1)))
+    rows = []
+    for r in runs:
+        files = glob.glob(os.path.join(r, '*.data'))
+        if not files: continue
+        c = yaml.safe_load(open(os.path.join(r, 'conditions.yaml')))
+        vals = open(files[0]).read().split()
+        if len(vals) != 
+… [689 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 03:43:30 UTC
+
+**Tool result:**
+
+```
+521 sg13cmos5l_IOPadSingle2Diff.md
+5:# sg13cmos5l_IOPadSingle2Diff (S2D pad, s7_an[0]): characterization data sheet
+16:## Pins
+33:## Default conditions
+50:## Figures
+84:## Specification (ex post facto, as characterized)
+88:### View: schematic
+120:| ac_mm_params | PSRR iovdd at 1 kHz (input-referred), mismatch | dB | 79.09 | — | 92.59 | 113.4 | Monte Carlo (iterations up to 30) | CACE summary values (per-run CSV not committed) |
+121:| ac_mm_params | PSRR iovdd at 100 kHz (input-referred), mismatch | dB | 77.3 | — | 91.01 | 104.5 | Monte Carlo (iterations up to 30) | CACE summary values (per-run CSV not committed) |
+122:| ac_mm_params | PSRR iovss at 1 kHz (input-referred), mismatch | dB | 83.32 | — | 90.35 | 110.6 | Monte Carlo (iterations up to 30) | CACE summary values (per-run CSV not committed) |
+123:| ac_mm_params | PSRR iovss at 100 kHz (input-referred), mismatch | dB | 63.78 | — | 74.5 | 94.84 | Monte Carlo (iterations up to 30) | CACE summary values (per-run CSV not committed) |
+124:| ac_mm_params | CMRR at 1 kHz (pad and vref together), mismatch | dB | 87.7 | — | 96.87 | 131.1 | Monte Carlo (iterations up to 30) | CACE summary values (per-run CSV not committed) |
+143:| mm_params | Input offset - Mismatch | mV | -17.25 | — | -0.391 | 18.17 | Monte Carlo (iterations up to 100) | CACE summary values (per-run CSV not committed) |
+144:| mm_params | Gain - Mismatch |  | 1.959 | — | 1.998 | 2.038 | Monte Carlo (iterations up to 100) | CACE summary values (per-run CSV not com
+… [2788 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:34 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/datasheets/; sed -n 1,15p sg13cmos5l_IOPadSingle2Diff.md; sed -n 84,120p sg13cmos5l_IOPadSingle2Diff.md; sed -n 150,200p sg13cmos5l_IOPadSingle2Diff.md; sed -n 516,521p sg13cmos5l_IOPadSingle2Diff.md
+```
+
+## Tool results / harness — 2026-11-25 03:43:35 UTC
+
+**Tool result:**
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# sg13cmos5l_IOPadSingle2Diff (S2D pad, s7_an[0]): characterization data sheet
+
+> **Scope: only what was taped out.** `sg13cmos5l_IOPadSingle2Diff` is the pad cell that replaces `s7_an[0]` in the taped-out slot 7; the delivery repository's `pads/` GDS and netlist are byte copies from the design repository's `toplevel` at `91a7da8b`, the commit used here, and the chip GDS contains the cell unchanged (checked). Two results views exist: the schematic netlist and the magic C-coupled extraction (`_pex`, post-layout, 2026-11-05); both are given. The pad's own bias tree takes `iref` from the slot (`bias_gen_pd` and `en_ctrl_3v3` are outside the cell since 2026-11-04; the CACE fixture `s2d_mpdda_pd_sel` supplies them, including a selection that can pick the Oguey–Aebischer core: in the taped-out slot `iref` comes from `bg_core_pd` through `bias_dist_pd`).
+
+**Cell:** `sg13cmos5l_IOPadSingle2Diff`  
+**Description (from the CACE file):** Single-ended-in, differential-out buffered input pad (matched-pair DDA, gain 2) with selectable bias and fail-safe enable  
+**PDK:** ihp-sg13cmos5l  
+**Designer:** Christoph Maier, CACE file created October 20, 2026  
+**Source:** [`macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/sg13cmos5l_IOPadSingle2Diff.yaml`](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single/blob/91a7da8b67ac56a26c605501146667a1fde28c32/macros/sg13cmos5l_IOPadSingle2Diff/
+… [14498 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:43 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /tmp; C=91a7da8b67ac56a26c605501146667a1fde28c32; for p in macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/results/sg13cmos5l_IOPadSingle2Diff macros/sg13cmos5l_IOPadSingle2Diff/schematic/xschem macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/templates macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/sg13cmos5l_IOPadSingle2Diff.yaml; do echo "== $p"; gh api "repos/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single/commits?sha=$C&path=$p&per_page=8" --jq '.[] | .sha[0:8] + " " + .commit.committer.date + " " + (.commit.message|split("\n")[0])' 2>&1 | head -8; done
+```
+
+## Tool results / harness — 2026-11-25 03:43:44 UTC
+
+**Tool result:**
+
+```
+== macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/results/sg13cmos5l_IOPadSingle2Diff
+{"message":"GitHub access to this repository is not enabled for this session. Use add_repo to request access. If add_repo answers that read access is already available and you need GitHub API or write access, call add_repo again with access:\"push\" to attach the repository with credentials.","documentation_url":"https://docs.anthropic.com/en/docs/claude-code/github-actions"}gh: GitHub access to this repository is not enabled for this session. Use add_repo to request access. If add_repo answers that read access is already available and you need GitHub API or write access, call add_repo again with access:"push" to attach the repository with credentials. (HTTP 403)
+== macros/sg13cmos5l_IOPadSingle2Diff/schematic/xschem
+{"message":"GitHub access to this repository is not enabled for this session. Use add_repo to request access. If add_repo answers that read access is already available and you need GitHub API or write access, call add_repo again with access:\"push\" to attach the repository with credentials.","documentation_url":"https://docs.anthropic.com/en/docs/claude-code/github-actions"}gh: GitHub access to this repository is not enabled for this session. Use add_repo to request access. If add_repo answers that read access is already available and you need GitHub API or write access, call add_repo again with access:"push" to attach the repository with credentials. (HTTP 403)
+== macros
+… [1489 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:43:49 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; mkdir -p $W; cd $W; time git clone -q --filter=blob:none --no-checkout https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single hist 2>&1 | tail -3; du -sh hist; git -C hist log --oneline -1 91a7da8b67ac56a26c605501146667a1fde28c32
+```
+
+## Tool results / harness — 2026-11-25 03:43:51 UTC
+
+**Tool result:**
+
+```
+real	0m0.969s
+user	0m0.125s
+sys	0m0.048s
+1.5M	hist
+91a7da8 docs/launch/custom_pad_harness_test.md : shortened by Claude
+```
+
+## Assistant — 2026-11-25 03:43:55 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/hist; git rev-list --count 91a7da8b67ac56a26c605501146667a1fde28c32; C=91a7da8b67ac56a26c605501146667a1fde28c32; M=macros/sg13cmos5l_IOPadSingle2Diff; for p in $M/verification/cace/results/sg13cmos5l_IOPadSingle2Diff $M/verification/cace/results/sg13cmos5l_IOPadSingle2Diff_pex $M/schematic/xschem $M/verification/cace/templates $M/verification/cace/sg13cmos5l_IOPadSingle2Diff.yaml $M/netlist/schematic $M/netlist/pex; do echo "== $p"; git log -6 --format='%h %ci %s' $C -- $p; done
+```
+
+## Tool results / harness — 2026-11-25 03:43:56 UTC
+
+**Tool result:**
+
+```
+179
+== macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/results/sg13cmos5l_IOPadSingle2Diff
+c913388 2026-11-05 01:48:33 +0000 macros/sg13cmos5l_IOPadSingle2Diff : schematic CACE rerun complete; README — schematic and post-layout CACE results
+7e51a36 2026-11-05 01:44:54 +0000 macros/sg13cmos5l_IOPadSingle2Diff : CACE results, interim: schematic enable_params (9 of 9)
+c3ea9f9 2026-11-05 01:43:26 +0000 macros/sg13cmos5l_IOPadSingle2Diff : CACE results, interim: schematic pd_params (24 of 24)
+c522b44 2026-11-05 01:42:38 +0000 macros/sg13cmos5l_IOPadSingle2Diff : CACE results, interim: schematic noise_params (15 of 15)
+c7f8960 2026-11-05 01:41:46 +0000 macros/sg13cmos5l_IOPadSingle2Diff : CACE results, interim: schematic tran_params (18 of 18)
+a2d89a8 2026-11-05 01:37:14 +0000 macros/sg13cmos5l_IOPadSingle2Diff : CACE results, interim: schematic ac_params (15 of 15)
+== macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/results/sg13cmos5l_IOPadSingle2Diff_pex
+1ece027 2026-11-05 01:38:14 +0000 macros/sg13cmos5l_IOPadSingle2Diff : post-layout CACE (magic C-coupled PEX) complete: 11 groups, 414 of 414 runs, every spec met
+f9628eb 2026-11-05 01:36:57 +0000 macros/sg13cmos5l_IOPadSingle2Diff : CACE results, interim: pex noise_params, pd_params
+083236a 2026-11-05 01:36:09 +0000 macros/sg13cmos5l_IOPadSingle2Diff : CACE results, interim: schematic dc_ibias_params (15 of 15)
+f36a75f 2026-11-05 01:35:22 +0000 macros/sg13cmos5l_IOPadSingle2Diff : CACE results, interim: pex tran_params 
+… [3454 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:44:02 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/hist; C=91a7da8b67ac56a26c605501146667a1fde28c32; M=macros/sg13cmos5l_IOPadSingle2Diff; R=$M/verification/cace/results/sg13cmos5l_IOPadSingle2Diff; for f in mm_params.csv summary_mm_params.md summary_ac_mm_params.md summary_mc_params.md summary_dc_params.md dc_params.csv; do echo "$f: $(git log -1 --format='%h %ci %s' $C -- $R/$f)"; done; git show --stat --format='%h %ci %s' 49bd7dc -- $M/schematic | head; git show 91a7da8b:$M/schematic/xschem/xschemrc | grep -v '^#' | grep -v '^$'
+```
+
+## Tool results / harness — 2026-11-25 03:44:03 UTC
+
+**Tool result:**
+
+```
+mm_params.csv: 6229797 2026-10-26 00:55:35 +0100 macros/sg13cmos5l_IOPadSingle2Diff : Claude Opus 5.5 Extra pulled in single2diff design from sudelbuecher worktree into macro hierarchy
+summary_mm_params.md: 6229797 2026-10-26 00:55:35 +0100 macros/sg13cmos5l_IOPadSingle2Diff : Claude Opus 5.5 Extra pulled in single2diff design from sudelbuecher worktree into macro hierarchy
+summary_ac_mm_params.md: 6229797 2026-10-26 00:55:35 +0100 macros/sg13cmos5l_IOPadSingle2Diff : Claude Opus 5.5 Extra pulled in single2diff design from sudelbuecher worktree into macro hierarchy
+summary_mc_params.md: 6229797 2026-10-26 00:55:35 +0100 macros/sg13cmos5l_IOPadSingle2Diff : Claude Opus 5.5 Extra pulled in single2diff design from sudelbuecher worktree into macro hierarchy
+summary_dc_params.md: c913388 2026-11-05 01:48:33 +0000 macros/sg13cmos5l_IOPadSingle2Diff : schematic CACE rerun complete; README — schematic and post-layout CACE results
+dc_params.csv: c913388 2026-11-05 01:48:33 +0000 macros/sg13cmos5l_IOPadSingle2Diff : schematic CACE rerun complete; README — schematic and post-layout CACE results
+49bd7dc 2026-11-05 01:19:07 +0000 macros/sg13cmos5l_IOPadSingle2Diff : magic PEX (C-coupled) of the drawn cell, post-layout CACE in sim-cace
+
+ .../xschem/sg13cmos5l_IOPadSingle2Diff_pex.sym     | 51 ++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
+if { ![info exists env(PDK_ROOT)] } {
+  puts stderr "Warning: PDK_ROOT env. var. not found or empty, trying to find an open_pdks install"
+  if 
+… [2516 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:44:15 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/hist; C=91a7da8b67ac56a26c605501146667a1fde28c32; for d in sg13cmos5l_IOPadDiff2Single en_ctrl_3v3 bias_sel_pd bias_gen_pd ls_up_1v2_3v3 hv_logic IOPad oa_core_pd bg_core_pd bias_tree_pd bias_tree_noab_pd bias_sel_noab_pd; do echo "$d: $(git log -1 --format='%h %ci %s' $C -- macros/$d/schematic/xschem | cut -c1-110)"; done; echo; git log --since=2026-11-05T01:48 --format='%h %ci %s' $C -- macros/sg13cmos5l_IOPadSingle2Diff | head -20
+```
+
+## Tool results / harness — 2026-11-25 03:44:16 UTC
+
+**Tool result:**
+
+```
+sg13cmos5l_IOPadDiff2Single: 2abcca1 2026-11-03 16:45:40 +0000 macros/sg13cmos5l_IOPadDiff2Single : vss / iovss substrate tie (2(a)); make 
+en_ctrl_3v3: 61624e5 2026-10-28 03:42:22 +0100 macros : consequences of adapting schematics and test environments to the pl
+bias_sel_pd: 61624e5 2026-10-28 03:42:22 +0100 macros : consequences of adapting schematics and test environments to the pl
+bias_gen_pd: 61624e5 2026-10-28 03:42:22 +0100 macros : consequences of adapting schematics and test environments to the pl
+ls_up_1v2_3v3: 61624e5 2026-10-28 03:42:22 +0100 macros : consequences of adapting schematics and test environments to the pl
+hv_logic: 61624e5 2026-10-28 03:42:22 +0100 macros : consequences of adapting schematics and test environments to the pl
+IOPad: 61624e5 2026-10-28 03:42:22 +0100 macros : consequences of adapting schematics and test environments to the pl
+oa_core_pd: 82a57ec 2026-10-30 17:28:05 +0000 macros/oa_core_pd : magic DRC, magic+netgen LVS, magic PEX 1/2/3 and KLayout
+bg_core_pd: 0ee4cc0 2026-10-30 23:41:57 +0000 macros/bg_core_pd : magic DRC, magic+netgen LVS, magic PEX 1/2/3 and KLayout
+bias_tree_pd: 2b3d437 2026-11-03 16:27:56 +0000 macros/bias_tree_pd, sg13cmos5l_IOPadDiff2Single : the tree's layout dummies
+bias_tree_noab_pd: 668cf59 2026-11-04 17:47:15 +0000 macros/sg13cmos5l_IOPadSingle2Diff : backannotation of the drawn cell (sheet
+bias_sel_noab_pd: 61624e5 2026-10-28 03:42:22 +0100 macros : consequences of adapting schematics and test environments to 
+… [157 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:44:22 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/hist; C=91a7da8b67ac56a26c605501146667a1fde28c32; M=macros/sg13cmos5l_IOPadSingle2Diff; git log --format='%h %ci %s' 6229797^..c913388 -- $M/verification/cace/results | cat; git show $C:$M/README.md | grep -n -i -E 'mismatch|mm_params|mc_params|monte|stale|2026-10-2' | head -30
+```
+
+## Tool results / harness — 2026-11-25 03:44:23 UTC
+
+**Tool result:**
+
+```
+c913388 2026-11-05 01:48:33 +0000 macros/sg13cmos5l_IOPadSingle2Diff : schematic CACE rerun complete; README — schematic and post-layout CACE results
+7e51a36 2026-11-05 01:44:54 +0000 macros/sg13cmos5l_IOPadSingle2Diff : CACE results, interim: schematic enable_params (9 of 9)
+c3ea9f9 2026-11-05 01:43:26 +0000 macros/sg13cmos5l_IOPadSingle2Diff : CACE results, interim: schematic pd_params (24 of 24)
+c522b44 2026-11-05 01:42:38 +0000 macros/sg13cmos5l_IOPadSingle2Diff : CACE results, interim: schematic noise_params (15 of 15)
+c7f8960 2026-11-05 01:41:46 +0000 macros/sg13cmos5l_IOPadSingle2Diff : CACE results, interim: schematic tran_params (18 of 18)
+1ece027 2026-11-05 01:38:14 +0000 macros/sg13cmos5l_IOPadSingle2Diff : post-layout CACE (magic C-coupled PEX) complete: 11 groups, 414 of 414 runs, every spec met
+a2d89a8 2026-11-05 01:37:14 +0000 macros/sg13cmos5l_IOPadSingle2Diff : CACE results, interim: schematic ac_params (15 of 15)
+f9628eb 2026-11-05 01:36:57 +0000 macros/sg13cmos5l_IOPadSingle2Diff : CACE results, interim: pex noise_params, pd_params
+083236a 2026-11-05 01:36:09 +0000 macros/sg13cmos5l_IOPadSingle2Diff : CACE results, interim: schematic dc_ibias_params (15 of 15)
+6a2b151 2026-11-05 01:35:37 +0000 macros/sg13cmos5l_IOPadSingle2Diff : CACE results, interim: schematic dc_sel3_params (15 of 15)
+f36a75f 2026-11-05 01:35:22 +0000 macros/sg13cmos5l_IOPadSingle2Diff : CACE results, interim: pex tran_params (18 of 18)
+75ea566 2026-11-05 01:35:03 +0000 macros/sg13cmos5l
+… [4194 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:44:28 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/hist; C=91a7da8b67ac56a26c605501146667a1fde28c32; M=macros/sg13cmos5l_IOPadSingle2Diff; git show $C:$M/README.md | sed -n 110,130p; git show $C:$M/README.md | sed -n 185,205p; git show $C:$M/README.md | sed -n 270,310p; git show $C:$M/Makefile | grep -n -A12 'sim-cace' | head -60
+```
+
+## Tool results / harness — 2026-11-25 03:44:28 UTC
+
+**Tool result:**
+
+```
+## Specification
+
+Limits are **proposals** (the requirements are in `sudelbuecher/description/s2d_d2s_pinbuffers.md`): the buffer's are those of `s2d_input_buffer.md` section VII, the pad-level ones (IO ring
+current, pad range, power down, enable time) the worst case of the first full run plus margin. Run
+2026-10-25/26 in the cloud with the IIC-OSIC-TOOLS 2026.09 pins (`sudelbuecher/cloud_environment.md`),
+CACE 2.13.0, schematic netlist, 574 + 60 runs; all 65 results pass. Conditions per group are in the yaml;
+defaults iovdd 3.3 V, vref = vcm = 1.2 V, 0.5 pF per output, rsrc 50 Ω, sel 00, harness ibias 5 µA.
+The plots are not shipped; `make sim-cace` regenerates them.
+
+| group | quantity | unit | limit | worst | runs | verdict |
+|---|---|---|---:|---:|---:|---|
+| dc_params | Gain |  | >= 1.99 | 1.998 | 135 | pass |
+| dc_params | Gain |  | <= 2.01 | 1.999 | 135 | pass |
+| dc_params | Input offset (systematic) | mV | >= -1 | -0.0004476 | 135 | pass |
+| dc_params | Input offset (systematic) | mV | <= 1 | 0.0001623 | 135 | pass |
+| dc_params | Integral nonlinearity | mV | <= 2 | 1.06 | 135 | pass |
+| dc_params | Output common-mode error | mV | >= -30 | 4.974 | 135 | pass |
+| dc_params | Output common-mode error | mV | <= 30 | 17.97 | 135 | pass |
+| dc_params | IO ring current | uA | <= 135 | 127 | 135 | pass |
+| range_params | Gain vs vref and vcm |  |  any | 1.95 .. 2.037 | 96 | report |
+| loop_params | DC loop gain, differential | dB | >= 60 | 64.54 | 60 | pass |
+| loop_params 
+… [8607 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:44:43 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/hist; C=91a7da8b67ac56a26c605501146667a1fde28c32; M=macros/sg13cmos5l_IOPadSingle2Diff; git show $C:$M/Makefile | sed -n 18,122p | grep -v '^\s*$' ; git show $C:$M/Makefile | sed -n 167,230p
+```
+
+## Tool results / harness — 2026-11-25 03:44:44 UTC
+
+**Tool result:**
+
+```
+# PEX mode (1 = C-decoupled, 2 = C-coupled, 3 = full-RC)
+# Override with: make <target> EXT_MODE=<1|2|3>
+EXT_MODE ?= 3
+# full-RC extresist threshold in mOhm (sak-pex.sh -t, only used in EXT_MODE=3; default: 10000 = 10 Ohm)
+# Override with: make <target> THRESHOLD=<mOhm>
+THRESHOLD ?= 10000
+# full-RC extresist minres in mOhm (sak-pex.sh -r, only used in EXT_MODE=3; default: 1000 = 1 Ohm)
+# Override with: make <target> MINRES=<mOhm>
+MINRES ?= 1000
+# full-RC extresist mindelay in ps (sak-pex.sh -y, only used in EXT_MODE=3; default: 1; 0 = gate by resistance)
+# Override with: make <target> MINDELAY=<ps>
+MINDELAY ?= 1
+# KLayout DRC level: precheck, macro, or regular (sak-drc.sh -l, only used by klayout-drc; default: macro)
+# Override with: make <target> DRC_LEVEL=<precheck|macro|regular>
+DRC_LEVEL ?= macro
+# Floating-point precision (significant digits) for Xschem's ev function
+# Override with: make <target> EV_PRECISION=<digits>
+EV_PRECISION ?= 5
+# Preferred GDS extension: use .gds when available for the CELL, otherwise .klay.gds
+# Resolved per CELL (CELL defaults to TOP), so cells can mix .gds and .klay.gds within one macro.
+# All DRC, LVS and PEX targets (KLayout and Magic) work with either .gds or .klay.gds.
+_GDS_EXT    = $(if $(wildcard $(LAY_DIR)/gds/$(CELL).gds),gds,klay.gds)
+_LAY_SUBDIR = $(if $(filter gds,$(_GDS_EXT)),gds,klayout)
+# Extra options for the sak-open.py file browser (e.g. --all to include build outputs)
+# Override with: make open OPEN_ARGS=<options>
+OPEN_ARGS 
+… [6192 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:44:52 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; cd $W; git clone -q --depth 1 --filter=blob:none --no-checkout https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single repo && git -C repo fetch -q --depth 1 origin 91a7da8b67ac56a26c605501146667a1fde28c32 && echo ok; C=91a7da8b67ac56a26c605501146667a1fde28c32; T=sg13cmos5l_IOPadSingle2Diff; P="scripts/cace macros/$T/schematic macros/$T/verification/cace macros/$T/netlist macros/$T/layout/klayout/$T.klay.gds macros/$T/Makefile"; for d in sg13cmos5l_IOPadDiff2Single en_ctrl_3v3 bias_sel_pd bias_gen_pd ls_up_1v2_3v3 hv_logic IOPad oa_core_pd bg_core_pd bias_tree_pd bias_tree_noab_pd bias_sel_noab_pd; do P="$P macros/$d/schematic/xschem"; done; mkdir -p design; time git -C repo archive $C $P | tar x -C design; du -sh design; ls design/macros; ls design/scripts/cace; grep -n 'mm.ok\|argparse\|add_argument' design/scripts/cace/pex_for_sim.py
+```
+
+## Tool results / harness — 2026-11-25 03:44:58 UTC
+
+**Tool result:**
+
+```
+ok
+
+real	0m4.740s
+user	0m0.868s
+sys	0m0.226s
+2.7M	design
+IOPad
+bg_core_pd
+bias_gen_pd
+bias_sel_noab_pd
+bias_sel_pd
+bias_tree_noab_pd
+bias_tree_pd
+en_ctrl_3v3
+hv_logic
+ls_up_1v2_3v3
+oa_core_pd
+sg13cmos5l_IOPadDiff2Single
+sg13cmos5l_IOPadSingle2Diff
+cace_to_csv.py
+compare_views.py
+mc_stats.py
+pex_for_sim.py
+spec_table.py
+4:"""Copy an extracted (PEX) netlist for simulation: optionally set mm_ok=1 on the mismatch devices, and tie the nodes that
+7:Usage: pex_for_sim.py <in.spice> <out.spice> [--mm-ok] [--tie <net> <ohm>]
+8:  --mm-ok   The PDK switches local mismatch on per instance with mm_ok=1 (in the *_mismatch model sections), and xschem
+10:            extracted netlist draws nothing for those devices. This appends mm_ok=1 to the X lines of sg13_hv_nmos /
+33:    mm_ok = '--mm-ok' in opts
+62:        if mm_ok and t and t[0][0] in 'Xx' and model(t) in MM and not any(x.lower().startswith('mm_ok=') for x in t):
+63:            st[-1] = st[-1] + ' mm_ok=1'
+69:    if mm_ok:
+70:        what.append('mm_ok=1 on %d devices' % n_mm)
+```
+
+## Assistant — 2026-11-25 03:45:01 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; cat $W/design/scripts/cace/pex_for_sim.py | sed -n 1,80p; cat $W/design/scripts/cace/mc_stats.py | head -30
+```
+
+## Tool results / harness — 2026-11-25 03:45:01 UTC
+
+**Tool result:**
+
+```
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Copy an extracted (PEX) netlist for simulation: optionally set mm_ok=1 on the mismatch devices, and tie the nodes that
+only capacitors touch to a net.
+
+Usage: pex_for_sim.py <in.spice> <out.spice> [--mm-ok] [--tie <net> <ohm>]
+  --mm-ok   The PDK switches local mismatch on per instance with mm_ok=1 (in the *_mismatch model sections), and xschem
+            writes it into the schematic netlist only: magic and KLayout-PEX leave it out, so a Monte Carlo run on an
+            extracted netlist draws nothing for those devices. This appends mm_ok=1 to the X lines of sg13_hv_nmos /
+            sg13_hv_pmos / sg13_lv_nmos / sg13_lv_pmos / rhigh / rppd / rsil (pnpMPA has no mismatch model).
+  --tie     A node that only capacitors touch has no DC path: ngspice's op matrix is singular, it falls back to gmin
+            stepping or a transient op, and can land on a wrong operating point. This adds R<k> <node> <net> <ohm>
+            before .ends for each such node (the subckt's ports excepted).
+Everything else is copied unchanged. Added 2026-10-30 (cloud session C1) for the bias_sel_pd core views in
+macros/bias_sel_pd/verification/cace/templates/cores/ (make cores-pex-sim there).
+"""
+import sys
+
+MM = {'sg13_hv_nmos', 'sg13_hv_pmos', 'sg13_lv_nmos', 'sg13_lv_pmos', 'rhigh', 'rppd', 'rsil'}
+
+def model(tokens):
+    # the model is the last token of an X line that is not a parameter 
+… [3293 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:45:11 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; T=sg13cmos5l_IOPadSingle2Diff; M=$W/design/macros/$T; export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l; mkdir -p $W/netcheck; cd $M/schematic/xschem && xschem -n -s -r -x -q --tcl "set top_is_subckt 1" -o $W/netcheck -N cace_sch.spice $T.sch > $W/netcheck/xschem.log 2>&1; echo rc=$?; ls -la $W/netcheck; head -5 /home/user/sg13cmos5l_cm_slot7/pads/$T/$T.spice; ls -la /home/user/sg13cmos5l_cm_slot7/pads/$T/ $M/netlist/schematic/
+```
+
+## Tool results / harness — 2026-11-25 03:45:12 UTC
+
+**Tool result:**
+
+```
+rc=0
+total 24
+drwxr-xr-x 2 root root 4096 Nov 25 03:45 .
+drwxr-xr-x 6 root root 4096 Nov 25 03:45 ..
+-rw-r--r-- 1 root root 8450 Nov 25 03:45 cace_sch.spice
+-rw-r--r-- 1 root root  431 Nov 25 03:45 xschem.log
+* PROVENANCE: copied unchanged below this 4-line header from tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single
+* commit 91a7da8b67ac56a26c605501146667a1fde28c32 (branch toplevel), path macros/sg13cmos5l_IOPadSingle2Diff/netlist/schematic/sg13cmos5l_IOPadSingle2Diff_magic.spice
+* sha256 of the source file (= this file without these 4 lines): 5a4e67f9b12f5f9017978ad0da4305fb331c9aa3abf4657ec48f5c77a8d32810
+* LVS netlist of the pad cell sg13cmos5l_IOPadSingle2Diff (magic/netgen flavour)
+** sch_path: /home/user/sg13cmos5l_cm_ip__single2diff2single/macros/sg13cmos5l_IOPadSingle2Diff/schematic/xschem/sg13cmos5l_IOPadSingle2Diff.sch
+/home/user/sg13cmos5l_cm_slot7/pads/sg13cmos5l_IOPadSingle2Diff/:
+total 1288
+drwxr-xr-x 2 root root    4096 Nov 23 19:50 .
+drwxr-xr-x 4 root root    4096 Nov 23 19:50 ..
+-rw-r--r-- 1 root root 1296496 Nov 23 19:50 sg13cmos5l_IOPadSingle2Diff.gds
+-rw-r--r-- 1 root root    8492 Nov 23 19:50 sg13cmos5l_IOPadSingle2Diff.spice
+
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/design/macros/sg13cmos5l_IOPadSingle2Diff/netlist/schematic/:
+total 24
+drwxrwxr-x 2 root root 4096 Nov  5 18:14 .
+drwxrwxr-x 6 root root 4096 Nov  5 18:14 ..
+-rw-rw-r-- 1 root root 7202 Nov  5 18:14 sg13cmos5l_IOPadSingle2Diff_klayout.cdl
+-rw-rw-r-- 1 r
+… [66 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:45:19 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; T=sg13cmos5l_IOPadSingle2Diff; M=$W/design/macros/$T; cd $W/netcheck; cat xschem.log; tail -n +5 /home/user/sg13cmos5l_cm_slot7/pads/$T/$T.spice > pad_lvs.spice; sha256sum pad_lvs.spice $M/netlist/schematic/${T}_magic.spice; grep -vc '^\*\*' cace_sch.spice pad_lvs.spice; diff <(grep -v '^\*\*' pad_lvs.spice) <(grep -v '^\*\*' cace_sch.spice)
+```
+
+## Tool results / harness — 2026-11-25 03:45:19 UTC
+
+**Tool result:**
+
+```
+Using run time directory XSCHEM_SHAREDIR = /foss/tools/xschem/share/xschem
+Sourcing /foss/tools/xschem/share/xschem/xschemrc init file
+Sourcing /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/design/macros/sg13cmos5l_IOPadSingle2Diff/schematic/xschem/xschemrc init file
+MODELS_NGSPICE: /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models
+MODELS_XYCE: /foss/pdks/ihp-sg13cmos5l/libs.tech/xyce/models
+
+5a4e67f9b12f5f9017978ad0da4305fb331c9aa3abf4657ec48f5c77a8d32810  pad_lvs.spice
+5a4e67f9b12f5f9017978ad0da4305fb331c9aa3abf4657ec48f5c77a8d32810  /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/design/macros/sg13cmos5l_IOPadSingle2Diff/netlist/schematic/sg13cmos5l_IOPadSingle2Diff_magic.spice
+cace_sch.spice:123
+pad_lvs.spice:122
+5a6
+> Rsub iovss vss 1
+```
+
+## Assistant — 2026-11-25 03:45:25 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; T=sg13cmos5l_IOPadSingle2Diff; M=$W/design/macros/$T; grep -A5 'name=Rsub$' $M/schematic/xschem/$T.sch | tr '\n' ' '; echo; sha256sum /home/user/sg13cmos5l_cm_slot7/pads/$T/$T.gds $M/layout/klayout/$T.klay.gds; grep -c 'mm_ok=1' $W/netcheck/cace_sch.spice; grep -E '^X|^x|^R|^M' $W/netcheck/cace_sch.spice | grep -v mm_ok | head -30; grep -rl -i 'IOPadSingle2Diff' /home/user/sg13cmos5l_cm_slot7/verification --include=*.txt --include=*.md --include=*.log 2>/dev/null | head -20
+```
+
+## Tool results / harness — 2026-11-25 03:45:25 UTC
+
+**Tool result:**
+
+```
+C {devices/res.sym} 330 -120 1 0 {name=Rsub value=1 footprint=1206 device=resistor lvs_ignore=open m=1} 
+f4b0e07320821248872780b344d71845d08bc250a4bfc9bcf8633a39bdef0182  /home/user/sg13cmos5l_cm_slot7/pads/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.gds
+f4b0e07320821248872780b344d71845d08bc250a4bfc9bcf8633a39bdef0182  /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/design/macros/sg13cmos5l_IOPadSingle2Diff/layout/klayout/sg13cmos5l_IOPadSingle2Diff.klay.gds
+75
+xt iovdd iovss iref vbp vbn vbpc vbnc en_3v3 en_3v3_b bias_tree_noab_pd
+xa iovdd iovss pad vref vcm outp outn outp outn vbp vbn vbpc vbnc en_3v3 en_3v3_b s2d_mpdda_pd
+xp iovdd iovss pad s2d_pad_esd
+Rsub iovss vss 1
+xs vdd vss vin vref vcm voutp voutn vfbp vfbn vbp vbn vbpc vbnc s2d_mpdda
+XDP1 pad iovdd dpantenna l=27.78u w=1.26u
+XDN1 iovss pad dantenna l=27.78u w=1.26u
+XDP2 pad iovdd dpantenna l=27.78u w=1.26u
+XDN2 iovss pad dantenna l=27.78u w=1.26u
+XA1 x y vin vref vdd vss vbp unit_r2
+XA2 x y vin vref vdd vss vbp unit_r2
+XF1 x y vcm vfbp vdd vss vbp unit_r2
+XF2 x y vfbn vcm vdd vss vbp unit_r2
+XM1 xc yc vfbp vcm vdd vss vbp unit_r2
+XM2 xc yc vfbn vcm vdd vss vbp unit_r2
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/README.md
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/results.md
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/replica_bias/README.md
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/ac_tran/README.md
+```
+
+## Assistant — 2026-11-25 03:45:31 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; python3 - <<'EOF'
+import re,collections
+f='/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/netcheck/cace_sch.spice'
+st=[]
+for l in open(f):
+    l=l.rstrip('\n')
+    if l.startswith('+') and st: st[-1]+=' '+l[1:]
+    else: st.append(l)
+sub=None;c=collections.Counter()
+for s in st:
+    t=s.split()
+    if not t: continue
+    if t[0].lower()=='.subckt': sub=t[1]
+    if t[0][0] in 'XxMmRr' and not s.startswith('**'):
+        mdl=[x for x in t[1:] if '=' not in x][-1]
+        if mdl.startswith('sg13') or mdl in('rhigh','rppd','rsil'):
+            c[(sub,mdl,'mm_ok=1' in s)]+=1
+for k,v in sorted(c.items()): print(k,v)
+EOF
+grep -n -i 's2d\|IOPadSingle2Diff\|S2D' /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/ac_tran/README.md | head -20
+```
+
+## Tool results / harness — 2026-11-25 03:45:31 UTC
+
+**Tool result:**
+
+```
+('bias_tree_noab_pd', 'sg13_hv_nmos', True) 8
+('bias_tree_noab_pd', 'sg13_hv_pmos', True) 6
+('s2d_mpdda', 'sg13_hv_nmos', True) 10
+('s2d_mpdda', 'sg13_hv_pmos', True) 10
+('s2d_mpdda_pd', 'rhigh', True) 2
+('s2d_mpdda_pd', 'sg13_hv_nmos', True) 15
+('s2d_mpdda_pd', 'sg13_hv_pmos', True) 12
+('s2d_pad_esd', 'rppd', True) 2
+('s2d_pad_esd', 'sg13_hv_nmos', True) 1
+('s2d_pad_esd', 'sg13_hv_pmos', True) 1
+('unit_r2', 'rhigh', True) 4
+('unit_r2', 'sg13_hv_pmos', True) 4
+8:through CACE 2.11 on the pads' own committed CACE testbenches. Pads: `sg13cmos5l_IOPadSingle2Diff` (S2D, `s7_an[0]`)
+11:pad_s2d → S2D → slot 7 → D2S → pad_d2s. Numbers, cross-check against the committed CACE CSVs: **[results.md](results.md)**.
+28:| `rt_bode_tt27` | small-signal gain pad_d2s / pad_s2d, magnitude and phase, 1 kHz … 100 MHz, at pad_s2d = 0.5 V DC, tt 27 °C 3.3 V; three loads (color: unloaded = 1 GΩ only as the designer's deck, 1 kΩ ∥ 10 pF, 1 kΩ ∥ 100 pF), three pad views (line style). Ideal: 0 dB (S2D gain 2 × D2S gain ½). The text box lists f−3dB and peaking per curve. |
+31:| `rt_step_tt27` | step 0.25 → 0.75 V at pad_s2d (10 ns edges, up at 2 µs, down at 7 µs): top pad_s2d (the ideal source) and pad_d2s, bottom pad_d2s − final value in mV with the ±1 % band (±5 mV) grey; the 1 % settling time of each curve is the vertical line / triangle; tt 27 °C, three loads, schematic and PEX pads |
+33:| `rt_sine_tt27` | 10 kHz sine 0 … 1 V at pad_s2d, 4 periods after 2 settling periods: input, expected output vcm 
+… [2749 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:45:42 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; C=91a7da8b67ac56a26c605501146667a1fde28c32; T=sg13cmos5l_IOPadSingle2Diff; git -C repo show $C:macros/$T/verification/lvs/$T.magic.lvs/$T.lvs.out > lvs.out; grep -n -i -E 'match|Number of devices|Number of nets' lvs.out | tail -12; git -C hist log -1 --format='%h %ci' $C -- macros/$T/verification/lvs macros/$T/layout/klayout/$T.klay.gds macros/$T/netlist/pex; head -30 design/macros/$T/netlist/pex/${T}_magic_pex_2.spice | cut -c1-150; grep -c '^X\|^x' design/macros/$T/netlist/pex/${T}_magic_pex_2.spice
+```
+
+## Tool results / harness — 2026-11-25 03:45:42 UTC
+
+**Tool result:**
+
+```
+340:Property mm_ok in circuit2 has no matching property in circuit1
+342:Property mm_ok in circuit2 has no matching property in circuit1
+344:Property mm_ok in circuit2 has no matching property in circuit1
+346:Property mm_ok in circuit2 has no matching property in circuit1
+348:Property mm_ok in circuit2 has no matching property in circuit1
+350:Property mm_ok in circuit2 has no matching property in circuit1
+352:Property mm_ok in circuit2 has no matching property in circuit1
+354:Property mm_ok in circuit2 has no matching property in circuit1
+356:Property mm_ok in circuit2 has no matching property in circuit1
+372:(no matching pin)                          |vss                                        
+374:Cell pin lists for sg13cmos5l_IOPadSingle2Diff and sg13cmos5l_IOPadSingle2Diff altered to match.
+377:Final result: Top level cell failed pin matching.
+49bd7dc 2026-11-05 01:19:07 +0000
+* PEX produced on Thu Nov  5 00:57:07 UTC 2026 using /usr/local/bin/sak-pex.sh with m=2 and s=1
+* NGSPICE file created from sg13cmos5l_IOPadSingle2Diff_pex.ext - technology: ihp-sg13cmos5l
+
+.subckt sg13cmos5l_IOPadSingle2Diff_pex iovdd iovss vdd vss pad outp outn vcm
++ vref iref en_3v3 en_3v3_b
+X0 iovdd s2d_block_0.s2d_tails_hi_f_0.vbp iovdd iovdd sg13_hv_pmos ad=1.7p pd=10.68u as=0.65663n ps=2.66142m w=5u l=6u
+X1 iovss iovss iovss rhigh l=12.65u w=0.5u
+X2 s2d_block_0.s2d_loads_f_0.ln s2d_block_0.s2d_loads_f_0.vcmfb iovdd iovdd sg13_hv_pmos ad=2.04p pd=12.68u as=2.04p ps=12.68u w=6u l=4u
+X3 s2d_block
+… [2637 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:45:50 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; grep -n -E 'Circuits match|Netlists match|devices|nets|uniquely|mismatch' lvs.out | grep -v 'Property' | tail -15; sed -n 358,377p lvs.out; grep -rn -i 'Single2Diff\|s2d' /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/replica_bias/README.md | head; ls /home/user/sg13cmos5l_cm_slot7/verification/
+```
+
+## Tool results / harness — 2026-11-25 03:45:50 UTC
+
+**Tool result:**
+
+```
+94:Class sg13cmos5l_IOPadSingle2Diff (0):  Merged 131 parallel devices.
+95:Class sg13cmos5l_IOPadSingle2Diff (0):  Merged 18 series devices.
+96:Class sg13cmos5l_IOPadSingle2Diff (1):  Merged 25 parallel devices.
+97:Class sg13cmos5l_IOPadSingle2Diff (1):  Merged 18 series devices.
+110:Number of devices: 76                      |Number of devices: 76                      
+111:Number of nets: 37                         |Number of nets: 37                         
+116:Netlists match with 7 symmetries with property errors.
+Subcircuit pins:
+Circuit 1: sg13cmos5l_IOPadSingle2Diff     |Circuit 2: sg13cmos5l_IOPadSingle2Diff     
+-------------------------------------------|-------------------------------------------
+en_3v3                                     |en_3v3                                     
+vcm                                        |vcm                                        
+en_3v3_b                                   |en_3v3_b                                   
+outp                                       |outp                                       
+outn                                       |outn                                       
+pad                                        |pad                                        
+iref                                       |iref                                       
+vref                                       |vref                                       
+iovss                                      |iovss                              
+… [1077 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:45:57 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; sed -n 100,130p lvs.out; grep -v 'mm_ok' lvs.out | sed -n 116,340p | grep -i -E 'property|mismatch|value' | sort | uniq -c | head
+```
+
+## Tool results / harness — 2026-11-25 03:45:57 UTC
+
+**Tool result:**
+
+```
+Cell sg13cmos5l_IOPadSingle2Diff (1) disconnected node: vss
+Subcircuit summary:
+Circuit 1: sg13cmos5l_IOPadSingle2Diff     |Circuit 2: sg13cmos5l_IOPadSingle2Diff     
+-------------------------------------------|-------------------------------------------
+sg13_hv_pmos (120->42)                     |sg13_hv_pmos (53->42)                      
+rhigh (26->7)                              |rhigh (26->7)                              
+sg13_hv_nmos (73->23)                      |sg13_hv_nmos (34->23)                      
+rppd (2)                                   |rppd (2)                                   
+dpantenna (2->1)                           |dpantenna (2->1)                           
+dantenna (2->1)                            |dantenna (2->1)                            
+Number of devices: 76                      |Number of devices: 76                      
+Number of nets: 37                         |Number of nets: 37                         
+---------------------------------------------------------------------------------------
+Resolving symmetries by property value.
+Resolving symmetries by pin name.
+Resolving symmetries by net name.
+Netlists match with 7 symmetries with property errors.
+dantenna:54 vs. s2d_pad_esd:p/dantenna:DN1:
+ w circuit1: 2.778e-05   circuit2: 1.26e-06   (delta=183%, cutoff=1%)
+ l circuit1: 1.26e-06   circuit2: 2.778e-05   (delta=183%, cutoff=1%)
+dpantenna:43 vs. s2d_pad_esd:p/dpantenna:DP1:
+ w circuit1: 2.778e-05   circuit2: 1.26e-06   (delta=183%, 
+… [588 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:46:04 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/hist; C=91a7da8b67ac56a26c605501146667a1fde28c32; T=sg13cmos5l_IOPadSingle2Diff; for p in macros/$T/verification/lvs macros/$T/layout/klayout/$T.klay.gds macros/$T/netlist/pex macros/$T/netlist/schematic/${T}_magic.spice; do echo "$p: $(git log -1 --format='%h %ci %s' $C -- $p | cut -c1-120)"; done; head -5 ../lvs.out
+```
+
+## Tool results / harness — 2026-11-25 03:46:04 UTC
+
+**Tool result:**
+
+```
+macros/sg13cmos5l_IOPadSingle2Diff/verification/lvs: 2b8516a 2026-11-04 21:17:21 +0000 macros/sg13cmos5l_IOPadSingle2Diff : drawn pad cell, stage B4 (input gate band: vfbp /
+macros/sg13cmos5l_IOPadSingle2Diff/layout/klayout/sg13cmos5l_IOPadSingle2Diff.klay.gds: 2b8516a 2026-11-04 21:17:21 +0000 macros/sg13cmos5l_IOPadSingle2Diff : drawn pad cell, stage B4 (input gate band: vfbp /
+macros/sg13cmos5l_IOPadSingle2Diff/netlist/pex: 49bd7dc 2026-11-05 01:19:07 +0000 macros/sg13cmos5l_IOPadSingle2Diff : magic PEX (C-coupled) of the drawn cell, post-lay
+macros/sg13cmos5l_IOPadSingle2Diff/netlist/schematic/sg13cmos5l_IOPadSingle2Diff_magic.spice: 03c221b 2026-11-04 17:47:53 +0000 macros/sg13cmos5l_IOPadSingle2Diff : drawn pad cell (C3 stage B2, interim) and its mak
+
+Circuit 1 cell sg13_hv_pmos and Circuit 2 cell sg13_hv_pmos are black boxes.
+Warning: Equate pins:  cell sg13_hv_pmos is a placeholder, treated as a black box.
+Warning: Equate pins:  cell sg13_hv_pmos is a placeholder, treated as a black box.
+```
+
+## Assistant — 2026-11-25 03:46:09 UTC
+
+**Tool call: `Bash`**
+
+```bash
+which cace ngspice xschem python3; cace --version 2>&1 | tail -1; ngspice -v 2>&1 | grep -i ngspice | head -2; xschem -v 2>&1 | head -2; python3 --version; head -3 $(which cace); nproc; uptime; ps aux | grep -c '[n]gspice'
+```
+
+## Tool results / harness — 2026-11-25 03:46:09 UTC
+
+**Tool result:**
+
+```
+/usr/local/bin/cace
+/usr/local/bin/ngspice
+/usr/local/bin/xschem
+/usr/local/bin/python3
+cace 2.11.0
+** ngspice-47 : Circuit level simulation program
+** Copyright 2001-2026, The ngspice team.
+XSCHEM V3.4.8RC
+Copyright (C) 1998-2026 Stefan Schippers
+Python 3.13.18
+#!/usr/bin/python3.12
+# -*- coding: utf-8 -*-
+import re
+4
+ 03:46:09 up  2:10,  0 user,  load average: 0.08, 0.07, 0.72
+1
+```
+
+## Assistant — 2026-11-25 03:46:12 UTC
+
+**Tool call: `Bash`**
+
+```bash
+ps aux | grep -i '[n]gspice\|[c]ace' | cut -c1-200
+```
+
+## Tool results / harness — 2026-11-25 03:46:13 UTC
+
+**Tool result:**
+
+```
+(Bash completed with no output)
+```
+
+## Assistant — 2026-11-25 03:46:18 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace; ls -la templates results/sg13cmos5l_IOPadSingle2Diff | head -50; grep -n -i 'seed\|iterations\|mismatch\|CACE{' templates/sg13cmos5l_IOPadSingle2Diff_tb_dc.sch | head -30
+```
+
+## Tool results / harness — 2026-11-25 03:46:18 UTC
+
+**Tool result:**
+
+```
+results/sg13cmos5l_IOPadSingle2Diff:
+total 244
+drwxrwxr-x 2 root root  4096 Nov  5 18:14 .
+drwxrwxr-x 5 root root  4096 Nov  5 18:14 ..
+-rw-rw-r-- 1 root root   126 Nov  5 18:14 ac_mm_params.csv
+-rw-rw-r-- 1 root root  1229 Nov  5 18:14 ac_params.csv
+-rw-rw-r-- 1 root root  1034 Nov  5 18:14 dc_ibias_params.csv
+-rw-rw-r-- 1 root root  9549 Nov  5 18:14 dc_params.csv
+-rw-rw-r-- 1 root root  1023 Nov  5 18:14 dc_sel3_params.csv
+-rw-rw-r-- 1 root root  2951 Nov  5 18:14 dc_sel_params.csv
+-rw-rw-r-- 1 root root   615 Nov  5 18:14 enable_params.csv
+-rw-rw-r-- 1 root root    79 Nov  5 18:14 mc_params.csv
+-rw-rw-r-- 1 root root    79 Nov  5 18:14 mm_params.csv
+-rw-rw-r-- 1 root root   710 Nov  5 18:14 noise_params.csv
+-rw-rw-r-- 1 root root  2029 Nov  5 18:14 pd_params.csv
+-rw-rw-r-- 1 root root  7096 Nov  5 18:14 range_params.csv
+-rw-rw-r-- 1 root root 11187 Nov  5 18:14 summary_ac_mm_params.md
+-rw-rw-r-- 1 root root 11201 Nov  5 18:14 summary_ac_params.md
+-rw-rw-r-- 1 root root 11187 Nov  5 18:14 summary_dc_ibias_params.md
+-rw-rw-r-- 1 root root 11187 Nov  5 18:14 summary_dc_params.md
+-rw-rw-r-- 1 root root 11187 Nov  5 18:14 summary_dc_sel3_params.md
+-rw-rw-r-- 1 root root 11187 Nov  5 18:14 summary_dc_sel_params.md
+-rw-rw-r-- 1 root root 11187 Nov  5 18:14 summary_enable_params.md
+-rw-rw-r-- 1 root root 11201 Nov  5 18:14 summary_mc_params.md
+-rw-rw-r-- 1 root root 11201 Nov  5 18:14 summary_mm_params.md
+-rw-rw-r-- 1 root root 11231 Nov  5 18:14 summary_noise_params.md
+-rw-rw-r-
+… [1288 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:46:23 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace; sed -n 40,120p templates/sg13cmos5l_IOPadSingle2Diff_tb_dc.sch; sed -n 1,80p results/sg13cmos5l_IOPadSingle2Diff/summary_mm_params.md | grep -v '^$' | head -60
+```
+
+## Tool results / harness — 2026-11-25 03:46:24 UTC
+
+**Tool result:**
+
+```
+Vs1 s1 0 CACE[floor(CACE\{sel=0\} / 2)*CACE\{vddl=1.2\}]
+Vs12 s12 0 CACE\{vs12=1.2\}
+Vs33 s33 0 CACE\{vs33=3.3\}
+* ---- harness iDAC: a sourced current from a PMOS mirror on its own 3.3 V supply
+Vext vext 0 3.3
+Iext xg 0 CACE\{ibias=5e-6\}
+XEd xg xg vext vext sg13_hv_pmos w=5u l=6u
+XEm ibias xg vext vext sg13_hv_pmos w=5u l=6u
+* ---- references (gates only) and the input: pad source = vref + u, through rsrc
+Vref vref 0 dc CACE\{vref=1.2\} ac 0
+Vcm vcm 0 CACE\{vcm=1.2\}
+Vu u 0 dc 0
+Ein vsrc vref u 0 1
+Rsrc vsrc pad CACE\{rsrc=50\}
+* ---- load per output (gates of the next stage, routing), on top of the buffer's built-in CLP / CLN
+Cp outp 0 CACE\{cload=0.5e-12\}
+Cn outn 0 CACE\{cload=0.5e-12\}
+"}
+C {devices/code_shown.sym} 1700 -460 0 0 {name=NGSPICE simulator=ngspice only_toplevel=false
+value="
+.include CACE\{DUT_path\}
+.temp CACE\{temp\}
+.options savecurrents method=gear reltol=1e-4 abstol=1e-15 gmin=1e-15 SEED=CACE[CACE\{seed=12345\} + CACE\{iterations=0\}]
+.option warn=1
+.control
+save v(outp) v(outn) v(vcm) v(u) i(vio) i(vcore)
+dc Vu -CACE\{umax=0.5\} CACE\{umax=0.5\} 0.005
+let vd = v(outp) - v(outn)
+let vc = (v(outp) + v(outn))/2 - v(vcm)
+meas dc vdp find vd at=0.1
+meas dc vdm find vd at=-0.1
+meas dc vd0 find vd at=0
+meas dc vc0 find vc at=0
+* small-signal gain (ideally 2), offset referred to the input, output common-mode error
+let Gain = (vdp - vdm)/0.2
+let Vos_in = vd0/Gain
+let Vcm_err = vc0
+* integral nonlinearity referred to the input: max deviation from the small-sign
+… [12994 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:46:34 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace; head -3 results/sg13cmos5l_IOPadSingle2Diff/ac_params.csv; cat results/sg13cmos5l_IOPadSingle2Diff/ac_mm_params.csv results/sg13cmos5l_IOPadSingle2Diff/mm_params.csv; head -3 results/sg13cmos5l_IOPadSingle2Diff/dc_params.csv; grep -n 'echo\|meas\|let' templates/sg13cmos5l_IOPadSingle2Diff_tb_ac.sch | head -60
+```
+
+## Tool results / harness — 2026-11-25 03:46:34 UTC
+
+**Tool result:**
+
+```
+corner_mos,temp,Acl_dB[dB],f3dB[MHz],None[],None[],None[],None[],None[],CMvdd_1k[dB]
+ss,-40,6.01563,1.40461E+06,143.787,143.787,143.787,143.787,143.787,-53.9823
+sf,-40,6.01561,1.396E+06,143.831,143.831,143.831,143.831,143.831,-54.3737
+iterations,corner_mos,corner_r,temp,None[],None[],PSRRp_1k[dB],PSRRp_100k[dB],PSRRn_1k[dB],PSRRn_100k[dB],CMRR_1k[dB],None[]
+iterations,corner_mos,corner_r,temp,Gain[],Vos_in[mV],INL[],Vcm_err[mV],Iio[]
+vdd,corner_mos,corner_r,temp,Gain[],Vos_in[mV],INL[mV],Vcm_err[mV],Iio[A]
+3.0,ss,bcs,-40,1.99905,-8.01939E-10,0.000447806,0.0109093,0.000114707
+3.0,sf,bcs,-40,1.99905,-7.80802E-10,0.000247911,0.0110239,0.000115078
+71:let vd = v(outp) - v(outn)
+72:let A = mag(vd)
+73:meas ac a1k find A at=1k
+74:meas ac a100k find A at=100k
+75:let a3 = a1k/sqrt(2)
+76:let f3dB = 1e12
+77:meas ac f3dB when A=a3 fall=1
+78:let Acl_dB = 20*log10(a1k)
+86:let vd = v(outp) - v(outn)
+87:let vc = (v(outp) + v(outn))/2
+88:let A = mag(vd)
+89:let C = mag(vc)
+90:meas ac p1k find A at=1k
+91:meas ac p100k find A at=100k
+92:meas ac c1k find C at=1k
+99:let vd = v(outp) - v(outn)
+100:let A = mag(vd)
+101:meas ac n1k find A at=1k
+102:meas ac n100k find A at=100k
+108:let vd = v(outp) - v(outn)
+109:let A = mag(vd)
+110:meas ac m1k find A at=1k
+111:let Acl_dB = $s_acl
+112:let f3dB = $s_f3
+113:let PSRRp_1k = 20*log10($s_a1k/$s_pp1k)
+114:let PSRRp_100k = 20*log10($s_a100k/$s_pp100k)
+115:let PSRRn_1k = 20*log10($s_a1k/$s_pn1k)
+116:let PSRRn_100k = 20*log10($s_a100k/$s_pn100k)
+117:let CM
+… [193 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:46:56 UTC
+
+**Tool call: `Bash`**
+
+```bash
+P=/foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models; ls $P | head -30; grep -n -i 'mm_ok' $P/*.lib 2>/dev/null | head -20
+```
+
+## Tool results / harness — 2026-11-25 03:46:56 UTC
+
+**Tool result:**
+
+```
+cap_cmomf.lib
+cap_cmomi.lib
+cornerCAP.lib
+cornerDIO.lib
+cornerMOSCAP.lib
+cornerMOShv.lib
+cornerMOSlv.lib
+cornerPNP.lib
+cornerRES.lib
+diodes.lib
+resistors_mod.lib
+resistors_mod_mismatch.lib
+resistors_stat.lib
+sg13cmos5l_pnpMPA_mod.lib
+sg13cmos5l_pnpMPA_stat.lib
+sg13g2_bondpad.lib
+sg13g2_esd.lib
+sg13g2_moscap_mismatch.lib
+sg13g2_moscap_mod.lib
+sg13g2_moscap_mod_mismatch.lib
+sg13g2_moscap_parm.lib
+sg13g2_moscap_stat.lib
+sg13g2_moshv_mismatch.lib
+sg13g2_moshv_mod.lib
+sg13g2_moshv_mod_mismatch.lib
+sg13g2_moshv_parm.lib
+sg13g2_moshv_stat.lib
+sg13g2_moslv_mismatch.lib
+sg13g2_moslv_mod.lib
+sg13g2_moslv_mod_mismatch.lib
+/foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_cmomf.lib:42:* m: parallel device multiplier (ngspice subckt multiplier).  mm_ok: accepted
+/foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_cmomf.lib:53:.subckt cap_cmomf PLUS MINUS w=5e-6 l=5e-6 mmin=1 mmax=4 subblock=0 mm_ok=1
+/foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_cmomi.lib:38:* m: parallel device multiplier (ngspice subckt multiplier).  mm_ok: accepted for
+/foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_cmomi.lib:60:.subckt cap_cmomi PLUS MINUS w=5e-6 l=5e-6 mmin=1 mmax=4 feed=double subblock=0 mm_ok=1
+/foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/resistors_mod.lib:46:.param w=0.5e-6 l=0.5e-6 mm_ok=0 m=1 trise=0 sw_et=0
+/foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/resistors_mod.lib:108:.param w=0.5e-6 l=0.96e-6 mm_ok=0 b=0 trise=0 m=1 sw_et=0
+/foss/pdks/ihp-sg13cmos5l/lib
+… [2172 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:47:02 UTC
+
+**Tool call: `Bash`**
+
+```bash
+P=/foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models; grep -n -i 'mm_ok\|sqrt.*m\b\|/sqrt' $P/sg13g2_moshv_mod_mismatch.lib | head -20; grep -n -i 'm=' $P/sg13g2_moshv_mismatch.lib | head; cat /foss/pdks/ihp-sg13cmos5l/SOURCES* 2>/dev/null | head; ls /foss/pdks/ihp-sg13cmos5l/
+```
+
+## Tool results / harness — 2026-11-25 03:47:02 UTC
+
+**Tool result:**
+
+```
+67:+ w=0.35u l=0.34u ng=1 m=1 mm_ok=0 as=0 ad=0 pd=0 ps=0 trise=0 z1=0.34e-6 z2=0.38e-6 wmin=0.15e-6 rfmode=0 pre_layout=1
+78:              + w='agauss(w, sg13g2_hv_nmos_dw_mm, (mm_ok != 1 ? 0 : 1))'
+79:              + l='agauss(l, sg13g2_hv_nmos_dl_mm, (mm_ok != 1 ? 0 : 1))'
+87:              + delvto='agauss(0, sg13g2_hv_nmos_delvto_mm/sqrt(m*l*w*1e12), (mm_ok != 1 ? 0 : 1))'
+88:              + factuo='agauss(1, sg13g2_hv_nmos_factuo_mm/sqrt(m*l*w*1e12), (mm_ok != 1 ? 0 : 1))'
+91:              + w='agauss(w, sg13g2_hv_nmos_dw_mm, (mm_ok != 1 ? 0 : 1))'
+92:              + l='agauss(l, sg13g2_hv_nmos_dl_mm, (mm_ok != 1 ? 0 : 1))'
+100:              + delvto='agauss(0, sg13g2_hv_nmos_delvto_mm/sqrt(m*l*w*1e12), (mm_ok != 1 ? 0 : 1))'
+101:              + factuo='agauss(1, sg13g2_hv_nmos_factuo_mm/sqrt(m*l*w*1e12), (mm_ok != 1 ? 0 : 1))'
+105:          + w='agauss(w, sg13g2_hv_nmos_dw_mm, (mm_ok != 1 ? 0 : 1))'
+106:          + l='agauss(l, sg13g2_hv_nmos_dl_mm, (mm_ok != 1 ? 0 : 1))'
+110:          + delvto='agauss(0, sg13g2_hv_nmos_delvto_mm/sqrt(m*l*w*1e12), (mm_ok != 1 ? 0 : 1))'
+111:          + factuo='agauss(1, sg13g2_hv_nmos_factuo_mm/sqrt(m*l*w*1e12), (mm_ok != 1 ? 0 : 1))'
+117:              + w='agauss(w, sg13g2_hv_nmos_dw_mm, (mm_ok != 1 ? 0 : 1))'
+118:              + l='agauss(l, sg13g2_hv_nmos_dl_mm, (mm_ok != 1 ? 0 : 1))'
+126:              + delvto='agauss(0, sg13g2_hv_nmos_delvto_mm/sqrt(m*l*w*1e12), (mm_ok != 1 ? 0 : 1))'
+127:              + factuo='agauss(1, sg13g2_hv
+… [352 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:47:07 UTC
+
+**Tool call: `Bash`**
+
+```bash
+ls -a /foss/pdks/ /foss/pdks/ihp-sg13cmos5l/libs.tech | head -30; grep -rl df4c5054 /foss/pdks/ 2>/dev/null | head -3; cat /foss/pdks/*.json 2>/dev/null | head; grep -rn 'df4c5054' /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/*/README.md | head -3
+```
+
+## Tool results / harness — 2026-11-25 03:47:11 UTC
+
+**Tool result:**
+
+```
+/foss/pdks/:
+.
+..
+IHP-Open-PDK
+ciel
+ihp-sg13cmos5l
+sky130A
+
+/foss/pdks/ihp-sg13cmos5l/libs.tech:
+.
+..
+gnucap
+klayout
+librelane
+magic
+netgen
+ngspice
+verilog-a
+xschem
+xyce
+/foss/pdks/IHP-Open-PDK/.git/logs/HEAD
+/foss/pdks/IHP-Open-PDK/.git/HEAD
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/ac_tran/README.md:167:- PDK `/foss/pdks/ihp-sg13cmos5l` (IHP-Open-PDK commit df4c5054ee8ca481c3eb873687274f28cdb50b1e, as ../dc_curves).
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/d2s_pex/README.md:82:- PDK: /foss/pdks/ihp-sg13cmos5l -> IHP-Open-PDK commit df4c5054ee8ca481c3eb873687274f28cdb50b1e (2026-10-14).
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/d2s_schematic_rerun/README.md:132:- PDK `/foss/pdks/ihp-sg13cmos5l` (IHP-Open-PDK commit df4c5054ee8ca481c3eb873687274f28cdb50b1e).
+```
+
+## Assistant — 2026-11-25 03:47:18 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/design/macros/sg13cmos5l_IOPadSingle2Diff/netlist/pex; f=sg13cmos5l_IOPadSingle2Diff_magic_pex_2.spice; grep -n -i ' vss \| vss$' $f | head; grep -n '^\.ends\|^\.subckt\|^\*' $f | head; grep -c '^C' $f; awk '/^X/{print $NF}' $f | sort | uniq -c; grep -c 'm=' $f
+```
+
+## Tool results / harness — 2026-11-25 03:47:18 UTC
+
+**Tool result:**
+
+```
+4:.subckt sg13cmos5l_IOPadSingle2Diff_pex iovdd iovss vdd vss pad outp outn vcm
+804:Rport_vss vss iovss 1
+1:* PEX produced on Thu Nov  5 00:57:07 UTC 2026 using /usr/local/bin/sak-pex.sh with m=2 and s=1
+2:* NGSPICE file created from sg13cmos5l_IOPadSingle2Diff_pex.ext - technology: ihp-sg13cmos5l
+4:.subckt sg13cmos5l_IOPadSingle2Diff_pex iovdd iovss vdd vss pad outp outn vcm
+805:.ends
+573
+      7 l=0.45u
+     60 l=0.6u
+      2 l=12u
+     32 l=1u
+     18 l=3u
+     20 l=4u
+     53 l=6u
+      1 l=8u
+     28 w=0.5u
+      4 w=27.78u
+1
+```
+
+## Assistant — 2026-11-25 03:47:26 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cat /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/replica_bias/run_cace.sh; sed -n 1,200p /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/replica_bias/analyze.py | grep -n -i 'hist\|fig\|dpi\|plt\.' | head -40
+```
+
+## Assistant — 2026-11-25 03:47:26 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/replica_bias/results/pad_ref_rb_mc_hist.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 03:47:26 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Tool results / harness — 2026-11-25 03:47:26 UTC
+
+**Tool result:**
+
+```
+#!/bin/bash
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# Run CACE groups of pad_ref_rb on the schematic or on the prepared PEX netlist, in a copy of the design repository's
+# macro tree (<tree>), the same way as macros/sg13cmos5l_IOPadSingle2Diff/Makefile sim-cace CACE_SOURCE=pex does at
+# design commit 9052bd35: a copy of the yaml with its own runs/netlist/docs folders, the prepared netlist placed at
+# cace/netlist_pex/pex/pad_ref_rb.spice (newer than the layout, so CACE takes it as up to date).
+# Usage: run_cace.sh <tree> <schematic|pex> <results_dir> <keep_runs_dir|-> <group> [<group> ...]
+#   pex expects <tree>/pex/pad_ref_rb_sim.spice (pex_for_sim.py output) and <tree>/pex/pad_ref_rb.gds.
+#   keep_runs_dir: if not '-', the CACE run folder of each group is moved there (for per-run data, e.g. mm_params).
+set -u
+TREE=$(realpath "$1"); SRC=$2; RES=$(realpath -m "$3"); KEEP=$4; shift 4
+TOP=pad_ref_rb
+MAC=$TREE/macros/$TOP
+SCR=$TREE/scripts/cace
+JOBS=${CACE_JOBS:-1}
+cd $MAC/verification/cace || exit 1
+mkdir -p "$RES"
+xschem -x -q -r --rcfile $MAC/schematic/xschem/xschemrc \
+  --command "set fp [open .xlp_$SRC w]; puts \$fp \$XSCHEM_LIBRARY_PATH; close \$fp" > /dev/null 2>&1
+export XSCHEM_USER_LIBRARY_PATH=$(tr ':' '\n' < .xlp_$SRC | grep '/macros/' | grep -v "^$MAC/" | paste -sd: -)
+echo "XSCHEM_USER_LIBRARY_PATH=$XSCHEM_USER_LIBRARY_PATH"
+if [ "$SRC" = pex ]; then
+  Y=_${TOP}_pex.yaml; RUNS=_runs_pex; NET=netlist_pex; DOCS=_docs_pex
+ 
+… [1462 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:47:28 UTC
+
+**Tool call: `Bash`**
+
+```bash
+sed -n 40,70p /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/replica_bias/analyze.py; python3 -c "import matplotlib, numpy; print(matplotlib.__version__, numpy.__version__)"; python3 -c "import yaml; print(yaml.__version__)"; /usr/bin/python3.12 -c "import yaml; print(yaml.__version__)"
+```
+
+## Tool results / harness — 2026-11-25 03:47:29 UTC
+
+**Tool result:**
+
+```
+dr = max(abs(float(cm[key(r, conds)][q]) - float(r[q])) * f for r in a)
+            fmt = '%.4g'
+            if g == 'pd_params':
+                fmt = '%.3e'
+            print('| %s | %d / %d | %s [%s] | %s .. %s | %s .. %s | %.3g %s | %.3g %s |' % (g, len(a), len(b), q.split('[')[0], u,
+                  fmt % min(xa), fmt % max(xa), fmt % min(xb), fmt % max(xb), d, u, dr, u))
+    print()
+
+def mc(res):
+    r = load(os.path.join(res, 'mc', 'mm_params_runs.csv'))
+    print('### pad_ref_rb: local-mismatch Monte Carlo (IHP sg13cmos5l simulation, schematic, tt_mismatch, 27 C, 3.3 V, 100 runs)\n')
+    print('| quantity | n | mean | sigma | min | max | mean - 3 sigma .. mean + 3 sigma |')
+    print('|---|---|---|---|---|---|---|')
+    data = {}
+    for q, u, f in Q:
+        x = [float(t[q]) * f for t in r]; data[q] = x
+        m, s = st.mean(x), st.stdev(x)
+        unit = 'mV' if u == 'V' else u
+        k = 1e3 if u == 'V' else 1
+        print('| %s | %d | %.2f %s | %.3f %s | %.2f %s | %.2f %s | %.2f .. %.2f %s |' % (q.split('[')[0], len(x), m * k, unit, s * k, unit,
+              min(x) * k, unit, max(x) * k, unit, (m - 3 * s) * k, (m + 3 * s) * k, unit))
+    print()
+    fig, ax = plt.subplots(1, 2, figsize=(8, 3))
+    for a, q, lab in ((ax[0], 'Vcm[V]', 'vcm [mV]'), (ax[1], 'Vref[V]', 'vref [mV]')):
+        a.hist([v * 1e3 for v in data[q]], bins=20, color='#4a6fa5', edgecolor='white')
+        a.set_xlabel(lab); a.set_ylabel('runs')
+    fig.suptitle('pad_ref_rb mismatch MC, 100 
+… [344 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:47:48 UTC
+
+**Tool call: `Bash`**
+
+```bash
+mkdir -p /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/csv && cat > /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/cace_run.sh <<'EOF'
+#!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+#
+# Run CACE parameter groups of sg13cmos5l_IOPadSingle2Diff (S2D pad, s7_an[0]) on its schematic or on the magic
+# C-coupled PEX netlist (IHP sg13cmos5l simulation), design repository commit 91a7da8b, yaml and templates unchanged,
+# CACE 2.11, ngspice-47 + OSDI. Scheme of ../d2s_schematic_rerun/cace_sch.sh (schematic) and of the design's
+# macros/sg13cmos5l_IOPadSingle2Diff/Makefile sim-cace CACE_SOURCE=pex (pex), with one change for pex: the extracted
+# netlist is prepared with pex_for_sim.py --mm-ok (mm_ok=1 on every MOSFET / rhigh / rppd instance, as xschem writes it
+# on every such instance of the schematic), so that local mismatch is drawn for the extracted devices too; without
+# it a mismatch group on the extraction is vacuous (the reason the Makefile leaves mm groups out for pex).
+# Per group: <out>/<group>[_pex].csv (mm_collect.py: CACE 2.11 nests the iterations of a collated group one level
+# deeper than cace_to_csv.py looks; for a group without iterations it gives the same rows), <out>/summary_<group>[_pex].md
+# (CACE's summary.md), <out>/log_<group>[_pex].txt; the CACE run folder is kept as <work>/runs/<group>[_pex].
+# Templates are restored from a pristine copy and their netlists deleted before every group.
+# Usage: [JOBS=2] cace_run.sh <work_dir> <out_dir> <schematic|pex> <group> [<group> ...]
+set -u
+WORK=$(realpath "$1"); OUT=$(realpath -m "$2"); SRC=$3; shift 3
+HERE=$(dirname "$(realpath "$0")")
+JOBS=${JOBS:-2}
+T=sg13cmos5l_IOPadSingle2Diff
+M=$WORK/design/macros/$T
+SCR=$WORK/design/scripts/cace
+mkdir -p "$OUT" "$WORK/runs"
+cd "$M/verification/cace" || exit 1
+xschem -x -q -r --rcfile "$M/schematic/xschem/xschemrc" \
+  --command "set fp [open .xschem_library_path_$SRC w]; puts \$fp \$XSCHEM_LIBRARY_PATH; close \$fp" > /dev/null 2>&1
+export XSCHEM_USER_LIBRARY_PATH=$(tr ':' '\n' < .xschem_library_path_$SRC | grep '/macros/' | grep -v "^$M/" | paste -sd: -)
+[ -n "$XSCHEM_USER_LIBRARY_PATH" ] || { echo "no macro library path"; exit 1; }
+if [ "$SRC" = pex ]; then
+  Y=_pex_$T.yaml; RUNS=_runs_pex; SUF=_pex
+  sed -e 's|^  runs:.*|  runs:             cace/_runs_pex|' -e 's|^  documentation:.*|  documentation:    cace/_docs_pex|' \
+      -e 's|^  netlist:.*|  netlist:          cace/netlist_pex\n  layout:           cace/layout_pex|' $T.yaml > $Y
+  rm -rf layout_pex netlist_pex && mkdir -p layout_pex netlist_pex/pex
+  cp "$M/layout/klayout/$T.klay.gds" layout_pex/$T.gds
+  sleep 1   # the prepared netlist must be newer than the layout: CACE then skips the extraction ("Up to date")
+  python3 "$SCR/pex_for_sim.py" "$M/netlist/pex/${T}_magic_pex_2.spice" netlist_pex/pex/$T.spice --mm-ok --tie iovss 1e12 \
+    > "$OUT/pex_for_sim.log" 2>&1 || exit 1
+  sed -i "s/\b${T}_pex\b/$T/g" netlist_pex/pex/$T.spice
+  cp netlist_pex/pex/$T.spice "$WORK/${T}_pex_mm.spice"
+else
+  Y=_sch_$T.yaml; RUNS=_runs_sch; SUF=
+  sed -e 's|^  runs:.*|  runs:             cace/_runs_sch|' -e 's|^  documentation:.*|  documentation:    cace/_docs_sch|' \
+      $T.yaml > $Y
+fi
+[ -d _templates_orig ] || cp -r templates _templates_orig
+status=0
+for g in "$@"; do
+  rm -rf $RUNS/RUN_* templates
+  cp -r _templates_orig templates           # fresh mtimes: CACE renetlists every template
+  rm -f templates/*.spice
+  echo "=== $g$SUF start $(date -u +%FT%H:%M:%SZ) jobs=$JOBS"
+  cace $Y -s $SRC -p "$g" -j "$JOBS" --no-progress-bar > "$OUT/log_$g$SUF.txt" 2>&1 || status=1
+  cp $RUNS/RUN_*/summary.md "$OUT/summary_$g$SUF.md" 2>/dev/null || status=1
+  python3 "$HERE/mm_collect.py" $T.yaml "$g" $RUNS/RUN_* "$OUT/$g$SUF.csv" templates || status=1
+  [ "$SRC" = schematic ] && cp netlist/schematic/$T.spice "$OUT/netlist_$g.spice" 2>/dev/null
+  rm -rf "$WORK/runs/$g$SUF"; mv $RUNS/RUN_* "$WORK/runs/$g$SUF" 2>/dev/null
+  echo "=== $g$SUF done $(date -u +%FT%H:%M:%SZ) rows=$(($(grep -vc '^#' "$OUT/$g$SUF.csv" 2>/dev/null || echo 1)-1))"
+done
+rm -rf templates && cp -r _templates_orig templates
+exit $status
+EOF
+chmod +x /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/cace_run.sh
+```
+
+## Tool results / harness — 2026-11-25 03:47:48 UTC
+
+**Tool result:**
+
+```
+(Bash completed with no output)
+```
+
+## Assistant — 2026-11-25 03:48:03 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/mm_collect.py`
+
+```
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Per-run CSV of one CACE group, also for a group collated over Monte Carlo iterations.
+
+CACE 2.11 nests the iterations of a collated group one level deeper (parameters/<group>/run_0/run_<k>/) than the
+design repository's scripts/cace/cace_to_csv.py looks (parameters/<group>/run_*/): that is why the committed
+mm_params.csv, ac_mm_params.csv and mc_params.csv of the S2D pad have a header only. This reads every *.data file
+below parameters/<group>/ (as ../d2s_schematic_rerun/mm_collect.py and ../replica_bias/mc_collect.py).
+
+CSV format as cace_to_csv.py: the group's conditions, then the yaml `variables` in the order of the data file; the
+[unit] in the header is the yaml display unit, the values are what the testbench writes (SI: V, A, Hz; dB as dB).
+Difference: a `null` variable (written by the testbench, not scored by CACE) is labelled with the name the template's
+`echo $&... > ...data` line gives it, as `<name>(unscored)[]`, instead of cace_to_csv.py's `None[]` (which repeats the
+last null value in every None column). Rows sorted by iteration. A run whose data file has the wrong number of values
+(failed simulation) is left out and counted.
+Usage: mm_collect.py <cell.yaml> <group> <run_dir> <out.csv> [<templates_dir>]"""
+import csv, glob, os, re, sys
+import yaml
+
+
+def echo_names(tdir, template, n):
+    try:
+        txt = open(os.path.join(tdir, template)).read()
+    except OSError:
+        return None
+    for line in txt.splitlines():
+        if line.lstrip().startswith('echo') and '.data' in line:
+            names = re.findall(r'\$&(\w+)', line)
+            if len(names) == n:
+                return names
+    return None
+
+
+def main(ycell, group, rundir, out, tdir=None):
+    d = yaml.safe_load(open(ycell))
+    g = d['parameters'][group]
+    ng = g['tool']['ngspice']
+    variables = list(ng['variables'])
+    conds = list(g['conditions'])
+    si = {'ns': 's', 'ps': 's', 'pA': 'A', 'nA': 'A', 'uA': 'A', 'fC': 'C', 'pC': 'C', 'fW⋅s': 'J', 'pW⋅s': 'J'}
+    units = {k: si.get(v.get('unit', ''), v.get('unit', '')) for k, v in g['spec'].items()}
+    names = echo_names(tdir, ng['template'], len(variables)) if tdir else None
+    labels = []
+    for i, v in enumerate(variables):
+        if v is None:
+            labels.append('%s(unscored)[]' % (names[i] if names else 'col%d' % i))
+        else:
+            labels.append('%s[%s]' % (v, units.get(v, '')))
+    rows, bad = [], 0
+    files = glob.glob(os.path.join(rundir, 'parameters', group, '**', '*.data'), recursive=True)
+    leaves = [os.path.dirname(c) for c in glob.glob(os.path.join(rundir, 'parameters', group, '**', 'conditions.yaml'),
+                                                    recursive=True)]
+    leaves = [r for r in leaves if not glob.glob(os.path.join(r, 'run_*'))]
+    for f in files:
+        r = os.path.dirname(f)
+        c = yaml.safe_load(open(os.path.join(r, 'conditions.yaml')))
+        vals = open(f).read().split()
+        if len(vals) != len(variables):
+            bad += 1
+            continue
+        rows.append([c.get(k) for k in conds] + vals)
+    if 'iterations' in conds:
+        i = conds.index('iterations')
+        rows.sort(key=lambda x: int(x[i] or 0))
+    os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
+    with open(out, 'w', newline='') as fh:
+        w = csv.writer(fh)
+        w.writerow(conds + labels)
+        w.writerows(rows)
+    print('%s: %d of %d runs -> %s (%d data files with a wrong value count)' % (group, len(rows), len(leaves), out, bad))
+
+
+if __name__ == '__main__':
+    if len(sys.argv) not in (5, 6):
+        sys.exit(__doc__)
+    main(*sys.argv[1:])
+```
+
+## Tool results / harness — 2026-11-25 03:48:03 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/mm_collect.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 03:48:08 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch && python3 - <<'EOF'
+p='mm_collect.py'; s=open(p).read()
+s=s.replace("""    files = glob.glob(os.path.join(rundir, 'parameters', group, '**', '*.data'), recursive=True)
+""","""    files = sorted(glob.glob(os.path.join(rundir, 'parameters', group, '**', '*.data'), recursive=True),
+                   key=lambda p: [int(x) for x in re.findall(r'run_(\\d+)', p)])
+""")
+s=s.replace("(failed simulation) is left out and counted.","(failed simulation) is left out and counted. Rows in run order (CACE's run_<k> numbers).")
+open(p,'w').write(s)
+EOF
+grep -n 'sorted' -A1 mm_collect.py
+```
+
+## Tool results / harness — 2026-11-25 03:48:08 UTC
+
+**Tool result:**
+
+```
+15:last null value in every None column). Rows sorted by iteration. A run whose data file has the wrong number of values
+16-(failed simulation) is left out and counted. Rows in run order (CACE's run_<k> numbers).
+--
+51:    files = sorted(glob.glob(os.path.join(rundir, 'parameters', group, '**', '*.data'), recursive=True),
+52-                   key=lambda p: [int(x) for x in re.findall(r'run_(\d+)', p)])
+```
+
+## Assistant — 2026-11-25 03:48:45 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/run.sh`
+
+```
+#!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+#
+# IHP sg13cmos5l simulation: the Monte Carlo groups of the S2D pad sg13cmos5l_IOPadSingle2Diff (s7_an[0]) re-run with
+# the per-run data kept (mm_params, ac_mm_params, mc_params on the schematic; mm_params also on the magic C-coupled
+# PEX netlist with mm_ok=1 set on the extracted devices), plus one dc_params run as a check of the committed
+# (non-Monte-Carlo) schematic results. Design repository commit 91a7da8b, yaml and templates unchanged, CACE 2.11.
+# Usage: run.sh [<work_dir>] [fetch|history|netcheck|sim|csv|analyze|all]   (default ./_work next to this script, all)
+# Environment: JOBS = parallel ngspice runs per group (default 2); SIM_SCH / SIM_PEX = groups of the sim step.
+# Needs: PDK_ROOT with ihp-sg13cmos5l, ngspice-47 with the IHP OSDI models, xschem, CACE 2.11, python3 with pyyaml and
+# matplotlib, git with network access to github.com (blobless clones; only the needed paths are extracted).
+set -euo pipefail
+HERE=$(cd "$(dirname "$0")" && pwd)
+SLOT=$(cd "$HERE/../../.." && pwd)
+WORK=$(realpath -m "${1:-$HERE/_work}")
+STEP=${2:-all}
+export PDK_ROOT=${PDK_ROOT:-/foss/pdks} PDK=ihp-sg13cmos5l
+export JOBS=${JOBS:-2}
+export PYTHONDONTWRITEBYTECODE=1
+T=sg13cmos5l_IOPadSingle2Diff
+URL=https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single
+C=91a7da8b67ac56a26c605501146667a1fde28c32
+SIM_SCH=${SIM_SCH-mm_params ac_mm_params mc_params dc_params}
+SIM_PEX=${SIM_PEX-mm_params}
+M=$WORK/design/macros/$T
+DEPS="sg13cmos5l_IOPadDiff2Single en_ctrl_3v3 bias_sel_pd bias_gen_pd ls_up_1v2_3v3 hv_logic IOPad oa_core_pd bg_core_pd
+ bias_tree_pd bias_tree_noab_pd bias_sel_noab_pd"     # the macros the S2D xschemrc puts on the library path
+mkdir -p "$WORK"
+
+fetch() {
+  [ -d "$WORK/repo" ] || git clone -q --depth 1 --filter=blob:none --no-checkout "$URL" "$WORK/repo"
+  git -C "$WORK/repo" fetch -q --depth 1 origin $C
+  local P="scripts/cace macros/$T/schematic macros/$T/verification/cace macros/$T/verification/lvs macros/$T/netlist
+   macros/$T/layout/klayout/$T.klay.gds" d
+  for d in $DEPS; do P="$P macros/$d/schematic/xschem"; done
+  rm -rf "$WORK/design" && mkdir -p "$WORK/design"
+  git -C "$WORK/repo" archive $C $P | tar x -C "$WORK/design"
+}
+
+# Staleness: commit dates of the committed results vs the last change of the schematic (S2D and the macros it uses),
+# from a blobless clone with full history (commits and trees only, about 2 MB).
+history() {
+  [ -d "$WORK/hist" ] || git clone -q --filter=blob:none --no-checkout "$URL" "$WORK/hist"
+  local H="git -C $WORK/hist" R=macros/$T/verification/cace/results/$T f d
+  {
+    echo "# SPDX-FileCopyrightText: 2026 Christoph Maier"
+    echo "# SPDX-License-Identifier: Apache-2.0"
+    echo "# last commit (at design commit ${C:0:8}) that changed each path: hash, committer date, subject"
+    echo "## committed schematic results, per file"
+    for f in mm_params.csv summary_mm_params.md ac_mm_params.csv summary_ac_mm_params.md mc_params.csv \
+             summary_mc_params.md dc_params.csv summary_dc_params.md; do
+      echo "$f: $($H log -1 --format='%h %ci %s' $C -- $R/$f)"
+    done
+    echo "## schematic, CACE file, templates, LVS netlist, layout, PEX netlist of the S2D pad"
+    for f in schematic/xschem verification/cace/$T.yaml verification/cace/templates netlist/schematic/${T}_magic.spice \
+             layout/klayout/$T.klay.gds netlist/pex; do
+      echo "macros/$T/$f: $($H log -1 --format='%h %ci %s' $C -- macros/$T/$f)"
+    done
+    echo "## commits that changed macros/$T/schematic/xschem after the mismatch results (2026-10-26)"
+    $H log --format='%h %ci %s' 6229797..$C -- macros/$T/schematic/xschem
+    echo "## schematic folders of the macros on the S2D library path"
+    for d in $DEPS; do echo "macros/$d: $($H log -1 --format='%h %ci %s' $C -- macros/$d/schematic/xschem)"; done
+  } > "$HERE/staleness.txt"
+  cat "$HERE/staleness.txt"
+}
+
+# Which netlist: CACE 2.11 regenerat
+… [4627 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 03:48:45 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/run.sh (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 03:48:49 UTC
+
+**Tool call: `Bash`**
+
+```bash
+chmod +x /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/run.sh; W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; rm -f $W/lvs.out; rm -rf $W/netcheck; cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch && ./run.sh $W fetch && ./run.sh $W history && ./run.sh $W netcheck
+```
+
+## Tool results / harness — 2026-11-25 03:48:51 UTC
+
+**Tool result:**
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# last commit (at design commit 91a7da8b) that changed each path: hash, committer date, subject
+## committed schematic results, per file
+mm_params.csv: 6229797 2026-10-26 00:55:35 +0100 macros/sg13cmos5l_IOPadSingle2Diff : Claude Opus 5.5 Extra pulled in single2diff design from sudelbuecher worktree into macro hierarchy
+summary_mm_params.md: 6229797 2026-10-26 00:55:35 +0100 macros/sg13cmos5l_IOPadSingle2Diff : Claude Opus 5.5 Extra pulled in single2diff design from sudelbuecher worktree into macro hierarchy
+ac_mm_params.csv: 6229797 2026-10-26 00:55:35 +0100 macros/sg13cmos5l_IOPadSingle2Diff : Claude Opus 5.5 Extra pulled in single2diff design from sudelbuecher worktree into macro hierarchy
+summary_ac_mm_params.md: 6229797 2026-10-26 00:55:35 +0100 macros/sg13cmos5l_IOPadSingle2Diff : Claude Opus 5.5 Extra pulled in single2diff design from sudelbuecher worktree into macro hierarchy
+mc_params.csv: 6229797 2026-10-26 00:55:35 +0100 macros/sg13cmos5l_IOPadSingle2Diff : Claude Opus 5.5 Extra pulled in single2diff design from sudelbuecher worktree into macro hierarchy
+summary_mc_params.md: 6229797 2026-10-26 00:55:35 +0100 macros/sg13cmos5l_IOPadSingle2Diff : Claude Opus 5.5 Extra pulled in single2diff design from sudelbuecher worktree into macro hierarchy
+dc_params.csv: c913388 2026-11-05 01:48:33 +0000 macros/sg13cmos5l_IOPadSingle2Diff : schematic CACE rerun complete; README — schematic and p
+… [7793 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:48:56 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch && SIM_PEX="" SIM_SCH="mm_params" ./run.sh $W sim > $W/sim_mm.log 2>&1; tail -5 $W/sim_mm.log; tail -20 $W/out/log_mm_params.txt
+```
+
+## Tool results / harness — 2026-11-25 03:48:56 UTC
+
+**Tool result:**
+
+```
+Command running in background with ID: bh17kg7xo. Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bh17kg7xo.output. You will be notified when it completes. To check interim output, use Read on that file path.
+Session cwd remains /home/user/sky130_cm_ip__single2diff2single_sudelbuecher; directory changes made by the backgrounded command do not apply to subsequent commands.
+```
+
+## Assistant — 2026-11-25 03:48:57 UTC
+
+Meanwhile I'll draft the README skeleton.
+
+## Assistant — 2026-11-25 03:48:59 UTC
+
+**Tool call: `Bash`**
+
+```bash
+sleep 45; W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; cat $W/sim_mm.log; tail -5 $W/out/log_mm_params.txt; ls $W/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/_runs_sch/RUN_*/parameters/mm_params/run_0 2>/dev/null | wc -l; ps aux | grep -c '[n]gspice'
+```
+
+## Tool results / harness — 2026-11-25 03:48:59 UTC
+
+**Tool result:**
+
+```
+<tool_use_error>Blocked: sleep 45 followed by: W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm cat $W/sim_mm.log tail -5 $W/out/log_mm_params.txt ls $W/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/_runs_sch/RUN_*/parameters/mm_params/run_0 wc -l ps aux grep -c '[n]gspice'. To wait for a condition, use Monitor with an until-loop (e.g. `until <check>; do sleep 2; done`). To wait for a command you started, use run_in_background: true. Do not chain shorter sleeps to work around this block.</tool_use_error>
+```
+
+## Assistant — 2026-11-25 03:49:02 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; cat $W/sim_mm.log; tail -5 $W/out/log_mm_params.txt; find $W/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/_runs_sch/ -name '*.data' 2>/dev/null | wc -l; ps aux | grep -c '[n]gspice'
+```
+
+## Tool results / harness — 2026-11-25 03:49:02 UTC
+
+**Tool result:**
+
+```
+=== mm_params start 2026-11-25T03:48:56Z jobs=2
+                    2-a4b3-592d-8838-6ea52a1be021/scratchpad/s2                 
+                    d_mm/design/macros/sg13cmos5l_IOPadSingle2D                 
+                    iff/verification/cace/_runs_sch/RUN_2026-11                 
+                    -25_03-48-57/parameters/mm_params/run_0/run                 
+                    _15/sg13cmos5l_IOPadSingle2Diff_tb_dc.sch                   
+0
+0
+```
+
+## Assistant — 2026-11-25 03:49:05 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; grep -v '^ \{10,\}' $W/out/log_mm_params.txt | head -40; ls $W/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/_runs_sch/RUN_*/parameters/mm_params/run_0/ | head
+```
+
+## Tool results / harness — 2026-11-25 03:49:05 UTC
+
+**Tool result:**
+
+```
+[03:48:57] INFO     Maximum number of jobs is 2.        parameter_manager.py:105
+[03:48:57] INFO     Working directory set to '..'       parameter_manager.py:153
+[03:48:57] INFO     Starting a new run with tag         parameter_manager.py:624
+[03:48:57] INFO     PDK root is '/foss/pdks'.           parameter_manager.py:637
+[03:48:57] INFO     Running parameters: mm_params                cace_cli.py:327
+[03:48:57] INFO     Generating simulation netlist from    cace_regenerate.py:562
+────────────────────────────── Started mm_params ───────────────────────────────
+[03:48:57] INFO     Parameter mm_params: Generating     parameter_ngspice.py:211
+[03:48:57] INFO     Collating results using condition   parameter_ngspice.py:314
+[03:48:57] ERROR    Subprocess exited with error code 10        parameter.py:431
+[03:48:57] ERROR    Error output generated by subprocess:       parameter.py:435
+[03:48:57] ERROR    Using run time directory XSCHEM_SHAREDIR =  parameter.py:437
+[03:48:57] ERROR    Sourcing                                    parameter.py:437
+[03:48:57] ERROR    Sourcing                                    parameter.py:437
+[03:48:57] ERROR    MODELS_NGSPICE:                             parameter.py:437
+[03:48:57] ERROR    MODELS_XYCE:                                parameter.py:437
+[03:48:57] ERROR    -----------/tmp/claude-0/-home-user/468ace8 parameter.py:437
+[03:48:57] ERROR    Warning: open net: pad                      parameter.py:437
+[03:48:57] ERROR    Error: undriven node: 
+… [1807 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:49:09 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; R=$(ls -d $W/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/_runs_sch/RUN_*); ls $R/parameters/mm_params/run_0/run_0/; ps aux | grep -E '[n]gspice|[c]ace' | cut -c1-150; grep -v '^ \{10,\}' $W/out/log_mm_params.txt | grep -v 'parameter.py:437' | tail -20
+```
+
+## Tool results / harness — 2026-11-25 03:49:09 UTC
+
+**Tool result:**
+
+```
+conditions.yaml
+sg13cmos5l_IOPadSingle2Diff.sym
+sg13cmos5l_IOPadSingle2Diff_tb_dc.sch
+sg13cmos5l_IOPadSingle2Diff_tb_dc.spice
+xschem_stderr.out
+xschem_stdout.out
+root     30440  0.0  0.0   4472  3364 ?        S    03:48   0:00 bash /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/cace_run.sh /tm
+root     30480 13.1  0.4 429852 77588 ?        Sl   03:48   0:01 /usr/bin/python3.12 /usr/local/bin/cace _sch_sg13cmos5l_IOPadSingle2Diff.yaml -s sche
+root     31883 50.0  0.0  23636 13720 ?        R    03:49   0:00 xschem -n -s -r -x -q --tcl append XSCHEM_LIBRARY_PATH :/tmp/claude-0/-home-user/468a
+root     31884  0.0  0.0   4476  3472 ?        Ss   03:49   0:00 /bin/bash -c source /root/.claude/shell-snapshots/snapshot-bash-1795570553470-egyi21.
+[03:49:06] ERROR    Subprocess exited with error code 10        parameter.py:431
+[03:49:06] ERROR    Error output generated by subprocess:       parameter.py:435
+[03:49:06] ERROR    Subprocess exited with error code 10        parameter.py:431
+[03:49:06] ERROR    Error output generated by subprocess:       parameter.py:435
+[03:49:07] ERROR    Subprocess exited with error code 10        parameter.py:431
+[03:49:07] ERROR    Error output generated by subprocess:       parameter.py:435
+[03:49:07] ERROR    Subprocess exited with error code 10        parameter.py:431
+[03:49:07] ERROR    Error output generated by subprocess:       parameter.py:435
+[03:49:07] ERROR    Subprocess exited with error code 10        parameter.py:431
+[03:4
+… [885 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:49:12 UTC
+
+**Tool call: `Bash`**
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad; grep -c 'error code 10' $S/d2s_sch/out/log_mm_params.txt; grep -v '^ \{10,\}' $S/d2s_sch/out/log_mm_params.txt | grep -v 'parameter.py:43' | tail -8
+```
+
+## Tool results / harness — 2026-11-25 03:49:12 UTC
+
+**Tool result:**
+
+```
+30
+ misma…                                                                         
+ Gain -  ngspi…  Gain      0.49  0.488…     any  0.500…    0.51  0.505…   Fail  
+ misma…                                                                    ❌   
+ Quies…  ngspi…  IqP     100 uA  197.3…     any  220.4…  400 uA  243.7…   Pass  
+ curre…                              uA              uA              uA    ✅   
+ OP -                                                                           
+ misma…                                                                         
+[03:13:34] INFO     CACE failed, skipping documentation          cace_cli.py:404
+```
+
+## Assistant — 2026-11-25 03:49:14 UTC
+
+**Tool call: `ToolSearch`**
+
+```json
+{
+ "query": "select:Monitor",
+ "max_results": 1
+}
+```
+
+## Tool results / harness — 2026-11-25 03:49:14 UTC
+
+**Tool result:**
+
+```
+[tool_reference]
+```
+
+## Assistant — 2026-11-25 03:49:18 UTC
+
+**Tool call: `Monitor`**
+
+_S2D mm_params progress (data files every 25, done/fail)_
+
+```json
+{
+ "timeout_ms": 1800000,
+ "command": "W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; last=-1; while true; do n=$(find $W/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/_runs_sch/ -name '*.data' 2>/dev/null | wc -l); b=$((n/25)); if [ $b -ne $last ]; then echo \"data files: $n $(date -u +%T)\"; last=$b; fi; if grep -q '=== mm_params done' $W/sim_mm.log 2>/dev/null; then grep '===' $W/sim_mm.log; tail -2 $W/sim_mm.log; exit 0; fi; if ! pgrep -f cace_run.sh >/dev/null; then echo \"cace_run.sh not running\"; tail -3 $W/sim_mm.log; exit 1; fi; sleep 10; done"
+}
+```
+
+## Tool results / harness — 2026-11-25 03:49:18 UTC
+
+**Tool result:**
+
+```
+Monitor started (task bva205fbd, expires in 30m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+```
+
+## Assistant — 2026-11-25 03:50:06 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/analyze.py`
+
+```
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Statistics, comparison with the committed CACE results, and histograms of the S2D pad's Monte Carlo groups.
+
+Usage: analyze.py <cell.yaml> <committed_results_dir> <csv_dir> <out_dir>
+Reads <csv_dir>/<group>[_pex].csv (mm_collect.py format, '#' comment lines) and the CACE summaries
+<csv_dir>/summary_<group>[_pex].md of this run, and the committed <committed_results_dir>/summary_<group>.md and
+dc_params.csv. Writes <out_dir>/tables/stats.{md,csv}, <out_dir>/tables/compare_committed.md and
+<out_dir>/figures/*.png (150 dpi). Every number comes from those files; nothing is typed in.
+"""
+import csv, os, re, statistics as st, sys
+import yaml
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+MC_GROUPS = ('mm_params', 'ac_mm_params', 'mc_params')
+VIEWS = (('', 'schematic'), ('_pex', 'magic PEX (C-coupled), mm_ok=1 on the extracted devices'))
+SCALE = {'mV': 1e3, 'uV': 1e6, 'V': 1, 'dB': 1, '': 1, 'MHz': 1e-6, 'uA': 1e6, 'nA': 1e9}
+BLUE, ORANGE = '#4a6fa5', '#d9822b'
+
+
+def load(path):
+    if not os.path.exists(path):
+        return None
+    with open(path) as fh:
+        return list(csv.DictReader(l for l in fh if not l.startswith('#')))
+
+
+def col(rows, var):
+    for k in rows[0]:
+        if k.split('[')[0] == var:
+            return [float(r[k]) for r in rows]
+    raise KeyError(var)
+
+
+def summary(path):
+    """CACE summary.md -> {display name: (min, typ, max) as printed (strings)}"""
+    out = {}
+    if not os.path.exists(path):
+        return out
+    for line in open(path):
+        c = [x.strip() for x in line.strip().strip('|').split('|')]
+        if len(c) == 10 and c[1] == 'ngspice':
+            out[c[0]] = (c[4], c[6], c[8], c[9])
+    return out
+
+
+def num(s):
+    """'-17.250 mV' -> (value in SI, unit); '' or the zero-width space of a skipped row -> None"""
+    s = s.replace('​', '').strip()
+    m = re.match(r'^([-+0-9.eE]+)\s*(\S*)$', s)
+    if not m:
+        return None
+    u = m.group(2)
+    return float(m.group(1)) / SCALE.get(u, 1)
+
+
+def fmt(x, k=4):
+    return '%.*g' % (k, x)
+
+
+def main(ycell, oldres, csvdir, out):
+    y = yaml.safe_load(open(ycell))['parameters']
+    os.makedirs(os.path.join(out, 'tables'), exist_ok=True)
+    os.makedirs(os.path.join(out, 'figures'), exist_ok=True)
+    md, rows_csv, data = [], [], {}
+    md.append('<!--\nSPDX-FileCopyrightText: 2026 Christoph Maier\nSPDX-License-Identifier: Apache-2.0\n'
+              'generated by analyze.py from csv/*.csv and the CACE summaries; IHP sg13cmos5l simulation\n-->')
+    md.append('| group | view | quantity | unit | n (runs with data / runs) | mean | sigma | min | median | max | '
+              'mean - 3 sigma | mean + 3 sigma | working limits | min / max inside |')
+    md.append('|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|')
+    cmp_ = []
+    for g in MC_GROUPS:
+        spec = y[g]['spec']
+        n_iter = y[g]['conditions']['iterations']['maximum']
+        old = summary(os.path.join(oldres, 'summary_%s.md' % g))
+        for suf, view in VIEWS:
+            rows = load(os.path.join(csvdir, '%s%s.csv' % (g, suf)))
+            if not rows:
+                continue
+            new = summary(os.path.join(csvdir, 'summary_%s%s.md' % (g, suf)))
+            for var, sp in spec.items():
+                u = sp.get('unit', '')
+                k = SCALE.get(u, 1)
+                x = col(rows, var)
+                data[(g, suf, var)] = x
+                m, s = st.mean(x), st.stdev(x)
+                lo, hi = sp.get('minimum', {}).get('value', 'any'), sp.get('maximum', {}).get('value', 'any')
+                inside = all((lo == 'any' or v * k >= float(lo)) and (hi == 'any' or v * k <= float(hi)) for v in x)
+                lim = '%s … %s' % (lo, hi)
+                vals = [m * k, s * k, min(x) * k, st.median(x) * k, max(x) * k, (m - 3 * s) * k, (m + 3 * s) * k]
+                md.append('| %s | %s | %s | %s | %d / %d | %s 
+… [7392 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 03:50:06 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/analyze.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 03:50:08 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; cat $W/sim_mm.log; ls $W/out
+```
+
+## Tool results / harness — 2026-11-25 03:50:08 UTC
+
+**Tool result:**
+
+```
+=== mm_params start 2026-11-25T03:48:56Z jobs=2
+log_mm_params.txt
+```
+
+## Assistant — 2026-11-25 03:50:10 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; until grep -q 'done' $W/sim_mm.log || ! pgrep -f cace_run.sh >/dev/null; do sleep 5; done; cat $W/sim_mm.log; head -8 $W/out/mm_params.csv
+```
+
+## Tool results / harness — 2026-11-25 03:50:50 UTC
+
+**Tool result:**
+
+```
+=== mm_params start 2026-11-25T03:48:56Z jobs=2
+mm_params: 100 of 100 runs -> /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/out/mm_params.csv (0 data files with a wrong value count)
+=== mm_params done 2026-11-25T03:50:49Z rows=100
+iterations,corner_mos,corner_r,temp,Gain[],Vos_in[mV],INL[],Vcm_err[mV],Iio[]
+1.0,tt_mismatch,typ_mismatch,27,1.96854,-0.00757894,0.000100412,0.0157551,0.00011353
+2.0,tt_mismatch,typ_mismatch,27,2.00778,-0.00189319,7.7093E-05,-0.00930245,0.000116068
+3.0,tt_mismatch,typ_mismatch,27,2.00211,-0.00740824,0.000441621,-0.00654281,0.000116401
+4.0,tt_mismatch,typ_mismatch,27,2.03889,0.00289572,0.00043125,0.00271005,0.000116191
+5.0,tt_mismatch,typ_mismatch,27,1.98003,0.00393221,0.000309562,0.0133599,0.000113022
+6.0,tt_mismatch,typ_mismatch,27,1.98752,-0.0030868,0.000130693,0.0183552,0.000113728
+7.0,tt_mismatch,typ_mismatch,27,2.0003,0.00270094,0.000278479,0.00522109,0.000114369
+```
+
+## Assistant — 2026-11-25 03:50:53 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch && SIM_SCH="ac_mm_params mc_params dc_params" ./run.sh $W sim > $W/sim_rest.log 2>&1; cat $W/sim_rest.log
+```
+
+## Assistant — 2026-11-25 03:50:55 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch && ./run.sh $W csv && ./run.sh $W analyze && cat tables/stats.md tables/compare_committed.md; grep -v '^ \{10,\}' $W/out/summary_mm_params.md | tail -5
+```
+
+## Tool results / harness — 2026-11-25 03:50:55 UTC
+
+**Tool result:**
+
+```
+Command running in background with ID: bn5t0s7lu. Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bn5t0s7lu.output. You will be notified when it completes. To check interim output, use Read on that file path.
+Session cwd remains /home/user/sky130_cm_ip__single2diff2single_sudelbuecher; directory changes made by the backgrounded command do not apply to subsequent commands.
+```
+
+## Tool results / harness — 2026-11-25 03:50:56 UTC
+
+**Tool result:**
+
+```
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/figures/s2d_mm_hist.png: 69 kB
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+generated by analyze.py from csv/*.csv and the CACE summaries; IHP sg13cmos5l simulation
+-->
+| group | view | quantity | unit | n (runs with data / runs) | mean | sigma | min | median | max | mean - 3 sigma | mean + 3 sigma | working limits | min / max inside |
+|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|
+| mm_params | schematic | Input offset - Mismatch | mV | 100 / 100 | -0.403 | 5.251 | -10.22 | -0.7581 | 15.97 | -16.16 | 15.35 | -20 … 20 | yes |
+| mm_params | schematic | Gain - Mismatch |  | 100 / 100 | 1.999 | 0.01668 | 1.958 | 2 | 2.05 | 1.949 | 2.049 | 1.93 … 2.07 | yes |
+| mm_params | schematic | Output common-mode error - Mismatch | mV | 100 / 100 | 7.943 | 10.97 | -27.29 | 7.498 | 47.04 | -24.96 | 40.85 | -60 … 60 | yes |
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+generated by analyze.py
+-->
+### Monte Carlo groups: committed CACE summary (min / typ / max) vs this run
+
+"this run, CACE" = CACE 2.11's own summary of this run (its typ column); "this run, CSV" = from the per-run CSV: min / median / mean / max.
+
+| group | view | quantity | unit | committed min / typ / max (status) | this run, CACE min / typ / max (status) | this run, CSV min / median / mean / max | sigma |
+|---|---|---|---|---|---|---|---|
+| mm_params | schematic |
+… [1254 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:50:58 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/figures/s2d_mm_hist.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 03:50:58 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 03:51:02 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; cat $W/sim_rest.log
+```
+
+## Tool results / harness — 2026-11-25 03:51:02 UTC
+
+**Tool result:**
+
+```
+=== ac_mm_params start 2026-11-25T03:50:55Z jobs=2
+```
+
+## Assistant — 2026-11-25 03:51:03 UTC
+
+Now an initial README (status: in progress), to be kept current.
+
+## Assistant — 2026-11-25 03:51:06 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/README.md`
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# S2D pad: Monte Carlo groups re-run with the per-run data kept
+
+**IHP sg13cmos5l simulation** of `sg13cmos5l_IOPadSingle2Diff` (S2D pad, `s7_an[0]`): the CACE groups `mm_params`
+(local mismatch, offset / gain / output-CM error, 100 iterations), `ac_mm_params` (PSRR / CMRR under mismatch, 30
+iterations) and `mc_params` (process MC, 30 iterations) on the taped-out schematic, `mm_params` also on the magic
+C-coupled PEX netlist, and one `dc_params` run as a check; run on 2026-11-25. Numbers: **[results.md](results.md)**.
+
+Status: in progress (mm_params schematic done; ac_mm_params, mc_params, dc_params, PEX mm_params running).
+```
+
+## Tool results / harness — 2026-11-25 03:51:06 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/README.md (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 03:51:08 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; until grep -q 'dc_params done' $W/sim_rest.log || ! pgrep -f cace_run.sh >/dev/null; do sleep 5; done; cat $W/sim_rest.log
+```
+
