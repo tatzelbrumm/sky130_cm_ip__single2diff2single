@@ -157,3 +157,4979 @@ DC transfer curves: [../dc_cur
 … [11900 more characters cut]
 ```
 
+## Assistant — 2026-11-25 04:04:00 UTC
+
+**Tool call: `Bash`**
+
+_Read slot.py and check work dirs_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps; cat ac_tran/slot.py; ls ac_tran/_work 2>/dev/null | head; ls /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/
+```
+
+## Tool results / harness — 2026-11-25 04:04:00 UTC
+
+**Tool result:**
+
+```
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Round trip pad_s2d -> S2D -> slot 7 (default mode) -> D2S -> pad_d2s: AC, step and sine (IHP sg13cmos5l simulation).
+
+Usage: python3 -I slot.py <work_dir> <out_dir> <job> [<job> ...]
+  job = <view>:<mos>:<temp>:<vdd>:<analysis>[:<load>]
+    view      klayout | schematic | pex (the two custom pads; see ../dc_curves/roundtrip.py, identical deck)
+    analysis  ac    pad_s2d DC 0.5 V + AC 1 V, dec 40 10 Hz ... 1 GHz, three loads in one deck (open, 1k|10p, 1k|100p)
+              step  pad_s2d 0.25 V -> 0.75 V at 2 us (10 ns edge), back at 7 us (10 ns), tran to 12 us, max step 2 ns
+              sine  pad_s2d 0.5 + 0.5 sin(2 pi 10 kHz t) (0 ... 1 V), tran 0 ... 600 us, written from 200 us (4 periods)
+    load      (step / sine) open | 10p | 100p      open = 1 Gohm to ground only (the designer's tier-1 deck)
+  e.g. schematic:tt:27:3.3:ac, pex:tt:27:3.3:step:100p; a 7th field 'rshunt' forces the solver aid rshunt=1e12 (check
+  of its effect, tag suffix _rshunt), e.g. schematic:tt:27:3.3:ac:open:rshunt
+Writes <out_dir>/<tag>.<suffix> (wrdata) and <tag>.log.
+
+The deck is the designer's tier-1 slot deck (design repository commit 9052bd35, docs/slot7_hookup/tier1/run_tier1.py,
+imported from there) exactly as ../dc_curves/roundtrip.py builds it: slot_7 source netlist in its default mode (all
+mode bits 0, enable 1.2 V), pad_ref_rb and bias_dist_pd KLayout-extracted (run_tier1.wrap
+… [7223 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:04:06 UTC
+
+**Tool call: `Bash`**
+
+_Inspect existing ac_tran work folder_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/; ls actran; ls actran/* | head -40; ls work | head
+```
+
+## Tool results / harness — 2026-11-25 04:04:06 UTC
+
+**Tool result:**
+
+```
+chain1.log
+chain1.sh
+chain2.log
+chain2.sh
+chain3.log
+chain3.sh
+chain4.log
+jobs_nopex.txt
+jobs_pex.txt
+md5_before.txt
+slot1.log
+t
+w
+actran/chain1.log
+actran/chain1.sh
+actran/chain2.log
+actran/chain2.sh
+actran/chain3.log
+actran/chain3.sh
+actran/chain4.log
+actran/jobs_nopex.txt
+actran/jobs_pex.txt
+actran/md5_before.txt
+actran/slot1.log
+
+actran/t:
+n.sp
+rc.sp
+t.ac
+t.noise
+t.tran
+t2.ac
+
+actran/w:
+design
+out
+repo
+slot_runs
+tier1
+ccc
+harness
+ocd
+pdk_install.log
+pdk_install.sh
+tmpl
+web
+```
+
+## Assistant — 2026-11-25 04:04:10 UTC
+
+**Tool call: `Bash`**
+
+_List tier1 files and klayout slot runs_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran/w; ls tier1 tier1/docs/slot7_hookup/tier1 slot_runs | head -80; ls out/slot | grep klayout | head -40
+```
+
+## Tool results / harness — 2026-11-25 04:04:10 UTC
+
+**Tool result:**
+
+```
+slot_runs:
+slot_klayout_ff_125_3.6_ac
+slot_klayout_fs_125_3.6_ac
+slot_klayout_sf_-40_3.0_ac
+slot_klayout_ss_-40_3.0_ac
+slot_klayout_tt_27_3.3_ac
+slot_klayout_tt_27_3.3_sine_open
+slot_klayout_tt_27_3.3_step_100p
+slot_klayout_tt_27_3.3_step_10p
+slot_klayout_tt_27_3.3_step_open
+slot_pex_ff_125_3.6_ac
+slot_pex_ff_125_3.6_step_100p
+slot_pex_ff_125_3.6_step_open
+slot_pex_fs_125_3.6_ac
+slot_pex_sf_-40_3.0_ac
+slot_pex_ss_-40_3.0_ac
+slot_pex_ss_-40_3.0_step_100p
+slot_pex_ss_-40_3.0_step_open
+slot_pex_tt_27_3.3_ac
+slot_pex_tt_27_3.3_sine_100p
+slot_pex_tt_27_3.3_sine_open
+slot_pex_tt_27_3.3_step_100p
+slot_pex_tt_27_3.3_step_10p
+slot_pex_tt_27_3.3_step_open
+slot_schematic_ff_125_3.6_ac
+slot_schematic_ff_125_3.6_sine_open
+slot_schematic_ff_125_3.6_step_100p
+slot_schematic_ff_125_3.6_step_open
+slot_schematic_fs_125_3.6_ac
+slot_schematic_fs_125_3.6_sine_open
+slot_schematic_fs_125_3.6_step_100p
+slot_schematic_fs_125_3.6_step_open
+slot_schematic_sf_-40_3.0_ac
+slot_schematic_sf_-40_3.0_sine_open
+slot_schematic_sf_-40_3.0_step_100p
+slot_schematic_sf_-40_3.0_step_open
+slot_schematic_ss_-40_3.0_ac
+slot_schematic_ss_-40_3.0_sine_open
+slot_schematic_ss_-40_3.0_step_100p
+slot_schematic_ss_-40_3.0_step_open
+slot_schematic_tt_27_3.3_ac
+slot_schematic_tt_27_3.3_ac_rshunt
+slot_schematic_tt_27_3.3_sine_100p
+slot_schematic_tt_27_3.3_sine_open
+slot_schematic_tt_27_3.3_step_100p
+slot_schematic_tt_27_3.3_step_10p
+slot_schematic_tt_27_3.3_step_open
+
+tier1:
+docs
+macros
+
+tier1/docs/slot7_hookup/tier1:
+__pycache
+… [1345 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:04:16 UTC
+
+**Tool call: `Bash`**
+
+_Inspect klayout sine run dir and wrapped()_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran/w; ls -la out; ls slot_runs/slot_klayout_tt_27_3.3_sine_open; grep -n "def wrapped" -A60 tier1/docs/slot7_hookup/tier1/run_tier1.py
+```
+
+## Tool results / harness — 2026-11-25 04:04:16 UTC
+
+**Tool result:**
+
+```
+total 40
+drwxr-xr-x 7 root root  4096 Nov 25 02:44 .
+drwxr-xr-x 7 root root  4096 Nov 25 01:45 ..
+drwxr-xr-x 2 root root  4096 Nov 25 02:13 pex
+drwxr-xr-x 2 root root  4096 Nov 25 02:21 schematic
+drwxr-xr-x 2 root root  4096 Nov 25 02:13 schematic_rshunt
+drwxr-xr-x 2 root root 16384 Nov 25 02:45 slot
+drwxr-xr-x 2 root root  4096 Nov 25 02:44 slot_rshunt_chk
+bias_dist_pd_flat.spice
+pad_ref_rb_flat.spice
+sg13cmos5l_IOPadDiff2Single_flat.spice
+sg13cmos5l_IOPadSingle2Diff_flat.spice
+slot_klayout_tt_27_3.3_sine_open.op
+slot_klayout_tt_27_3.3_sine_open.sine
+slot_klayout_tt_27_3.3_sine_open.spice
+v_a.log
+v_a.spice
+v_b.log
+v_b.spice
+v_c.log
+v_c.spice
+v_d.log
+v_d.spice
+v_e.log
+v_e.spice
+v_f.log
+v_f.spice
+v_g.log
+v_g.raw
+v_g.spice
+35:def wrapped(cell):
+36-    RS.RUNS = RUNS
+37-    flat = RUNS / RS.convert(cell)
+38-    txt = flat.read_text()
+39-    m = re.search(r"^\.SUBCKT\s+(\S+)\s+(.*)$", txt, re.M | re.I)
+40-    lay_ports = m.group(2).split()
+41-    txt = txt.replace(m.group(0), f".SUBCKT {cell}_lay {' '.join(lay_ports)}", 1)
+42-    src = SRC_PORTS[cell].split()
+43-    missing = [p for p in lay_ports if p not in src]
+44-    assert not missing, (cell, missing)
+45-    wrap = f"\n.subckt {cell} {' '.join(src)}\nXlay {' '.join(lay_ports)} {cell}_lay\n.ends {cell}\n"
+46-    flat.write_text(txt + wrap)
+47-    return flat.name
+48-
+49-
+50-def main():
+51-    RUNS.mkdir(exist_ok=True)
+52-    incs = [wrapped(c) for c in SRC_PORTS]
+53-    bg = MAC / "bg_core_pd" / "netlist" / "schematic" / "bg_
+… [2138 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:04:20 UTC
+
+**Tool call: `Bash`**
+
+_Read run_tier1.py header and find converter_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran/w; sed -n 1,34p tier1/docs/slot7_hookup/tier1/run_tier1.py; ls tier1/docs/slot7_hookup/; find tier1 -name "*.py" | head -20
+```
+
+## Tool results / harness — 2026-11-25 04:04:20 UTC
+
+**Tool result:**
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Simulate slot7_tier1.spice with both custom pads: round trip pad in -> S2D -> D2S -> pad out, references, currents.
+
+usage (repo env, from this directory): python3 -I run_tier1.py   -> results.txt (decks and logs in runs/)
+
+Blocks with a layout are simulated from their extracted layout netlists (read only, converted to simulator syntax in
+runs/ and wrapped to the source port order by port name): both pads, pad_ref_rb, bias_dist_pd. bg_core_pd from its
+schematic netlist, ls_up_fs (no layout yet) from its source netlist. Slot vdd_3v3 and the pad ring iovdd both 3.3 V
+(3.0 / 3.6 at the corners), harness enable 1.2 V. The S2D pad input is swept 0 ... 1.0 V; the D2S pad output is
+unloaded (1 Gohm). Expected: pad_out = vcm + (pad_in - vref).
+"""
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+REPO = HERE.parents[2]
+MAC = REPO / "macros"
+RUNS = HERE / "runs"
+sys.path.insert(0, str(MAC / "en_ctrl_3v3" / "testbenches" / "spice"))
+import run_starve as RS  # noqa: E402  (its convert() reads netlist/layout/<cell>_klayout.cir)
+
+SRC_PORTS = {
+    "sg13cmos5l_IOPadSingle2Diff": "iovdd iovss vdd vss pad outp outn vcm vref iref en_3v3 en_3v3_b",
+    "sg13cmos5l_IOPadDiff2Single": "iovdd iovss vdd vss pad vinp vinn vref iref en_3v3 en_3v3_b",
+    "pad_ref_rb": "vddh vssh iref vcm vref en_3v3 en_3v3_b",
+    "bias_dist_pd": "vddh vssh en_3v3 en_3v3_b iin
+… [377 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:04:24 UTC
+
+**Tool call: `Bash`**
+
+_Read run_starve.py converter_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran/w; cat tier1/macros/en_ctrl_3v3/testbenches/spice/run_starve.py | head -120
+```
+
+## Tool results / harness — 2026-11-25 04:04:24 UTC
+
+**Tool result:**
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Starvation check: ring (iovdd) current of the two custom pads and of pad_ref_rb with the slot off, i.e. no iref,
+enables anywhere (pad_ref_rb has no pad pin: its line shows pad_V 0).
+
+usage (repo env, from this directory): python3 -I run_starve.py   -> results/starve.txt (decks and logs in runs/)
+
+The pads are not changed: their extracted layout netlists (netlist/layout/*_klayout.cir of the two pad macros) are
+read and converted to simulator syntax in runs/. iovdd 3.6 V; iref, vcm / vref / vinp / vinn and the core outputs
+float (1 Gohm to iovss); en_3v3 and en_3v3_b each swept 0 ... 3.6 V in 0.3 V steps (169 combinations, as a switched-off
+slot can leave them anywhere); the pad pin driven at 0, 1.8 and 3.6 V. Reported: the largest and smallest iovdd
+current over the 169 combinations.
+"""
+import re
+import subprocess
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+MAC = HERE.parents[2]
+RUNS = HERE / "runs"
+RES = HERE / "results"
+PADS = {"s2d": ("sg13cmos5l_IOPadSingle2Diff", "X1 en enb iovdd 0 iref outn outp padn vcm vref",
+                ["iref", "vcm", "vref", "outp", "outn"]),
+        "d2s": ("sg13cmos5l_IOPadDiff2Single", "X1 en enb iovdd 0 iref padn vinn vinp vref",
+                ["iref", "vinn", "vinp", "vref"]),
+        "prb": ("pad_ref_rb", "X1 en enb iref vcm iovdd vref 0", ["iref", "vcm", "vref"])}
+CORNERS = [("tt", 27), ("ff", 125), ("fs", 125), ("sf", 125), ("
+… [2523 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:04:31 UTC
+
+**Tool call: `Bash`**
+
+_Show diode instance lines in converted netlists_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran/w/slot_runs/slot_klayout_tt_27_3.3_sine_open; for f in *_flat.spice; do echo "== $f"; grep -i "^X.*\(dant\|dpant\|diode\|esd\)" $f | awk '{$1=$1;print}' | cut -c1-200 | sort | uniq -c | head -20; grep -c . $f; done; awk '{print $NF}' sg13cmos5l_IOPadSingle2Diff_flat.spice | sort | uniq -c | sort -rn | head -30
+```
+
+## Tool results / harness — 2026-11-25 04:04:32 UTC
+
+**Tool result:**
+
+```
+== bias_dist_pd_flat.spice
+34
+== pad_ref_rb_flat.spice
+42
+== sg13cmos5l_IOPadDiff2Single_flat.spice
+      1 X$165 iovss n_I114 dantenna a=1.984p p=7.48u m=1
+      1 X$166 iovss n_I113 dantenna a=1.984p p=7.48u m=1
+      1 X$167 n_I114 iovdd dpantenna a=3.1872p p=11.24u m=1
+      1 X$168 n_I113 iovdd dpantenna a=3.1872p p=11.24u m=1
+      1 X$3 pad iovdd dpantenna a=82.908p p=134.12u m=2
+      1 X$5 iovss pad dantenna a=85.176p p=137.72u m=2
+82
+== sg13cmos5l_IOPadSingle2Diff_flat.spice
+      1 X$63 pad iovdd dpantenna a=35.0028p p=58.08u m=2
+      1 X$65 iovss pad dantenna a=35.0028p p=58.08u m=2
+81
+     14 pd=10.68u
+     12 pd=31.06u
+      8 m=1
+      7 pd=61.36u
+      7 pd=2.68u
+      5 pd=50.72u
+      3 pd=12.68u
+      3 m=2
+      2 sg13cmos5l_IOPadSingle2Diff
+      2 pd=76.08u
+      2 pd=5.48u
+      2 pd=24.68u
+      2 pd=1.38u
+      1 vref
+      1 sg13cmos5l_IOPadSingle2Diff_lay
+      1 pd=8.04u
+      1 pd=50.12u
+      1 pd=4.68u
+      1 pd=36.72u
+      1 pd=316.72u
+      1 pd=18.72u
+      1 pd=124.24u
+      1 pd=110.9u
+      1 pd=10.72u
+      1 en_3v3_b
+      1
+```
+
+## Assistant — 2026-11-25 04:04:37 UTC
+
+**Tool call: `Bash`**
+
+_Find dantenna/dpantenna definitions in PDK_
+
+```bash
+cd /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice; ls; ls models; grep -n -i -B2 -A25 "subckt *dpantenna\|subckt *dantenna" models/*.lib | head -120
+```
+
+## Tool results / harness — 2026-11-25 04:04:37 UTC
+
+**Tool result:**
+
+```
+models
+osdi
+cap_cmomf.lib
+cap_cmomi.lib
+cornerCAP.lib
+cornerDIO.lib
+cornerMOSCAP.lib
+cornerMOShv.lib
+cornerMOSlv.lib
+cornerPNP.lib
+cornerRES.lib
+diodes.lib
+resistors_mod.lib
+resistors_mod_mismatch.lib
+resistors_stat.lib
+sg13cmos5l_pnpMPA_mod.lib
+sg13cmos5l_pnpMPA_stat.lib
+sg13g2_bondpad.lib
+sg13g2_esd.lib
+sg13g2_moscap_mismatch.lib
+sg13g2_moscap_mod.lib
+sg13g2_moscap_mod_mismatch.lib
+sg13g2_moscap_parm.lib
+sg13g2_moscap_stat.lib
+sg13g2_moshv_mismatch.lib
+sg13g2_moshv_mod.lib
+sg13g2_moshv_mod_mismatch.lib
+sg13g2_moshv_parm.lib
+sg13g2_moshv_stat.lib
+sg13g2_moslv_mismatch.lib
+sg13g2_moslv_mod.lib
+sg13g2_moslv_mod_mismatch.lib
+sg13g2_moslv_parm.lib
+sg13g2_moslv_stat.lib
+sg13g2_svaricaphv_mod.lib
+sg13g2_svaricaphv_mod_mismatch.lib
+models/diodes.lib-47-*************************************
+models/diodes.lib-48-
+models/diodes.lib:49:.subckt dantenna 1 2
+models/diodes.lib:50:*subckt dantenna (bn C)
+models/diodes.lib-51-*                (anode  cathode)
+models/diodes.lib-52-*      (substrate/pWell  NSD)
+models/diodes.lib-53-.params l=780n   w=780n   DEV_A=(l*w)/1p  DEV_P=(l+w)/0.5u  DEV_C=4
+models/diodes.lib-54-D1 1 2 darea area=DEV_A
+models/diodes.lib-55-D2 1 2 dperim area=DEV_P
+models/diodes.lib-56-D3 1 2 dcorner area=DEV_C
+models/diodes.lib-57-.ends dantenna
+models/diodes.lib-58-
+models/diodes.lib-59-**************************************
+models/diodes.lib-60-* Device: dpantenna
+models/diodes.lib-61-* Testfield: T262
+models/diodes.lib-62-* Technology: IHP SG13S technologies
+models/
+… [1206 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:04:42 UTC
+
+**Tool call: `Bash`**
+
+_Read diode models in diodes.lib_
+
+```bash
+cd /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models; sed -n 1,48p diodes.lib; sed -n 88,200p diodes.lib
+```
+
+## Tool results / harness — 2026-11-25 04:04:42 UTC
+
+**Tool result:**
+
+```
+*#######################################################################
+*
+* Copyright 2023 IHP PDK Authors
+* 
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+* 
+*    https://www.apache.org/licenses/LICENSE-2.0
+* 
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+*#######################################################################
+       
+.MODEL darea D (tnom=27 is=2.315E-019 n=1.009 ik=1.434E-007 rs=2.193E+005 cj0=9.371E-016 m=0.3036 vj=0.696 fc=0.5 bv=11.64 ibv=3.458E-007 tcv=0.001 nbv = 48.9 isr=7.413E-019 xti=5.039 trs=0 trs2=0 tt=7.009E-007)
+.MODEL dperim D (tnom=27 is=3.851E-021 n=1.022 rs=1.688E+006 ik=7.838E-008 isr=1.011E-017 xti=3 bv=31.86 ibv=6.115E-014 nbv=112.1 cj=1.821E-017 m=0.01923 vj=0.598 tt=7.009E-007)
+.MODEL dcorner D (tnom=27 is=6.502E-021 n=1 rs=4.857E+005 ik=1E-006 isr=0 xti=3 bv=11.64 ibv=3.458E-007 cj=0 m =0.5 vj=0.7)
+.MODEL dparea D (tnom=27 is=8.569E-020 n=1.003 ik=2.957E-007 rs=1.728E+005 cj=8.252E-016 m=0.3171 vj=0.6628 fc=0.5 bv=12.14 ibv=1E-006 tcv=0.001 nbv=11.85 isr=2.421E-019 xti=4.56 trs=0 trs2=0 tt=1E-012)
+.MODEL dpperim D (tnom=27 is=1.186E-020 n=1
+… [927 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:04:48 UTC
+
+**Tool call: `Bash`**
+
+_Compare diode instances in schematic/PEX netlists_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran/w; for c in sg13cmos5l_IOPadSingle2Diff sg13cmos5l_IOPadDiff2Single; do for d in netlist/schematic netlist_pex/pex; do f=design/macros/$c/verification/cace/$d/$c.spice; echo "== $f"; grep -i "antenna\|diode" $f | head; done; done; ls tier1/macros/*/netlist/layout/ 2>/dev/null
+```
+
+## Tool results / harness — 2026-11-25 04:04:48 UTC
+
+**Tool result:**
+
+```
+== design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/netlist/schematic/sg13cmos5l_IOPadSingle2Diff.spice
+XDP1 pad iovdd dpantenna l=27.78u w=1.26u
+XDN1 iovss pad dantenna l=27.78u w=1.26u
+XDP2 pad iovdd dpantenna l=27.78u w=1.26u
+XDN2 iovss pad dantenna l=27.78u w=1.26u
+== design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/netlist_pex/pex/sg13cmos5l_IOPadSingle2Diff.spice
+X43 pad iovdd dpantenna l=1.26u w=27.78u
+X54 iovss pad dantenna l=1.26u w=27.78u
+X97 pad iovdd dpantenna l=1.26u w=27.78u
+X219 iovss pad dantenna l=1.26u w=27.78u
+== design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/netlist/schematic/sg13cmos5l_IOPadDiff2Single.spice
+XDP0 pad iovdd dpantenna l=65.8u w=1.26u
+XDP1 pad iovdd dpantenna l=65.8u w=1.26u
+XDN0 iovss pad dantenna l=67.6u w=1.26u
+XDN1 iovss pad dantenna l=67.6u w=1.26u
+XD0 core iovdd dpantenna l=4.98u w=0.64u
+XD1 iovss core dantenna l=3.1u w=0.64u
+== design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/netlist_pex/pex/sg13cmos5l_IOPadDiff2Single.spice
+X5 iovss pad dantenna l=1.26u w=67.6u
+X21 pad iovdd dpantenna l=1.26u w=65.8u
+X60 iovss d2s_block_0.d2s_sp2k_f2_1.core dantenna l=3.1u w=0.64u
+X72 pad iovdd dpantenna l=1.26u w=65.8u
+X114 d2s_block_0.d2s_sp2k_f2_0.core iovdd dpantenna l=0.64u w=4.98u
+X160 d2s_block_0.d2s_sp2k_f2_1.core iovdd dpantenna l=0.64u w=4.98u
+X208 iovss pad dantenna l=1.26u w=67.6u
+X209 iovss d2s_block_0.d2s_sp2k_f2_0.core dantenna l=3.1u w=0.64u
+tier1/macros/bg_core_pd/netlist/layout/:
+bg_core
+… [495 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:04:57 UTC
+
+**Tool call: `Bash`**
+
+_Check the klayout sine run log for warnings_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran/w; L=tier1/docs/slot7_hookup/tier1/slot_klayout_tt_27_3.3_sine_open.log; wc -l $L; grep -n -i "warn\|unknown\|param\|error\|timestep\|abort" $L | head -40; cat tier1/docs/slot7_hookup/tier1/slot_klayout_tt_27_3.3_sine_open.aid
+```
+
+## Tool results / harness — 2026-11-25 04:04:57 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+wc: tier1/docs/slot7_hookup/tier1/slot_klayout_tt_27_3.3_sine_open.log: No such file or directory
+grep: tier1/docs/slot7_hookup/tier1/slot_klayout_tt_27_3.3_sine_open.log: No such file or directory
+cat: tier1/docs/slot7_hookup/tier1/slot_klayout_tt_27_3.3_sine_open.aid: No such file or directory
+```
+
+## Assistant — 2026-11-25 04:05:02 UTC
+
+**Tool call: `Bash`**
+
+_Check the klayout sine run log for warnings_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran/w; L=out/slot/slot_klayout_tt_27_3.3_sine_open.log; wc -l $L; grep -n -i "warn\|unknown\|param\|error\|timestep\|abort" $L | head -40; cat out/slot/slot_klayout_tt_27_3.3_sine_open.aid
+```
+
+## Tool results / harness — 2026-11-25 04:05:02 UTC
+
+**Tool result:**
+
+```
+860 out/slot/slot_klayout_tt_27_3.3_sine_open.log
+417:Warning: Dynamic gmin stepping failed
+421:Warning: Dynamic gmin stepping failed
+424:doAnalyses: TRAN:  Timestep too small; time = 6.59723e-05, timestep = 4.88281e-20: trouble with node "v.xs.vsv0#branch"
+427:tran simulation(s) aborted
+428:Error: no such vector v(padin)
+429:Error: incomplete or empty netlist
+853:doAnalyses: TRAN:  Timestep too small; time = 6.59723e-05, timestep = 4.88281e-20: trouble with node "v.xs.vsv0#branch"
+856:tran simulation(s) aborted
+857:Error: no such vector v(padin)
+858:Error: incomplete or empty netlist
+rshunt=1e12 (retry after the run without it failed)
+```
+
+## Assistant — 2026-11-25 04:05:10 UTC
+
+**Tool call: `Bash`**
+
+_Test how ngspice treats a=/p= on dpantenna_
+
+```bash
+mkdir -p /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/t && cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/t && cat > d.sp <<'EOF'
+* dpantenna a/p vs l/w
+.include /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/diodes.lib
+V1 a 0 0.6
+Va a 1 0
+Vb a 2 0
+Vc a 3 0
+Xa 1 0 dpantenna a=35.0028p p=58.08u m=2
+Xb 2 0 dpantenna l=27.78u w=1.26u m=2
+Xc 3 0 dpantenna
+.control
+op
+print i(va) i(vb) i(vc)
+listing expand
+.endc
+.end
+EOF
+ngspice -b d.sp 2>&1 | grep -v "^$" | head -60; ngspice --version | head -3
+```
+
+## Tool results / harness — 2026-11-25 04:05:10 UTC
+
+**Tool result:**
+
+```
+Note: No compatibility mode selected!
+Circuit: * dpantenna a/p vs l/w
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+Using SPARSE 1.3 as Direct Linear Solver
+No. of Data Rows : 1
+i(va) = 2.408307e-09
+i(vb) = 7.634844e-08
+i(vc) = 1.205049e-09
+	* dpantenna a/p vs l/w
+    24 : .model dparea d (tnom=27 is=8.569e-020 n=1.003 ik=2.957e-007 rs=1.728e+005 cj=8.252e-016 m=0.3171 vj=0.6628 fc=0.5 bv=12.14 ibv=1e-006 tcv=0.001 nbv=11.85 isr=2.421e-019 xti=4.56 trs=0 trs2=0 tt=1e-012)
+    25 : .model dpperim d (tnom=27 is=1.186e-020 n=1.006 rs=1.577e+006 ik=2.158e-008 isr=7.211e-018 xti=4.118 bv=27.26 ibv=1.832e-011 nbv=32.47 cj=3.657e-017 m=0.1512 vj=0.5241 tt=1e-012)
+    26 : .model dpcorner d (tnom=27 is=6.965e-021 n=1 rs=4.734e+005 ik=1.19e-008 isr=0 xti=3 cj=0 m=0.5 vj=0.7)
+    91 : v1 a 0 0.6
+    92 : va a 1 0
+    93 : vb a 2 0
+    94 : vc a 3 0
+    86 : d.xa.d1 1 0 dparea area=    6.084000000000002e-01     m=    2.000000000000000e+00   
+    87 : d.xa.d2 1 0 dpperim area=    3.120000000000001e+00     m=    2.000000000000000e+00   
+    88 : d.xa.d3 1 0 dpcorner area=    4.000000000000000e+00     m=    2.000000000000000e+00   
+    86 : d.xb.d1 2 0 dparea area=    3.500279999999999e+01     m=    2.000000000000000e+00   
+    87 : d.xb.d2 2 0 dpperim area=    5.808000000000001e+01     m=    2.000000000000000e+00   
+    88 : d.xb.d3 2 0 dpcorner area=    4.000000000000000e+00     m=    2.000000000000000e+00   
+    86 : d.xc.d1 3 0 dparea area=    6.084000000000002e-01     m=    
+… [376 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:05:20 UTC
+
+**Tool call: `Bash`**
+
+_View converted vs original KLayout pad netlist_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran/w/slot_runs/slot_klayout_tt_27_3.3_sine_open; head -30 sg13cmos5l_IOPadSingle2Diff_flat.spice | cut -c1-220; grep -v "^X.*sg13_\(hv\|lv\)_[np]mos" sg13cmos5l_IOPadDiff2Single_flat.spice | cut -c1-200; head -40 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran/w/tier1/macros/sg13cmos5l_IOPadSingle2Diff/netlist/layout/sg13cmos5l_IOPadSingle2Diff_klayout.cir | cut -c1-200
+```
+
+## Tool results / harness — 2026-11-25 04:05:20 UTC
+
+**Tool result:**
+
+```
+.SUBCKT sg13cmos5l_IOPadSingle2Diff_lay en_3v3 en_3v3_b iovdd iovss iref outn outp pad vcm vref
+X$1 iovdd n_I9 iovss rppd w=0.5u l=12.9u b=0 m=1
+X$2 iovss n_I8 iovss rppd w=0.5u l=3.54u b=0 m=1
+X$3 iovdd n_I9 pad iovdd sg13_hv_pmos l=0.6u w=266.4u as=123.21p ad=123.21p ps=316.72u pd=316.72u
+X$43 iovss n_I8 pad iovss sg13_hv_nmos l=0.6u w=88u as=40.7p ad=40.7p ps=110.9u pd=110.9u
+X$63 pad iovdd dpantenna a=35.0028p p=58.08u m=2
+X$65 iovss pad dantenna a=35.0028p p=58.08u m=2
+X$67 outp en_3v3_b vcm iovss sg13_hv_nmos l=0.45u w=1u as=0.34p ad=0.19p ps=2.68u pd=1.38u
+X$68 vcm en_3v3_b outn iovss sg13_hv_nmos l=0.45u w=1u as=0.19p ad=0.34p ps=1.38u pd=2.68u
+X$69 iovss en_3v3_b n_I35 iovss sg13_hv_nmos l=0.45u w=1u as=0.34p ad=0.34p ps=2.68u pd=2.68u
+X$70 n_I35 en_3v3 iref iovss sg13_hv_nmos l=0.45u w=1u as=0.34p ad=0.34p ps=2.68u pd=2.68u
+X$71 iovdd n_I12 n_I16 iovdd sg13_hv_pmos l=4u w=24u as=8.16p ad=8.16p ps=50.72u pd=50.72u
+X$72 iovdd n_I12 n_I15 iovdd sg13_hv_pmos l=4u w=24u as=8.16p ad=8.16p ps=50.72u pd=50.72u
+X$73 iovdd n_I12 n_I18 iovdd sg13_hv_pmos l=4u w=24u as=8.16p ad=8.16p ps=50.72u pd=50.72u
+X$83 iovdd n_I12 iovdd iovdd sg13_hv_pmos l=4u w=4u as=1.36p ad=1.36p ps=10.72u pd=10.72u
+X$87 iovdd n_I17 n_I17 iovdd sg13_hv_pmos l=4u w=1u as=0.34p ad=0.34p ps=2.68u pd=2.68u
+X$88 iovdd n_I17 iovdd iovdd sg13_hv_pmos l=4u w=3u as=1.02p ad=1.02p ps=8.04u pd=8.04u
+X$91 n_I15 n_I17 outn iovdd sg13_hv_pmos l=3u w=30u as=10.2p ad=10.2p ps=61.36u pd=61.36u
+X$92 n_I18 n_I17 outp iov
+… [4013 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:05:51 UTC
+
+**Tool call: `Bash`**
+
+_Read fetch.sh and roundtrip.py_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps; cat dc_curves/fetch.sh; sed -n 1,200p dc_curves/roundtrip.py
+```
+
+## Tool results / harness — 2026-11-25 04:05:51 UTC
+
+**Tool result:**
+
+```
+#!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+#
+# Fetch the design-repository paths the DC-curve runs need (shallow, blobless; only these paths are downloaded).
+# Usage: fetch.sh <work_dir>   -> <work_dir>/design (commit 91a7da8b...: both pad macros, their CACE yaml / templates /
+# committed results, schematics of the macros the templates place next to the pads, scripts/cace, the S2D PEX netlist)
+# and <work_dir>/tier1 (commit 9052bd35...: docs/slot7_hookup/tier1 and the netlists the slot decks include).
+set -euo pipefail
+WORK=$(realpath -m "$1")
+URL=https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single
+C91=91a7da8b67ac56a26c605501146667a1fde28c32
+C90=9052bd35928c6d40344e8e686c9abbe736bfadb9
+mkdir -p "$WORK"
+if [ ! -d "$WORK/repo" ]; then
+  git clone -q --depth 1 --filter=blob:none --no-checkout "$URL" "$WORK/repo"
+fi
+git -C "$WORK/repo" fetch -q --depth 1 origin $C91
+P="scripts/cace scripts/pex_add_port.py"
+for t in sg13cmos5l_IOPadSingle2Diff sg13cmos5l_IOPadDiff2Single; do
+  P="$P macros/$t/schematic macros/$t/verification/cace macros/$t/netlist"
+done
+for d in en_ctrl_3v3 bias_sel_pd bias_gen_pd ls_up_1v2_3v3 hv_logic IOPad oa_core_pd bg_core_pd bias_tree_pd \
+         bias_tree_noab_pd bias_sel_noab_pd bias_in_pd bias_out_pd bias_oa_pd bias_bg_pd; do
+  P="$P macros/$d/schematic/xschem"
+done
+rm -rf "$WORK/design" && mkdir -p "$WORK/design"
+git -C "$WORK/repo" archive $C91 $P | tar x -C "$WORK/design"
+
+… [6986 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:06:00 UTC
+
+**Tool call: `Bash`**
+
+_Inspect slot_modes.py structure_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_modes_bg; sed -n 1,60p slot_modes.py; grep -n "wrapped\|RUNS\|def \|sys.argv" slot_modes.py; cat jobs_modes.txt | head; cat run.sh | sed -n 1,80p
+```
+
+## Tool results / harness — 2026-11-25 04:06:01 UTC
+
+**Tool result:**
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Slot 7 modes from power-up (IHP sg13cmos5l simulation): transient power-up, enable, mode bits, pad-in staircase.
+
+usage: python3 -I slot_modes.py <design-repo-tree> <work-dir> <out-dir> <job> [<job> ...]
+  job = <mode>:<mos>:<temp>:<vdd>[:<variant>]   e.g. swap:ss:-40:3.0
+  variant: "pu" (default; power-up transient, see below), "dcop" (the designer's DC sweep as in run_modes.py, stderr kept),
+           "dcns" (dcop plus .nodeset of the bandgap nodes g / vpc / vpg / ks / ibg at their running values: diagnosis)
+
+Same netlists and testbench as the designer's docs/slot7_hookup/tier1/run_modes.py at the design-repo commit (it is
+imported from there, via run_tier1.wrapped(), so the decks use the same views): both custom pads, pad_ref_rb and
+bias_dist_pd from their extracted layout netlists; bg_core_pd from its schematic netlist; ls_up_fs / s7_ctrl / hv_logic
+/ en_ctrl_3v3 from their source netlists. MOS corner on hv and lv, res_typ, pnp typ.
+
+"pu": vdd_3v3 and iovdd ramp 0 -> V in 10 us; v12 (1.2 V) and the mode bits d0..d5 are there from t = 0 (the harness
+writes the register before enabling), enable 0 -> 1.2 V at 20 us (100 ns edge). Pad in 0.5 V until 40 us (values
+"at 39 us" = settled with pad in 0.5 V), then a staircase 0 / 0.25 / 0.5 / 0.75 / 1.0 V (10 us each, 40 ... 90 us,
+sampled at each step's end; settle = pad-out change between 85 and 90 us). Pad out: 1 Gohm as in run_modes.py plus
+… [6442 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:06:08 UTC
+
+**Tool call: `Bash`**
+
+_Find antenna diode notes in slot_modes_bg docs_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_modes_bg; grep -n -i "antenna\|dpantenna\|a=\|timestep\|x\$3\|x\$63" README.md results.md results_tables.md | cut -c1-400; cat designer_modes_rerun_ss.txt
+```
+
+## Tool results / harness — 2026-11-25 04:06:08 UTC
+
+**Tool result:**
+
+```
+README.md:64:enable edge 1 µs, maximum step 5 ns. Without these the transient aborts with "timestep too small" in the D2S pad's
+README.md:65:antenna diode `X$3` (`dpantenna`, pad → iovdd): at 5.9 µs (trapezoidal, no cshunt), 21.3 µs (gear + cshunt, swap),
+results.md:21:   stepping and the "transient op" fallback all fail, the last with *timestep too small, trouble with
+results.md:22:   dparea-instance* **`d.x2d.xlay.x$3.d1`** (swap; the D2S pad's antenna diode `dpantenna` pad → iovdd) or
+results.md:23:   **`d.x2s.xlay.x$63.d1`** (feed, ext, swap+feed; the S2D pad's). Not a bandgap node.
+results.md:36:   during the supply ramp (6.6 µs, before enable) at the D2S antenna diode (section 2).
+results.md:38:   1 GΩ only: 5.9 / 6.6 / 21.3 µs at `x2d … x$3` depending on options; with 10 pF, sf −40 °C mon at 20.07 µs (the
+results.md:39:   enable edge, `x2d … x$3`), feed and swap+feed at 3.95 µs (supply ramp, `v.xs.vsb3#branch`), the bandgap not yet
+results.md:87:- Slot transients abort with "timestep too small" at the pads' antenna diodes (or `v.xs.vsb3#branch`) in some runs;
+results.md:89:  netlists in ngspice; not investigated further. The converted pad netlists call `dpantenna` with `a=` / `p=`, which
+results.md:103:IHP sg13cmos5l simulation; bg_core_pd schematic, both pads / pad_ref_rb / bias_dist_pd extracted, ls_up_fs / s7_ctrl source. Pad in 0 / 0.25 / 0.5 / 0.75 / 1.0 V (feed modes: 0.5 V). `FAILED @t` = the transient aborted at t ("timestep too small"; enable is at 20 us, so t
+… [3291 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:06:13 UTC
+
+**Tool call: `Bash`**
+
+_Read slot_modes_bg results_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_modes_bg; sed -n 1,60p results.md; sed -n 80,135p results.md
+```
+
+## Tool results / harness — 2026-11-25 04:06:13 UTC
+
+**Tool result:**
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Results: slot 7 modes at ss / −40 °C, mode table, bg_core_pd alone
+
+IHP sg13cmos5l simulation, ngspice-47. Views: in the slot decks `bg_core_pd` **schematic**, both custom pads,
+`pad_ref_rb`, `bias_dist_pd` **extracted** (layout netlists), `ls_up_fs` / `s7_ctrl` / `hv_logic` / `en_ctrl_3v3`
+source; `bg_core_pd` alone: **schematic** and **extracted** (magic PEX R + C). Design repository commit `9052bd3`,
+slot commit `158afc5`. Method and limits: `README.md`.
+
+## 1. ss / −40 °C mode failures: simulator artefact, not a second state of the bandgap
+
+**Verdict: simulator (DC solver / time-step) artefact.** In every run where the circuit was simulated from power-up,
+the bandgap started and the slot settled to the expected output; no zero-current (second) state of `bg_core_pd` was
+found by any method. Evidence:
+
+1. **Reproduced.** The designer's `run_modes.py`, unchanged, at ss −40 °C 3.0 V: default and all_high pass (1.31 mV),
+   swap, mon, feed, ext, swap+feed `FAILED` (`designer_modes_rerun_ss.txt`), as in the design repository.
+2. **Where the solver fails.** ngspice's stderr for the same DC deck (`slot_modes_dc_diag.csv`): gmin stepping, source
+   stepping and the "transient op" fallback all fail, the last with *timestep too small, trouble with
+   dparea-instance* **`d.x2d.xlay.x$3.d1`** (swap; the D2S pad's antenna diode `dpantenna` pad → iovdd) or
+   **`d.x2s.xlay.x$63.d1`** (feed, ext, 
+… [8250 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:06:36 UTC
+
+**Tool call: `Bash`**
+
+_Write fix_diodes.py and test it on converted netlists_
+
+```bash
+mkdir -p /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; cat > /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/fix_diodes.py <<'EOF'
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Give the antenna diodes of a converted KLayout pad netlist their extracted size (IHP sg13cmos5l).
+
+Usage: python3 -I fix_diodes.py <converted.spice> [<out.spice>]   (in place without <out>); prints one line per diode.
+Also imported by run_fixed.py (fix_file()).
+
+KLayout's SG13 LVS writes the antenna diodes as  D$63 pad iovdd dpantenna A=35.0028p P=58.08u m=2  (area in m^2,
+perimeter in m). The designer's run_starve.convert() (design repository, macros/en_ctrl_3v3/testbenches/spice/
+run_starve.py) turns that into the subckt call  X$63 pad iovdd dpantenna a=35.0028p p=58.08u m=2 . The PDK subckts
+(libs.tech/ngspice/models/diodes.lib) take only l / w (defaults 780n): .params l=780n w=780n DEV_A=(l*w)/1p
+DEV_P=(l+w)/0.5u DEV_C=4. ngspice ignores the unknown a= / p= without a message, so each diode is simulated at
+0.78 um x 0.78 um. Here a / p are replaced by the rectangle l x w with l*w = A and 2(l + w) = P, which gives the model
+exactly DEV_A = A/1um^2 and DEV_P = P/1um (real for every rectilinear outline, P >= 4 sqrt(A)); m= and everything else
+on the line is kept.
+"""
+import math
+import re
+import sys
+from pathlib import Path
+
+SI = {'f': 1e-15, 'p': 1e-12, 'n': 1e-9, 'u': 1e-6, 'm': 1e-3, '': 1.0}
+LINE = re.compile(r'^(X\S+\s+\S+\s+\S+\s+(?:dantenna|dpantenna))\s+(.*)$', re.I)
+
+
+def num(s):
+    m = re.fullmatch(r'([-+0-9.eE]+?)([fpnum]?)', s.strip(), re.I)
+    return float(m.group(1)) * SI[m.group(2).lower()]
+
+
+def lw(a, p):
+    """Rectangle with area a [m^2] and perimeter p [m]: (l, w) [m], l >= w."""
+    s = p / 2
+    d = s * s - 4 * a
+    if d < 0:
+        raise ValueError(f'no rectangle with A={a} P={p}')
+    l = (s + math.sqrt(d)) / 2
+    return l, a / l
+
+
+def fix_text(txt):
+    out, log = [], []
+    for line in txt.splitlines():
+        m = LINE.match(line)
+        if m:
+            prm = dict(t.split('=', 1) for t in m.group(2).split() if '=' in t)
+            low = {k.lower(): k for k in prm}
+            if 'a' in low and 'p' in low and 'l' not in low and 'w' not in low:
+                a, p = num(prm.pop(low['a'])), num(prm.pop(low['p']))
+                l, w = lw(a, p)
+                rest = ' '.join(f'{k}={v}' for k, v in prm.items())
+                new = f'{m.group(1)} l={l * 1e6:.6g}u w={w * 1e6:.6g}u' + (f' {rest}' if rest else '')
+                log.append(f'{line.strip()}  ->  {new.strip()}   (DEV_A {l * w * 1e12:.6g}, DEV_P {(l + w) / 0.5e-6:.6g})')
+                line = new
+        out.append(line)
+    return '\n'.join(out) + '\n', log
+
+
+def fix_file(src, dst=None):
+    src = Path(src)
+    txt, log = fix_text(src.read_text())
+    Path(dst or src).write_text(txt)
+    return log
+
+
+if __name__ == '__main__':
+    if len(sys.argv) not in (2, 3):
+        sys.exit(__doc__)
+    for ln in fix_file(*sys.argv[1:]):
+        print(ln)
+EOF
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/t; for c in sg13cmos5l_IOPadSingle2Diff sg13cmos5l_IOPadDiff2Single; do python3 -I /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/fix_diodes.py ../../actran/w/slot_runs/slot_klayout_tt_27_3.3_sine_open/${c}_flat.spice $c.fixed.spice; done
+```
+
+## Tool results / harness — 2026-11-25 04:06:36 UTC
+
+**Tool result:**
+
+```
+X$63 pad iovdd dpantenna a=35.0028p p=58.08u m=2  ->  X$63 pad iovdd dpantenna l=27.78u w=1.26u m=2   (DEV_A 35.0028, DEV_P 58.08)
+X$65 iovss pad dantenna a=35.0028p p=58.08u m=2  ->  X$65 iovss pad dantenna l=27.78u w=1.26u m=2   (DEV_A 35.0028, DEV_P 58.08)
+X$3 pad iovdd dpantenna a=82.908p p=134.12u m=2  ->  X$3 pad iovdd dpantenna l=65.8u w=1.26u m=2   (DEV_A 82.908, DEV_P 134.12)
+X$5 iovss pad dantenna a=85.176p p=137.72u m=2  ->  X$5 iovss pad dantenna l=67.6u w=1.26u m=2   (DEV_A 85.176, DEV_P 137.72)
+X$165 iovss n_I114 dantenna a=1.984p p=7.48u m=1  ->  X$165 iovss n_I114 dantenna l=3.1u w=0.64u m=1   (DEV_A 1.984, DEV_P 7.48)
+X$166 iovss n_I113 dantenna a=1.984p p=7.48u m=1  ->  X$166 iovss n_I113 dantenna l=3.1u w=0.64u m=1   (DEV_A 1.984, DEV_P 7.48)
+X$167 n_I114 iovdd dpantenna a=3.1872p p=11.24u m=1  ->  X$167 n_I114 iovdd dpantenna l=4.98u w=0.64u m=1   (DEV_A 3.1872, DEV_P 11.24)
+X$168 n_I113 iovdd dpantenna a=3.1872p p=11.24u m=1  ->  X$168 n_I113 iovdd dpantenna l=4.98u w=0.64u m=1   (DEV_A 3.1872, DEV_P 11.24)
+```
+
+## Assistant — 2026-11-25 04:06:52 UTC
+
+**Tool call: `Bash`**
+
+_Write run_fixed.py and check slot_modes main_
+
+```bash
+cat > /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/run_fixed.py <<'EOF'
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Run one of the existing slot-deck scripts with the KLayout pad netlists' antenna diodes at their extracted size.
+
+Usage: python3 -I run_fixed.py <script.py> <runs_dir> <script arguments ...>
+  <script.py>  ../ac_tran/slot.py, ../dc_curves/roundtrip.py or ../slot_modes_bg/slot_modes.py (unchanged files)
+  <runs_dir>   where the decks are written (replaces the script's own RUNS folder, so earlier runs are not touched)
+  e.g. run_fixed.py ../ac_tran/slot.py W/fixed_runs W W/out_fixed klayout:tt:27:3.3:sine
+
+The script is imported as it is; the only change is that run_tier1.wrapped() (design repository 9052bd35, which calls
+run_starve.convert()) is wrapped so that each converted netlist then goes through fix_diodes.fix_file(): every
+dantenna / dpantenna a= p= is replaced by the equivalent l= w= (see fix_diodes.py). The replacements are printed.
+"""
+import importlib.util
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import fix_diodes  # noqa: E402
+
+script, runs = Path(sys.argv[1]).resolve(), Path(sys.argv[2]).resolve()
+sys.argv = [str(script)] + sys.argv[3:]
+spec = importlib.util.spec_from_file_location(script.stem, script)
+mod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mod)  # module level only (argument parsing, run_tier1 import); __main__ block not run
+T = mod.T
+orig = T.wrapped
+seen = set()
+
+
+def wrapped(cell):
+    name = orig(cell)
+    log = fix_diodes.fix_file(Path(T.RUNS) / name)
+    if cell not in seen:
+        seen.add(cell)
+        for ln in log:
+            print(f'fix_diodes {cell}: {ln}', flush=True)
+    return name
+
+
+T.wrapped = wrapped
+if hasattr(mod, 'RUNS'):
+    mod.RUNS = runs
+if hasattr(mod, 'main'):          # slot_modes.py: main() reads JOBS itself (its runs go to its <work-dir> argument)
+    mod.main()
+else:                             # slot.py / roundtrip.py
+    mod.OUT.mkdir(parents=True, exist_ok=True)
+    for j in mod.JOBS:
+        mod.run(j)
+EOF
+grep -n "^def main" -A40 /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_modes_bg/slot_modes.py | head -60
+```
+
+## Tool results / harness — 2026-11-25 04:06:52 UTC
+
+**Tool result:**
+
+```
+158:def main():
+159-    WORK.mkdir(parents=True, exist_ok=True)
+160-    OUT.mkdir(parents=True, exist_ok=True)
+161-    T.RUNS = WORK
+162-    incs = [T.wrapped(c) for c in T.SRC_PORTS]
+163-    for job in JOBS:
+164-        p = job.split(":")
+165-        name, c, t, v = p[0], p[1], int(p[2]), float(p[3])
+166-        var = p[4] if len(p) > 4 else "pu"
+167-        if var in ("pu", "pu0", "pu2"):
+168-            tag, deck = deck_pu(name, c, t, v, incs, "" if var == "pu0" else CLOAD, var == "pu2")
+169-        else:
+170-            tag, deck = deck_dcop(name, c, t, v, incs, var)
+171-        f = WORK / f"{tag}.spice"
+172-        f.write_text(deck)
+173-        r = subprocess.run(["ngspice", "-b", f.name], cwd=WORK, capture_output=True, text=True)
+174-        f.with_suffix(".log").write_text(r.stdout + "\n#### stderr\n" + r.stderr)
+175-        res = {"mode": name, "mos": c, "temp": t, "vdd": v, "variant": var,
+176-               "cload": ("none" if var == "pu0" else CLOAD) if var.startswith("pu") else ""}
+177-        if var.startswith("pu"):
+178-            a = re.search(r"^PU (.*)$", r.stdout, re.M)
+179-            b = re.search(r"^STEPS (.*)$", r.stdout, re.M)
+180-            vals = a.group(1).split() if a else []
+181-            for k, key in enumerate(["v_g_V", "v_ibg_V", "vcm_V", "vref_V", "i_slot_uA", "t_g90_us",
+182-                                     "t_vcm98_us", "settle_85_90us_V"]):
+183-                x = vals[k] if k < len(vals) else ""
+184-                try:
+185-       
+… [647 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:07:03 UTC
+
+**Tool call: `Bash`**
+
+_Set up scratch work dir with symlinks_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; A=$K/../actran/w; mkdir -p $K/w; ln -sfn $A/tier1 $K/w/tier1; ln -sfn $A/design $K/w/design; git -C $A/repo log --oneline -3 2>&1 | head; ls $A/repo; ls /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/csv | head -30
+```
+
+## Tool results / harness — 2026-11-25 04:07:03 UTC
+
+**Tool result:**
+
+```
+60f270a CLAUDE.md : salvaged updated version
+d2s_grid_summary.csv
+d2s_noload_summary.csv
+d2s_slot_summary.csv
+rt_summary.csv
+s2d_grid_summary.csv
+s2d_slot_summary.csv
+s2d_vrefvcm_runs.csv
+s2d_vrefvcm_summary.csv
+```
+
+## Assistant — 2026-11-25 04:07:11 UTC
+
+**Tool call: `Bash`**
+
+_Launch fixed sine and DC round-trip runs_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps; cd $K; export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1; (time python3 -I $D/klayout_pad_diodes/run_fixed.py $D/ac_tran/slot.py $K/w/fixed_slot_runs $K/w $K/w/out_fixed/slot klayout:tt:27:3.3:sine) > $K/sine_fixed.log 2>&1 &
+(time python3 -I $D/klayout_pad_diodes/run_fixed.py $D/dc_curves/roundtrip.py $K/w/fixed_rt_runs $K/w $K/w/out_fixed/rt klayout:tt:27:3.3) > $K/rt_fixed_tt.log 2>&1 &
+sleep 5; cat $K/sine_fixed.log $K/rt_fixed_tt.log
+```
+
+## Tool results / harness — 2026-11-25 04:07:16 UTC
+
+**Tool result:**
+
+```
+fix_diodes sg13cmos5l_IOPadSingle2Diff: X$63 pad iovdd dpantenna a=35.0028p p=58.08u m=2  ->  X$63 pad iovdd dpantenna l=27.78u w=1.26u m=2   (DEV_A 35.0028, DEV_P 58.08)
+fix_diodes sg13cmos5l_IOPadSingle2Diff: X$65 iovss pad dantenna a=35.0028p p=58.08u m=2  ->  X$65 iovss pad dantenna l=27.78u w=1.26u m=2   (DEV_A 35.0028, DEV_P 58.08)
+fix_diodes sg13cmos5l_IOPadDiff2Single: X$3 pad iovdd dpantenna a=82.908p p=134.12u m=2  ->  X$3 pad iovdd dpantenna l=65.8u w=1.26u m=2   (DEV_A 82.908, DEV_P 134.12)
+fix_diodes sg13cmos5l_IOPadDiff2Single: X$5 iovss pad dantenna a=85.176p p=137.72u m=2  ->  X$5 iovss pad dantenna l=67.6u w=1.26u m=2   (DEV_A 85.176, DEV_P 137.72)
+fix_diodes sg13cmos5l_IOPadDiff2Single: X$165 iovss n_I114 dantenna a=1.984p p=7.48u m=1  ->  X$165 iovss n_I114 dantenna l=3.1u w=0.64u m=1   (DEV_A 1.984, DEV_P 7.48)
+fix_diodes sg13cmos5l_IOPadDiff2Single: X$166 iovss n_I113 dantenna a=1.984p p=7.48u m=1  ->  X$166 iovss n_I113 dantenna l=3.1u w=0.64u m=1   (DEV_A 1.984, DEV_P 7.48)
+fix_diodes sg13cmos5l_IOPadDiff2Single: X$167 n_I114 iovdd dpantenna a=3.1872p p=11.24u m=1  ->  X$167 n_I114 iovdd dpantenna l=4.98u w=0.64u m=1   (DEV_A 3.1872, DEV_P 11.24)
+fix_diodes sg13cmos5l_IOPadDiff2Single: X$168 n_I113 iovdd dpantenna a=3.1872p p=11.24u m=1  ->  X$168 n_I113 iovdd dpantenna l=4.98u w=0.64u m=1   (DEV_A 3.1872, DEV_P 11.24)
+fix_diodes sg13cmos5l_IOPadSingle2Diff: X$63 pad iovdd dpantenna a=35.0028p p=58.08u m=2  ->  X$63 pad iovdd dpantenna l=27.78u w=1.26u 
+… [1227 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:07:21 UTC
+
+**Tool call: `Bash`**
+
+_Read dc_curves round-trip range results_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves; grep -n -i "klayout\|55 mV\|1.435" results.md | cut -c1-500 | head -30; head -3 csv/rt_summary.csv; grep "tt_27\|tt,27" csv/rt_summary.csv
+```
+
+## Tool results / harness — 2026-11-25 04:07:21 UTC
+
+**Tool result:**
+
+```
+175:bias `pad_ref_rb` and `bias_dist_pd` KLayout-extracted, `bg_core_pd` schematic, iref from the slot's bandgap, pad out
+177:5 mV steps; the two custom pads in three views (both pads the same view): schematic, magic PEX, and the KLayout-extracted
+179:sf −40 °C 3.0 V: ngspice aborted the sweep at pad in 1.435 V, "timestep too small" at the S2D pad's diode
+199:- Views: magic PEX = schematic within 0.3 mV (range ends) and 0.01 mV (max |err|). The KLayout-extracted pads (the
+201:  55 mV (high end lower by 7.7 … 55.2 mV, low end up to 32.9 mV higher at −40 °C); the reason was not investigated here.
+202:- Cross-check: with the KLayout-extracted pads, max |err| over pad in 0 … 1 V = 0.90 / 1.37 / 6.48 / 3.37 / 1.13 mV at
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# round trip, IHP sg13cmos5l simulation, slot 7 tier-1 deck (pads: schematic | magic PEX | KLayout-extracted); rt.py
+schematic,tt,27,3.3,0.4922591751,1.256639543,1.256639543,0.99875,0.053,0.858,-0.1709,1.2811,0.5954,2.0435,-0.2969,1.4064
+pex,tt,27,3.3,0.4922646955,1.256635784,1.256635784,0.99875,0.064,0.870,-0.1708,1.2812,0.5955,2.0436,-0.2969,1.4064
+klayout,tt,27,3.3,0.4922591751,1.256639543,1.256639543,0.99871,0.070,0.897,-0.1718,1.2445,0.5945,2.0070,-0.2979,1.3653
+```
+
+## Assistant — 2026-11-25 04:07:26 UTC
+
+**Tool call: `Bash`**
+
+_Read round-trip section and CSV columns_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves; sed -n 170,215p results.md; sed -n 4,5p csv/rt_summary.csv; grep -n "rt_summary\|cols\|header\|writerow" rt.py | head -20; cat jobs_rt.txt
+```
+
+## Tool results / harness — 2026-11-25 04:07:27 UTC
+
+**Tool result:**
+
+```
+(schematic, pad-voltage span [V] with |error from small-signal line| < 10 mV; PEX in `tables/d2s.md`.)
+
+## 3. Round trip S2D → slot 7 (default mode) → D2S
+
+Conditions: the designer's tier-1 slot deck (design 9052bd35, `run_tier1.py`, imported): slot_7 default mode, replica
+bias `pad_ref_rb` and `bias_dist_pd` KLayout-extracted, `bg_core_pd` schematic, iref from the slot's bandgap, pad out
+unloaded (1 GΩ); **vref / vcm are the replica values as simulated** (not set by sources). Pad in swept −0.3 … 3.3 V in
+5 mV steps; the two custom pads in three views (both pads the same view): schematic, magic PEX, and the KLayout-extracted
+netlists that the designer's deck uses. PVT: the designer's five tier-1 points. 15 runs: 14 complete, 1 partial (PEX,
+sf −40 °C 3.0 V: ngspice aborted the sweep at pad in 1.435 V, "timestep too small" at the S2D pad's diode
+`d.x2s.x43.d1`; data up to 1.43 V are used, which covers the linear range there).
+
+| pads | PVT | replica vref / vcm [V] | max \|err\| pad in 0 … 1 V [mV] | pad in range, 1 mV [V] | pad out range, 1 mV [V] |
+|---|---|---|---|---|---|
+| schematic | tt 27 °C 3.3 V | 0.4923 / 1.2566 | 0.86 | -0.171 … 1.281 | 0.595 … 2.044 |
+| schematic | ss −40 °C 3.0 V | 0.4475 / 1.1148 | 1.33 | -0.243 … 1.055 | 0.427 … 1.721 |
+| schematic | ff 125 °C 3.6 V | 0.5709 / 1.2991 | 6.10 | 0.096 … 1.367 | 0.828 … 2.095 |
+| schematic | fs 125 °C 3.6 V | 0.5757 / 1.3655 | 3.10 | 0.028 … 1.440 | 0.821 … 2.229 |
+| schematic | sf −40 °C 3.0 V | 0.4441 / 1.1377 | 1.
+… [2904 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:07:31 UTC
+
+**Tool call: `Bash`**
+
+_Read rt.py range computation_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves; sed -n 1,140p rt.py
+```
+
+## Tool results / harness — 2026-11-25 04:07:31 UTC
+
+**Tool result:**
+
+```
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Round trip S2D -> slot 7 (default mode) -> D2S: plots, range table, summary CSV (IHP sg13cmos5l simulation).
+
+Usage: rt.py <rt_out_dir> <dest_dir>   (reads rt_<view>_<mos>_<temp>_<vdd>.csv written by roundtrip.py)
+
+expected = v(vcm_s2d) + v(padin) - v(vref_s2d) (replica values as simulated; the designer's run_tier1.py definition)
+err      = v(padout) - expected
+err_ss   = deviation of padout(padin) from its small-signal line (slope from padin = vref_s2d +- 0.1 V, value at
+           vref_s2d); the round-trip gain is 1, so input- and output-referred are the same
+range    = contiguous padin range around vref_s2d with |err_ss| < 1 mV (and < 10 mV), with the padout span
+"""
+import csv
+import glob
+import re
+import sys
+from pathlib import Path
+
+import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from common import LABEL, VIEWNAME, contiguous_range, md_table, plt, save, ss_line, style  # noqa: E402
+
+PTS = [('tt', 27, 3.3), ('ss', -40, 3.0), ('ff', 125, 3.6), ('fs', 125, 3.6), ('sf', -40, 3.0)]
+PCOL = {('tt', 27, 3.3): '#2a78d6', ('ss', -40, 3.0): '#eb6834', ('ff', 125, 3.6): '#1baf7a',
+        ('fs', 125, 3.6): '#e87ba4', ('sf', -40, 3.0): '#eda100'}
+VLS = {'schematic': '-', 'pex': '--', 'klayout': ':'}
+VIEWS = ['schematic', 'pex', 'klayout']
+RTLABEL = 'IHP sg13cmos5l simulation, slot 7 tier-1 deck (pads: schematic | magic PEX | KLayout-extracted)'
+
+… [5980 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:07:38 UTC
+
+**Tool call: `Bash`**
+
+_Check progress of runs_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; tail -3 $K/sine_fixed.log $K/rt_fixed_tt.log; ls -la $K/w/out_fixed/*; ps aux | grep ngspice | grep -v grep | wc -l
+```
+
+## Tool results / harness — 2026-11-25 04:07:38 UTC
+
+**Tool result:**
+
+```
+tail: option used in invalid context -- 3
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/w/out_fixed/rt:
+total 148
+drwxr-xr-x 2 root root   4096 Nov 25 04:07 .
+drwxr-xr-x 4 root root   4096 Nov 25 04:07 ..
+-rw-r--r-- 1 root root 135736 Nov 25 04:07 rt_klayout_tt_27_3.3.csv
+-rw-r--r-- 1 root root   1101 Nov 25 04:07 rt_klayout_tt_27_3.3.log
+
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/w/out_fixed/slot:
+total 12
+drwxr-xr-x 2 root root 4096 Nov 25 04:07 .
+drwxr-xr-x 4 root root 4096 Nov 25 04:07 ..
+-rw-r--r-- 1 root root  410 Nov 25 04:07 slot_klayout_tt_27_3.3_sine_open.op
+1
+```
+
+## Assistant — 2026-11-25 04:07:42 UTC
+
+**Tool call: `Bash`**
+
+_Find original round-trip CSVs_
+
+```bash
+find /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad -name "rt_*_3.3.csv" -o -name "rt_*_3.0.csv" -o -name "rt_*_3.6.csv" 2>/dev/null | grep -v klsine | head -20
+```
+
+## Tool results / harness — 2026-11-25 04:07:43 UTC
+
+**Tool result:**
+
+```
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/out/rt/rt_pex_ff_125_3.6.csv
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/out/rt/rt_pex_sf_-40_3.0.csv
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/out/rt/rt_schematic_ff_125_3.6.csv
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/out/rt/rt_klayout_fs_125_3.6.csv
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/out/rt/rt_schematic_tt_27_3.3.csv
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/out/rt/rt_schematic_fs_125_3.6.csv
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/out/rt/rt_pex_ss_-40_3.0.csv
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/out/rt/rt_pex_tt_27_3.3.csv
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/out/rt/rt_schematic_sf_-40_3.0.csv
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/out/rt/rt_klayout_ss_-40_3.0.csv
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/out/rt/rt_pex_fs_125_3.6.csv
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/out/rt/rt_klayout_sf_-40_3.0.csv
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dcgraphs/out/rt/rt_schematic_ss_-40_3.0.csv
+/tmp/claude-0/-ho
+… [811 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:07:55 UTC
+
+**Tool call: `Bash`**
+
+_Run unfixed round-trip DC for comparison_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps; cd $K; export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1; cat rt_fixed_tt.log | tail -4; time python3 -I $D/dc_curves/roundtrip.py $K/w $K/w/out_orig/rt klayout:tt:27:3.3 schematic:tt:27:3.3 pex:tt:27:3.3
+```
+
+## Tool results / harness — 2026-11-25 04:08:38 UTC
+
+**Tool result:**
+
+```
+real	0m6.852s
+user	0m7.611s
+sys	0m1.906s
+rt_klayout_tt_27_3.3 ok
+rt_schematic_tt_27_3.3 ok
+rt_pex_tt_27_3.3 ok
+
+real	0m42.459s
+user	0m47.298s
+sys	0m13.548s
+```
+
+## Assistant — 2026-11-25 04:08:46 UTC
+
+**Tool call: `Bash`**
+
+_Compare round-trip range metrics_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps; cd $K; cat > $K/cmp.py <<'EOF'
+import sys
+sys.path.insert(0, '/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves')
+import rt
+for lab, d in (('orig', sys.argv[1]), ('fixed', sys.argv[2])):
+    for k, dd in sorted(rt.load(d).items()):
+        m = rt.metrics(dd)
+        print(lab, k, 'G %.5f off %.3f emax %.3f  in1 %.4f..%.4f out1 %.4f..%.4f in10 %.4f..%.4f' % (m['G'], m['off']*1e3, m['emax01']*1e3, m['lo1'], m['hi1'], m['olo1'], m['ohi1'], m['lo10'], m['hi10']))
+EOF
+python3 $K/cmp.py $K/w/out_orig/rt $K/w/out_fixed/rt 2>&1 | grep -v Warn; tail -2 $K/sine_fixed.log
+```
+
+## Tool results / harness — 2026-11-25 04:08:47 UTC
+
+**Tool result:**
+
+```
+orig ('klayout', 'tt', 27, 3.3) G 0.99871 off 0.070 emax 0.897  in1 -0.1718..1.2445 out1 0.5945..2.0070 in10 -0.2979..1.3653
+orig ('pex', 'tt', 27, 3.3) G 0.99875 off 0.064 emax 0.870  in1 -0.1708..1.2812 out1 0.5955..2.0436 in10 -0.2969..1.4064
+orig ('schematic', 'tt', 27, 3.3) G 0.99875 off 0.053 emax 0.858  in1 -0.1709..1.2811 out1 0.5954..2.0435 in10 -0.2969..1.4064
+fixed ('klayout', 'tt', 27, 3.3) G 0.99871 off 0.070 emax 0.897  in1 -0.1718..1.2445 out1 0.5945..2.0070 in10 -0.2979..1.3653
+fix_diodes sg13cmos5l_IOPadDiff2Single: X$167 n_I114 iovdd dpantenna a=3.1872p p=11.24u m=1  ->  X$167 n_I114 iovdd dpantenna l=4.98u w=0.64u m=1   (DEV_A 3.1872, DEV_P 11.24)
+fix_diodes sg13cmos5l_IOPadDiff2Single: X$168 n_I113 iovdd dpantenna a=3.1872p p=11.24u m=1  ->  X$168 n_I113 iovdd dpantenna l=4.98u w=0.64u m=1   (DEV_A 3.1872, DEV_P 11.24)
+```
+
+## Assistant — 2026-11-25 04:08:57 UTC
+
+**Tool call: `Bash`**
+
+_Diff fixed vs orig DC; inspect earlier sine variants_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; A=$K/../actran/w; python3 - <<EOF
+import numpy as np
+def ld(f):
+    l=open(f).read().split('\n'); h=l[0].split(); return h,np.array([[float(x) for x in r.split()] for r in l[1:] if len(r.split())==len(h)])
+h,a=ld('$K/w/out_orig/rt/rt_klayout_tt_27_3.3.csv'); h,b=ld('$K/w/out_fixed/rt/rt_klayout_tt_27_3.3.csv')
+for i,n in enumerate(h): print(n, np.abs(a[:,i]-b[:,i]).max())
+EOF
+grep -n -i "vsv0\|^\.subckt" $A/tier1/macros/slot_7/netlist/source/slot_7.spice | head; for f in $A/slot_runs/slot_klayout_tt_27_3.3_sine_open/v_*.spice; do echo "== $f"; grep -n "option\|^Vin\|tran " $f; grep -i "timestep\|SLOTDONE" ${f%.spice}.log | head -2; done
+```
+
+## Tool results / harness — 2026-11-25 04:08:57 UTC
+
+**Tool result:**
+
+```
+v-sweep 0.0
+v(padin) 0.0
+v(padout) 1.000000082740371e-09
+v(vcm_s2d) 0.0
+v(vref_s2d) 0.0
+v(vref_d2s) 0.0
+v(outp) 1.000000082740371e-09
+v(outn) 9.99999860695766e-10
+v(vinp) 1.000000082740371e-09
+v(vinn) 1.000000082740371e-09
+i(vio) 1.000000321264849e-13
+18:.subckt s7_ctrl vddh vss enable d0 d1 d2 d3 d4 d5 en en_b outp outn vinp vinn bus0 bus1 vcm_rb vref_rb vcm_pad vref_pad
+73:.subckt s7_doutpd d0 d1 d2 d3 d4 d5 d6 d7 d8 d9 d10 d11 vdd_1v2 vss_1v2 vss_3v3
+88:.subckt slot_7 vdd_3v3 vss_3v3 enable dig_in0 dig_in1 dig_in2 dig_in3 dig_in4 dig_in5 analog_bus0 analog_bus1 analog_bus2 analog_bus3
+109:Vsv0 vcm s7_an_0_vcm 0
+== /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/../actran/w/slot_runs/slot_klayout_tt_27_3.3_sine_open/v_a.spice
+18:.option gmin=1e-12 method=gear cshunt=1e-15
+22:Vin padin 0 dc 0.5 sin(0.5 0.5 10k)
+36:option numdgt=9
+42:option numdgt=9
+43:tran 39.0625n 600u 200u 39.0625n
+doAnalyses: TRAN:  Timestep too small; time = 6.59723e-05, timestep = 4.88281e-20: trouble with node "et#branch"
+SLOTDONE
+== /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/../actran/w/slot_runs/slot_klayout_tt_27_3.3_sine_open/v_b.spice
+18:.option gmin=1e-12 method=gear
+22:Vin padin 0 dc 0.5 sin(0.5 0.5 10k)
+36:option numdgt=9
+42:option numdgt=9
+43:tran 39.0625n 70u 0 39.0625n
+ Reference value :  0.00000e+00 Reference value :  1.61250e-06 Reference value :  3.40938e-06 Reference value :  5.08906e-06 Reference value :  6.65156e-
+… [13188 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:09:12 UTC
+
+**Tool call: `Bash`**
+
+_Check sine run status_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; tail -c 600 $K/sine_fixed.log; ls -la $K/w/out_fixed/slot; ls $K/w/fixed_slot_runs/*/
+```
+
+## Tool results / harness — 2026-11-25 04:09:12 UTC
+
+**Tool result:**
+
+```
+_diodes sg13cmos5l_IOPadDiff2Single: X$166 iovss n_I113 dantenna a=1.984p p=7.48u m=1  ->  X$166 iovss n_I113 dantenna l=3.1u w=0.64u m=1   (DEV_A 1.984, DEV_P 7.48)
+fix_diodes sg13cmos5l_IOPadDiff2Single: X$167 n_I114 iovdd dpantenna a=3.1872p p=11.24u m=1  ->  X$167 n_I114 iovdd dpantenna l=4.98u w=0.64u m=1   (DEV_A 3.1872, DEV_P 11.24)
+fix_diodes sg13cmos5l_IOPadDiff2Single: X$168 n_I113 iovdd dpantenna a=3.1872p p=11.24u m=1  ->  X$168 n_I113 iovdd dpantenna l=4.98u w=0.64u m=1   (DEV_A 3.1872, DEV_P 11.24)
+slot_klayout_tt_27_3.3_sine_open ok 
+
+real	1m40.336s
+user	1m54.192s
+sys	0m54.022s
+total 2084
+drwxr-xr-x 2 root root    4096 Nov 25 04:08 .
+drwxr-xr-x 4 root root    4096 Nov 25 04:07 ..
+-rw-r--r-- 1 root root   20166 Nov 25 04:08 slot_klayout_tt_27_3.3_sine_open.log
+-rw-r--r-- 1 root root     410 Nov 25 04:07 slot_klayout_tt_27_3.3_sine_open.op
+-rw-r--r-- 1 root root 2099610 Nov 25 04:08 slot_klayout_tt_27_3.3_sine_open.sine
+bias_dist_pd_flat.spice
+pad_ref_rb_flat.spice
+sg13cmos5l_IOPadDiff2Single_flat.spice
+sg13cmos5l_IOPadSingle2Diff_flat.spice
+slot_klayout_tt_27_3.3_sine_open.spice
+```
+
+## Assistant — 2026-11-25 04:09:20 UTC
+
+**Tool call: `Bash`**
+
+_Diff fixed vs original deck and netlists_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; A=$K/../actran/w; for f in bias_dist_pd_flat.spice pad_ref_rb_flat.spice sg13cmos5l_IOPadDiff2Single_flat.spice sg13cmos5l_IOPadSingle2Diff_flat.spice slot_klayout_tt_27_3.3_sine_open.spice; do echo "== $f"; diff $A/slot_runs/slot_klayout_tt_27_3.3_sine_open/$f $K/w/fixed_slot_runs/slot_klayout_tt_27_3.3_sine_open/$f; done
+```
+
+## Tool results / harness — 2026-11-25 04:09:21 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+== bias_dist_pd_flat.spice
+== pad_ref_rb_flat.spice
+== sg13cmos5l_IOPadDiff2Single_flat.spice
+4,5c4,5
+< X$3 pad iovdd dpantenna a=82.908p p=134.12u m=2
+< X$5 iovss pad dantenna a=85.176p p=137.72u m=2
+---
+> X$3 pad iovdd dpantenna l=65.8u w=1.26u m=2
+> X$5 iovss pad dantenna l=67.6u w=1.26u m=2
+13,16c13,16
+< X$165 iovss n_I114 dantenna a=1.984p p=7.48u m=1
+< X$166 iovss n_I113 dantenna a=1.984p p=7.48u m=1
+< X$167 n_I114 iovdd dpantenna a=3.1872p p=11.24u m=1
+< X$168 n_I113 iovdd dpantenna a=3.1872p p=11.24u m=1
+---
+> X$165 iovss n_I114 dantenna l=3.1u w=0.64u m=1
+> X$166 iovss n_I113 dantenna l=3.1u w=0.64u m=1
+> X$167 n_I114 iovdd dpantenna l=4.98u w=0.64u m=1
+> X$168 n_I113 iovdd dpantenna l=4.98u w=0.64u m=1
+== sg13cmos5l_IOPadSingle2Diff_flat.spice
+6,7c6,7
+< X$63 pad iovdd dpantenna a=35.0028p p=58.08u m=2
+< X$65 iovss pad dantenna a=35.0028p p=58.08u m=2
+---
+> X$63 pad iovdd dpantenna l=27.78u w=1.26u m=2
+> X$65 iovss pad dantenna l=27.78u w=1.26u m=2
+== slot_klayout_tt_27_3.3_sine_open.spice
+9,16c9,16
+< .include /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran/w/tier1/macros/hv_logic/netlist/source/hv_logic.spice
+< .include /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran/w/tier1/macros/en_ctrl_3v3/netlist/source/en_ctrl_3v3.spice
+< .include /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran/w/tier1/macros/bg_core_pd/netlist/schematic/bg_core_pd_magic.spice
+< .include
+… [3165 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:09:57 UTC
+
+**Tool call: `Bash`**
+
+_Start unfixed control sine run in background_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps; cd $K; export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1; (time python3 -I $D/ac_tran/slot.py $K/w $K/w/out_orig/slot klayout:tt:27:3.3:sine) > $K/sine_orig.log 2>&1 &
+cd $K/t; cat > dsw.sp <<'EOF'
+* dantenna near -3 n Vt
+.include /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/diodes.lib
+.temp 27
+V1 c 0 0
+Xs 0 c dantenna
+Xb 0 c dantenna l=27.78u w=1.26u
+Vs c s 0
+Vb c b 0
+.control
+dc V1 0.06 0.1 0.0005
+EOF
+echo ok
+```
+
+## Tool results / harness — 2026-11-25 04:09:57 UTC
+
+**Tool result:**
+
+```
+ok
+```
+
+## Assistant — 2026-11-25 04:10:06 UTC
+
+**Tool call: `Bash`**
+
+_Sweep antenna diodes near -3nVt_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/t; cat > dsw.sp <<'EOF'
+* dantenna / dpantenna reverse current near vd = -3 n Vt (cathode swept, anode 0)
+.include /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/diodes.lib
+.temp 27
+.option gmin=1e-12
+V1 c 0 0
+Vs c s 0
+Vb c b 0
+Vps c ps 0
+Vpb c pb 0
+Xs 0 s dantenna
+Xb 0 b dantenna l=27.78u w=1.26u
+Xps 0 ps dpantenna
+Xpb 0 pb dpantenna l=27.78u w=1.26u
+.control
+dc V1 0.0 0.2 0.0005
+set wr_singlescale
+set wr_vecnames
+option numdgt=9
+wrdata dsw.txt i(vs) i(vb) i(vps) i(vpb) @d.xs.d1[id] @d.xs.d2[id] @d.xs.d3[id] @d.xs.d1[gd] @d.xb.d1[gd]
+.endc
+.end
+EOF
+ngspice -b dsw.sp 2>&1 | grep -i -v "^$" | head; python3 - <<'EOF'
+import numpy as np
+l=open('dsw.txt').read().split('\n'); h=l[0].split(); a=np.array([[float(x) for x in r.split()] for r in l[1:] if r.split()])
+print(h)
+for r in a[::10]: print(' '.join('%11.4e'%x for x in r))
+# jumps
+for i,n in enumerate(h[1:],1):
+    d=np.diff(a[:,i]); k=np.argmax(np.abs(d)); print(n, 'max step %.3e at v=%.4f (typical %.3e)'%(d[k],a[k,0],np.median(np.abs(d))))
+EOF
+```
+
+## Tool results / harness — 2026-11-25 04:10:06 UTC
+
+**Tool result:**
+
+```
+Note: No compatibility mode selected!
+Circuit: * dantenna / dpantenna reverse current near vd = -3 n vt (cathode swept, anode 0)
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+Using SPARSE 1.3 as Direct Linear Solver
+No. of Data Rows : 401
+Note: Simulation executed from .control section 
+['v-sweep', 'i(vs)', 'i(vb)', 'i(vps)', 'i(vpb)', '@d.xs.d1[id]', '@d.xs.d2[id]', '@d.xs.d3[id]', '@d.xs.d1[gd]', '@d.xb.d1[gd]']
+ 0.0000e+00  1.7643e-33  3.4249e-37  7.5650e-41 -4.9215e-52 -4.0999e-11 -2.0003e-13 -2.0000e-13  3.3257e-11  3.3258e-11
+ 5.0000e-03  1.5003e-14  1.5058e-14  1.5002e-14  1.5040e-14 -4.0999e-11 -2.0003e-13 -2.0000e-13  3.3257e-11  3.3258e-11
+ 1.0000e-02  3.0006e-14  3.0110e-14  3.0004e-14  3.0077e-14 -4.0999e-11 -2.0003e-13 -2.0000e-13  3.3257e-11  3.3258e-11
+ 1.5000e-02  4.5008e-14  4.5158e-14  4.5006e-14  4.5110e-14 -4.0999e-11 -2.0003e-13 -2.0000e-13  3.3257e-11  3.3258e-11
+ 2.0000e-02  6.0010e-14  6.0201e-14  6.0007e-14  6.0140e-14 -4.0999e-11 -2.0003e-13 -2.0000e-13  3.3257e-11  3.3258e-11
+ 2.5000e-02  7.5012e-14  7.5240e-14  7.5009e-14  7.5167e-14 -4.0999e-11 -2.0003e-13 -2.0000e-13  3.3257e-11  3.3258e-11
+ 3.0000e-02  9.0014e-14  9.0276e-14  9.0010e-14  9.0192e-14 -4.0999e-11 -2.0003e-13 -2.0000e-13  3.3257e-11  3.3258e-11
+ 3.5000e-02  1.0502e-13  1.0531e-13  1.0501e-13  1.0521e-13 -4.0999e-11 -2.0003e-13 -2.0000e-13  3.3257e-11  3.3258e-11
+ 4.0000e-02  1.2002e-13  1.2034e-13  1.2001e-13  1.2024e-13 -4.0999e-11 -2.0003e-13 -2.0000e-13  3.3257e-11  3.3
+… [4397 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:10:18 UTC
+
+**Tool call: `Bash`**
+
+_Isolate which diode model has the jump_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/t; cat > dsw2.sp <<'EOF'
+* the three dantenna component models, cathode swept near 3 n Vt (anode 0), 27 C
+.include /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/diodes.lib
+.temp 27
+.option gmin=1e-12
+V1 c 0 0
+Va c a 0
+Vp c p 0
+Vk c k 0
+Da1 0 a darea area=1
+Dp1 0 p dperim area=1
+Dk1 0 k dcorner area=1
+.control
+dc V1 0.07 0.09 0.0001
+set wr_singlescale
+set wr_vecnames
+option numdgt=9
+wrdata dsw2.txt i(va) i(vp) i(vk)
+.endc
+.end
+EOF
+ngspice -b dsw2.sp >/dev/null 2>&1; python3 - <<'EOF'
+import numpy as np
+l=open('dsw2.txt').read().split('\n'); h=l[0].split(); a=np.array([[float(x) for x in r.split()] for r in l[1:] if r.split()])
+for i,n in enumerate(h[1:],1):
+    d=np.diff(a[:,i]); k=np.argmax(np.abs(d)); print(n, 'max step %.4e A between v=%.4f and %.4f (typical %.3e); I before %.4e after %.4e'%(d[k],a[k,0],a[k+1,0],np.median(np.abs(d)),a[k,i],a[k+1,i]))
+EOF
+```
+
+## Tool results / harness — 2026-11-25 04:20:19 UTC
+
+**Tool result:**
+
+```
+Command did not complete within its 600s timeout and was moved to the background (ID: bv43j2iwp). Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bv43j2iwp.output. You will be notified when it completes. If it is still running after 30m in the background, it will be stopped and you will be notified. It is running now: do not start a second copy while it runs. If it is no longer needed, stop it with TaskStop. No output had been read from it when it was moved. A program that buffers its output, or a pipe into one such as tail, can keep the output file empty until the command finishes. To check interim output, use Read on that file path.
+Session cwd remains /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps; directory changes made by the backgrounded command do not apply to subsequent commands.
+```
+
+## Assistant — 2026-11-25 04:20:25 UTC
+
+**Tool call: `Bash`**
+
+_Kill stuck ngspice sweep_
+
+```bash
+pkill -f "ngspice -b dsw2.sp"; sleep 1; ps aux | grep ngspice | grep -v grep | cut -c1-150; ls /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/t/
+```
+
+## Tool results / harness — 2026-11-25 04:20:27 UTC
+
+**Tool result:**
+
+```
+root      4203 99.5  0.0      0     0 ?        Z    04:10  10:04 [ngspice] <defunct>
+d.sp
+dsw.sp
+dsw.txt
+dsw2.sp
+sg13cmos5l_IOPadDiff2Single.fixed.spice
+sg13cmos5l_IOPadSingle2Diff.fixed.spice
+```
+
+## Assistant — 2026-11-25 04:20:34 UTC
+
+**Tool call: `Bash`**
+
+_Check unfixed control sine run_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; cat $K/sine_orig.log; ls $K/w/out_orig/slot; grep -a -i "timestep\|abort" $K/w/out_orig/slot/*.log | cut -c1-200
+```
+
+## Tool results / harness — 2026-11-25 04:20:34 UTC
+
+**Tool result:**
+
+```
+slot_klayout_tt_27_3.3_sine_open FAILED (rshunt retry)
+
+real	0m45.000s
+user	0m58.337s
+sys	0m27.430s
+slot_klayout_tt_27_3.3_sine_open.aid
+slot_klayout_tt_27_3.3_sine_open.log
+slot_klayout_tt_27_3.3_sine_open.op
+doAnalyses: TRAN:  Timestep too small; time = 6.59723e-05, timestep = 4.88281e-20: trouble with node "v.xs.vsv0#branch"
+tran simulation(s) aborted
+doAnalyses: TRAN:  Timestep too small; time = 6.59723e-05, timestep = 4.88281e-20: trouble with node "v.xs.vsv0#branch"
+tran simulation(s) aborted
+```
+
+## Assistant — 2026-11-25 04:20:45 UTC
+
+**Tool call: `Bash`**
+
+_Sweep each diode component model separately_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/t; for mdl in darea dperim dcorner dparea dpperim dpcorner; do cat > m_$mdl.sp <<EOF
+* $mdl alone, area 1, cathode swept (anode 0), 27 C
+.include /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/diodes.lib
+.temp 27
+.option gmin=1e-12
+V1 c 0 0
+D1 0 c $mdl area=1
+.control
+dc V1 0.0 0.2 0.0005
+set wr_singlescale
+set wr_vecnames
+option numdgt=9
+wrdata m_$mdl.txt i(v1)
+.endc
+.end
+EOF
+timeout 60 ngspice -b m_$mdl.sp >m_$mdl.log 2>&1; echo "$mdl exit $?"; done; python3 - <<'EOF'
+import numpy as np,glob
+for f in sorted(glob.glob('m_*.txt')):
+    l=open(f).read().split('\n'); a=np.array([[float(x) for x in r.split()] for r in l[1:] if r.split()])
+    d=np.diff(a[:,1]); k=np.argmax(np.abs(d)); print(f, len(a),'max step %.4e A between v=%.4f and %.4f (median step %.3e)'%(d[k],a[k,0],a[k+1,0],np.median(np.abs(d))))
+EOF
+```
+
+## Tool results / harness — 2026-11-25 04:20:45 UTC
+
+**Tool result:**
+
+```
+darea exit 0
+dperim exit 0
+dcorner exit 0
+dparea exit 0
+dpperim exit 0
+dpcorner exit 0
+m_darea.txt 401 max step -3.7063e-11 A between v=0.0780 and 0.0785 (median step 1.541e-14)
+m_dcorner.txt 401 max step -5.0000e-16 A between v=0.0000 and 0.0005 (median step 5.000e-16)
+m_dparea.txt 401 max step -5.0000e-16 A between v=0.0000 and 0.0005 (median step 5.000e-16)
+m_dpcorner.txt 401 max step -5.0000e-16 A between v=0.0000 and 0.0005 (median step 5.000e-16)
+m_dperim.txt 401 max step -5.0107e-16 A between v=0.0790 and 0.0795 (median step 5.000e-16)
+m_dpperim.txt 401 max step -5.0007e-16 A between v=0.0000 and 0.0005 (median step 5.000e-16)
+```
+
+## Assistant — 2026-11-25 04:21:19 UTC
+
+**Tool call: `Bash`**
+
+_Launch ss -40 C mode DC runs with fixed diodes_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps; mkdir -p $K/w/modes_fixed $K/w/modes_out_fixed; cp /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/.spiceinit $K/w/modes_fixed/; cd $K; export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1
+for j in swap mon feed ext swap+feed; do (time timeout 1200 python3 -I $D/klayout_pad_diodes/run_fixed.py $D/slot_modes_bg/slot_modes.py $K/w/modes_fixed $K/w/tier1 $K/w/modes_fixed/$j $K/w/modes_out_fixed/$j $j:ss:-40:3.0:dcop) > $K/modes_$j.log 2>&1 & done; sleep 2; sed -n 129,157p $D/slot_modes_bg/slot_modes.py
+```
+
+## Tool results / harness — 2026-11-25 04:21:21 UTC
+
+**Tool result:**
+
+```
+[1]   Done                    ( time timeout 1200 python3 -I $D/klayout_pad_diodes/run_fixed.py $D/slot_modes_bg/slot_modes.py $K/w/modes_fixed $K/w/tier1 $K/w/modes_fixed/$j $K/w/modes_out_fixed/$j $j:ss:-40:3.0:dcop ) > $K/modes_$j.log 2>&1
+[2]   Done                    ( time timeout 1200 python3 -I $D/klayout_pad_diodes/run_fixed.py $D/slot_modes_bg/slot_modes.py $K/w/modes_fixed $K/w/tier1 $K/w/modes_fixed/$j $K/w/modes_out_fixed/$j $j:ss:-40:3.0:dcop ) > $K/modes_$j.log 2>&1
+[3]   Done                    ( time timeout 1200 python3 -I $D/klayout_pad_diodes/run_fixed.py $D/slot_modes_bg/slot_modes.py $K/w/modes_fixed $K/w/tier1 $K/w/modes_fixed/$j $K/w/modes_out_fixed/$j $j:ss:-40:3.0:dcop ) > $K/modes_$j.log 2>&1
+[4]-  Done                    ( time timeout 1200 python3 -I $D/klayout_pad_diodes/run_fixed.py $D/slot_modes_bg/slot_modes.py $K/w/modes_fixed $K/w/tier1 $K/w/modes_fixed/$j $K/w/modes_out_fixed/$j $j:ss:-40:3.0:dcop ) > $K/modes_$j.log 2>&1
+[5]+  Done                    ( time timeout 1200 python3 -I $D/klayout_pad_diodes/run_fixed.py $D/slot_modes_bg/slot_modes.py $K/w/modes_fixed $K/w/tier1 $K/w/modes_fixed/$j $K/w/modes_out_fixed/$j $j:ss:-40:3.0:dcop ) > $K/modes_$j.log 2>&1
+def deck_dcop(name, c, t, v, incs, var="dcop"):
+    """The designer's DC sweep (run_modes.py deck) unchanged, for the record of how it fails (stderr kept).
+    var "dcns": the same plus .nodeset of the bandgap nodes at their running state (diagnosis only)."""
+    bits, kind = MODES[na
+… [893 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:21:28 UTC
+
+**Tool call: `Bash`**
+
+_Check mode run log_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; tail -5 $K/modes_swap.log; ls $K/w/modes_out_fixed/swap $K/w/modes_fixed/swap
+```
+
+## Tool results / harness — 2026-11-25 04:21:28 UTC
+
+**Tool result:**
+
+```
+ROW {'mode': 'swap', 'mos': 'ss', 'temp': -40, 'vdd': 3.0, 'variant': 'dcop', 'cload': '', 'err_max_mV': 'FAILED', 'v_g_V': '', 'solver_notes': ''}
+
+real	0m0.334s
+user	0m0.283s
+sys	0m0.024s
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/w/modes_fixed/swap:
+bias_dist_pd_flat.spice
+dcop_swap_ss_-40_3.0.log
+dcop_swap_ss_-40_3.0.spice
+pad_ref_rb_flat.spice
+sg13cmos5l_IOPadDiff2Single_flat.spice
+sg13cmos5l_IOPadSingle2Diff_flat.spice
+
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/w/modes_out_fixed/swap:
+slot_modes_dcop.csv
+```
+
+## Assistant — 2026-11-25 04:21:31 UTC
+
+**Tool call: `Bash`**
+
+_Read ngspice log of failed mode run_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; head -30 $K/w/modes_fixed/swap/dcop_swap_ss_-40_3.0.log; head -3 $K/modes_swap.log | cut -c1-150
+```
+
+## Tool results / harness — 2026-11-25 04:21:31 UTC
+
+**Tool result:**
+
+```
+Note: No compatibility mode selected!
+
+
+Circuit: * slot 7 mode swap dc as run_modes.py, ss -40 c, 3.0 v
+
+
+#### stderr
+Warning: Model issue on line 1603 :
+  .model xs.xc.xle.xn1:sg13g2_hv_nmos_psp psp103va type=+1 level=103.60 tr ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 1604 :
+  .model xs.xc.xle.xn1:sg13g2_hv_nmos_psp_rf pspnqs103va type=+1 level=103 ...
+Unknown model type pspnqs103va - ignored
+
+Warning: Model issue on line 1624 :
+  .model xs.xc.xle.xn1:sg13g2_hv_pmos_psp psp103va type=-1 level=103.60 tr ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 1625 :
+  .model xs.xc.xle.xn1:sg13g2_hv_pmos_psp_rf pspnqs103va type=-1 level=103 ...
+Unknown model type pspnqs103va - ignored
+
+Error on line 1631 or its substitute:
+  n.xs.xc.xle.xn1.nsg13_hv_nmos xs.xc.xle.x enable 0 0 xs.xc.xle.xn1:sg13g2_hv_nmos_psp w=    1.000000000000000e-06     l=    4.500000000000000e-07     nf=    1.000000000000000e+00     mult=    1.000000000000000e+00     as=    3.400000000000000e-13     ad=    3.400000000000000e-13     ps=    2.680000000000000e-06     pd=    2.680000000000000e-06     dta=    0.000000000000000e+00     ngcon=2 delvto=0 factuo=1
+Unable to find definition of model xs.xc.xle.xn1:sg13g2_hv_nmos_psp
+    Simulation interrupted due to error!
+
+Error: incomplete or empty netlist
+fix_diodes sg13cmos5l_IOPadSingle2Diff: X$63 pad iovdd dpantenna a=35.0028p p=58.08u m=2  ->  X$63 pad iovdd dpantenna l=27.78u w=1.26u m=2   (DEV_A 3
+fix_diodes sg1
+… [287 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:21:39 UTC
+
+**Tool call: `Bash`**
+
+_Relaunch mode DC runs with spiceinit_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps; cd $K; export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1
+for j in swap mon feed ext swap+feed; do mkdir -p $K/w/modes_fixed/$j; cp /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/.spiceinit $K/w/modes_fixed/$j/; rm -f $K/w/modes_out_fixed/$j/*; (time timeout 1200 python3 -I $D/klayout_pad_diodes/run_fixed.py $D/slot_modes_bg/slot_modes.py $K/w/modes_fixed $K/w/tier1 $K/w/modes_fixed/$j $K/w/modes_out_fixed/$j $j:ss:-40:3.0:dcop) > $K/modes_$j.log 2>&1 & done; sleep 30; grep -h ROW $K/modes_*.log
+```
+
+## Tool results / harness — 2026-11-25 04:22:10 UTC
+
+**Tool result:**
+
+```
+(Bash completed with no output)
+```
+
+## Assistant — 2026-11-25 04:22:16 UTC
+
+**Tool call: `Bash`**
+
+_Check diode jump vs temperature_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/t; for T in -40 27 125; do for mdl in darea dparea; do sed -e "s/.temp 27/.temp $T/" -e "s/m_$mdl.txt/mT_${mdl}_$T.txt/" m_$mdl.sp > mT_${mdl}_$T.sp; timeout 60 ngspice -b mT_${mdl}_$T.sp > /dev/null 2>&1; done; done; python3 - <<'EOF'
+import numpy as np,glob
+for f in sorted(glob.glob('mT_*.txt')):
+    l=open(f).read().split('\n'); a=np.array([[float(x) for x in r.split()] for r in l[1:] if r.split()])
+    d=np.diff(a[:,1]); k=np.argmax(np.abs(d)); print(f, 'max step %.4e A between v=%.4f and %.4f (median step %.3e)'%(d[k],a[k,0],a[k+1,0],np.median(np.abs(d))))
+EOF
+```
+
+## Tool results / harness — 2026-11-25 04:22:17 UTC
+
+**Tool result:**
+
+```
+mT_darea_-40.txt max step -2.4595e-12 A between v=0.0605 and 0.0610 (median step 1.803e-15)
+mT_darea_125.txt max step -3.7845e-10 A between v=0.1035 and 0.1040 (median step 9.383e-16)
+mT_darea_27.txt max step -3.7063e-11 A between v=0.0780 and 0.0785 (median step 1.541e-14)
+mT_dparea_-40.txt max step -5.0000e-16 A between v=0.1405 and 0.1410 (median step 5.000e-16)
+mT_dparea_125.txt max step -6.6925e-16 A between v=0.0000 and 0.0005 (median step 5.094e-16)
+mT_dparea_27.txt max step -5.0000e-16 A between v=0.0000 and 0.0005 (median step 5.000e-16)
+```
+
+## Assistant — 2026-11-25 04:22:30 UTC
+
+**Tool call: `Bash`**
+
+_Minimal transient: pad diode alone driven by sine_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/t; for v in "default:" "sized:l=27.78u w=1.26u"; do n=${v%%:*}; p=${v#*:}; cat > tr_$n.sp <<EOF
+* S2D pad diode X\$65 alone: ideal 10 kHz sine 0 ... 1 V on the cathode, anode 0 (as in the slot deck), 27 C
+.include /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/diodes.lib
+.temp 27
+.option gmin=1e-12 method=gear
+V1 c 0 dc 0.5 sin(0.5 0.5 10k)
+X65 0 c dantenna $p m=2
+.control
+tran 39.0625n 100u 0 39.0625n
+echo "TRDONE"
+.endc
+.end
+EOF
+timeout 120 ngspice -b tr_$n.sp 2>&1 | grep -a -i "timestep\|TRDONE\|abort" | cut -c1-200 | sed "s/^/$n: /"; done
+```
+
+## Tool results / harness — 2026-11-25 04:22:30 UTC
+
+**Tool result:**
+
+```
+default: doAnalyses: TRAN:  Timestep too small; time = 6.59723e-05, timestep = 4.88281e-20: trouble with darea-instance d.x65.d1
+default: tran simulation(s) aborted
+default: TRDONE
+sized: TRDONE
+```
+
+## Assistant — 2026-11-25 04:22:42 UTC
+
+**Tool call: `Bash`**
+
+_Test tolerance window theory_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/t; for vn in 1e-7 1e-8; do sed "s/method=gear/method=gear vntol=$vn/" tr_sized.sp > tr_sized_$vn.sp; timeout 120 ngspice -b tr_sized_$vn.sp 2>&1 | grep -a -i "timestep\|TRDONE\|abort" | cut -c1-200 | sed "s/^/sized vntol=$vn: /"; done; sed "s/method=gear/method=gear vntol=2e-5/" tr_default.sp > tr_default_2e-5.sp; timeout 120 ngspice -b tr_default_2e-5.sp 2>&1 | grep -a -i "timestep\|TRDONE\|abort" | sed "s/^/default vntol=2e-5: /"; grep -h ROW /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/modes_*.log
+```
+
+## Tool results / harness — 2026-11-25 04:22:43 UTC
+
+**Tool result:**
+
+```
+sized vntol=1e-7: TRDONE
+sized vntol=1e-8: TRDONE
+default vntol=2e-5: doAnalyses: TRAN:  Timestep too small; time = 6.59723e-05, timestep = 4.88281e-20: trouble with darea-instance d.x65.d1
+default vntol=2e-5: tran simulation(s) aborted
+default vntol=2e-5: TRDONE
+```
+
+## Assistant — 2026-11-25 04:23:10 UTC
+
+**Tool call: `Bash`**
+
+_Diagnose which darea parameter causes abort_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/t; M=/foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/diodes.lib
+run() { n=$1; sz=$2; sedexp=$3; sed "$sedexp" $M > lib_$n.lib; cat > x_$n.sp <<EOF
+* diagnosis $n
+.include lib_$n.lib
+.temp 27
+.option gmin=1e-12 method=gear
+V1 c 0 dc 0.5 sin(0.5 0.5 10k)
+X65 0 c dantenna $sz m=2
+.control
+tran 39.0625n 100u 0 39.0625n
+echo "TRDONE"
+.endc
+.end
+EOF
+r=$(timeout 120 ngspice -b x_$n.sp 2>&1 | grep -a -i "timestep too small" | cut -c1-120); echo "$n: ${r:-runs through}"; }
+run def_ref "" "s/xx/xx/"
+run def_noibv "" "/MODEL darea/s/ibv=3.458E-007/ibv=1E-030/"
+run def_rs0 "" "/MODEL darea/s/rs=2.193E+005/rs=0/"
+run def_tt0 "" "/MODEL darea/s/tt=7.009E-007/tt=0/"
+run def_cj0 "" "/MODEL darea/s/cj0=9.371E-016/cj0=0/"
+run siz_ref "l=27.78u w=1.26u" "s/xx/xx/"
+run siz_rs57 "l=27.78u w=1.26u" "/MODEL darea/s/rs=2.193E+005/rs=1.2614E+007/"
+run siz_cj57 "l=27.78u w=1.26u" "/MODEL darea/s/cj0=9.371E-016/cj0=1.6268E-017/"
+```
+
+## Tool results / harness — 2026-11-25 04:25:11 UTC
+
+**Tool result:**
+
+```
+def_ref: doAnalyses: TRAN:  Timestep too small; time = 6.59723e-05, timestep = 4.88281e-20: trouble with darea-instance d.x65.d1
+def_noibv: runs through
+def_rs0: runs through
+def_tt0: runs through
+def_cj0: runs through
+siz_ref: runs through
+siz_rs57: runs through
+siz_cj57: runs through
+```
+
+## Assistant — 2026-11-25 04:25:23 UTC
+
+**Tool call: `Bash`**
+
+_Combined rs/cj scaling and trap method test_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/t; M=/foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/diodes.lib
+run() { n=$1; sz=$2; sedexp=$3; sed "$sedexp" $M > lib_$n.lib; cat > x_$n.sp <<EOF
+* diagnosis $n
+.include lib_$n.lib
+.temp 27
+.option gmin=1e-12 method=gear
+V1 c 0 dc 0.5 sin(0.5 0.5 10k)
+X65 0 c dantenna $sz m=2
+.control
+tran 39.0625n 100u 0 39.0625n
+echo "TRDONE"
+.endc
+.end
+EOF
+r=$(timeout 120 ngspice -b x_$n.sp 2>&1 | grep -a -i "timestep too small" | cut -c1-120); echo "$n: ${r:-runs through}"; }
+run siz_rs57_cj57 "l=27.78u w=1.26u" "/MODEL darea/s/rs=2.193E+005/rs=1.2614E+007/;/MODEL darea/s/cj0=9.371E-016/cj0=1.6268E-017/"
+run def_trap "" "s/xx/xx/" ; sed -i "s/method=gear/method=trap/" x_def_trap.sp; r=$(timeout 120 ngspice -b x_def_trap.sp 2>&1 | grep -a -i "timestep too small" | cut -c1-120); echo "def trap: ${r:-runs through}"
+grep -h ROW /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/modes_*.log
+```
+
+## Tool results / harness — 2026-11-25 04:25:23 UTC
+
+**Tool result:**
+
+```
+siz_rs57_cj57: doAnalyses: TRAN:  Timestep too small; time = 6.59723e-05, timestep = 4.88281e-20: trouble with dperim-instance d.x65.d2
+def_trap: doAnalyses: TRAN:  Timestep too small; time = 6.59723e-05, timestep = 4.88281e-20: trouble with darea-instance d.x65.d1
+def trap: doAnalyses: TRAN:  Timestep too small; time = 6.59723e-05, timestep = 4.88281e-20: trouble with darea-instance d.x65.d1
+ROW {'mode': 'ext', 'mos': 'ss', 'temp': -40, 'vdd': 3.0, 'variant': 'dcop', 'cload': '', 'err_max_mV': 'FAILED', 'v_g_V': '', 'solver_notes': 'Error: Transient op failed, timestep too small; Note: Starting dynamic gmin stepping; Note: Starting source stepping; Note: Starting true gmin stepping; Note: Transient op started; Warning: Dynamic gmin stepping failed; Warning: True gmin stepping failed; Warning: source stepping failed'}
+ROW {'mode': 'feed', 'mos': 'ss', 'temp': -40, 'vdd': 3.0, 'variant': 'dcop', 'cload': '', 'err_max_mV': 'FAILED', 'v_g_V': '', 'solver_notes': 'Error: Transient op failed, timestep too small; Note: Starting dynamic gmin stepping; Note: Starting source stepping; Note: Starting true gmin stepping; Note: Transient op started; Warning: Dynamic gmin stepping failed; Warning: True gmin stepping failed; Warning: source stepping failed'}
+ROW {'mode': 'mon', 'mos': 'ss', 'temp': -40, 'vdd': 3.0, 'variant': 'dcop', 'cload': '', 'err_max_mV': 'FAILED', 'v_g_V': '', 'solver_notes': 'Error: Transient op failed, timestep too small; Note: Starting dynamic gmin stepping; Note:
+… [1073 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:25:28 UTC
+
+**Tool call: `Bash`**
+
+_Find failing instance in fixed ss -40 C runs_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; for j in swap mon feed ext swap+feed; do echo "== $j"; grep -a -i "trouble\|timestep too small" $K/w/modes_fixed/$j/*.log | sort | uniq -c | head -5 | cut -c1-200; grep real $K/modes_$j.log; grep -c "dpantenna l=" $K/w/modes_fixed/$j/sg13cmos5l_IOPadDiff2Single_flat.spice; done
+```
+
+## Tool results / harness — 2026-11-25 04:25:29 UTC
+
+**Tool result:**
+
+```
+== swap
+      1 Error: Transient op failed, timestep too small
+      1 doAnalyses: DC:  Timestep too small;  vin = 0: trouble with dparea-instance d.x2s.xlay.x$63.d1
+real	2m7.053s
+3
+== mon
+      1 Error: Transient op failed, timestep too small
+      1 doAnalyses: DC:  Timestep too small;  vin = 0: trouble with dparea-instance d.x2s.xlay.x$63.d1
+real	2m4.731s
+3
+== feed
+      1 Error: Transient op failed, timestep too small
+      1 doAnalyses: OP:  Timestep too small; trouble with dparea-instance d.x2s.xlay.x$63.d1
+real	2m6.874s
+3
+== ext
+      1 Error: Transient op failed, timestep too small
+      1 doAnalyses: DC:  Timestep too small;  vin = 0: trouble with dparea-instance d.x2s.xlay.x$63.d1
+real	1m55.729s
+3
+== swap+feed
+      1 Error: Transient op failed, timestep too small
+      1 doAnalyses: OP:  Timestep too small; trouble with dparea-instance d.x2s.xlay.x$63.d1
+real	2m1.491s
+3
+```
+
+## Assistant — 2026-11-25 04:25:45 UTC
+
+**Tool call: `Bash`**
+
+_Locate stage where klayout DC range differs_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; python3 - <<EOF
+import numpy as np
+def ld(f):
+    l=open(f).read().split('\n'); h=l[0].split(); a=np.array([[float(x) for x in r.split()] for r in l[1:] if len(r.split())==len(h)]); return {n:a[:,i] for i,n in enumerate(h)}
+S=ld('$K/w/out_orig/rt/rt_schematic_tt_27_3.3.csv'); Kl=ld('$K/w/out_fixed/rt/rt_klayout_tt_27_3.3.csv')
+for x0 in (0.0,0.5,1.0,1.2,1.24,1.26,1.28,1.3,1.35,1.4):
+    i=np.argmin(abs(S['v(padin)']-x0))
+    row=[]
+    for d in (S,Kl):
+        row += [d['v(outp)'][i]-d['v(outn)'][i], (d['v(outp)'][i]+d['v(outn)'][i])/2, d['v(vinp)'][i]-d['v(vinn)'][i], d['v(padout)'][i]]
+    print('%.3f sch: vd %.4f cm %.4f vd2 %.4f out %.4f | kl: vd %.4f cm %.4f vd2 %.4f out %.4f'%(x0,*row))
+EOF
+```
+
+## Tool results / harness — 2026-11-25 04:25:45 UTC
+
+**Tool result:**
+
+```
+0.000 sch: vd -0.9827 cm 1.2691 vd2 -0.9827 out 0.7652 | kl: vd -0.9827 cm 1.2352 vd2 -0.9827 out 0.7653
+0.500 sch: vd 0.0155 cm 1.2684 vd2 0.0155 out 1.2644 | kl: vd 0.0155 cm 1.2358 vd2 0.0155 out 1.2644
+1.000 sch: vd 1.0144 cm 1.2684 vd2 1.0144 out 1.7638 | kl: vd 1.0145 cm 1.2344 vd2 1.0145 out 1.7638
+1.200 sch: vd 1.4139 cm 1.2691 vd2 1.4139 out 1.9634 | kl: vd 1.4137 cm 1.2329 vd2 1.4137 out 1.9632
+1.240 sch: vd 1.4935 cm 1.2696 vd2 1.4935 out 2.0031 | kl: vd 1.4927 cm 1.2327 vd2 1.4927 out 2.0026
+1.260 sch: vd 1.5330 cm 1.2700 vd2 1.5330 out 2.0229 | kl: vd 1.5316 cm 1.2328 vd2 1.5316 out 2.0220
+1.280 sch: vd 1.5723 cm 1.2706 vd2 1.5723 out 2.0425 | kl: vd 1.5700 cm 1.2332 vd2 1.5700 out 2.0412
+1.300 sch: vd 1.6111 cm 1.2714 vd2 1.6111 out 2.0619 | kl: vd 1.6077 cm 1.2337 vd2 1.6077 out 2.0600
+1.350 sch: vd 1.7061 cm 1.2750 vd2 1.7061 out 2.1092 | kl: vd 1.6984 cm 1.2365 vd2 1.6984 out 2.1054
+1.400 sch: vd 1.7971 cm 1.2818 vd2 1.7971 out 2.1542 | kl: vd 1.7813 cm 1.2421 vd2 1.7813 out 2.1471
+```
+
+## Assistant — 2026-11-25 04:25:56 UTC
+
+**Tool call: `Bash`**
+
+_Compare resistor definitions and instances_
+
+```bash
+cd /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models; grep -n -i -A12 "^.subckt rhigh\|^.subckt rppd" resistors_mod.lib | head -50; A=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran/w; grep -i "rhigh\|rppd\|rsil" $A/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/netlist/schematic/sg13cmos5l_IOPadSingle2Diff.spice | head -30; grep -i "rhigh\|rppd" $A/tier1/macros/sg13cmos5l_IOPadSingle2Diff/netlist/layout/sg13cmos5l_IOPadSingle2Diff_klayout.cir
+```
+
+## Tool results / harness — 2026-11-25 04:25:56 UTC
+
+**Tool result:**
+
+```
+107:.subckt rhigh 1 2 bn
+108-.param w=0.5e-6 l=0.96e-6 mm_ok=0 b=0 trise=0 m=1 sw_et=0
+109-+postsim=0
+110-+kappa=1.85
+111-+ps=0.18e-6
+112-+weff=w+dw_rhigh_par
+113-+leff=(b+1)*l+(2/kappa*weff+ps)*b
+114-+lhead=0.86e-6
+115-+rzspec=80e-6
+116-+cax=90e-18
+117-+cpx=25e-18
+118-+ax=175e-18*(1-1/(1.5*leff*1e6+1))/cax
+119-+px=115e-18/cpx
+--
+169:.subckt rppd 1 2 bn
+170-.param w=0.5e-6 l=0.5e-6 mm_ok=0 b=0 ps=0.18e-6 trise=0 m=1 sw_et=0
+171-+postsim=0
+172-+kappa=1.85
+173-+weff=w+dw_rppd_par
+174-+leff=(b+1)*l+(2/kappa*weff+ps)*b
+175-+lhead=0.86e-6
+176-+rzspec=35e-6
+177-+cax=90e-18
+178-+cpx=25e-18
+179-+ax=175e-18*(1-1/(1.5*leff*1e6+1))/cax
+180-+px=115e-18/cpx
+181-+a0=0.5*(leff+lhead)*w-(postsim>0)*w*ax*1e-6
+XRD[1] vss vss vss rhigh w=0.5u l=12.65u m=1 b=0 mm_ok=1
+XRD[0] vss vss vss rhigh w=0.5u l=12.65u m=1 b=0 mm_ok=1
+XRP iovdd gp iovss rppd w=0.5u l=12.9u m=1 b=0 mm_ok=1
+XRN gn iovss iovss rppd w=0.5u l=3.54u m=1 b=0 mm_ok=1
+XR[3] sa n1 vss rhigh w=0.5u l=12.65u m=1 b=0 mm_ok=1
+XR[2] n1 n2 vss rhigh w=0.5u l=12.65u m=1 b=0 mm_ok=1
+XR[1] n2 n3 vss rhigh w=0.5u l=12.65u m=1 b=0 mm_ok=1
+XR[0] n3 sb vss rhigh w=0.5u l=12.65u m=1 b=0 mm_ok=1
+R$1 iovdd \$I9 iovss rppd w=0.5u l=12.9u ps=0u b=0 m=1
+R$2 iovss \$I8 iovss rppd w=0.5u l=3.54u ps=0u b=0 m=1
+R$112 iovss iovss iovss rhigh w=0.5u l=12.65u ps=0u b=0 m=2
+R$126 \$I33 \$I26 iovss rhigh w=0.5u l=50.6u ps=0u b=0 m=1
+R$127 \$I34 \$I29 iovss rhigh w=0.5u l=50.6u ps=0u b=0 m=1
+R$128 \$I25 \$I22 iovss rhigh w=0.5u l=50.6u ps=0u b=0 m=1
+R$129 \$I24
+… [165 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:26:09 UTC
+
+**Tool call: `Bash`**
+
+_Inspect ac_tran rt.py sine evaluation_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/ac_tran; grep -n "def \|^import\|^from\|sys.path" rt.py common.py | head -40; grep -n "sine" rt.py | head -30; grep "sine" csv/rt_*summary*.csv | head; ls csv
+```
+
+## Tool results / harness — 2026-11-25 04:26:09 UTC
+
+**Tool result:**
+
+```
+rt.py:11:import csv
+rt.py:12:import glob
+rt.py:13:import os
+rt.py:14:import re
+rt.py:15:import sys
+rt.py:17:import numpy as np
+rt.py:19:from common import COLOR, first_fall, logx_interp, last_cross, plt, save, style, title
+rt.py:33:def rd(path):
+rt.py:40:def tag(view, pt, ana, load=None):
+rt.py:45:def get(sdir, view, pt, ana, load=None, sfx=None):
+rt.py:50:def ac_scalars(d):
+rt.py:58:def step_scalars(d):
+rt.py:74:def harmonics(t, y, f0, n=7, t0=200e-6, periods=4):
+rt.py:84:def sine_scalars(d):
+rt.py:104:def plot_bode_tt(S, out):
+rt.py:133:def plot_bode_pvt(S, out):
+rt.py:161:def plot_f3(rows, out):
+rt.py:184:def plot_step_tt(S, out):
+rt.py:230:def plot_step_pvt(S, out):
+rt.py:258:def plot_sine(S, out):
+rt.py:302:def consistency(sdir, here, S, rows):
+rt.py:343:def main(sdir, here):
+common.py:5:import csv
+common.py:6:import gzip
+common.py:7:import os
+common.py:8:from collections import OrderedDict
+common.py:10:import numpy as np
+common.py:12:import importlib.util  # noqa: E402
+common.py:28:def save(fig, path, svg_max=60e3):
+common.py:40:def _f(x):
+common.py:47:def load(path):
+common.py:69:def scalars(path):
+common.py:86:def committed(path):
+common.py:94:def find(runs, **kw):
+common.py:110:def logx_interp(f, y, f0):
+common.py:114:def first_fall(f, y, level, i0=0):
+common.py:123:def cross_times(t, y, level):
+common.py:130:def first_cross(t, y, level, rising=True, t0=0.0, t1=np.inf):
+common.py:139:def last_cross(t, y, level, t0=0.0, t1=np.inf):
+common.py:146:def integrate_psd(f, v
+… [1236 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:26:14 UTC
+
+**Tool call: `Bash`**
+
+_Read sine scalar functions and summary CSV_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/ac_tran; sed -n 20,103p rt.py; sed -n 258,300p rt.py; cat csv/rt_sine_summary.csv; sed -n 1,40p common.py
+```
+
+## Tool results / harness — 2026-11-25 04:26:14 UTC
+
+**Tool result:**
+
+```
+VIEWS = ['schematic', 'pex', 'klayout']
+VN = {'schematic': 'schematic', 'pex': 'magic PEX', 'klayout': 'KLayout-extracted'}
+VLS = {'schematic': '-', 'pex': '--', 'klayout': ':'}
+POINTS = [('tt', 27, 3.3), ('ss', -40, 3.0), ('ff', 125, 3.6), ('fs', 125, 3.6), ('sf', -40, 3.0)]
+LOADS = ['open', '10p', '100p']
+LN = {'open': 'unloaded (1 GΩ)', '10p': '1 kΩ ∥ 10 pF', '100p': '1 kΩ ∥ 100 pF'}
+LC = {'open': '#2a78d6', '10p': '#1baf7a', '100p': '#eb6834'}
+PTN = lambda c, t, v: f'{c} {t} °C {v} V'  # noqa: E731
+COND = ('slot 7 default mode, tier-1 deck (replica bias pad_ref_rb: vref_s2d ≈ 0.49 V, vcm ≈ 1.26 V; iref from '
+        'the slot bandgap); load = 1 kΩ to an ideal copy of vref_d2s, CL to ground')
+
+
+def rd(path):
+    with open(path) as f:
+        head = f.readline().split()
+    a = np.loadtxt(path, skiprows=1, ndmin=2)
+    return {h: a[:, i] for i, h in enumerate(head)} if a.size else None
+
+
+def tag(view, pt, ana, load=None):
+    c, t, v = pt
+    return f'slot_{view}_{c}_{t}_{v}_{ana}' + (f'_{load}' if load else '')
+
+
+def get(sdir, view, pt, ana, load=None, sfx=None):
+    p = os.path.join(sdir, tag(view, pt, ana, None if ana == 'ac' else load) + '.' + (sfx or ana))
+    return rd(p) if os.path.exists(p) and os.path.getsize(p) > 0 else None
+
+
+def ac_scalars(d):
+    f, g = d['frequency'], d['g_db']
+    g1k = logx_interp(f, g, 1e3)
+    i0 = np.searchsorted(f, 1e3)
+    f3 = first_fall(f, g - g1k, -3.0, i0)
+    return {'G_1k_dB': g1k, 'f3dB': f3, 'Peak_dB': float((g - g1k)[i0:].max(
+… [8104 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:26:23 UTC
+
+**Tool call: `Bash`**
+
+_Run fixed 100p sine and all-PVT DC round trips_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps; cd $K; export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1; (time python3 -I $D/klayout_pad_diodes/run_fixed.py $D/ac_tran/slot.py $K/w/fixed_slot_runs $K/w $K/w/out_fixed/slot klayout:tt:27:3.3:sine:100p) > $K/sine100_fixed.log 2>&1 &
+python3 -I $D/klayout_pad_diodes/run_fixed.py $D/dc_curves/roundtrip.py $K/w/fixed_rt_runs $K/w $K/w/out_fixed/rt klayout:ss:-40:3.0 klayout:ff:125:3.6 klayout:fs:125:3.6 klayout:sf:-40:3.0 | grep -v fix_diodes; python3 -I $D/dc_curves/roundtrip.py $K/w $K/w/out_orig/rt klayout:ss:-40:3.0 klayout:ff:125:3.6 klayout:fs:125:3.6 klayout:sf:-40:3.0
+```
+
+## Tool results / harness — 2026-11-25 04:27:19 UTC
+
+**Tool result:**
+
+```
+rt_klayout_ss_-40_3.0 ok
+rt_klayout_ff_125_3.6 ok
+rt_klayout_fs_125_3.6 ok
+rt_klayout_sf_-40_3.0 ok
+rt_klayout_ss_-40_3.0 ok
+rt_klayout_ff_125_3.6 ok
+rt_klayout_fs_125_3.6 ok
+rt_klayout_sf_-40_3.0 ok
+```
+
+## Assistant — 2026-11-25 04:27:29 UTC
+
+**Tool call: `Skill`**
+
+```json
+{
+ "skill": "dataviz"
+}
+```
+
+## Tool results / harness — 2026-11-25 04:27:29 UTC
+
+**Tool result:**
+
+```
+Launching skill: dataviz
+```
+
+## User (or harness) — 2026-11-25 04:27:29 UTC
+
+Base directory for this skill: /tmp/claude-0/bundled-skills/2.1.331/70b50eb8280a9d3008d8398d8b64b086/dataviz
+
+# Data Visualization
+
+A chart is **read by people and executed by you**. This skill turns "make it look
+good" into a procedure with checks, so the result is right by construction rather
+than by taste.
+
+**The method here is design-system-agnostic.** Nothing in the procedure, the form
+heuristic, the six checks, or the mark specs is specific to one product. A design
+system supplies a small set of *parameters* (its ramps, a categorical order, a
+diverging pair, a status palette, a texture, its surfaces, its filter components);
+the method consumes them unchanged. A **validated default palette** is the
+reference instance, fully specified in `references/palette.md`. To target your
+brand, read that file's structure and substitute its values - touch nothing else.
+
+> The single most important habit: **the color part is computable, so compute it.**
+> Never eyeball whether a palette is colorblind-safe - run `scripts/validate_palette.js`.
+
+## The procedure - do these in order
+
+Color comes LAST. Most bad charts pick colors first.
+
+1. **Pick the form.** What is the data's job - magnitude, identity, polarity, a
+   single headline, change-over-time? The job picks the chart type, and sometimes
+   the answer is *not a chart* (a stat tile or hero number). -> `references/choosing-a-form.md`
+2. **Assign color by the job it does.** Categorical (identity), sequential
+   (magnitude), diverging (polarity), or status (state) - each has one rule.
+   Assign categorical hues in fixed order, never cycled. -> `references/color-formula.md`
+3. **VALIDATE the palette - run the script, don't reason about Delta E.**
+   `node scripts/validate_palette.js "<hex,hex,...>" --mode light` (relative to
+   this skill's base directory - or load it as `<script type="module">` in the
+   chart's own page, where it reads
+   `data-palette` off `<body>` and logs a `console.table` report). It returns
+   pass/fail on the lightness band, chroma floor, adjacent-pair CVD separation,
+   the normal-vision floor, and contrast. Fix anything that FAILs before continuing. Re-run for
+   `--mode dark` with that mode's surface.
+4. **Apply mark specs & spacers.** Thin marks, 4px rounded data-ends anchored to
+   the baseline, 2px lines, >=8px markers, a 2px surface gap between fills (stacked
+   segments and adjacent bars alike) and a 2px surface ring on overlapping marks,
+   selective direct labels. -> `references/marks-and-anatomy.md`
+5. **Add the hover layer - by default.** An HTML/SVG chart *is* interactive; ship
+   a crosshair+tooltip on line/area and a per-mark hover tooltip on bar/dot/cell.
+   The only form that skips it is a bare stat tile with no plot. Hit targets bigger
+   than the mark; filters in one row above the charts. -> `references/interaction.md`
+6. **Final accessibility pass.** For >= 2 series a legend is always present and <= 4
+   are also direct-labeled (a single series needs no legend box - the title names
+   it), so identity is never color-alone; a table view exists; dark mode is **selected** - its own
+   steps from the same ramps, validated against the dark surface, not an automatic
+   flip; texture is available for the CVD/print/forced-colors case.
+   One exception to direct name labels: the tall segmented bar (*Figures* in `references/marks-and-anatomy.md`).
+7. **Render it and look at it.** The validator checks color, not layout - open or
+   screenshot the output and eyeball it for label collisions, geometry, and overflow
+   before calling it done.
+
+Then check the result against **`references/anti-patterns.md`** - it is the catalog
+of what goes wrong. If your chart matches an entry, it's wrong.
+
+## Non-negotiables (true in every design system)
+
+- **Assign categorical hues in fixed order, never cycled.** A 9th series is never a
+  generated hue - it folds into "Other," small multiples, or composite encoding.
+- **One axis.** Never a dual-axis chart (two y-scales). Two measures of different
+  scale -> two charts, small multiples, or indexed to a common base. *(This is the
+  #1 chart mistake - see anti-patterns.)*
+- **Color follows the entity, never its rank.** A filter that changes the series
+  count must not repaint the survivors.
+- **Sequential = one hue, light->dark. Diverging = two hues + a neutral gray
+  midpoint.** Never a rainbow; never a hue at the diverging midpoint.
+- **Run the validator before shipping any categorical palette.** CVD Delta E >= 8 is the
+  target (OKLab ×100); 6-8 is a floor that is legal ONLY with secondary encoding. A
+  normal-vision floor below 15 is a hard FAIL - full-color readers can't tell the
+  pair apart; re-step it on the adjacent pairlist (secondary encoding does not excuse
+  this one); under `--pairs all` cut series or facet instead - see check 4. A contrast WARN
+  obligates visible labels or a table view - it is not dismissable.
+- **Thin marks; a legend always present for >= 2 series (none for one), with
+  selective direct labels (never a number on every point); recessive grid/axes.**
+  One exception, legend kept: the tall segmented bar (*Figures* in `references/marks-and-anatomy.md`).
+- **Text wears text tokens, never the series color** - values, labels, and legends
+  stay in primary/secondary/muted ink; a colored mark beside them carries identity.
+- **Status colors are reserved** (good/warning/serious/critical) and never reused
+  for "series 4"; they ship with an icon + label, never color alone.
+
+## Plugging in a design system
+
+The method is invariant; only these parameters change per system. The reference
+instance - every value filled in - is `references/palette.md`.
+
+| Parameter | What the system provides |
+|---|---|
+| **Ramps** | the hue scales (named steps) the palette draws from |
+| **Categorical theme** | the fixed hue order (a named theme); default + alternates |
+| **Sequential hue** | the default single hue for magnitude |
+| **Diverging pair** | two warm/cool poles + a neutral midpoint |
+| **Status palette** | good / warning / serious / critical - steps distinct from categorical, except that dark-mode good is the series green |
+| **Texture fill** | one directional hand-drawn fill, used at 45° / 135° |
+| **Surfaces** | light & dark chart-surface colors (the validator needs these) |
+| **Filter controls** | date-range & dimension controls (behavioral spec in `interaction.md`) |
+
+To onboard a new system: fill those rows, feed its ramps to the validator, and let
+it snap each slot to the nearest passing step. Structure and rules stay as written.
+
+## Reference files
+
+| File | What it answers |
+|------|-----------------|
+| `references/choosing-a-form.md` | Which chart type / is it even a chart? |
+| `references/color-formula.md` | The four jobs, the six checks, snap-to-passing |
+| `references/marks-and-anatomy.md` | Mark specs, spacers, labels, figures, hero number |
+| `references/interaction.md` | Tooltips & hover, filters & time ranges |
+| `references/components.md` | The pieces a chart is made of - build each in plain HTML |
+| `references/anti-patterns.md` | **What goes wrong - check every chart against this** |
+| `references/palette.md` | **The reference palette instance** - every parameter, filled in; swap for your brand's |
+| `scripts/validate_palette.js` | Runnable six-checks validator (run it; don't eyeball) |
+
+## Assistant — 2026-11-25 04:27:38 UTC
+
+**Tool call: `Bash`**
+
+_Check sine100 and gather version info_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; sleep 45; tail -4 $K/sine100_fixed.log; ls $K/w/out_fixed/slot; ls $K/../actran/w/out/slot/ | grep "tt_27.*sine"; ngspice --version 2>&1 | grep -i ngspice | head -2; ls /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/osdi; cat /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/.spiceinit; ls /foss/pdks/ihp-sg13cmos5l/; cat /foss/pdks/ihp-sg13cmos5l/*.json 2>/dev/null | head -20
+```
+
+## Tool results / harness — 2026-11-25 04:28:23 UTC
+
+**Tool result:**
+
+```
+real	1m31.193s
+user	1m46.931s
+sys	0m42.188s
+slot_klayout_tt_27_3.3_sine_100p.log
+slot_klayout_tt_27_3.3_sine_100p.op
+slot_klayout_tt_27_3.3_sine_100p.sine
+slot_klayout_tt_27_3.3_sine_open.log
+slot_klayout_tt_27_3.3_sine_open.op
+slot_klayout_tt_27_3.3_sine_open.sine
+slot_klayout_tt_27_3.3_sine_open.aid
+slot_klayout_tt_27_3.3_sine_open.log
+slot_klayout_tt_27_3.3_sine_open.op
+slot_pex_tt_27_3.3_sine_100p.log
+slot_pex_tt_27_3.3_sine_100p.op
+slot_pex_tt_27_3.3_sine_100p.sine
+slot_pex_tt_27_3.3_sine_open.log
+slot_pex_tt_27_3.3_sine_open.op
+slot_pex_tt_27_3.3_sine_open.sine
+slot_schematic_tt_27_3.3_sine_100p.log
+slot_schematic_tt_27_3.3_sine_100p.op
+slot_schematic_tt_27_3.3_sine_100p.sine
+slot_schematic_tt_27_3.3_sine_open.log
+slot_schematic_tt_27_3.3_sine_open.op
+slot_schematic_tt_27_3.3_sine_open.sine
+** ngspice-47 : Circuit level simulation program
+** Copyright 2001-2026, The ngspice team.
+cap_cmomf.osdi
+cap_cmomi.osdi
+mosvar.osdi
+psp103.osdi
+psp103_nqs.osdi
+r3_cmc.osdi
+*  a custom spiceinit file for IHP-Open-PDK 
+
+* export PDK_ROOT and PDK environmental variables first and add it to your .bashrc
+* export PDK_ROOT= installation_specific_directory/IHP-Open-PDK
+* export PDK=ihp-sg13g2 or ihp-sg13cmos5l
+
+setcs sourcepath = (  $sourcepath $PDK_ROOT/$PDK/libs.tech/ngspice/models $PDK_ROOT/$PDK/libs.ref/sg13cmos5l_stdcell/spice )
+setcs sourcepath = (  $sourcepath $PDK_ROOT/$PDK/libs.tech/ngspice/models $PDK_ROOT/$PDK/libs.ref/sg13cmos5l_io/spice )
+*echo $sourcepath
+
+*option tnom=28
+*op
+… [607 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:28:28 UTC
+
+**Tool call: `Bash`**
+
+_Check how versions are documented_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps; grep -n -i "version\|ngspice-47\|pdk commit\|IHP-Open-PDK" ac_tran/README.md dc_curves/README.md slot_modes_bg/README.md | head; sed -n '/## Files/,$p' ac_tran/README.md | tail -30; md5sum /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/diodes.lib
+```
+
+## Tool results / harness — 2026-11-25 04:28:28 UTC
+
+**Tool result:**
+
+```
+ac_tran/README.md:7:**IHP sg13cmos5l simulation (schematic | magic PEX)**, ngspice-47 with the IHP OSDI models; the pad curves are run
+ac_tran/README.md:162:## Tool versions and sources
+ac_tran/README.md:164:- `ngspice -v`: `ngspice-47 : Circuit level simulation program`, `Compiled with KLU Direct Linear Solver`; IHP OSDI
+ac_tran/README.md:167:- PDK `/foss/pdks/ihp-sg13cmos5l` (IHP-Open-PDK commit df4c5054ee8ca481c3eb873687274f28cdb50b1e, as ../dc_curves).
+dc_curves/README.md:7:**IHP sg13cmos5l simulation (schematic | magic PEX)**, ngspice-47 with the IHP OSDI models, run through CACE 2.11 on
+dc_curves/README.md:143:## Tool versions
+dc_curves/README.md:145:- `ngspice -v`: `ngspice-47 : Circuit level simulation program` (KLU compiled in), IHP OSDI models of the PDK
+dc_curves/README.md:149:- PDK `/foss/pdks/ihp-sg13cmos5l` → IHP-Open-PDK commit df4c5054ee8ca481c3eb873687274f28cdb50b1e (2026-10-14).
+slot_modes_bg/README.md:28:| PDK | IHP-Open-PDK `ihp-sg13cmos5l`, commit `df4c5054ee8ca481c3eb873687274f28cdb50b1e`, `.spiceinit` of the PDK (OSDI psp103, r3_cmc, ...) |
+slot_modes_bg/README.md:32:- `ngspice -v`: `ngspice-47 : Circuit level simulation program`, compiled with KLU (the decks use the default SPARSE
+
+## Tool versions and sources
+
+- `ngspice -v`: `ngspice-47 : Circuit level simulation program`, `Compiled with KLU Direct Linear Solver`; IHP OSDI
+  models of the PDK (`.spiceinit` of the PDK).
+- CACE 2.11.0, XSCHEM V3.4.8RC (netlisting), Python 3.13.18, numpy 2.5.3, matplotl
+… [2294 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:28:41 UTC
+
+**Tool call: `Bash`**
+
+_Check design repo HEAD and commit for the converter bug_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; git clone -q --depth 1 --filter=blob:none --no-checkout https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single repo 2>&1 | tail -2; cd repo; git log -1 --format='%H %ci %s'; git show HEAD:macros/en_ctrl_3v3/testbenches/spice/run_starve.py | grep -n 'k == "D"' -A1; git fetch -q --depth 1 origin 9052bd35928c6d40344e8e686c9abbe736bfadb9; git show 9052bd35928c6d40344e8e686c9abbe736bfadb9:macros/en_ctrl_3v3/testbenches/spice/run_starve.py | grep -n 'k == "D"' -A1; git grep -n "RS.convert\|run_starve\|convert(" HEAD -- '*.py' | cut -c1-200 | head -20
+```
+
+## Tool results / harness — 2026-11-25 04:28:46 UTC
+
+**Tool result:**
+
+```
+60f270a0a109578b62f4e5e701cb5fe3298bcae2 2026-09-30 02:24:31 +0200 CLAUDE.md : salvaged updated version
+fatal: path 'macros/en_ctrl_3v3/testbenches/spice/run_starve.py' does not exist in 'HEAD'
+44:        elif k == "D":
+45-            out.append(f"X{t[0][1:]} {t[1]} {t[2]} {t[3]} " + " ".join(p.lower() for p in t[4:]))
+```
+
+## Assistant — 2026-11-25 04:28:52 UTC
+
+**Tool call: `Bash`**
+
+_List remote branches and convert() users_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/repo; git ls-remote --heads origin | head -20; git grep -n "run_starve\|RS.convert\|def convert" 9052bd35928c6d40344e8e686c9abbe736bfadb9 -- '*.py' | cut -c1-220
+```
+
+## Tool results / harness — 2026-11-25 04:29:09 UTC
+
+**Tool result:**
+
+```
+150184afbd9ff46ad6eca8f0cc8c9c9f5c91975c	refs/heads/art/tughra-metal
+280609473528ba3a627165ac78e7b057f0515e87	refs/heads/art/tughra-metal-sudelbuecher
+0c131d746ed1b84c08d1564a777746d679734437	refs/heads/cace
+82a57ec4359301a8b0d7a1c0c350e1c560b5a9d7	refs/heads/claude/c0-oa-core-pd-pex
+f9c28e1a2906f7eb63712eae4134a1634d68a7f5	refs/heads/claude/c0-oa-core-pd-pex-sudel
+8a72dd8f3f1c385145f53e400a63fbe15a6d50e8	refs/heads/claude/c1-core-pex-verif
+21d022ef2fc05f5a7f1ee4585ad470d695018c7f	refs/heads/claude/c1-core-pex-verif-sudel
+c503b87ada2e5ff58b4393dad98e5a94f51baf95	refs/heads/claude/c2-pad-layout
+fd6c33fa336527aa14713434edf3f910d439efb8	refs/heads/claude/c2-pad-layout-sudel
+c9133882acf89d2db45ad50e38818d7f6ad92daa	refs/heads/claude/c3-s2d-pad-layout
+0e98d065f88bbcc21861847961f740fa8b371f8e	refs/heads/claude/c3-s2d-pad-layout-sudel
+a006081bd4239589a6bff0f80154d5bfeca3e255	refs/heads/claude/c4-replica-bias
+efd95530bf23e7d9f0d79a711ecf7f86e2cc60b1	refs/heads/claude/c4-replica-bias-sudel
+2c1903e62b73572cedcf233c74495dcdb84ceb13	refs/heads/claude/c5-slot7-schematics
+ba05ca8628b6c9e1c3767f2bfd110a3fa3f51641	refs/heads/claude/c5-slot7-testplatform
+7b35dc38a2e8fb7e0a7993da44ee110583f2c6d3	refs/heads/claude/c5-slot7-testplatform-sudel
+f124f04f0334589b19685958acbadf3b33e47e79	refs/heads/claude/c5-tree-layout
+b752a2f0d520c0be66704ac9c9ec45a3e3f6a4ec	refs/heads/claude/cloud-claudemd
+60f270a0a109578b62f4e5e701cb5fe3298bcae2	refs/heads/claude/dazzling-mccarthy-unu1rl
+30da354aab5fabb2059f0a1ce
+… [778 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:29:17 UTC
+
+**Tool call: `Bash`**
+
+_Find main branch tip_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/repo; git ls-remote origin HEAD refs/heads/main refs/heads/master; git ls-remote --heads origin | wc -l
+```
+
+## Tool results / harness — 2026-11-25 04:29:17 UTC
+
+**Tool result:**
+
+```
+60f270a0a109578b62f4e5e701cb5fe3298bcae2	HEAD
+60f270a0a109578b62f4e5e701cb5fe3298bcae2	refs/heads/main
+33
+```
+
+## Assistant — 2026-11-25 04:30:01 UTC
+
+**Tool call: `Bash`**
+
+_Write and run diode_check.py_
+
+```bash
+cat > /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/diode_check.py <<'EOF'
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""The pad antenna diode alone in ngspice (IHP sg13cmos5l simulation): parameter handling, I-V step, minimal abort.
+
+Usage: python3 -I diode_check.py <work_dir> <dest_dir>   -> <dest_dir>/csv/diode_*.csv; decks / logs in <work_dir>/diode
+Needs PDK_ROOT (ihp-sg13cmos5l) and ngspice on PATH; each ngspice run has a 120 s timeout.
+
+1. params:  dpantenna called with a= p= (as the converted KLayout netlists), with l= w= (as the schematic / PEX
+            netlists) and with nothing; `listing expand` shows the area= that each component diode gets.
+2. iv:      dantenna (KLayout default size / extracted size l=27.78u w=1.26u, m=2 as X$65 of the S2D pad) and its
+            component models darea / dperim / dcorner (area 1), anode 0, cathode swept 0 ... 0.2 V in 0.1 mV, at -40 /
+            27 / 125 C, .option gmin=1e-12 as the slot decks. Reported: the largest current step between neighbouring
+            points, where it is, and the median step (the smooth part).
+3. tran:    X$65 alone, cathode = the slot sine 0.5 + 0.5 sin(2 pi 10 kHz t), tran 0 ... 100 us, max step 39.0625 ns,
+            method=gear gmin=1e-12 (the options of ../ac_tran/slot.py): default size vs extracted size, and (diagnosis,
+            modified copies of diodes.lib in the work dir) default size with one darea parameter removed (ibv -> 1e-30,
+            rs -> 0, tt -> 0, cj0 -> 0), extracted size with trap integration, with the darea rs and cj0 of the default
+            size, and with both.
+"""
+import csv
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+import numpy as np
+
+WORK, DEST = Path(sys.argv[1]).resolve() / 'diode', Path(sys.argv[2]).resolve()
+LIB = Path(os.environ.get('PDK_ROOT', '/foss/pdks')) / 'ihp-sg13cmos5l' / 'libs.tech' / 'ngspice' / 'models' / 'diodes.lib'
+SIZED = 'l=27.78u w=1.26u'   # = KLayout A=35.0028p P=58.08u (S2D pad X$65), = the schematic XDN1 / XDN2
+HDR = '# IHP sg13cmos5l simulation (ngspice, PDK diodes.lib): %s\n'
+
+
+def ng(name, deck, lib=None):
+    f = WORK / f'{name}.sp'
+    f.write_text(deck.replace('@LIB@', str(lib or LIB)))
+    try:
+        p = subprocess.run(['ngspice', '-b', f.name], cwd=WORK, capture_output=True, text=True, timeout=120)
+        out = p.stdout + p.stderr
+    except subprocess.TimeoutExpired as e:
+        out = (e.stdout or b'').decode(errors='replace') + '\nTIMEOUT 120 s'
+    (WORK / f'{name}.log').write_text(out)
+    return out
+
+
+def params():
+    out = ng('params', """* dpantenna: a= p= vs l= w= vs default
+.include @LIB@
+V1 a 0 0
+Xap a 0 dpantenna a=35.0028p p=58.08u m=2
+Xlw a 0 dpantenna l=27.78u w=1.26u m=2
+Xdef a 0 dpantenna
+.control
+op
+listing expand
+.endc
+.end
+""")
+    rows = []
+    for inst, how in (('xap', 'a=35.0028p p=58.08u m=2 (converted KLayout netlist)'),
+                      ('xlw', 'l=27.78u w=1.26u m=2 (schematic / PEX netlist)'), ('xdef', '(no parameters)')):
+        for comp in ('d1', 'd2', 'd3'):
+            m = re.search(rf'd\.{inst}\.{comp}\s+\S+\s+\S+\s+(\S+)\s+area=\s*(\S+)', out)
+            mm = re.search(rf'd\.{inst}\.{comp}\s.*?\bm=\s*(\S+)', out)
+            rows.append([inst, how, comp, m.group(1) if m else '?', float(m.group(2)) if m else '',
+                         float(mm.group(1)) if mm else 1.0])
+    warn = 'warning' in out.lower() and re.search(r'(?i)warn.*\b(a|p)\b', out)
+    with open(DEST / 'csv' / 'diode_params.csv', 'w', newline='') as f:
+        f.write(HDR % 'area factor each component diode of dpantenna gets (listing expand); ngspice message about '
+                'a= / p=: ' + ('yes' if warn else 'none') + '\n')
+        w = csv.writer(f)
+        w.writerow(['instance', 'call', 'component', 'model', 'area', 'm'])
+        w.writerows(rows)
+
+
+def iv():
+    rows, curves = [], {}
+    devs = [('dantenna_default', 'X1 0 c dantenna m=2'), ('dantenna_extracted', f'X1 0 c dantenna {SIZED} m=2'),
+            ('darea_area1', 'D1 0 c darea area=1'), ('dperim_area1', 'D1 0 c dperim area=1'),
+            ('dcorner_area1', 'D1 0 c dcorner area=1')]
+    for t in (-40, 27, 125):
+        for name, line in devs:
+            tag = f'iv_{name}_{t}'
+            ng(tag, f"""* {name}: anode 0, cathode swept, {t} C
+.include @LIB@
+.temp {t}
+.option gmin=1e-12
+V1 c 0 0
+{line}
+.control
+dc V1 0 0.2 0.0001
+set wr_singlescale
+set wr_vecnames
+option numdgt=9
+wrdata {tag}.txt i(v1)
+.endc
+.end
+""")
+            p = WORK / f'{tag}.txt'
+            if not p.exists():
+                rows.append([name, t, 'no result', '', '', '', ''])
+                continue
+            a = np.loadtxt(p, skiprows=1, ndmin=2)
+            v, i = a[:, 0], -a[:, 1]     # reverse current into the cathode, positive
+            d = np.diff(i)
+            k = int(np.argmax(np.abs(d)))
+            rows.append([name, t, len(v), f'{d[k]:.4e}', f'{v[k]:.4f}', f'{v[k + 1]:.4f}', f'{np.median(np.abs(d)):.3e}'])
+            if t == 27 and name.startswith('dantenna'):
+                curves[name] = (v, i)
+    with open(DEST / 'csv' / 'diode_iv_step.csv', 'w', newline='') as f:
+        f.write(HDR % 'reverse current I (into the cathode) vs cathode voltage V, anode 0, sweep 0 ... 0.2 V step 0.1 mV; '
+                'largest step dI between neighbouring points [A] and where; median |dI| = the smooth part')
+        w = csv.writer(f)
+        w.writerow(['device', 'temp_C', 'points', 'max_step_A', 'between_V', 'and_V', 'median_abs_step_A'])
+        w.writerows(rows)
+    if curves:
+        v = curves['dantenna_default'][0]
+        sel = (v >= 0.06) & (v <= 0.10)
+        with open(DEST / 'csv' / 'diode_iv_27C.csv', 'w', newline='') as f:
+            f.write(HDR % 'dantenna m=2 (S2D pad X$65), 27 C: reverse current [A] vs cathode voltage [V], 60 ... 100 mV')
+            w = csv.writer(f)
+            w.writerow(['v_cathode', 'i_default_size', 'i_extracted_size'])
+            for j in np.nonzero(sel)[0]:
+                w.writerow([f'{v[j]:.4f}', f'{curves["dantenna_default"][1][j]:.6e}',
+                            f'{np.interp(v[j], *curves["dantenna_extracted"]):.6e}'])
+
+
+def tran():
+    src = LIB.read_text()
+    mods = {'ibv=1e-30': ('ibv=3.458E-007', 'ibv=1E-030'), 'rs=0': ('rs=2.193E+005', 'rs=0'),
+            'tt=0': ('tt=7.009E-007', 'tt=0'), 'cj0=0': ('cj0=9.371E-016', 'cj0=0'),
+            'rs as default size': ('rs=2.193E+005', 'rs=1.2614E+007'),
+            'cj0 as default size': ('cj0=9.371E-016', 'cj0=1.6268E-017')}
+    # 'as default size': darea rs x (35.0028 / 0.6084), cj0 / (35.0028 / 0.6084), so that the extracted-size darea has
+    # the series resistance / junction capacitance of the default-size one
+    cases = [('default size', '', [], 'gear'), ('extracted size', SIZED, [], 'gear'),
+             ('extracted size, trap', SIZED, [], 'trap'), ('default size, trap', '', [], 'trap')]
+    cases += [(f'default size, darea {k}', '', [k], 'gear') for k in ('ibv=1e-30', 'rs=0', 'tt=0', 'cj0=0')]
+    cases += [('extracted size, darea rs as default size', SIZED, ['rs as default size'], 'gear'),
+              ('extracted size, darea cj0 as default size', SIZED, ['cj0 as default size'], 'gear'),
+              ('extracted size, darea rs and cj0 as default size', SIZED, ['rs as default size', 'cj0 as default size'],
+               'gear')]
+    rows = []
+    for n, (name, size, mk, meth) in enumerate(cases):
+        lib = None
+        if mk:
+            txt = src
+            for k in mk:
+                old, new = mods[k]
+                line = re.search(r'^\.MODEL darea .*$', txt, re.M).group(0)
+                assert old in line, (k, line)
+                txt = txt.replace(line, line.replace(old, new))
+            lib = WORK / f'diodes_mod{n}.lib'
+            lib.write_text(txt)
+        out = ng(f'tran{n}', f"""* S2D pad diode X$65 alone, {name}; cathode = the slot sine, anode 0, 27 C
+.include @LIB@
+.temp 27
+.option gmin=1e-12 method={meth}
+V1 c 0 dc 0.5 sin(0.5 0.5 10k)
+X65 0 c dantenna {size} m=2
+.control
+tran 39.0625n 100u 0 39.0625n
+echo "TRDONE"
+.endc
+.end
+""", lib)
+        m = re.search(r'Timestep too small; time = (\S+), timestep = (\S+): trouble with (.*)', out)
+        if m:
+            t = float(m.group(1).rstrip(','))
+            vin = 0.5 + 0.5 * np.sin(2 * np.pi * 1e4 * t)
+            rows.append([name, meth, 'ABORTED', f'{t:.6e}', f'{vin:.4f}', m.group(3).strip()])
+        else:
+            rows.append([name, meth, 'completed' if 'TRDONE' in out and 'aborted' not in out else 'no result', '', '',
+                         ''])
+    with open(DEST / 'csv' / 'diode_tran.csv', 'w', newline='') as f:
+        f.write(HDR % 'S2D pad antenna diode X$65 (dantenna m=2) alone, cathode driven by the slot sine 0 ... 1 V 10 kHz, '
+                'tran 0 ... 100 us; modified darea parameters = diagnosis only')
+        w = csv.writer(f)
+        w.writerow(['case', 'method', 'result', 'abort_time_s', 'v_cathode_at_abort', 'ngspice_trouble'])
+        w.writerows(rows)
+    for r in rows:
+        print('diode tran:', ' | '.join(r))
+
+
+if __name__ == '__main__':
+    if len(sys.argv) != 3:
+        sys.exit(__doc__)
+    WORK.mkdir(parents=True, exist_ok=True)
+    (DEST / 'csv').mkdir(parents=True, exist_ok=True)
+    params()
+    iv()
+    tran()
+EOF
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; mkdir -p dest; time python3 -I /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/diode_check.py w dest; cat dest/csv/diode_params.csv dest/csv/diode_iv_step.csv dest/csv/diode_tran.csv
+```
+
+## Tool results / harness — 2026-11-25 04:38:02 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+Traceback (most recent call last):
+  File "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/diode_check.py", line 193, in <module>
+    iv()
+    ~~^^
+  File "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/diode_check.py", line 119, in iv
+    v = curves['dantenna_default'][0]
+        ~~~~~~^^^^^^^^^^^^^^^^^^^^
+KeyError: 'dantenna_default'
+
+real	8m0.639s
+user	7m59.593s
+sys	0m0.072s
+# IHP sg13cmos5l simulation (ngspice, PDK diodes.lib): area factor each component diode of dpantenna gets (listing expand); ngspice message about a= / p=: 
+none
+instance,call,component,model,area,m
+xap,a=35.0028p p=58.08u m=2 (converted KLayout netlist),d1,dparea,0.6084000000000002,2.0
+xap,a=35.0028p p=58.08u m=2 (converted KLayout netlist),d2,dpperim,3.120000000000001,2.0
+xap,a=35.0028p p=58.08u m=2 (converted KLayout netlist),d3,dpcorner,4.0,2.0
+xlw,l=27.78u w=1.26u m=2 (schematic / PEX netlist),d1,dparea,35.00279999999999,2.0
+xlw,l=27.78u w=1.26u m=2 (schematic / PEX netlist),d2,dpperim,58.08000000000001,2.0
+xlw,l=27.78u w=1.26u m=2 (schematic / PEX netlist),d3,dpcorner,4.0,2.0
+xdef,(no parameters),d1,dparea,0.6084000000000002,1.0
+xdef,(no parameters),d2,dpperim,3.120000000000001,1.0
+xdef,(no parameters),d3,dpcorner,4.0,1.0
+# IHP sg13cmos5l simulation (ngspice, PDK diodes.lib): reverse current I (into the cathode) vs cathode voltage V, anode 0, sweep 0 ... 0.2 V step 0.1 mV; largest step dI between neighbouring points [A] and where
+… [945 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:38:23 UTC
+
+**Tool call: `Bash`**
+
+_Revise diode_check.py sweep settings_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; python3 - <<'EOF'
+p='diode_check.py'; s=open(p).read()
+s=s.replace("""Needs PDK_ROOT (ihp-sg13cmos5l) and ngspice on PATH; each ngspice run has a 120 s timeout.""","""Needs PDK_ROOT (ihp-sg13cmos5l) and ngspice on PATH; each ngspice run has a 60 s timeout (a stuck DC sweep is a
+result here, see 2.).""")
+s=s.replace("""            component models darea / dperim / dcorner (area 1), anode 0, cathode swept 0 ... 0.2 V in 0.1 mV, at -40 /
+            27 / 125 C, .option gmin=1e-12 as the slot decks. Reported: the largest current step between neighbouring
+            points, where it is, and the median step (the smooth part).""","""            component models darea / dperim / dcorner (area 1), anode 0, cathode swept 0 ... 0.2 V in 0.5 mV, at -40 /
+            27 / 125 C, .option gmin=1e-12 as the slot decks. Reported: the largest current step between neighbouring
+            points, where it is, and the median step (the smooth part). The same sweep in 0.1 mV steps for the two
+            dantenna sizes: whether ngspice finishes it within the timeout (a point inside the step can have no DC
+            solution).""")
+s=s.replace("timeout=120)","timeout=60)").replace("TIMEOUT 120 s","TIMEOUT 60 s")
+s=s.replace("""    for t in (-40, 27, 125):
+        for name, line in devs:
+            tag = f'iv_{name}_{t}'""","""    jobs = [(t, name, line, 0.0005) for t in (-40, 27, 125) for name, line in devs]
+    jobs += [(t, name, line, 0.0001) for t in (-40, 27, 125) for name, line in devs[:2]]
+    for t, name, line, dv in jobs:
+            tag = f'iv_{name}_{t}_{dv * 1e3:g}mV'""")
+s=s.replace("""dc V1 0 0.2 0.0001""","""dc V1 0 0.2 {dv}""")
+s=s.replace("""""\")
+            p = WORK / f'{tag}.txt'
+            if not p.exists():
+                rows.append([name, t, 'no result', '', '', '', ''])
+                continue""","""""\")
+            p = WORK / f'{tag}.txt'
+            if not p.exists():
+                rows.append([name, t, dv * 1e3, 'not finished in 60 s (ngspice batch, DC sweep)', '', '', '', ''])
+                continue""")
+s=s.replace("""            rows.append([name, t, len(v), f'{d[k]:.4e}'""","""            rows.append([name, t, dv * 1e3, f'completed, {len(v)} points', f'{d[k]:.4e}'""")
+s=s.replace("""            if t == 27 and name.startswith('dantenna'):""","""            if t == 27 and name.startswith('dantenna') and dv == 0.0005:""")
+s=s.replace("""'reverse current I (into the cathode) vs cathode voltage V, anode 0, sweep 0 ... 0.2 V step 0.1 mV; '""","""'reverse current I (into the cathode) vs cathode voltage V, anode 0, sweep 0 ... 0.2 V; '""")
+s=s.replace("""        w.writerow(['device', 'temp_C', 'points', 'max_step_A',""","""        w.writerow(['device', 'temp_C', 'sweep_step_mV', 'sweep', 'max_step_A',""")
+open(p,'w').write(s)
+EOF
+sed -n 88,135p diode_check.py
+```
+
+## Tool results / harness — 2026-11-25 04:38:23 UTC
+
+**Tool result:**
+
+```
+for t, name, line, dv in jobs:
+            tag = f'iv_{name}_{t}_{dv * 1e3:g}mV'
+            ng(tag, f"""* {name}: anode 0, cathode swept, {t} C
+.include @LIB@
+.temp {t}
+.option gmin=1e-12
+V1 c 0 0
+{line}
+.control
+dc V1 0 0.2 {dv}
+set wr_singlescale
+set wr_vecnames
+option numdgt=9
+wrdata {tag}.txt i(v1)
+.endc
+.end
+""")
+            p = WORK / f'{tag}.txt'
+            if not p.exists():
+                rows.append([name, t, dv * 1e3, 'not finished in 60 s (ngspice batch, DC sweep)', '', '', '', ''])
+                continue
+            a = np.loadtxt(p, skiprows=1, ndmin=2)
+            v, i = a[:, 0], -a[:, 1]     # reverse current into the cathode, positive
+            d = np.diff(i)
+            k = int(np.argmax(np.abs(d)))
+            rows.append([name, t, dv * 1e3, f'completed, {len(v)} points', f'{d[k]:.4e}', f'{v[k]:.4f}', f'{v[k + 1]:.4f}', f'{np.median(np.abs(d)):.3e}'])
+            if t == 27 and name.startswith('dantenna') and dv == 0.0005:
+                curves[name] = (v, i)
+    with open(DEST / 'csv' / 'diode_iv_step.csv', 'w', newline='') as f:
+        f.write(HDR % 'reverse current I (into the cathode) vs cathode voltage V, anode 0, sweep 0 ... 0.2 V; '
+                'largest step dI between neighbouring points [A] and where; median |dI| = the smooth part')
+        w = csv.writer(f)
+        w.writerow(['device', 'temp_C', 'sweep_step_mV', 'sweep', 'max_step_A', 'between_V', 'and_V', 'median_abs_step_A'])
+        w.writerows(rows)
+    if curves:
+        v = cur
+… [623 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:38:35 UTC
+
+**Tool call: `Bash`**
+
+_Clean up and rerun diode_check.py_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; python3 - <<'EOF'
+p='diode_check.py'; L=open(p).read().split('\n')
+a=next(i for i,l in enumerate(L) if l.startswith('    for t, name, line, dv in jobs:'))
+b=next(i for i,l in enumerate(L) if "diode_iv_step.csv', 'w'" in l)
+for i in range(a+1,b):
+    if L[i].startswith('            '): L[i]=L[i][4:]
+s='\n'.join(L)
+s=s.replace("""        rows.append([name, t, dv * 1e3, f'completed, {len(v)} points', f'{d[k]:.4e}', f'{v[k]:.4f}', f'{v[k + 1]:.4f}', f'{np.median(np.abs(d)):.3e}'])""","""        rows.append([name, t, dv * 1e3, f'completed, {len(v)} points', f'{d[k]:.4e}', f'{v[k]:.4f}', f'{v[k + 1]:.4f}',
+                     f'{np.median(np.abs(d)):.3e}'])""")
+s=s.replace("""        w.writerow(['device', 'temp_C', 'sweep_step_mV', 'sweep', 'max_step_A', 'between_V', 'and_V', 'median_abs_step_A'])""","""        w.writerow(['device', 'temp_C', 'sweep_step_mV', 'sweep', 'max_step_A', 'between_V', 'and_V',
+                    'median_abs_step_A'])""")
+open(p,'w').write(s)
+EOF
+python3 -m py_compile diode_check.py && echo ok; awk 'length>120{print FILENAME": "FNR}' *.py; cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; rm -rf w/diode; time python3 -I /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/diode_check.py w dest; cat dest/csv/diode_iv_step.csv dest/csv/diode_tran.csv; head -5 dest/csv/diode_iv_27C.csv
+```
+
+## Tool results / harness — 2026-11-25 04:41:36 UTC
+
+**Tool result:**
+
+```
+ok
+diode_check.py: 34
+diode_check.py: 128
+diode_check.py: 184
+fix_diodes.py: 54
+diode tran: default size | gear | ABORTED | 6.597230e-05 | 0.0783 | darea-instance d.x65.d1
+diode tran: extracted size | gear | completed |  |  | 
+diode tran: extracted size, trap | trap | completed |  |  | 
+diode tran: default size, trap | trap | ABORTED | 6.597230e-05 | 0.0783 | darea-instance d.x65.d1
+diode tran: default size, darea ibv=1e-30 | gear | completed |  |  | 
+diode tran: default size, darea rs=0 | gear | completed |  |  | 
+diode tran: default size, darea tt=0 | gear | completed |  |  | 
+diode tran: default size, darea cj0=0 | gear | no result |  |  | 
+diode tran: extracted size, darea rs as default size | gear | completed |  |  | 
+diode tran: extracted size, darea cj0 as default size | gear | completed |  |  | 
+diode tran: extracted size, darea rs and cj0 as default size | gear | ABORTED | 6.597230e-05 | 0.0783 | dperim-instance d.x65.d2
+
+real	3m0.511s
+user	2m59.666s
+sys	0m0.520s
+# IHP sg13cmos5l simulation (ngspice, PDK diodes.lib): reverse current I (into the cathode) vs cathode voltage V, anode 0, sweep 0 ... 0.2 V; largest step dI between neighbouring points [A] and where; median |dI| = the smooth part
+device,temp_C,sweep_step_mV,sweep,max_step_A,between_V,and_V,median_abs_step_A
+dantenna_default,-40,0.5,"completed, 401 points",4.9195e-12,0.0605,0.0610,4.106e-15
+dantenna_extracted,-40,0.5,"completed, 401 points",4.9195e-12,0.0605,0.0610,4.106e-15
+darea_area1,-40,0.5,"completed
+… [2770 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:41:40 UTC
+
+**Tool call: `Bash`**
+
+_Investigate cj0=0 case result_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/w/diode; tail -c 300 tran7.log; cd ../../t; time (timeout 300 ngspice -b x_def_cj0.sp 2>&1 | grep -a -i "timestep\|TRDONE")
+```
+
+## Tool results / harness — 2026-11-25 04:46:40 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+Reference value :  6.59727e-05 Reference value :  6.59727e-05 Reference value :  6.59727e-05 Reference value :  6.59727e-05 Reference value :  6.59727e-05 Reference value :  6.59727e-05 Reference value :  6.59727e-05 Reference value :  6.59727e-05 Reference value :  6.59727e-05
+TIMEOUT 60 s
+real	5m0.017s
+user	4m56.563s
+sys	0m2.115s
+```
+
+## Assistant — 2026-11-25 04:46:52 UTC
+
+**Tool call: `Bash`**
+
+_Handle stuck transient in diode_check_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; python3 - <<'EOF'
+p='diode_check.py'; s=open(p).read()
+old="""        else:
+            rows.append([name, meth, 'completed' if 'TRDONE' in out and 'aborted' not in out else 'no result', '', '',
+                         ''])"""
+new="""        elif 'TIMEOUT' in out:
+            ref = re.findall(r'Reference value :\\s*(\\S+)', out)
+            t = float(ref[-1]) if ref else float('nan')
+            vin = 0.5 + 0.5 * np.sin(2 * np.pi * 1e4 * t)
+            rows.append([name, meth, 'STUCK (no end within the 60 s timeout; last time point given)', f'{t:.6e}',
+                         f'{vin:.4f}', ''])
+        else:
+            rows.append([name, meth, 'completed' if 'TRDONE' in out and 'aborted' not in out else 'no result', '', '',
+                         ''])"""
+assert old in s; s=s.replace(old,new)
+s=s.replace("""        w.writerow(['case', 'method', 'result', 'abort_time_s', 'v_cathode_at_abort', 'ngspice_trouble'])""","""        w.writerow(['case', 'method', 'result', 'abort_time_s', 'v_cathode_at_abort', 'ngspice_trouble'])  # noqa""")
+open(p,'w').write(s)
+EOF
+python3 -m py_compile diode_check.py && echo ok
+```
+
+## Tool results / harness — 2026-11-25 04:46:52 UTC
+
+**Tool result:**
+
+```
+ok
+```
+
+## Assistant — 2026-11-25 04:47:08 UTC
+
+**Tool call: `Bash`**
+
+_Check plotting helpers in common.py_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; sed -i "s/'ngspice_trouble'\])  # noqa/'ngspice_trouble'])/" diode_check.py; grep -n "def \|^LABEL\|^VIEWNAME\|^def style\|^def save" ../dc_curves/common.py | head; grep -n "^def title" -A15 ../ac_tran/common.py
+```
+
+## Tool results / harness — 2026-11-25 04:47:09 UTC
+
+**Tool result:**
+
+```
+14:LABEL = {'schematic': 'IHP sg13cmos5l simulation (schematic)', 'pex': 'IHP sg13cmos5l simulation (magic PEX)',
+16:VIEWNAME = {'schematic': 'schematic', 'pex': 'magic PEX (C-coupled)', 'klayout': 'KLayout-extracted'}
+24:def style():
+32:def load(path):
+52:def ss_line(x, y, x0=0.0, dx=0.1):
+58:def contiguous_range(x, err, lim, x0=0.0):
+82:def save(fig, path, svg=True, svg_max=60e3):
+98:def md_table(head, rows):
+161:def title(fig, ax, text, view):
+162-    """suptitle: the view label, then the conditions, wrapped to the figure width; then tight_layout below it"""
+163-    import textwrap
+164-    lab = {'schematic': LABEL['schematic'], 'pex': LABEL['pex'], 'both': 'IHP sg13cmos5l simulation (schematic | magic PEX)',
+165-           'slot3': 'IHP sg13cmos5l simulation (pads: schematic | magic PEX | KLayout-extracted)'}[view]
+166-    w = fig.get_size_inches()
+167-    width = int(w[0] * 14.5)
+168-    lines = [lab] + [x for part in text.split('\n') for x in textwrap.wrap(part, width)]
+169-    fig.suptitle('\n'.join(lines), fontsize=9, y=0.995, va='top')
+170-    fig.tight_layout()  # matplotlib >= 3.x leaves room for the suptitle itself
+```
+
+## Assistant — 2026-11-25 04:47:57 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/evaluate.py`
+
+```
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Tables and plots of the KLayout-pad antenna-diode check (IHP sg13cmos5l simulation).
+
+Usage: python3 -I evaluate.py <work_dir> <ref_slot_dir> <dest_dir>
+  <work_dir>      this folder's run.sh work dir: out_fixed/slot (sine, KLayout pads with the fixed diodes),
+                  out_fixed/rt + out_orig/rt (DC round trip, KLayout pads fixed / as converted),
+                  modes_out_fixed/<mode>/slot_modes_dcop.csv + modes_fixed/<mode>/dcop_*.log (ss -40 C mode DC)
+  <ref_slot_dir>  ../ac_tran's slot output (out/slot of its work dir): the schematic / magic PEX sine runs and the
+                  failed KLayout sine log, as committed in ../ac_tran
+  <dest_dir>      writes csv/sine_summary.csv, csv/sine_tt27.csv, csv/rt_range.csv, csv/modes_ss_m40.csv,
+                  plots/sine_tt27_fixed.png, plots/diode_step_27C.png (+ .svg if small)
+Sine scalars with ../ac_tran/rt.py sine_scalars() (THD harmonics 2-7 over 200 ... 600 us); DC range metrics with
+../dc_curves/rt.py metrics() (contiguous range around pad in = vref with |error from the small-signal line| < 1 mV).
+"""
+import csv
+import glob
+import importlib.util
+import re
+import sys
+from pathlib import Path
+
+import numpy as np
+
+HERE = Path(__file__).resolve().parent
+WORK, REF, DEST = (Path(a).resolve() for a in sys.argv[1:4])
+
+
+def load_module(name, path):
+    sys.path.insert(0, str(path.parent))
+    sys.modules.pop('common', None)          # ../dc_curves and ../ac_tran each have their own common.py
+    spec = importlib.util.spec_from_file_location(name, path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    sys.path.pop(0)
+    return mod
+
+
+DC = load_module('dc_rt', HERE.parent / 'dc_curves' / 'rt.py')
+AT = load_module('at_rt', HERE.parent / 'ac_tran' / 'rt.py')
+ATC = sys.modules['common']                  # ../ac_tran/common.py (save, title, style)
+HDR = '# IHP sg13cmos5l simulation, slot 7 tier-1 deck; %s\n'
+VCOL = {'schematic': '#2a78d6', 'pex': '#eb6834', 'klayout': '#1baf7a'}
+VLS = {'schematic': '-', 'pex': '-.', 'klayout': ':'}
+VN = {'schematic': 'schematic', 'pex': 'magic PEX', 'klayout': 'KLayout-extracted, diodes fixed'}
+
+
+def sine():
+    runs = {}
+    for v in ('schematic', 'pex'):
+        for ld in ('open', '100p'):
+            runs[(v, ld)] = AT.rd(REF / f'slot_{v}_tt_27_3.3_sine_{ld}.sine')
+    for ld in ('open', '100p'):
+        p = WORK / 'out_fixed' / 'slot' / f'slot_klayout_tt_27_3.3_sine_{ld}.sine'
+        runs[('klayout', ld)] = AT.rd(p) if p.exists() and p.stat().st_size else None
+    aid = {k: (REF if k[0] != 'klayout' else WORK / 'out_fixed' / 'slot').joinpath(
+        f'slot_{k[0]}_tt_27_3.3_sine_{k[1]}.aid').exists() for k in runs}
+    keys = ['THD_dB', 'H2_dBc', 'H3_dBc', 'A1_out', 'gain_10k', 'delay_10k', 'err_pp', 'err_max_abs']
+    rows = []
+    for (v, ld), d in runs.items():
+        if d is None:
+            rows.append([v, ld, 'no result'] + [''] * len(keys))
+            continue
+        s = AT.sine_scalars(d)
+        rows.append([v + ('' if v != 'klayout' else ' (antenna diodes l/w from the extracted A/P)'), ld,
+                     ('rshunt=1e12' if v == 'pex' or aid[(v, ld)] else 'none')] + ['%.6g' % s[k] for k in keys])
+    with open(DEST / 'csv' / 'sine_summary.csv', 'w', newline='') as f:
+        f.write(HDR % 'round trip 10 kHz sine 0 ... 1 V, tt 27 C 3.3 V; THD / H dB(c) (harmonics 2-7, 200 ... 600 us), '
+                'A1 V, gain_10k = A1_out / A1_in, delay_10k s, err V = pad_d2s - (vcm + pad_s2d - vref)')
+        w = csv.writer(f)
+        w.writerow(['pads', 'load', 'solver_aid'] + keys)
+        w.writerows(rows)
+    # waveform CSV (unloaded, 256 points per period over the 4 periods) and plot
+    tt = 200e-6 + np.arange(1024) * 400e-6 / 1024
+    cols, names = [tt], ['time']
+    for v in ('schematic', 'pex', 'klayout'):
+        d = runs[(v, 'open')]
+        if d is None:
+            continue
+ 
+… [8284 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 04:47:57 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/evaluate.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 04:48:04 UTC
+
+**Tool call: `Bash`**
+
+_Run evaluate.py into scratch_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; python3 -I /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/evaluate.py w ../actran/w/out/slot dest 2>&1 | tail -5; cat dest/csv/sine_summary.csv dest/csv/rt_range.csv dest/csv/modes_ss_m40.csv; ls -la dest/plots dest/csv
+```
+
+## Tool results / harness — 2026-11-25 04:48:05 UTC
+
+**Tool result:**
+
+```
+max |dV| DC round trip, fixed vs as converted (all saved nodes, all PVT): 2.000000165480742e-09
+# IHP sg13cmos5l simulation, slot 7 tier-1 deck; round trip 10 kHz sine 0 ... 1 V, tt 27 C 3.3 V; THD / H dB(c) (harmonics 2-7, 200 ... 600 us), A1 V, gain_10k = A1_out / A1_in, delay_10k s, err V = pad_d2s - (vcm + pad_s2d - vref)
+pads,load,solver_aid,THD_dB,H2_dBc,H3_dBc,A1_out,gain_10k,delay_10k,err_pp,err_max_abs
+schematic,open,none,-78.238,-81.3715,-81.3048,0.499292,0.998584,1.45881e-07,0.00919594,0.00464087
+schematic,100p,none,-72.4895,-77.6811,-74.3793,0.499249,0.998498,1.70344e-07,0.0110114,0.00553565
+pex,open,rshunt=1e12,-77.8717,-81.3913,-80.5748,0.499289,0.998579,1.64445e-07,0.0103416,0.00522503
+pex,100p,rshunt=1e12,-72.0083,-77.432,-73.8227,0.499245,0.99849,1.91755e-07,0.0123694,0.00622644
+klayout (antenna diodes l/w from the extracted A/P),open,none,-78.2638,-81.3677,-81.3491,0.499269,0.998538,1.47531e-07,0.00930612,0.00471219
+klayout (antenna diodes l/w from the extracted A/P),100p,none,-69.8631,-75.4919,-71.6983,0.499214,0.998429,1.74665e-07,0.0113931,0.00573317
+# IHP sg13cmos5l simulation, slot 7 tier-1 deck; DC round trip, pad out unloaded; gain, max |err| over pad in 0 ... 1 V [mV], pad in / out range with |error from the small-signal line| < 1 mV [V] (../dc_curves/rt.py definitions)
+pads,corner_mos,temp,vdd,gain,max_abs_err_0to1V_mV,in_lo_1mV,in_hi_1mV,out_lo_1mV,out_hi_1mV
+schematic (../dc_curves committed),tt,27,3.3,0.99875,0.858,-0.1709,1.2811,0.5954,2
+… [3254 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:48:10 UTC
+
+**Tool call: `Bash`**
+
+_Inspect slot_modes dcop CSV format_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; cat w/modes_out_fixed/swap/slot_modes_dcop.csv; ls w/modes_fixed/swap/
+```
+
+## Tool results / harness — 2026-11-25 04:48:10 UTC
+
+**Tool result:**
+
+```
+mode=swap,mos=ss,temp=-40,vdd=3.0,variant=dcop,cload=,err_max_mV=FAILED,v_g_V=,"solver_notes=Error: Transient op failed, timestep too small; Note: Starting dynamic gmin stepping; Note: Starting source stepping; Note: Starting true gmin stepping; Note: Transient op started; Warning: Dynamic gmin stepping failed; Warning: True gmin stepping failed; Warning: source stepping failed"
+bias_dist_pd_flat.spice
+dcop_swap_ss_-40_3.0.log
+dcop_swap_ss_-40_3.0.spice
+pad_ref_rb_flat.spice
+sg13cmos5l_IOPadDiff2Single_flat.spice
+sg13cmos5l_IOPadSingle2Diff_flat.spice
+```
+
+## Assistant — 2026-11-25 04:48:18 UTC
+
+**Tool call: `Bash`**
+
+_Fix modes CSV parsing and diode header_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; python3 - <<'EOF'
+p='evaluate.py'; s=open(p).read()
+old="""        with open(f) as fh:
+            for r in csv.DictReader(line for line in fh if not line.startswith('#')):
+"""
+new="""        with open(f) as fh:   # slot_modes.py writes key=value fields
+            for rec in csv.reader(line for line in fh if line.strip() and not line.startswith('#')):
+                r = dict(x.split('=', 1) for x in rec)
+"""
+assert old in s; s=s.replace(old,new); open(p,'w').write(s)
+p='diode_check.py'; s=open(p).read()
+old="""        f.write(HDR % 'area factor each component diode of dpantenna gets (listing expand); ngspice message about '
+                'a= / p=: ' + ('yes' if warn else 'none') + '\\n')"""
+new="""        f.write(HDR % ('area factor each component diode of dpantenna gets (listing expand); ngspice message about '
+                       'a= / p=: ' + ('yes' if warn else 'none')))"""
+assert old in s; s=s.replace(old,new); open(p,'w').write(s)
+EOF
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; python3 -I /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/evaluate.py w ../actran/w/out/slot dest 2>&1 | tail -2; cat dest/csv/modes_ss_m40.csv
+```
+
+## Tool results / harness — 2026-11-25 04:48:19 UTC
+
+**Tool result:**
+
+```
+max |dV| DC round trip, fixed vs as converted (all saved nodes, all PVT): 2.000000165480742e-09
+# IHP sg13cmos5l simulation, slot 7 tier-1 deck; designer's mode DC deck (../slot_modes_bg/slot_modes.py variant dcop), KLayout pads with the antenna diodes fixed; err_max_mV = max |pad out - expected| or FAILED; ngspice = first abort message
+mode,corner_mos,temp,vdd,err_max_mV,ngspice
+ext,ss,-40,3.0,FAILED,Timestep too small;  vin = 0: trouble with dparea-instance d.x2s.xlay.x$63.d1
+feed,ss,-40,3.0,FAILED,Timestep too small; trouble with dparea-instance d.x2s.xlay.x$63.d1
+mon,ss,-40,3.0,FAILED,Timestep too small;  vin = 0: trouble with dparea-instance d.x2s.xlay.x$63.d1
+swap+feed,ss,-40,3.0,FAILED,Timestep too small; trouble with dparea-instance d.x2s.xlay.x$63.d1
+swap,ss,-40,3.0,FAILED,Timestep too small;  vin = 0: trouble with dparea-instance d.x2s.xlay.x$63.d1
+```
+
+## Assistant — 2026-11-25 04:48:22 UTC
+
+Let me look at the plots.
+
+## Assistant — 2026-11-25 04:48:23 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/dest/plots/sine_tt27_fixed.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 04:48:23 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 04:48:24 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/dest/plots/diode_step_27C.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 04:48:24 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 04:48:33 UTC
+
+**Tool call: `Bash`**
+
+_Fix diode plot title_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; python3 - <<'EOF'
+p='evaluate.py'; s=open(p).read()
+old="""    ATC.title(fig, None, 'PDK dantenna (darea + dperim + dcorner), m = 2 as X$65, 27 °C, DC sweep in 0.5 mV steps, '
+              'gmin 1e-12: a 74 pA step at the same voltage for both sizes; only the default size makes the sine abort '
+              '(csv/diode_tran.csv)', 'schematic')"""
+new="""    fig.suptitle('IHP sg13cmos5l simulation (PDK diodes.lib, ngspice-47): dantenna alone\\nm = 2 as the S2D pad\\'s '
+                 'X$65, 27 °C, DC sweep in 0.5 mV steps, gmin 1e-12: the same 74 pA step for both sizes;\\nonly with '
+                 'the default size does the sine through it abort (csv/diode_tran.csv)', fontsize=9, y=0.995, va='top')
+    fig.tight_layout()"""
+assert old in s; s=s.replace(old,new); open(p,'w').write(s)
+EOF
+grep -n "def title" -A12 ../ac_tran/common.py | tail -3
+```
+
+## Tool results / harness — 2026-11-25 04:48:33 UTC
+
+**Tool result:**
+
+```
+168-    lines = [lab] + [x for part in text.split('\n') for x in textwrap.wrap(part, width)]
+169-    fig.suptitle('\n'.join(lines), fontsize=9, y=0.995, va='top')
+170-    fig.tight_layout()  # matplotlib >= 3.x leaves room for the suptitle itself
+```
+
+## Assistant — 2026-11-25 04:48:49 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/run.sh`
+
+```
+#!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+#
+# KLayout-extracted pads: antenna diodes at their extracted size (IHP sg13cmos5l simulation). Reproduces csv/ and
+# plots/ of this folder.
+# Usage: run.sh <ac_tran_work_dir> [<work_dir>] [diode|sine|dc|modes|eval|all]   (default ./_work, all)
+#   <ac_tran_work_dir>  the work dir of ../ac_tran/run.sh after its fetch, s2d, d2s and slot steps: design/ and tier1/
+#                       (design-repository commits 91a7da8b / 9052bd35) and out/slot (the schematic / PEX sine runs)
+# Environment: JOBS = parallel ngspice runs in the modes step (default 3). Needs PDK_ROOT with ihp-sg13cmos5l, ngspice-47
+# with the IHP OSDI models, python3 with numpy / matplotlib / Pillow.
+set -euo pipefail
+HERE=$(cd "$(dirname "$0")" && pwd)
+AT=$(realpath "$1")
+WORK=$(realpath -m "${2:-$HERE/_work}")
+STEP=${3:-all}
+export PDK_ROOT=${PDK_ROOT:-/foss/pdks} PDK=ihp-sg13cmos5l
+export PYTHONDONTWRITEBYTECODE=1
+JOBS=${JOBS:-3}
+SPICEINIT=$PDK_ROOT/$PDK/libs.tech/ngspice/.spiceinit
+mkdir -p "$WORK" "$HERE/csv" "$HERE/plots"
+# the decks read <work>/tier1 and <work>/design (slot.py, roundtrip.py): the ac_tran work dir's copies
+ln -sfn "$AT/tier1" "$WORK/tier1"
+ln -sfn "$AT/design" "$WORK/design"
+FIX="python3 -I $HERE/run_fixed.py"
+
+diode() {   # the PDK antenna diode alone: a= / p= handling, the I-V step, the minimal abort (about 3 min)
+  python3 -I "$HERE/diode_check.py" "$WORK" "$HERE"
+}
+
+sine() {    # 10 kHz sine, tt 27 C, KLayout pads with the diodes fixed (unloaded, 1 kOhm || 100 pF; about 2 min each),
+            # and the control: the same run as converted (aborts at 66 us; slot.py then retries with rshunt)
+  $FIX "$HERE/../ac_tran/slot.py" "$WORK/fixed_slot_runs" "$WORK" "$WORK/out_fixed/slot" \
+    klayout:tt:27:3.3:sine klayout:tt:27:3.3:sine:100p
+  python3 -I "$HERE/../ac_tran/slot.py" "$WORK" "$WORK/out_orig/slot" klayout:tt:27:3.3:sine
+}
+
+dc() {      # DC round trip at the five tier-1 PVT points, KLayout pads fixed and as converted (about 10 s each)
+  local P="klayout:tt:27:3.3 klayout:ss:-40:3.0 klayout:ff:125:3.6 klayout:fs:125:3.6 klayout:sf:-40:3.0"
+  $FIX "$HERE/../dc_curves/roundtrip.py" "$WORK/fixed_rt_runs" "$WORK" "$WORK/out_fixed/rt" $P
+  python3 -I "$HERE/../dc_curves/roundtrip.py" "$WORK" "$WORK/out_orig/rt" $P
+}
+
+modes() {   # the designer's mode DC deck at ss -40 C 3.0 V (../slot_modes_bg, variant dcop) with the fixed diodes,
+            # the five modes that failed there; about 2 min each where they fail
+  for m in swap mon feed ext swap+feed; do
+    mkdir -p "$WORK/modes_fixed/$m"
+    cp "$SPICEINIT" "$WORK/modes_fixed/$m/.spiceinit"
+    echo "$m"
+  done | xargs -P "$JOBS" -I{} $FIX "$HERE/../slot_modes_bg/slot_modes.py" "$WORK/modes_fixed" "$WORK/tier1" \
+    "$WORK/modes_fixed/{}" "$WORK/modes_out_fixed/{}" "{}:ss:-40:3.0:dcop"
+}
+
+eval_() {
+  python3 -I "$HERE/evaluate.py" "$WORK" "$AT/out/slot" "$HERE"
+}
+
+case "$STEP" in
+  all) diode; sine; dc; modes; eval_ ;;
+  eval) eval_ ;;
+  diode|sine|dc|modes) $STEP ;;
+  *) echo "unknown step $STEP"; exit 1 ;;
+esac
+```
+
+## Tool results / harness — 2026-11-25 04:48:49 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/run.sh (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 04:48:57 UTC
+
+**Tool call: `Bash`**
+
+_Launch full run.sh reproduction in background_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; python3 - <<'EOF'
+p='run.sh'; s=open(p).read()
+old='''    cp "$SPICEINIT" "$WORK/modes_fixed/$m/.spiceinit"'''
+new='''    cp "$SPICEINIT" "$WORK/modes_fixed/$m/.spiceinit"
+    rm -f "$WORK/modes_out_fixed/$m"/slot_modes_*.csv   # slot_modes.py appends'''
+s=s.replace(old,new); open(p,'w').write(s)
+EOF
+grep -n "append\|'a'" ../slot_modes_bg/slot_modes.py | head -3; chmod +x run.sh *.py; K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; (time ./run.sh $K/../actran/w $K/w2 all) > $K/runall.log 2>&1 &
+echo started
+```
+
+## Tool results / harness — 2026-11-25 04:48:57 UTC
+
+**Tool result:**
+
+```
+194:                    errs.append(float(sv[3 * k]))
+started
+```
+
+## Assistant — 2026-11-25 04:49:00 UTC
+
+**Tool call: `Bash`**
+
+_Check append behavior and slot_modes README notes_
+
+```bash
+grep -n "open(" /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_modes_bg/slot_modes.py; grep -rn "dpantenna\|antenna" /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_modes_bg/README.md | head -5; sed -n 55,75p /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_modes_bg/README.md
+```
+
+## Tool results / harness — 2026-11-25 04:49:00 UTC
+
+**Tool result:**
+
+```
+210:        with open(OUT / f"slot_modes_{var}.csv", "a", newline="") as fo:
+65:antenna diode `X$3` (`dpantenna`, pad → iovdd): at 5.9 µs (trapezoidal, no cshunt), 21.3 µs (gear + cshunt, swap),
+loads as in `run_modes.py`), but as a transient from all nodes at 0 V (`uic`, no `.ic` / `.nodeset`):
+vdd_3v3 and iovdd ramp 0 → V in 10 µs, v12 = 1.2 V and the mode bits from t = 0 (register written before enable),
+`enable` 0 → 1.2 V at 20 µs. Pad in 0.5 V to 40 µs, then 0 / 0.25 / 0.5 / 0.75 / 1.0 V for 10 µs each, sampled at each
+step's end; error = pad out − expected (`run_modes.py`'s expressions: direct vcm + (in − vref), swap vcm − (in − vref),
+feed vcm + (bus0 − bus1)/2, ext 1.30 + in − 0.50). Feed modes: pad in fixed 0.5 V, one sample at 90 µs. The bus
+sources (feed bus0 / bus1 1.45 / 1.05 V, ext bus2 / bus3 1.30 / 0.50 V, each through 10 kΩ) switch on at 25 … 26 µs,
+after enable (instrument connected to a powered slot). Pad out: 1 GΩ (as `run_modes.py`) ∥ **10 pF** (probe / board
+load; variant `pu`); variant `pu0` is 1 GΩ only. Solver aids (no circuit change): `method=gear`, `cshunt=1e-15` (as
+the designer's own transient in `run_tier1.py`), maximum time step 10 ns; variant `pu2` (retry of aborted runs):
+enable edge 1 µs, maximum step 5 ns. Without these the transient aborts with "timestep too small" in the D2S pad's
+antenna diode `X$3` (`dpantenna`, pad → iovdd): at 5.9 µs (trapezoidal, no cshunt), 21.3 µs (gear + cshunt, swap),
+6.6 µs (gear + cshunt + rshunt 1 TΩ, default m
+… [831 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:49:11 UTC
+
+**Tool call: `Bash`**
+
+_Launch two power-up transients with fixed diodes_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps; export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1; for j in mon:sf:-40:3.0 swap+feed:ss:-40:3.0:pu0; do n=$(echo $j | tr ':+' '__'); mkdir -p $K/w/pu/$n; cp /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/.spiceinit $K/w/pu/$n/; done; (for j in mon:sf:-40:3.0 swap+feed:ss:-40:3.0:pu0; do n=$(echo $j | tr ':+' '__'); time timeout 1500 python3 -I $D/klayout_pad_diodes/run_fixed.py $D/slot_modes_bg/slot_modes.py $K/w/pu $K/w/tier1 $K/w/pu/$n $K/w/pu_out/$n $j; done) > $K/pu.log 2>&1 &
+grep -n "mon\|swap+feed" $D/slot_modes_bg/jobs_modes.txt | head
+```
+
+## Tool results / harness — 2026-11-25 04:49:11 UTC
+
+**Tool result:**
+
+```
+5:mon:ss:-40:3.0:dcns
+8:swap+feed:ss:-40:3.0:dcns
+12:mon:ss:-40:3.0
+16:swap+feed:ss:-40:3.0
+20:mon:sf:-40:3.0
+24:swap+feed:sf:-40:3.0
+28:mon:tt:27:3.3
+32:swap+feed:tt:27:3.3
+36:mon:ff:125:3.6
+40:swap+feed:ff:125:3.6
+```
+
+## Assistant — 2026-11-25 04:49:21 UTC
+
+**Tool call: `Bash`**
+
+_Stop pu loop and look at committed power-up failures_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; pkill -f "run_fixed.py.*w/pu " ; sleep 1; pkill -f "slot_modes.py.*w/pu/"; sleep 1; ps aux | grep -c "[n]gspice -b pu\|[n]gspice"; ps aux | grep "[n]gspice" | awk '{print $NF}' | head; grep -n "pu0\|FAILED" /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_modes_bg/slot_modes_powerup.csv | grep "sf" | cut -c1-250 | head
+```
+
+## Tool results / harness — 2026-11-25 04:49:23 UTC
+
+**Tool result:**
+
+```
+1
+iv_dantenna_default_27_0.1mV.sp
+13:default,sf,-40,3.0,pu0,1.74638,0.96815,1.13763,0.44412,48.6094,20.79,21.54,0.0,1.13,5,none
+14:swap,sf,-40,3.0,pu0,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,0,none
+15:mon,sf,-40,3.0,pu0,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,0,none
+16:feed,sf,-40,3.0,pu0,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,0,none
+26:mon,sf,-40,3.0,pu,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,0,10p
+27:feed,sf,-40,3.0,pu,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,0,10p
+29:swap+feed,sf,-40,3.0,pu,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,0,10p
+39:mon,sf,-40,3.0,pu2,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,0,10p
+40:feed,sf,-40,3.0,pu2,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,0,10p
+41:swap+feed,sf,-40,3.0,pu2,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,FAILED,0,10p
+```
+
+## Assistant — 2026-11-25 04:49:30 UTC
+
+**Tool call: `Bash`**
+
+_Launch fixed power-up transients at sf -40 C_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps; export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1; rm -rf $K/w/pu $K/w/pu_out; for j in mon:sf:-40:3.0 swap:sf:-40:3.0:pu0; do n=$(echo $j | tr ':+' '__'); mkdir -p $K/w/pu/$n; cp /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/.spiceinit $K/w/pu/$n/; (time timeout 1800 python3 -I $D/klayout_pad_diodes/run_fixed.py $D/slot_modes_bg/slot_modes.py $K/w/pu $K/w/tier1 $K/w/pu/$n $K/w/pu_out/$n $j) > $K/pu_$n.log 2>&1 & done; tail -3 $K/runall.log
+```
+
+## Tool results / harness — 2026-11-25 04:49:30 UTC
+
+**Tool result:**
+
+```
+(Bash completed with no output)
+```
+
+## Assistant — 2026-11-25 04:49:57 UTC
+
+**Tool call: `Bash`**
+
+_Confirm run_modes import and compute numbers_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/repo; C=9052bd35928c6d40344e8e686c9abbe736bfadb9; git show $C:docs/slot7_hookup/tier1/run_modes.py | grep -n "run_tier1\|wrapped\|import" | head; git show $C:macros/en_ctrl_3v3/testbenches/spice/run_starve.py | sed -n 30,50p | cat -n | sed -n 1,20p; git log -1 --format='%H %ci %an %s' $C; python3 -c "
+import math
+vt=1.380649e-23*300.15/1.602176634e-19
+for T,n in ((27,1.009),):
+  print(3*n*vt, 3.458e-7*math.exp(-(11.64-3*n*vt)/(48.9*vt)))"; python3 - <<'EOF'
+import numpy as np
+a=np.genfromtxt('/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/dest/csv/sine_tt27.csv',delimiter=',',names=True,skip_header=1)
+print(a.dtype.names); print('kl-sch max', np.abs(a['pad_d2s_klayout']-a['pad_d2s_schematic']).max()*1e3, 'pex-sch', np.abs(a['pad_d2s_pex']-a['pad_d2s_schematic']).max()*1e3)
+EOF
+```
+
+## Tool results / harness — 2026-11-25 04:49:57 UTC
+
+**Tool result:**
+
+```
+12:import re
+13:import subprocess
+14:import sys
+15:from pathlib import Path
+18:import run_tier1 as T  # noqa: E402
+32:    incs = [T.wrapped(c) for c in T.SRC_PORTS]
+     1	def convert(cell):
+     2	    txt = (MAC / cell / "netlist" / "layout" / f"{cell}_klayout.cir").read_text()
+     3	    txt = txt.replace("\n+", " ").replace("\\$", "n_")
+     4	    out = []
+     5	    for line in txt.splitlines():
+     6	        t = line.split()
+     7	        if not t or t[0].startswith("*"):
+     8	            continue
+     9	        k = t[0][0].upper()
+    10	        if k == "M":
+    11	            prm = " ".join(p.lower() for p in t[6:] if not p.lower().startswith("rfmode"))
+    12	            out.append(f"X{t[0][1:]} {' '.join(t[1:5])} {t[5]} {prm}")
+    13	        elif k == "R":
+    14	            out.append(f"X{t[0][1:]} {' '.join(t[1:4])} {t[4]} {' '.join(p for p in t[5:] if not p.startswith('ps='))}")
+    15	        elif k == "D":
+    16	            out.append(f"X{t[0][1:]} {t[1]} {t[2]} {t[3]} " + " ".join(p.lower() for p in t[4:]))
+    17	        else:
+    18	            out.append(line)
+    19	    f = RUNS / f"{cell}_flat.spice"
+    20	    f.write_text("\n".join(out) + "\n")
+9052bd35928c6d40344e8e686c9abbe736bfadb9 2026-11-08 20:10:55 +0000 Claude slot_7 v3 (C6's requests: pnpMPA cell renamed, no KLayout context cell, X-card netlist for netgen; geometry XOR 0), checks clean in KLayout and magic+netgen; docs; roadmap for the next run; RUNLOG row 130
+0.07829313035521712 3.70565201
+… [188 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:50:04 UTC
+
+**Tool call: `Bash`**
+
+_Check MOS/resistor subckt parameter names_
+
+```bash
+cd /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models; grep -n -i -A6 "^.subckt sg13_hv_nmos" sg13g2_moshv_mod.lib | head -12; grep -n -A4 "^.subckt rppd\|^.subckt rhigh" resistors_mod.lib | head; A=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran/w; grep -m3 "sg13_hv_nmos" $A/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/netlist/schematic/sg13cmos5l_IOPadSingle2Diff.spice
+```
+
+## Tool results / harness — 2026-11-25 04:50:04 UTC
+
+**Tool result:**
+
+```
+66:.subckt sg13_hv_nmos d g s b
+67-+ w=0.35u l=0.34u ng=1 m=1 mm_ok=0 as=0 ad=0 pd=0 ps=0 trise=0 z1=0.34e-6 z2=0.38e-6 wmin=0.15e-6 rfmode=0 pre_layout=1
+68-* if as = 0, calculate value, else take it
+69-* if as is given externally, no adjustment for ng is done! -> must be done in the extractor
+70-* if ng>1 and as=0 (in schematic) recalculate!
+71-
+72-.include sg13g2_moshv_parm.lib
+107:.subckt rhigh 1 2 bn
+108-.param w=0.5e-6 l=0.96e-6 mm_ok=0 b=0 trise=0 m=1 sw_et=0
+109-+postsim=0
+110-+kappa=1.85
+111-+ps=0.18e-6
+--
+169:.subckt rppd 1 2 bn
+170-.param w=0.5e-6 l=0.5e-6 mm_ok=0 b=0 ps=0.18e-6 trise=0 m=1 sw_et=0
+171-+postsim=0
+172-+kappa=1.85
+XNI ni ni vss vss sg13_hv_nmos w=6u l=6u ng=1 m=1 mm_ok=1
+XNBPC vbpc ni vss vss sg13_hv_nmos w=2.4u l=6u ng=1 m=1 mm_ok=1
+XNBP vbp ni vss vss sg13_hv_nmos w=6u l=6u ng=1 m=1 mm_ok=1
+```
+
+## Assistant — 2026-11-25 04:50:09 UTC
+
+**Tool call: `Bash`**
+
+_Check background run progress_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; grep -v fix_diodes $K/runall.log | tail -8; tail -2 $K/pu_*.log
+```
+
+## Tool results / harness — 2026-11-25 04:50:09 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+tail: option used in invalid context -- 2
+```
+
+## Assistant — 2026-11-25 04:50:12 UTC
+
+**Tool call: `Bash`**
+
+_Check background run progress_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; grep -v fix_diodes $K/runall.log | tail -n 8; for f in $K/pu_*.log; do echo "== $f"; grep -v fix_diodes $f | tail -n 3; done; ls $K/w2 $K/w2/out_fixed/slot 2>/dev/null
+```
+
+## Tool results / harness — 2026-11-25 04:50:12 UTC
+
+**Tool result:**
+
+```
+Exit code 2
+== /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/pu_mon_sf_-40_3.0.log
+real	0m9.927s
+user	0m9.238s
+sys	0m1.789s
+== /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/pu_swap_sf_-40_3.0_pu0.log
+real	0m10.182s
+user	0m9.674s
+sys	0m1.974s
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/w2:
+design
+diode
+tier1
+```
+
+## Assistant — 2026-11-25 04:50:16 UTC
+
+**Tool call: `Bash`**
+
+_Inspect power-up run results_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; grep -h ROW $K/pu_*.log | cut -c1-400; ls $K/w/pu/*/; grep -a -i "timestep\|error\|trouble" $K/w/pu/*/*.log | head
+```
+
+## Tool results / harness — 2026-11-25 04:50:16 UTC
+
+**Tool result:**
+
+```
+ROW {'mode': 'mon', 'mos': 'sf', 'temp': -40, 'vdd': 3.0, 'variant': 'pu', 'cload': '10p', 'v_g_V': 'FAILED', 'v_ibg_V': 'FAILED', 'vcm_V': 'FAILED', 'vref_V': 'FAILED', 'i_slot_uA': 'FAILED', 't_g90_us': 'FAILED', 't_vcm98_us': 'FAILED', 'settle_85_90us_V': 'FAILED', 'err_max_mV': 'FAILED', 'n_samples': 0}
+ROW {'mode': 'swap', 'mos': 'sf', 'temp': -40, 'vdd': 3.0, 'variant': 'pu0', 'cload': 'none', 'v_g_V': 'FAILED', 'v_ibg_V': 'FAILED', 'vcm_V': 'FAILED', 'vref_V': 'FAILED', 'i_slot_uA': 'FAILED', 't_g90_us': 'FAILED', 't_vcm98_us': 'FAILED', 'settle_85_90us_V': 'FAILED', 'err_max_mV': 'FAILED', 'n_samples': 0}
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/w/pu/mon_sf_-40_3.0/:
+bias_dist_pd_flat.spice
+pad_ref_rb_flat.spice
+pu_mon_sf_-40_3.0.dat
+pu_mon_sf_-40_3.0.log
+pu_mon_sf_-40_3.0.spice
+sg13cmos5l_IOPadDiff2Single_flat.spice
+sg13cmos5l_IOPadSingle2Diff_flat.spice
+
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/w/pu/swap_sf_-40_3.0_pu0/:
+bias_dist_pd_flat.spice
+pad_ref_rb_flat.spice
+pu0_swap_sf_-40_3.0.dat
+pu0_swap_sf_-40_3.0.log
+pu0_swap_sf_-40_3.0.spice
+sg13cmos5l_IOPadDiff2Single_flat.spice
+sg13cmos5l_IOPadSingle2Diff_flat.spice
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/w/pu/mon_sf_-40_3.0/pu_mon_sf_-40_3.0.log:doAnalyses: TRAN:  Timestep too small; time = 6.25536e-06, timestep = 1.25e-20: trouble with dparea-instance d.x2d.xlay.x$3.d1
+/tmp/claude-0/-home-user/468ac
+… [1494 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:50:19 UTC
+
+**Tool call: `Bash`**
+
+_Show abort points of fixed power-up runs_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; grep -a -h "Timestep too small" $K/w/pu/*/*.log; grep -c "l=65.8u" $K/w/pu/*/sg13cmos5l_IOPadDiff2Single_flat.spice
+```
+
+## Tool results / harness — 2026-11-25 04:50:19 UTC
+
+**Tool result:**
+
+```
+doAnalyses: TRAN:  Timestep too small; time = 6.25536e-06, timestep = 1.25e-20: trouble with dparea-instance d.x2d.xlay.x$3.d1
+doAnalyses: TRAN:  Timestep too small; time = 6.26427e-06, timestep = 1.25e-20: trouble with dparea-instance d.x2d.xlay.x$167.d1
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/w/pu/mon_sf_-40_3.0/sg13cmos5l_IOPadDiff2Single_flat.spice:1
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/w/pu/swap_sf_-40_3.0_pu0/sg13cmos5l_IOPadDiff2Single_flat.spice:1
+```
+
+## Assistant — 2026-11-25 04:50:34 UTC
+
+**Tool call: `Bash`**
+
+_Draft modes step rewrite_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; python3 - <<'EOF'
+s=open('run.sh').read()
+old=s[s.index('modes() {'):s.index('eval_() {')]
+new='''modes() {   # ../slot_modes_bg/slot_modes.py with the fixed diodes: the designer's mode DC deck at ss -40 C 3.0 V (variant
+            # dcop) for the five modes that failed there (about 2 min each), and two power-up transients that aborted
+            # at the D2S pad diode in ../slot_modes_bg (sf -40 C: mon with 10 pF, swap with 1 Gohm only; ~10 s each)
+  for j in swap:ss:-40:3.0:dcop mon:ss:-40:3.0:dcop feed:ss:-40:3.0:dcop ext:ss:-40:3.0:dcop \\
+           swap+feed:ss:-40:3.0:dcop mon:sf:-40:3.0:pu swap:sf:-40:3.0:pu0; do
+    d=$(echo "$j" | tr ':' '_')
+    mkdir -p "$WORK/modes_fixed/$d"
+    cp "$SPICEINIT" "$WORK/modes_fixed/$d/.spiceinit"
+    rm -rf "$WORK/modes_out_fixed/$d"   # slot_modes.py appends to its CSVs
+    echo "$d $j"
+  done | xargs -P "$JOBS" -L 1 sh -c '$0 "$1" "$2" "$3" "$4/$5" "$6/$5" "$7"' "$HERE/run_fixed_sh" \\
+    "$HERE/../slot_modes_bg/slot_modes.py" "$WORK/modes_fixed" "$WORK/tier1" "$WORK/modes_fixed" "$WORK/modes_out_fixed"
+}
+
+'''
+s=s.replace(old,new); open('run.sh.new','w').write(s)
+EOF
+echo
+```
+
+## Tool results / harness — 2026-11-25 04:50:34 UTC
+
+**Tool result:**
+
+```
+(Bash completed with no output)
+```
+
+## Assistant — 2026-11-25 04:50:51 UTC
+
+**Tool call: `Bash`**
+
+_Rewrite modes step and evaluation safely_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; rm -f run.sh.new; python3 - <<'EOF'
+s=open('run.sh').read()
+old=s[s.index('modes() {'):s.index('eval_() {')]
+new='''modes() {   # ../slot_modes_bg/slot_modes.py with the fixed diodes: the designer's mode DC deck at ss -40 C 3.0 V (variant
+            # dcop) for the five modes that failed there (about 2 min each), and two power-up transients that aborted
+            # at the D2S pad diode in ../slot_modes_bg (sf -40 C: mon with 10 pF, swap with 1 Gohm only; ~10 s each)
+  local n=0 j d
+  for j in swap:ss:-40:3.0:dcop mon:ss:-40:3.0:dcop feed:ss:-40:3.0:dcop ext:ss:-40:3.0:dcop \\
+           swap+feed:ss:-40:3.0:dcop mon:sf:-40:3.0:pu swap:sf:-40:3.0:pu0; do
+    d=${j//:/_}
+    mkdir -p "$WORK/modes_fixed/$d"
+    cp "$SPICEINIT" "$WORK/modes_fixed/$d/.spiceinit"
+    rm -rf "$WORK/modes_out_fixed/$d"   # slot_modes.py appends to its CSVs
+    $FIX "$HERE/../slot_modes_bg/slot_modes.py" "$WORK/modes_fixed" "$WORK/tier1" "$WORK/modes_fixed/$d" \\
+      "$WORK/modes_out_fixed/$d" "$j" > "$WORK/modes_fixed/$d.out" 2>&1 &
+    n=$((n + 1))
+    if [ $((n % JOBS)) -eq 0 ]; then wait; fi
+  done
+  wait
+}
+
+'''
+s=s.replace(old,new); open('run.sh.new','w').write(s)
+EOF
+bash -n run.sh.new && chmod +x run.sh.new && mv run.sh.new run.sh && echo replaced
+python3 - <<'EOF'
+p='/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/evaluate.py'; s=open(p).read()
+a=s.index('def modes():'); b=s.index("if __name__ == '__main__':")
+new='''def modes():
+    rows = []
+    keys = ['err_max_mV', 'v_g_V', 'vcm_V', 'vref_V']
+    for f in sorted(glob.glob(str(WORK / 'modes_out_fixed' / '*' / 'slot_modes_*.csv'))):
+        d = Path(f).parent.name
+        logs = sorted(glob.glob(str(WORK / 'modes_fixed' / d / '*.log')))
+        tr = ''
+        if logs:
+            m = re.search(r'doAnalyses: \\w+:\\s+(.*?)\\n', Path(logs[0]).read_text())
+            tr = m.group(1).strip() if m else ''
+        with open(f) as fh:   # slot_modes.py writes key=value fields
+            for rec in csv.reader(line for line in fh if line.strip() and not line.startswith('#')):
+                r = dict(x.split('=', 1) for x in rec)
+                rows.append([r['mode'], r['mos'], r['temp'], r['vdd'], r['variant'], r.get('cload', '')]
+                            + [r.get(k, '') for k in keys] + [tr])
+    with open(DEST / 'csv' / 'modes_fixed.csv', 'w', newline='') as f:
+        f.write(HDR % "../slot_modes_bg/slot_modes.py (dcop = the designer's mode DC deck; pu / pu0 = power-up transient "
+                'with / without 10 pF on pad out), KLayout pads with the antenna diodes fixed; err_max_mV = max |pad out - '
+                'expected| or FAILED; ngspice = first abort message')
+        w = csv.writer(f)
+        w.writerow(['mode', 'corner_mos', 'temp', 'vdd', 'variant', 'cload'] + keys + ['ngspice'])
+        w.writerows(rows)
+
+
+'''
+s=s[:a]+new+s[b:]
+s=s.replace("csv/rt_range.csv, csv/modes_ss_m40.csv,","csv/rt_range.csv, csv/modes_fixed.csv,")
+s=s.replace("modes_out_fixed/<mode>/slot_modes_dcop.csv + modes_fixed/<mode>/dcop_*.log (ss -40 C mode DC)","modes_out_fixed/<job>/slot_modes_*.csv + modes_fixed/<job>/*.log (slot_modes.py runs)")
+open(p,'w').write(s)
+EOF
+grep -n "modes" /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/evaluate.py | head
+```
+
+## Tool results / harness — 2026-11-25 04:50:51 UTC
+
+**Tool result:**
+
+```
+replaced
+9:                  modes_out_fixed/<job>/slot_modes_*.csv + modes_fixed/<job>/*.log (slot_modes.py runs)
+12:  <dest_dir>      writes csv/sine_summary.csv, csv/sine_tt27.csv, csv/rt_range.csv, csv/modes_fixed.csv,
+200:def modes():
+203:    for f in sorted(glob.glob(str(WORK / 'modes_out_fixed' / '*' / 'slot_modes_*.csv'))):
+205:        logs = sorted(glob.glob(str(WORK / 'modes_fixed' / d / '*.log')))
+210:        with open(f) as fh:   # slot_modes.py writes key=value fields
+215:    with open(DEST / 'csv' / 'modes_fixed.csv', 'w', newline='') as f:
+216:        f.write(HDR % "../slot_modes_bg/slot_modes.py (dcop = the designer's mode DC deck; pu / pu0 = power-up transient "
+232:    modes()
+```
+
+## Assistant — 2026-11-25 04:51:14 UTC
+
+**Tool call: `Bash`**
+
+_Extend dc step and range table with S2D output CM_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; python3 - <<'EOF'
+s=open('run.sh').read()
+old='''dc() {      # DC round trip at the five tier-1 PVT points, KLayout pads fixed and as converted (about 10 s each)
+  local P="klayout:tt:27:3.3 klayout:ss:-40:3.0 klayout:ff:125:3.6 klayout:fs:125:3.6 klayout:sf:-40:3.0"
+  $FIX "$HERE/../dc_curves/roundtrip.py" "$WORK/fixed_rt_runs" "$WORK" "$WORK/out_fixed/rt" $P
+  python3 -I "$HERE/../dc_curves/roundtrip.py" "$WORK" "$WORK/out_orig/rt" $P
+}'''
+new='''dc() {      # DC round trip at the five tier-1 PVT points: KLayout pads fixed, and all three pad views as before
+            # (about 10 s per KLayout run, 10 ... 40 s per schematic / PEX run)
+  local PTS="tt:27:3.3 ss:-40:3.0 ff:125:3.6 fs:125:3.6 sf:-40:3.0" P="" Q="" p
+  for p in $PTS; do P="$P klayout:$p"; Q="$Q klayout:$p schematic:$p pex:$p"; done
+  $FIX "$HERE/../dc_curves/roundtrip.py" "$WORK/fixed_rt_runs" "$WORK" "$WORK/out_fixed/rt" $P
+  python3 -I "$HERE/../dc_curves/roundtrip.py" "$WORK" "$WORK/out_orig/rt" $Q
+}'''
+assert old in s; s=s.replace(old,new); open('run.sh.new','w').write(s)
+EOF
+bash -n run.sh.new && chmod +x run.sh.new && mv run.sh.new run.sh && echo replaced
+python3 - <<'EOF'
+p='/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/evaluate.py'; s=open(p).read()
+old="""        for tagv, lab in (('rerun', 'klayout as converted (rerun here)'), ('fixed', 'klayout, antenna diodes fixed')):
+            d = runs.get((tagv, 'klayout', c, t, v))
+            if d is None:
+                continue
+            m = DC.metrics(d)
+            rows.append([lab, c, t, v, '%.5f' % m['G'], '%.3f' % (m['emax01'] * 1e3), '%.4f' % m['lo1'],
+                         '%.4f' % m['hi1'], '%.4f' % m['olo1'], '%.4f' % m['ohi1']])"""
+new="""        for tagv, view, lab in (('rerun', 'schematic', 'schematic (rerun here)'), ('rerun', 'pex', 'pex (rerun here)'),
+                                ('rerun', 'klayout', 'klayout as converted (rerun here)'),
+                                ('fixed', 'klayout', 'klayout, antenna diodes fixed')):
+            d = runs.get((tagv, view, c, t, v))
+            if d is None:
+                continue
+            m = DC.metrics(d)
+            x = d['v(padin)']
+            cm = float(np.interp(0.5, x, (d['v(outp)'] + d['v(outn)']) / 2))
+            rows.append([lab, c, t, v, '%.5f' % m['G'], '%.3f' % (m['emax01'] * 1e3), '%.4f' % m['lo1'],
+                         '%.4f' % m['hi1'], '%.4f' % m['olo1'], '%.4f' % m['ohi1'],
+                         '%.4f' % float(np.interp(0.5, x, d['v(vcm_s2d)'])), '%.4f' % cm])"""
+assert old in s; s=s.replace(old,new)
+old="""            if r:
+                rows.append([f'{view} (../dc_curves committed)', c, t, v, r['gain'], r['max_abs_err_0to1V_mV'],
+                             r['in_lo_1mV'], r['in_hi_1mV'], r['out_lo_1mV'], r['out_hi_1mV']])"""
+new="""            if r:
+                rows.append([f'{view} (../dc_curves committed)', c, t, v, r['gain'], r['max_abs_err_0to1V_mV'],
+                             r['in_lo_1mV'], r['in_hi_1mV'], r['out_lo_1mV'], r['out_hi_1mV'], '', ''])"""
+assert old in s; s=s.replace(old,new)
+old="""                'with |error from the small-signal line| < 1 mV [V] (../dc_curves/rt.py definitions)')"""
+new="""                'with |error from the small-signal line| < 1 mV [V] (../dc_curves/rt.py definitions); vcm_s2d and the S2D '
+                'output common mode (outp + outn) / 2 at pad in 0.5 V [V]')"""
+assert old in s; s=s.replace(old,new)
+old="""                    'out_lo_1mV', 'out_hi_1mV'])"""
+new="""                    'out_lo_1mV', 'out_hi_1mV', 'vcm_s2d_V', 's2d_out_cm_V'])"""
+assert old in s; s=s.replace(old,new)
+s=s.replace("""        if k[0] == 'fixed' and ('rerun',) + k[1:] in runs:""","""        if k[0] == 'fixed' and ('rerun',) + k[1:] in runs:   # klayout only""")
+open(p,'w').write(s)
+EOF
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; grep -v fix_diodes runall.log | tail -n 5; ls w2
+```
+
+## Tool results / harness — 2026-11-25 04:51:14 UTC
+
+**Tool result:**
+
+```
+replaced
+design
+diode
+tier1
+```
+
+## Assistant — 2026-11-25 04:51:20 UTC
+
+**Tool call: `Bash`**
+
+_Wait and check run.sh progress_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; sleep 120; grep -v fix_diodes $K/runall.log | tail -n 15; ls $K/w2 $K/w2/out_fixed/slot 2>/dev/null; python3 -c "import numpy,matplotlib,PIL,sys;print(sys.version.split()[0],numpy.__version__,matplotlib.__version__,PIL.__version__)"
+```
+
+## Tool results / harness — 2026-11-25 04:53:20 UTC
+
+**Tool result:**
+
+```
+diode tran: default size | gear | ABORTED | 6.597230e-05 | 0.0783 | darea-instance d.x65.d1
+diode tran: extracted size | gear | completed |  |  | 
+diode tran: extracted size, trap | trap | completed |  |  | 
+diode tran: default size, trap | trap | ABORTED | 6.597230e-05 | 0.0783 | darea-instance d.x65.d1
+diode tran: default size, darea ibv=1e-30 | gear | completed |  |  | 
+diode tran: default size, darea rs=0 | gear | completed |  |  | 
+diode tran: default size, darea tt=0 | gear | completed |  |  | 
+diode tran: default size, darea cj0=0 | gear | STUCK (no end within the 60 s timeout; last time point given) | 6.597270e-05 | 0.0783 | 
+diode tran: extracted size, darea rs as default size | gear | completed |  |  | 
+diode tran: extracted size, darea cj0 as default size | gear | completed |  |  | 
+diode tran: extracted size, darea rs and cj0 as default size | gear | ABORTED | 6.597230e-05 | 0.0783 | dperim-instance d.x65.d2
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/w2:
+design
+diode
+fixed_slot_runs
+out_fixed
+tier1
+
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/w2/out_fixed/slot:
+slot_klayout_tt_27_3.3_sine_open.op
+3.13.18 2.5.3 3.11.2 12.3.0
+```
+
+## Assistant — 2026-11-25 04:53:34 UTC
+
+**Tool call: `Bash`**
+
+_Run fixed AC and step at tt 27 C_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; D=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps; export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1; cd $K; time python3 -I $D/klayout_pad_diodes/run_fixed.py $D/ac_tran/slot.py $K/w/fixed_slot_runs $K/w $K/w/out_fixed/slot klayout:tt:27:3.3:ac klayout:tt:27:3.3:step | grep -v fix_diodes; head -3 $D/ac_tran/csv/rt_ac_summary.csv; grep "tt 27" $D/ac_tran/csv/rt_ac_summary.csv $D/ac_tran/csv/rt_step_summary.csv | grep -i "klayout\|schem"
+```
+
+## Tool results / harness — 2026-11-25 04:54:28 UTC
+
+**Tool result:**
+
+```
+slot_klayout_tt_27_3.3_ac ok 
+slot_klayout_tt_27_3.3_step_open ok 
+
+real	0m54.027s
+user	1m0.005s
+sys	0m16.321s
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# IHP sg13cmos5l simulation: slot-7 round trip ac, pads schematic | magic PEX | KLayout-extracted; units: G_1k_dB dB (pad_d2s/pad_s2d at 1 kHz), f3dB Hz, Peak_dB dB above the 1 kHz gain, ph_f3dB deg
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/ac_tran/csv/rt_ac_summary.csv:schematic,tt 27 °C 3.3 V,open,,-0.0108072,1.53223e+06,0,-71.9041
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/ac_tran/csv/rt_ac_summary.csv:schematic,tt 27 °C 3.3 V,10p,,-0.0116939,1.26477e+06,0,-70.6455
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/ac_tran/csv/rt_ac_summary.csv:schematic,tt 27 °C 3.3 V,100p,,-0.011693,1.52333e+06,0,-89.8046
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/ac_tran/csv/rt_ac_summary.csv:klayout,tt 27 °C 3.3 V,open,,-0.0111624,1.51422e+06,0,-71.8335
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/ac_tran/csv/rt_ac_summary.csv:klayout,tt 27 °C 3.3 V,10p,,-0.0123185,1.21973e+06,0,-70.3528
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/ac_tran/csv/rt_ac_summary.csv:klayout,tt 27 °C 3.3 V,100p,,-0.0123175,1.48725e+06,0,-90.9913
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/ac_tran/csv/rt_step_summary.csv:schematic,tt 27 °C 3.3 V,open,,0.499358,4.601e-07,6.33166e-07,1.28165e-05,-0.499358,4.60889e-07,6.34369e-07,1.12144e-05,0.998716
+/home/user/s
+… [1011 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:54:32 UTC
+
+**Tool call: `Bash`**
+
+_Compute fixed AC/step scalars_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/ac_tran; python3 - <<EOF
+import sys; sys.path.insert(0,'.')
+import rt as AT
+for ld in ('open','10p','100p'):
+    d=AT.rd('$K/w/out_fixed/slot/slot_klayout_tt_27_3.3_ac.ac_'+ld); print(ld, AT.ac_scalars(d))
+d=AT.rd('$K/w/out_fixed/slot/slot_klayout_tt_27_3.3_step_open.step'); print(AT.step_scalars(d))
+EOF
+```
+
+## Tool results / harness — 2026-11-25 04:54:33 UTC
+
+**Tool result:**
+
+```
+open {'G_1k_dB': -0.01116235497, 'f3dB': np.float64(1515288.6967020745), 'Peak_dB': 0.0, 'ph_f3dB': -71.89240049777423}
+10p {'G_1k_dB': -0.01231850551, 'f3dB': np.float64(1220252.8898296372), 'Peak_dB': 0.0, 'ph_f3dB': -70.38917961999636}
+100p {'G_1k_dB': -0.01231746816, 'f3dB': np.float64(1487947.9733820823), 'Peak_dB': 0.0, 'ph_f3dB': -91.05174329380785}
+{'step_rise': np.float64(0.49933677), 'ts1_rise': np.float64(4.662879834998708e-07), 'ts0.1_rise': np.float64(6.424450667064028e-07), 'overshoot_rise': 8.611422708248995e-06, 'step_fall': np.float64(-0.49933677), 'ts1_fall': np.float64(4.660567390170105e-07), 'ts0.1_fall': np.float64(6.419230958282968e-07), 'overshoot_fall': 8.210891389026642e-06, 'gain_step': np.float64(0.99867354)}
+```
+
+## Assistant — 2026-11-25 04:54:49 UTC
+
+**Tool call: `Bash`**
+
+_Add AC/step check to run.sh and evaluate.py_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; python3 - <<'EOF'
+s=open('run.sh').read()
+old='''sine() {    # 10 kHz sine, tt 27 C, KLayout pads with the diodes fixed (unloaded, 1 kOhm || 100 pF; about 2 min each),
+            # and the control: the same run as converted (aborts at 66 us; slot.py then retries with rshunt)
+  $FIX "$HERE/../ac_tran/slot.py" "$WORK/fixed_slot_runs" "$WORK" "$WORK/out_fixed/slot" \\
+    klayout:tt:27:3.3:sine klayout:tt:27:3.3:sine:100p'''
+new='''sine() {    # 10 kHz sine, tt 27 C, KLayout pads with the diodes fixed (unloaded, 1 kOhm || 100 pF; about 2 min each),
+            # AC and unloaded step (under 1 min), and the control: the sine as converted (aborts at 66 us; slot.py then
+            # retries with rshunt, which aborts too)
+  $FIX "$HERE/../ac_tran/slot.py" "$WORK/fixed_slot_runs" "$WORK" "$WORK/out_fixed/slot" \\
+    klayout:tt:27:3.3:sine klayout:tt:27:3.3:sine:100p klayout:tt:27:3.3:ac klayout:tt:27:3.3:step'''
+assert old in s; s=s.replace(old,new); open('run.sh.new','w').write(s)
+EOF
+bash -n run.sh.new && chmod +x run.sh.new && mv run.sh.new run.sh && echo replaced
+python3 - <<'EOF'
+p='/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/evaluate.py'; s=open(p).read()
+new='''def ac_step():
+    """AC / step at tt 27 C with the fixed diodes against ../ac_tran's committed KLayout / schematic rows."""
+    ref = {}
+    for ana in ('ac', 'step'):
+        with open(HERE.parent / 'ac_tran' / 'csv' / f'rt_{ana}_summary.csv') as f:
+            for r in csv.DictReader(line for line in f if not line.startswith('#')):
+                if r['point'] == 'tt 27 °C 3.3 V' and r['view'] in ('schematic', 'pex', 'klayout'):
+                    ref[(ana, r['view'], r['load'])] = r
+    rows = []
+    sd = WORK / 'out_fixed' / 'slot'
+    for ld in ('open', '10p', '100p'):
+        p = sd / f'slot_klayout_tt_27_3.3_ac.ac_{ld}'
+        fx = AT.ac_scalars(AT.rd(p)) if p.exists() else None
+        for v in ('schematic', 'pex', 'klayout'):
+            r = ref.get(('ac', v, ld))
+            if r:
+                rows.append(['ac', f'{v} (../ac_tran committed)', ld, 'f3dB_Hz', '%.6g' % float(r['f3dB'])])
+        if fx:
+            rows.append(['ac', 'klayout, antenna diodes fixed', ld, 'f3dB_Hz', '%.6g' % fx['f3dB']])
+    p = sd / 'slot_klayout_tt_27_3.3_step_open.step'
+    fx = AT.step_scalars(AT.rd(p)) if p.exists() else None
+    for k in ('ts1_rise', 'ts0.1_rise', 'gain_step'):
+        for v in ('schematic', 'pex', 'klayout'):
+            r = ref.get(('step', v, 'open'))
+            if r:
+                rows.append(['step', f'{v} (../ac_tran committed)', 'open', k, '%.6g' % float(r[k])])
+        if fx:
+            rows.append(['step', 'klayout, antenna diodes fixed', 'open', k, '%.6g' % fx[k]])
+    with open(DEST / 'csv' / 'ac_step_tt27.csv', 'w', newline='') as f:
+        f.write(HDR % 'round trip tt 27 C 3.3 V: f-3dB (relative to 1 kHz) and step 0.25 -> 0.75 V settling (1 %% / '
+                '0.1 %%, s) and gain, ../ac_tran/rt.py definitions')
+        w = csv.writer(f)
+        w.writerow(['analysis', 'pads', 'load', 'quantity', 'value'])
+        w.writerows(rows)
+
+
+def modes():'''
+s=s.replace('def modes():', new, 1)
+s=s.replace("    print('max |dV| DC round trip", "    ac_step()\n    print('max |dV| DC round trip")
+s=s.replace("csv/rt_range.csv, csv/modes_fixed.csv,","csv/rt_range.csv, csv/ac_step_tt27.csv, csv/modes_fixed.csv,")
+open(p,'w').write(s)
+EOF
+head -4 /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/ac_tran/csv/rt_step_summary.csv | tail -n 1
+```
+
+## Tool results / harness — 2026-11-25 04:54:50 UTC
+
+**Tool result:**
+
+```
+replaced
+view,point,load,aid,step_rise,ts1_rise,ts0.1_rise,overshoot_rise,step_fall,ts1_fall,ts0.1_fall,overshoot_fall,gain_step
+```
+
+## Assistant — 2026-11-25 04:54:55 UTC
+
+**Tool call: `Bash`**
+
+_Fix format and test evaluate_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; sed -i "s|settling (1 %% / '|settling (1 % / '|; s|'0.1 %%, s) and gain|'0.1 %, s) and gain|" evaluate.py; grep -n "settling (1" -A1 evaluate.py; cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; python3 -I /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/evaluate.py w ../actran/w/out/slot dest 2>&1 | tail -n 3; cat dest/csv/ac_step_tt27.csv dest/csv/modes_fixed.csv; head -8 dest/csv/rt_range.csv; grep -v fix_diodes runall.log | tail -n 3
+```
+
+## Tool results / harness — 2026-11-25 04:54:57 UTC
+
+**Tool result:**
+
+```
+235:        f.write(HDR % 'round trip tt 27 C 3.3 V: f-3dB (relative to 1 kHz) and step 0.25 -> 0.75 V settling (1 % / '
+236-                '0.1 %, s) and gain, ../ac_tran/rt.py definitions')
+max |dV| DC round trip, fixed vs as converted (all saved nodes, all PVT): 2.000000165480742e-09
+# IHP sg13cmos5l simulation, slot 7 tier-1 deck; round trip tt 27 C 3.3 V: f-3dB (relative to 1 kHz) and step 0.25 -> 0.75 V settling (1 % / 0.1 %, s) and gain, ../ac_tran/rt.py definitions
+analysis,pads,load,quantity,value
+ac,schematic (../ac_tran committed),open,f3dB_Hz,1.53223e+06
+ac,pex (../ac_tran committed),open,f3dB_Hz,1.35559e+06
+ac,klayout (../ac_tran committed),open,f3dB_Hz,1.51422e+06
+ac,"klayout, antenna diodes fixed",open,f3dB_Hz,1.51529e+06
+ac,schematic (../ac_tran committed),10p,f3dB_Hz,1.26477e+06
+ac,pex (../ac_tran committed),10p,f3dB_Hz,1.12232e+06
+ac,klayout (../ac_tran committed),10p,f3dB_Hz,1.21973e+06
+ac,"klayout, antenna diodes fixed",10p,f3dB_Hz,1.22025e+06
+ac,schematic (../ac_tran committed),100p,f3dB_Hz,1.52333e+06
+ac,pex (../ac_tran committed),100p,f3dB_Hz,1.32479e+06
+ac,klayout (../ac_tran committed),100p,f3dB_Hz,1.48725e+06
+ac,"klayout, antenna diodes fixed",100p,f3dB_Hz,1.48795e+06
+step,schematic (../ac_tran committed),open,ts1_rise,4.601e-07
+step,pex (../ac_tran committed),open,ts1_rise,5.16697e-07
+step,klayout (../ac_tran committed),open,ts1_rise,4.66547e-07
+step,"klayout, antenna diodes fixed",open,ts1_rise,4.66288e-07
+step,schematic (../ac_tr
+… [2724 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:55:06 UTC
+
+**Tool call: `Bash`**
+
+_Restart reproduction with the updated run.sh_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; pkill -f "run.sh $K/../actran/w $K/w2"; pkill -f "run_fixed.py.*w2"; pkill -f "slot.py $K/w2"; sleep 2; pkill -f "ngspice -b slot_klayout"; sleep 1; ps aux | grep -c "[n]gspice"; cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; (for s in sine dc modes eval; do echo "=== step $s"; time ./run.sh $K/../actran/w $K/w2 $s; done) > $K/runall2.log 2>&1 &
+echo started
+```
+
+## Tool results / harness — 2026-11-25 04:55:09 UTC
+
+**Tool result:**
+
+```
+0
+started
+```
+
+## Assistant — 2026-11-25 04:56:15 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/README.md`
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# KLayout-extracted pads: antenna diodes simulated at the wrong size
+
+**IHP sg13cmos5l simulation**, ngspice-47 with the IHP OSDI models and the PDK's `diodes.lib`. Slot 7 tier-1 deck of
+the designer (design repository commit 9052bd35), pads in the KLayout-extracted view that the designer's tier-1 /
+mode scripts use. Follow-up to [../ac_tran/results.md](../ac_tran/results.md) section 1 (the 10 kHz sine through the
+KLayout-extracted pads aborts), [../slot_modes_bg](../slot_modes_bg) (ss / sf −40 °C aborts in the pads' antenna
+diodes) and [../dc_curves/results.md](../dc_curves/results.md) section 3 (KLayout-extracted pads shift the round-trip
+range ends by up to 55 mV). Status: complete (runs of 2026-11-25).
+
+## Question and hypothesis
+
+The KLayout-extracted pad netlists are converted to simulator syntax by the designer's scripts before simulation.
+Hypothesis: the antenna / ESD diodes come out of that conversion at the wrong size (the converted call passes `a=` /
+`p=`, the PDK subcircuit reads only `l` / `w`), and that is what makes the sine abort and perhaps shifts the range ends.
+
+## Answer
+
+| item | result |
+|---|---|
+| conversion bug | **real**. Every `dantenna` / `dpantenna` of both pads is simulated at the PDK default size 0.78 × 0.78 µm. ngspice prints no message about it. |
+| 10 kHz sine, tt 27 °C, KLayout pads (the open item of ../ac_tran) | **cured by the size fix**. Runs through with no solver aid. Matches the schematic pads to 0.07 mV (unloaded). |
+| why the wrong size makes the sine abort | `darea` (the area part of `dantenna`) has a current step of 37 pA in ngspice at a reverse voltage of exactly 3·n·kT/q = 78.3 mV. pad_s2d = 0.0783 V is that voltage on the S2D pad diode X$65. With the default size, ngspice cannot get past the step. With the extracted size, it can. |
+| round-trip DC range ends (../dc_curves) | **not explained by the diodes**. They are unchanged by the fix: every node within 2 nV at all five PVT points. The shift sits in the S2D output common mode, which is 33 mV lower in the KLayout view at tt 27 °C. The cause is not found here. |
+| AC / step through the KLayout pads (../ac_tran) | almost unchanged by the fix: f−3dB +0.04 … +0.07 %, settling −0.3 ns |
+| ss −40 °C mode DC (../slot_modes_bg) | **not cured**. All five failing modes still fail with the diodes fixed. |
+| sf −40 °C power-up transients (../slot_modes_bg) | **not cured**. Both still abort, now earlier in the supply ramp. |
+| magic PEX round trip at sf −40 °C, which stops at pad in 1.435 V (../dc_curves) | not addressed: the PEX netlist already has `l` / `w` |
+
+## Where the bug is (for the designer)
+
+Design repository `tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single`, commit
+`9052bd35928c6d40344e8e686c9abbe736bfadb9`, file `macros/en_ctrl_3v3/testbenches/spice/run_starve.py`, function
+`convert()`, lines 44–45:
+
+ʼʼʼpython
+        elif k == "D":
+            out.append(f"X{t[0][1:]} {t[1]} {t[2]} {t[3]} " + " ".join(p.lower() for p in t[4:]))
+ʼʼʼ
+
+KLayout's SG13 LVS writes `D$65 iovss pad dantenna A=35.0028p P=58.08u m=2`, with the area in m² and the perimeter in
+m. `convert()` turns this into the subcircuit call `X$65 iovss pad dantenna a=35.0028p p=58.08u m=2`.
+
+The PDK subcircuits are in `libs.tech/ngspice/models/diodes.lib`, lines 49–57 and 80–87:
+
+ʼʼʼ
+.subckt dantenna 1 2
+.params l=780n   w=780n   DEV_A=(l*w)/1p  DEV_P=(l+w)/0.5u  DEV_C=4
+D1 1 2 darea area=DEV_A
+D2 1 2 dperim area=DEV_P
+D3 1 2 dcorner area=DEV_C
+ʼʼʼ
+
+These subcircuits take only `l` and `w`. ngspice drops the unknown `a=` / `p=` without a message. Each diode therefore
+gets DEV_A = 0.6084 and DEV_P = 3.12 instead of 35.0028 / 58.08 (S2D X$63, X$65) and 82.908 / 134.12, 85.176 / 137.72
+(D2S X$3, X$5); that is 0.7 … 1.7 % of the area. The D2S's internal clamp diodes X$165 … X$168 (1.98 / 3.19 µm²) are
+affected too.
+
+`convert()` is used by:
+
+- `docs/slot7_hookup/tier1/run_tier1.py` `wrap
+… [12102 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 04:56:15 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/README.md (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 04:56:22 UTC
+
+**Tool call: `Bash`**
+
+_Check S2D schematic resistor structure_
+
+```bash
+A=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran/w; f=$A/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/netlist/schematic/sg13cmos5l_IOPadSingle2Diff.spice; grep -c "rhigh" $f; grep -n "^\.subckt\|^x.*unit_r\|^X.*unit_r" -i $f | head -20; grep -n "^X\|^\.subckt" $f | grep -iv "hv_nmos\|hv_pmos" | head -30
+```
+
+## Tool results / harness — 2026-11-25 04:56:22 UTC
+
+**Tool result:**
+
+```
+6
+2:.subckt sg13cmos5l_IOPadSingle2Diff iovdd iovss vdd vss pad outp outn vcm vref iref en_3v3 en_3v3_b
+13:.subckt bias_tree_noab_pd vdd vss iref vbp vbn vbpc vbnc en_3v3 en_3v3_b
+35:.subckt s2d_mpdda_pd vdd vss vin vref vcm voutp voutn vfbp vfbn vbp vbn vbpc vbnc en_3v3 en_3v3_b
+73:.subckt s2d_pad_esd iovdd iovss pad
+89:.subckt s2d_mpdda vdd vss vin vref vcm voutp voutn vfbp vfbn vbp vbn vbpc vbnc
+91:XA1 x y vin vref vdd vss vbp unit_r2
+92:XA2 x y vin vref vdd vss vbp unit_r2
+93:XF1 x y vcm vfbp vdd vss vbp unit_r2
+94:XF2 x y vfbn vcm vdd vss vbp unit_r2
+105:XM1 xc yc vfbp vcm vdd vss vbp unit_r2
+106:XM2 xc yc vfbn vcm vdd vss vbp unit_r2
+123:.subckt unit_r2 x y gp gn vdd vss vbp
+2:.subckt sg13cmos5l_IOPadSingle2Diff iovdd iovss vdd vss pad outp outn vcm vref iref en_3v3 en_3v3_b
+13:.subckt bias_tree_noab_pd vdd vss iref vbp vbn vbpc vbnc en_3v3 en_3v3_b
+35:.subckt s2d_mpdda_pd vdd vss vin vref vcm voutp voutn vfbp vfbn vbp vbn vbpc vbnc en_3v3 en_3v3_b
+52:XRD[1] vss vss vss rhigh w=0.5u l=12.65u m=1 b=0 mm_ok=1
+53:XRD[0] vss vss vss rhigh w=0.5u l=12.65u m=1 b=0 mm_ok=1
+73:.subckt s2d_pad_esd iovdd iovss pad
+75:XDP1 pad iovdd dpantenna l=27.78u w=1.26u
+76:XDN1 iovss pad dantenna l=27.78u w=1.26u
+77:XDP2 pad iovdd dpantenna l=27.78u w=1.26u
+78:XDN2 iovss pad dantenna l=27.78u w=1.26u
+79:XRP iovdd gp iovss rppd w=0.5u l=12.9u m=1 b=0 mm_ok=1
+81:XRN gn iovss iovss rppd w=0.5u l=3.54u m=1 b=0 mm_ok=1
+89:.subckt s2d_mpdda vdd vss vin vref vcm voutp voutn vfbp vfbn vbp vbn vbpc v
+… [523 more characters cut]
+```
+
+## Assistant — 2026-11-25 04:56:26 UTC
+
+**Tool call: `Edit`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/README.md`
+
+old:
+```
+netlist is not found. Not tested: KLayout merges each chain of four 12.65 µm `rhigh` segments of the schematic
+     into one 50.6 µm device, and the resistor bodies are tied to iovss instead of vss.
+```
+
+new:
+```
+netlist is not found. A candidate, not tested: KLayout merges each of the six four-segment `rhigh` chains
+     (4 × 12.65 µm, `unit_r2`, which includes the common-mode sense pair XM1 / XM2) into one 50.6 µm device
+     (R$126 … R$131).
+```
+
+## Tool results / harness — 2026-11-25 04:56:26 UTC
+
+**Tool result:**
+
+```
+The file /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/README.md has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 04:56:28 UTC
+
+**Tool call: `Bash`**
+
+_Check reproduction progress_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; grep -v fix_diodes $K/runall2.log | tail -n 12
+```
+
+## Tool results / harness — 2026-11-25 04:56:28 UTC
+
+**Tool result:**
+
+```
+=== step sine
+```
+
+## Assistant — 2026-11-25 04:56:32 UTC
+
+**Tool call: `Edit`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/README.md`
+
+old:
+```
+1.7 % of their area. In DC sweeps on a coarse grid this was harmless (a DC point rarely lands inside the 0.5 mV
+  where the step matters). Transients through a pad at 78 mV (27 °C) or 61 … 104 mV (−40 … 125 °C) abort.
+```
+
+new:
+```
+1.7 % of their area. The 5 mV and 50 mV DC sweeps went through. The diode alone does not finish a 0.1 mV sweep
+  at 27 °C, so a DC point can land where ngspice gets stuck. A transient that takes a pad slowly through 78 mV at
+  27 °C aborts (61 mV at −40 °C, 104 mV at 125 °C).
+```
+
+## Tool results / harness — 2026-11-25 04:56:32 UTC
+
+**Tool result:**
+
+```
+The file /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/README.md has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 04:56:37 UTC
+
+**Tool call: `Edit`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/README.md`
+
+old:
+```
+at 27 °C, so a DC point can land where ngspice gets stuck. A transient that takes a pad slowly through 78 mV at
+  27 °C aborts (61 mV at −40 °C, 104 mV at 125 °C).
+```
+
+new:
+```
+at 27 °C, so a DC point can land where ngspice gets stuck. A transient that takes the S2D pad through 78 mV at
+  27 °C aborts. The step is also at 61 mV (−40 °C, 4.9 pA) and 104 mV (125 °C, 0.76 nA); whether a transient aborts
+  there was not tested.
+```
+
+## Tool results / harness — 2026-11-25 04:56:37 UTC
+
+**Tool result:**
+
+```
+The file /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/README.md has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 04:56:39 UTC
+
+**Tool call: `Bash`**
+
+_Wait for reproduction progress_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; sleep 240; grep -v fix_diodes $K/runall2.log | tail -n 12
+```
+
+## Tool results / harness — 2026-11-25 05:00:39 UTC
+
+**Tool result:**
+
+```
+=== step sine
+slot_klayout_tt_27_3.3_sine_open ok 
+slot_klayout_tt_27_3.3_sine_100p ok 
+slot_klayout_tt_27_3.3_ac ok 
+slot_klayout_tt_27_3.3_step_open ok
+```
+
+## Assistant — 2026-11-25 05:00:42 UTC
+
+**Tool call: `Bash`**
+
+_Wait for further reproduction progress_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; sleep 300; grep -v fix_diodes $K/runall2.log | tail -n 25
+```
+
+## Tool results / harness — 2026-11-25 05:05:42 UTC
+
+**Tool result:**
+
+```
+=== step sine
+slot_klayout_tt_27_3.3_sine_open ok 
+slot_klayout_tt_27_3.3_sine_100p ok 
+slot_klayout_tt_27_3.3_ac ok 
+slot_klayout_tt_27_3.3_step_open ok 
+slot_klayout_tt_27_3.3_sine_open FAILED (rshunt retry)
+
+real	6m33.289s
+user	7m29.231s
+sys	5m15.773s
+=== step dc
+rt_klayout_tt_27_3.3 ok
+rt_klayout_ss_-40_3.0 ok
+rt_klayout_ff_125_3.6 ok
+rt_klayout_fs_125_3.6 ok
+rt_klayout_sf_-40_3.0 ok
+```
+
+## Assistant — 2026-11-25 05:05:45 UTC
+
+**Tool call: `Bash`**
+
+_Wait for dc/modes steps_
+
+```bash
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; sleep 420; grep -v fix_diodes $K/runall2.log | tail -n 25
+```
+
+## Tool results / harness — 2026-11-25 05:12:45 UTC
+
+**Tool result:**
+
+```
+=== step sine
+slot_klayout_tt_27_3.3_sine_open ok 
+slot_klayout_tt_27_3.3_sine_100p ok 
+slot_klayout_tt_27_3.3_ac ok 
+slot_klayout_tt_27_3.3_step_open ok 
+slot_klayout_tt_27_3.3_sine_open FAILED (rshunt retry)
+
+real	6m33.289s
+user	7m29.231s
+sys	5m15.773s
+=== step dc
+rt_klayout_tt_27_3.3 ok
+rt_klayout_ss_-40_3.0 ok
+rt_klayout_ff_125_3.6 ok
+rt_klayout_fs_125_3.6 ok
+rt_klayout_sf_-40_3.0 ok
+```
+
+## Assistant — 2026-11-25 05:12:48 UTC
+
+**Tool call: `Bash`**
+
+_Check which DC run is in progress_
+
+```bash
+ps aux | grep "[n]gspice" | awk '{print $10, $NF}'; ls /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/w2/out_orig/rt/
+```
+
+## Tool results / harness — 2026-11-25 05:12:49 UTC
+
+**Tool result:**
+
+```
+10:09 rt_pex_sf_-40_3.0.spice
+rt_klayout_ff_125_3.6.csv
+rt_klayout_ff_125_3.6.log
+rt_klayout_fs_125_3.6.csv
+rt_klayout_fs_125_3.6.log
+rt_klayout_sf_-40_3.0.csv
+rt_klayout_sf_-40_3.0.log
+rt_klayout_ss_-40_3.0.csv
+rt_klayout_ss_-40_3.0.log
+rt_klayout_tt_27_3.3.csv
+rt_klayout_tt_27_3.3.log
+rt_pex_ff_125_3.6.csv
+rt_pex_ff_125_3.6.log
+rt_pex_fs_125_3.6.csv
+rt_pex_fs_125_3.6.log
+rt_pex_ss_-40_3.0.csv
+rt_pex_ss_-40_3.0.log
+rt_pex_tt_27_3.3.csv
+rt_pex_tt_27_3.3.log
+rt_schematic_ff_125_3.6.csv
+rt_schematic_ff_125_3.6.log
+rt_schematic_fs_125_3.6.csv
+rt_schematic_fs_125_3.6.log
+rt_schematic_sf_-40_3.0.csv
+rt_schematic_sf_-40_3.0.log
+rt_schematic_ss_-40_3.0.csv
+rt_schematic_ss_-40_3.0.log
+rt_schematic_tt_27_3.3.csv
+rt_schematic_tt_27_3.3.log
+```
+
+## Assistant — 2026-11-25 05:12:53 UTC
+
+**Tool call: `Bash`**
+
+_Wait for PEX sf -40 DC run_
+
+```bash
+sleep 180; ps aux | grep "[n]gspice" | awk '{print $10, $NF}'; grep -v fix_diodes /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/runall2.log | tail -n 4
+```
+
+## Tool results / harness — 2026-11-25 05:12:53 UTC
+
+**Tool result:**
+
+```
+<tool_use_error>Blocked: sleep 180 followed by: ps aux grep "[n]gspice" awk '{print $10, $NF}' grep -v fix_diodes /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/runall2.log tail -n 4. To wait for a condition, use Monitor with an until-loop (e.g. `until <check>; do sleep 2; done`). To wait for a command you started, use run_in_background: true. Do not chain shorter sleeps to work around this block.</tool_use_error>
+```
+
+## Assistant — 2026-11-25 05:12:57 UTC
+
+**Tool call: `Bash`**
+
+_Wait until the PEX sf -40 run ends_
+
+```bash
+until ! pgrep -f "rt_pex_sf_-40_3.0.spice" >/dev/null; do sleep 5; done; grep -v fix_diodes /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/runall2.log | tail -n 6
+```
+
+## Tool results / harness — 2026-11-25 05:13:02 UTC
+
+**Tool result:**
+
+```
+rt_pex_sf_-40_3.0 ABORTED (sweep written up to the abort point): Timestep too small;  vin = 1.435: trouble with dparea-instance d.x2s.x43.d1
+
+real	11m16.848s
+user	11m33.979s
+sys	9m15.772s
+=== step modes
+```
+
+## Assistant — 2026-11-25 05:13:07 UTC
+
+**Tool call: `Bash`**
+
+_Wait for modes and eval to finish, show results_
+
+```bash
+until grep -q "=== step eval" /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/runall2.log && ! pgrep -f "run.sh" >/dev/null; do sleep 5; done; grep -v fix_diodes /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine/runall2.log | tail -n 12; cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; cat csv/modes_fixed.csv csv/sine_summary.csv; grep -i "klayout\|rerun" csv/rt_range.csv | grep "tt,27"; ls -la csv plots
+```
+
+## Tool results / harness — 2026-11-25 05:17:22 UTC
+
+**Tool result:**
+
+```
+sys	9m15.772s
+=== step modes
+
+real	4m16.902s
+user	10m8.987s
+sys	2m19.634s
+=== step eval
+max |dV| DC round trip, fixed vs as converted (all saved nodes, all PVT): 2.000000165480742e-09
+
+real	0m1.371s
+user	0m1.627s
+sys	0m0.071s
+# IHP sg13cmos5l simulation, slot 7 tier-1 deck; ../slot_modes_bg/slot_modes.py (dcop = the designer's mode DC deck; pu / pu0 = power-up transient with / without 10 pF on pad out), KLayout pads with the antenna diodes fixed; err_max_mV = max |pad out - expected| or FAILED; ngspice = first abort message
+mode,corner_mos,temp,vdd,variant,cload,err_max_mV,v_g_V,vcm_V,vref_V,ngspice
+ext,ss,-40,3.0,dcop,,FAILED,,,,Timestep too small;  vin = 0: trouble with dparea-instance d.x2s.xlay.x$63.d1
+feed,ss,-40,3.0,dcop,,FAILED,,,,Timestep too small; trouble with dparea-instance d.x2s.xlay.x$63.d1
+mon,sf,-40,3.0,pu,10p,FAILED,FAILED,FAILED,FAILED,"Timestep too small; time = 6.25536e-06, timestep = 1.25e-20: trouble with dparea-instance d.x2d.xlay.x$3.d1"
+mon,ss,-40,3.0,dcop,,FAILED,,,,Timestep too small;  vin = 0: trouble with dparea-instance d.x2s.xlay.x$63.d1
+swap+feed,ss,-40,3.0,dcop,,FAILED,,,,Timestep too small; trouble with dparea-instance d.x2s.xlay.x$63.d1
+swap,sf,-40,3.0,pu0,none,FAILED,FAILED,FAILED,FAILED,"Timestep too small; time = 6.26427e-06, timestep = 1.25e-20: trouble with dparea-instance d.x2d.xlay.x$167.d1"
+swap,ss,-40,3.0,dcop,,FAILED,,,,Timestep too small;  vin = 0: trouble with dparea-instance d.x2s.xlay.x$63.d1
+# IHP sg13cmos5l simulation
+… [2360 more characters cut]
+```
+
+## Assistant — 2026-11-25 05:17:27 UTC
+
+**Tool call: `Bash`**
+
+_Check reruns agree with committed DC values_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; head -3 csv/diode_params.csv; python3 - <<'EOF'
+import csv
+rows=[r for r in csv.reader(l for l in open('csv/rt_range.csv') if not l.startswith('#'))][1:]
+ref={(r[0].split()[0],r[1],r[2]):r for r in rows if 'committed' in r[0]}
+for r in rows:
+    if 'rerun' in r[0]:
+        v=r[0].split()[0]; c=ref[(v,r[1],r[2])]
+        d=[abs(float(a)-float(b)) for a,b in zip(r[4:10],c[4:10])]
+        print(r[0],r[1],r[2],'max diff',max(d))
+EOF
+```
+
+## Tool results / harness — 2026-11-25 05:17:27 UTC
+
+**Tool result:**
+
+```
+# IHP sg13cmos5l simulation (ngspice, PDK diodes.lib): area factor each component diode of dpantenna gets (listing expand); ngspice message about a= / p=: none
+instance,call,component,model,area,m
+xap,a=35.0028p p=58.08u m=2 (converted KLayout netlist),d1,dparea,0.6084000000000002,2.0
+schematic (rerun here) tt 27 max diff 0.0
+pex (rerun here) tt 27 max diff 0.0
+klayout as converted (rerun here) tt 27 max diff 0.0
+schematic (rerun here) ss -40 max diff 0.0
+pex (rerun here) ss -40 max diff 0.0
+klayout as converted (rerun here) ss -40 max diff 0.0
+schematic (rerun here) ff 125 max diff 0.0
+pex (rerun here) ff 125 max diff 0.0
+klayout as converted (rerun here) ff 125 max diff 0.0
+schematic (rerun here) fs 125 max diff 0.0
+pex (rerun here) fs 125 max diff 0.0
+klayout as converted (rerun here) fs 125 max diff 0.0
+schematic (rerun here) sf -40 max diff 0.0
+pex (rerun here) sf -40 max diff 0.0
+klayout as converted (rerun here) sf -40 max diff 0.0
+```
+
+## Assistant — 2026-11-25 05:17:28 UTC
+
+Now update README timings and append the follow-up to ac_tran/results.md.
+
+## Assistant — 2026-11-25 05:17:32 UTC
+
+**Tool call: `Bash`**
+
+_Update README timings and reproduction note_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; python3 - <<'EOF'
+p='README.md'; s=open(p).read()
+old="""| dc | 3 min |"""
+new="""| dc | 11 min (10 of them the magic PEX run at sf −40 °C, which aborts at pad in 1.435 V as in ../dc_curves) |"""
+assert old in s; s=s.replace(old,new)
+old="""| modes | 5 min |"""
+new="""| modes | 4 min |"""
+assert old in s; s=s.replace(old,new)
+s=s.replace("""  are rerun here and agree with ../dc_curves' committed CSV to its 4 digits.""","""  are rerun here and reproduce ../dc_curves' committed CSV exactly at its printed precision (all 15 runs, including
+  the magic PEX sf −40 °C abort at 1.435 V).""")
+open(p,'w').write(s)
+EOF
+sed -i 's/(SI suffixes, m², m)/(SI suffixes; m², m)/' README.md; tail -c 400 ../ac_tran/results.md
+```
+
+## Tool results / harness — 2026-11-25 05:17:32 UTC
+
+**Tool result:**
+
+```
+its.
+
+Remarks found on the way (no change made): the CACE yaml labels S2D `Vcm_dev` and D2S `Glitch_max` / `Glitch_min` as
+mV, but the templates compute them in V (S2D Vcm_dev = 0.012 means 12 mV; its 50 "mV" limit is therefore compared
+with a value in V, i.e. effectively 50 V). Several other CSV unit labels (f3dB "MHz", En "nV/rtHz", SR "V/µs") are
+likewise SI values; this folder converts them.
+[This command modified 1 file you've previously read: klayout_pad_diodes/README.md. Call Read before editing.]
+```
+
+## Assistant — 2026-11-25 05:17:41 UTC
+
+**Tool call: `Bash`**
+
+_Append dated follow-up to ac_tran results.md_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps; cat >> ac_tran/results.md <<'EOF'
+
+## Follow-up 2026-11-25: the KLayout sine abort
+
+Cause found; details, scripts and data in [../klayout_pad_diodes](../klayout_pad_diodes/README.md).
+
+- **The conversion bug.** The designer's converter `run_starve.convert()` (design repository 9052bd35,
+  `macros/en_ctrl_3v3/testbenches/spice/run_starve.py` lines 44–45; used by `run_tier1.wrapped()`) passes KLayout's
+  diode `A=` / `P=` to the PDK subcircuits `dantenna` / `dpantenna` as `a=` / `p=`. Those subcircuits read only
+  `l` / `w`. ngspice drops the unknown parameters without a message, so all pad antenna diodes are simulated at
+  0.78 × 0.78 µm, 0.7 … 1.7 % of their area.
+- **Why the run aborts.** ngspice's `darea` model has a 37 pA current step at a reverse voltage of 3·n·kT/q
+  = 78.3 mV (27 °C). The step is the soft-breakdown term (ibv, nbv = 48.9), added when the model switches to its
+  reverse-region expression. pad_s2d = 0.0783 V is that point on the S2D pad diode X$65. With the default size
+  ngspice cannot pass the step: X$65 alone under the same sine aborts at the same 65.9723 µs. With the extracted size
+  it passes.
+- **The sine with the fix.** The diodes get l / w from A / P (the schematic sizes). The run then goes through with no
+  solver aid. Unloaded: THD −78.3 dB, gain 0.9985, delay 148 ns, error 9.3 mVpp; pad_d2s is within 0.07 mV of the
+  schematic pads. With 1 kΩ ∥ 100 pF: THD −69.9 dB, delay 175 ns.
+- **Other KLayout results.** The KLayout AC / step results of section 1 change by under 0.1 % with the fix. The
+  KLayout DC range-end shift in ../dc_curves is **not** caused by the diodes: it is unchanged within 2 nV. It sits in
+  the S2D output common mode, 33 mV lower than schematic at tt 27 °C, cause not found.
+- **Still open.** The −40 °C aborts in ../slot_modes_bg are not cured by the fix.
+EOF
+tail -n 5 ac_tran/results.md | cut -c1-80
+```
+
+## Tool results / harness — 2026-11-25 05:17:41 UTC
+
+**Tool result:**
+
+```
+schematic pads. With 1 kΩ ∥ 100 pF: THD −69.9 dB, delay 175 ns.
+- **Other KLayout results.** The KLayout AC / step results of section 1 change b
+  KLayout DC range-end shift in ../dc_curves is **not** caused by the diodes: it
+  the S2D output common mode, 33 mV lower than schematic at tt 27 °C, cause not
+- **Still open.** The −40 °C aborts in ../slot_modes_bg are not cured by the
+```
+
+## Assistant — 2026-11-25 05:17:47 UTC
+
+**Tool call: `Bash`**
+
+_Find long lines and HDR definitions_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; awk 'length>120{print FILENAME": "FNR": "$0}' *.py run.sh; grep -n "^HDR" *.py; head -2 ../ac_tran/csv/rt_sine_summary.csv; cat /home/user/sg13cmos5l_cm_slot7/.gitignore 2>/dev/null | head
+```
+
+## Tool results / harness — 2026-11-25 05:17:47 UTC
+
+**Tool result:**
+
+```
+diode_check.py: 34: LIB = Path(os.environ.get('PDK_ROOT', '/foss/pdks')) / 'ihp-sg13cmos5l' / 'libs.tech' / 'ngspice' / 'models' / 'diodes.lib'
+diode_check.py: 128:             f.write(HDR % 'dantenna m=2 (S2D pad X$65), 27 C: reverse current [A] vs cathode voltage [V], 60 ... 100 mV')
+diode_check.py: 190:         f.write(HDR % 'S2D pad antenna diode X$65 (dantenna m=2) alone, cathode driven by the slot sine 0 ... 1 V 10 kHz, '
+evaluate.py: 12:   <dest_dir>      writes csv/sine_summary.csv, csv/sine_tt27.csv, csv/rt_range.csv, csv/ac_step_tt27.csv, csv/modes_fixed.csv,
+evaluate.py: 128:     ATC.title(fig, None, 'Round trip 10 kHz sine 0 … 1 V, tt 27 °C 3.3 V, slot 7 default mode: pads schematic, magic '
+evaluate.py: 129:               'PEX and KLayout-extracted with the antenna diodes at their extracted size (l / w from A / P; as converted, '
+evaluate.py: 143:     ax.plot(a[:, 0] * 1e3, a[:, 1] * 1e12, color='#eb6834', lw=2.0, label='default size 0.78 × 0.78 µm (a= / p= ignored)')
+evaluate.py: 190:                 'with |error from the small-signal line| < 1 mV [V] (../dc_curves/rt.py definitions); vcm_s2d and the S2D '
+evaluate.py: 258:         f.write(HDR % "../slot_modes_bg/slot_modes.py (dcop = the designer's mode DC deck; pu / pu0 = power-up transient "
+evaluate.py: 259:                 'with / without 10 pF on pad out), KLayout pads with the antenna diodes fixed; err_max_mV = max |pad out - '
+fix_diodes.py: 54:                 log.append(f'{line.strip()}  ->  {new.strip
+… [581 more characters cut]
+```
+
+## Assistant — 2026-11-25 05:18:02 UTC
+
+**Tool call: `Bash`**
+
+_Add SPDX headers to CSV output and wrap long lines_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; python3 - <<'EOF'
+import re
+SP = "'# SPDX-FileCopyrightText: 2026 Christoph Maier\\n# SPDX-License-Identifier: Apache-2.0\\n'"
+for p, old in (('diode_check.py', "HDR = '# IHP sg13cmos5l simulation (ngspice, PDK diodes.lib): %s\\n'"),
+               ('evaluate.py', "HDR = '# IHP sg13cmos5l simulation, slot 7 tier-1 deck; %s\\n'")):
+    s = open(p).read(); assert old in s
+    s = s.replace(old, old.replace("HDR = '", "HDR = (" + SP + "\n       '") + ")")
+    open(p, 'w').write(s)
+s = open('diode_check.py').read()
+s = s.replace("""LIB = Path(os.environ.get('PDK_ROOT', '/foss/pdks')) / 'ihp-sg13cmos5l' / 'libs.tech' / 'ngspice' / 'models' / 'diodes.lib'""",
+"""LIB = Path(os.environ.get('PDK_ROOT', '/foss/pdks')) / 'ihp-sg13cmos5l' / 'libs.tech' / 'ngspice' / 'models' \\
+    / 'diodes.lib'""")
+s = s.replace("""            f.write(HDR % 'dantenna m=2 (S2D pad X$65), 27 C: reverse current [A] vs cathode voltage [V], 60 ... 100 mV')""",
+"""            f.write(HDR % 'dantenna m=2 (S2D pad X$65), 27 C: reverse current [A] vs cathode voltage [V], '
+                    '60 ... 100 mV')""")
+s = s.replace("""        f.write(HDR % 'S2D pad antenna diode X$65 (dantenna m=2) alone, cathode driven by the slot sine 0 ... 1 V 10 kHz, '""",
+"""        f.write(HDR % 'S2D pad antenna diode X$65 (dantenna m=2) alone, cathode driven by the slot sine 0 ... 1 V '
+                '10 kHz, '""")
+open('diode_check.py', 'w').write(s)
+s = open('fix_diodes.py').read()
+s = s.replace("""                log.append(f'{line.strip()}  ->  {new.strip()}   (DEV_A {l * w * 1e12:.6g}, DEV_P {(l + w) / 0.5e-6:.6g})')""",
+"""                log.append(f'{line.strip()}  ->  {new.strip()}   '
+                           f'(DEV_A {l * w * 1e12:.6g}, DEV_P {(l + w) / 0.5e-6:.6g})')""")
+open('fix_diodes.py', 'w').write(s)
+s = open('evaluate.py').read()
+s = s.replace("""  <dest_dir>      writes csv/sine_summary.csv, csv/sine_tt27.csv, csv/rt_range.csv, csv/ac_step_tt27.csv, csv/modes_fixed.csv,
+                  plots/""", """  <dest_dir>      writes csv/sine_summary.csv, csv/sine_tt27.csv, csv/rt_range.csv, csv/ac_step_tt27.csv,
+                  csv/modes_fixed.csv, plots/""")
+s = s.replace("""    ax.plot(a[:, 0] * 1e3, a[:, 1] * 1e12, color='#eb6834', lw=2.0, label='default size 0.78 × 0.78 µm (a= / p= ignored)')""",
+"""    ax.plot(a[:, 0] * 1e3, a[:, 1] * 1e12, color='#eb6834', lw=2.0,
+            label='default size 0.78 × 0.78 µm (a= / p= ignored)')""")
+open('evaluate.py', 'w').write(s)
+s = open('run.sh').read()
+s = s.replace("""# Environment: JOBS = parallel ngspice runs in the modes step (default 3). Needs PDK_ROOT with ihp-sg13cmos5l, ngspice-47
+# with the IHP OSDI models""", """# Environment: JOBS = parallel ngspice runs in the modes step (default 3). Needs PDK_ROOT with ihp-sg13cmos5l,
+# ngspice-47 with the IHP OSDI models""")
+s = s.replace("""modes() {   # ../slot_modes_bg/slot_modes.py with the fixed diodes: the designer's mode DC deck at ss -40 C 3.0 V (variant
+            # dcop)""", """modes() {   # ../slot_modes_bg/slot_modes.py with the fixed diodes: the designer's mode DC deck at ss -40 C 3.0 V
+            # (variant dcop)""")
+open('run.sh.new', 'w').write(s)
+EOF
+bash -n run.sh.new && chmod +x run.sh.new && mv run.sh.new run.sh; for f in *.py; do python3 -m py_compile $f || echo BAD $f; done; rm -rf __pycache__; grep -n "^HDR" -A2 diode_check.py evaluate.py; awk 'length>120{print FILENAME": "FNR}' *.py run.sh
+```
+
+## Tool results / harness — 2026-11-25 05:18:02 UTC
+
+**Tool result:**
+
+```
+diode_check.py:37:HDR = ('# SPDX-FileCopyrightText: 2026 Christoph Maier\n# SPDX-License-Identifier: Apache-2.0\n'
+diode_check.py-38-       '# IHP sg13cmos5l simulation (ngspice, PDK diodes.lib): %s\n')
+diode_check.py-39-
+--
+evaluate.py:43:HDR = ('# SPDX-FileCopyrightText: 2026 Christoph Maier\n# SPDX-License-Identifier: Apache-2.0\n'
+evaluate.py-44-       '# IHP sg13cmos5l simulation, slot 7 tier-1 deck; %s\n')
+evaluate.py-45-VCOL = {'schematic': '#2a78d6', 'pex': '#eb6834', 'klayout': '#1baf7a'}
+evaluate.py: 129
+evaluate.py: 130
+evaluate.py: 192
+evaluate.py: 260
+evaluate.py: 261
+run.sh: 48
+```
+
+## Assistant — 2026-11-25 05:18:09 UTC
+
+**Tool call: `Bash`**
+
+_Rerun diode step and evaluation with SPDX headers_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; python3 - <<'EOF'
+p='evaluate.py'; s=open(p).read()
+old="""    a = np.loadtxt(p, delimiter=',', skiprows=2, ndmin=2)"""
+new="""    lines = [line for line in p.read_text().splitlines() if line and not line.startswith('#')][1:]
+    a = np.array([[float(x) for x in line.split(',')] for line in lines])"""
+assert old in s; s=s.replace(old,new); open(p,'w').write(s)
+EOF
+K=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/klsine; (./run.sh $K/../actran/w $K/w2 diode && ./run.sh $K/../actran/w $K/w2 eval) > $K/final.log 2>&1; tail -n 3 $K/final.log; rm -rf __pycache__; head -4 csv/*.csv | head -60; ls -la . csv plots
+```
+
+## Tool results / harness — 2026-11-25 05:21:11 UTC
+
+**Tool result:**
+
+```
+diode tran: extracted size, darea cj0 as default size | gear | completed |  |  | 
+diode tran: extracted size, darea rs and cj0 as default size | gear | ABORTED | 6.597230e-05 | 0.0783 | dperim-instance d.x65.d2
+max |dV| DC round trip, fixed vs as converted (all saved nodes, all PVT): 2.000000165480742e-09
+==> csv/ac_step_tt27.csv <==
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# IHP sg13cmos5l simulation, slot 7 tier-1 deck; round trip tt 27 C 3.3 V: f-3dB (relative to 1 kHz) and step 0.25 -> 0.75 V settling (1 % / 0.1 %, s) and gain, ../ac_tran/rt.py definitions
+analysis,pads,load,quantity,value
+
+==> csv/diode_iv_27C.csv <==
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# IHP sg13cmos5l simulation (ngspice, PDK diodes.lib): dantenna m=2 (S2D pad X$65), 27 C: reverse current [A] vs cathode voltage [V], 60 ... 100 mV
+v_cathode,i_default_size,i_extracted_size
+
+==> csv/diode_iv_step.csv <==
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# IHP sg13cmos5l simulation (ngspice, PDK diodes.lib): reverse current I (into the cathode) vs cathode voltage V, anode 0, sweep 0 ... 0.2 V; largest step dI between neighbouring points [A] and where; median |dI| = the smooth part
+device,temp_C,sweep_step_mV,sweep,max_step_A,between_V,and_V,median_abs_step_A
+
+==> csv/diode_params.csv <==
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# IHP 
+… [3954 more characters cut]
+```
+
+## Assistant — 2026-11-25 05:21:15 UTC
+
+**Tool call: `Bash`**
+
+_Final consistency check of outputs_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes; grep "0.1," csv/diode_iv_step.csv; grep -c . csv/diode_tran.csv; ls -a; ls ../ac_tran | grep -c _work
+```
+
+## Tool results / harness — 2026-11-25 05:21:15 UTC
+
+**Tool result:**
+
+```
+dantenna_default,-40,0.1,"completed, 2001 points",4.9178e-12,0.0608,0.0609,8.209e-16
+dantenna_extracted,-40,0.1,"completed, 2001 points",4.9178e-12,0.0608,0.0609,8.209e-16
+dantenna_default,27,0.1,"not finished in 60 s (ngspice batch, DC sweep)",,,,
+dantenna_extracted,27,0.1,"completed, 2001 points",7.4113e-11,0.0782,0.0783,6.262e-15
+dantenna_default,125,0.1,"not finished in 60 s (ngspice batch, DC sweep)",,,,
+dantenna_extracted,125,0.1,"completed, 2001 points",7.5541e-10,0.1038,0.1039,6.963e-15
+15
+.
+..
+README.md
+csv
+diode_check.py
+evaluate.py
+fix_diodes.py
+plots
+run.sh
+run_fixed.py
+0
+```
+
+## Assistant — 2026-11-25 05:21:25 UTC
+
+**Tool call: `SubagentHandback`**
+
+```json
+{
+ "message": "**The hypothesis holds for the sine abort. It does not explain the range-end shift or the −40 °C aborts.**\n\n**Where the bug is:** design repo commit 9052bd35, `macros/en_ctrl_3v3/testbenches/spice/run_starve.py`, `convert()`, lines 44–45 (the D branch).\n- It turns KLayout's `D$… dantenna A=… P=…` into `X$… dantenna a=… p=…`. The PDK `diodes.lib` subcircuits take only `l` and `w` (default 0.78 µm).\n- ngspice drops `a=` / `p=` without any message. `listing expand` shows area 0.6084 instead of 35.0 / 82.9 / 85.2 µm², i.e. 0.7–1.7 % of the real area.\n- `run_tier1.wrapped()`, `run_modes.py` and `run_starve.py` all use this converter, so their pad diodes are undersized too.\n\n**Why the sine aborts:**\n- ngspice's `darea` model has a 37 pA current step per diode at a reverse voltage of exactly 3·n·kT/q = 78.3 mV at 27 °C. It matches the soft-breakdown term ibv·exp(…/(nbv·Vt)) with nbv = 48.9.\n- The input level of the abort, pad_s2d ≈ 0.078 V, is this point on the S2D pad diode X$65.\n- X$65 alone, driven by the same sine, aborts at the same 65.9723 µs with the default size and runs through with the extracted size.\n- The step is the same for both sizes. Only the default size makes ngspice stall: a 0.1 mV DC sweep of the default-size diode does not finish at 27 °C or 125 °C.\n\n**Effect of the fix (l/w computed from A/P by a script, which gives exactly the schematic sizes):**\n- **Sine, tt 27 °C:** runs through with no solver aid. Unloaded: THD −78.3 dB, delay 148 ns; pad_d2s is within 0.07 mV of the schematic pads. With 1 kΩ ∥ 100 pF: THD −69.9 dB. The control run without the fix still aborts.\n- **AC / step:** f−3dB changes by at most +0.07 %, settling by −0.3 ns.\n- **DC range ends:** unchanged at all five PVT points; every node agrees within 2 nV. The shift comes from the S2D output common mode, which is 33 mV lower than schematic at tt 27 °C. I did not find the cause. One untested candidate: KLayout merges the four-segment rhigh chains into single resistors.\n- **ss −40 °C mode DC:** all five failing modes still fail.\n- **sf −40 °C power-up:** both runs still abort, now earlier, at 6.26 µs.\n\nI added a dated Follow-up section to `ac_tran/results.md`. No other existing files were changed.\n\nFiles are in `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/`:\n- README.md\n- run.sh\n- fix_diodes.py\n- run_fixed.py\n- diode_check.py\n- evaluate.py\n- csv/ (9 files)\n- plots/sine_tt27_fixed.png\n- plots/diode_step_27C.png\n"
+}
+```
+
+## Tool results / harness — 2026-11-25 05:21:25 UTC
+
+**Tool result:**
+
+```
+{"success":true,"message":"Report delivered to your caller."}
+```
+
