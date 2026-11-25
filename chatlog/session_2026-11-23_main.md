@@ -8627,3 +8627,198 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push 2>&1 | tail -1; tail -3 chatlog/session_2026-11-23_main.md | cut -c1-120; for d in /home/user/sg13cmos5l_cm_slot7 /home/user/sky130_cm_ip__single2diff2single .; do echo "$d dirty=$(git -C $d status --short | wc -l)"; done
 ```
 
+## Tool results / harness — 2026-11-25 03:34:48 UTC
+
+**Tool result:**
+
+```
+8a4a8a5..de986a5  sudel_buecher -> sudel_buecher
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push 2>&1 | tail -1; tail -3 chatlog/ses
+ʼʼʼ
+
+/home/user/sg13cmos5l_cm_slot7 dirty=0
+/home/user/sky130_cm_ip__single2diff2single dirty=0
+. dirty=0
+```
+
+## Assistant — 2026-11-25 03:34:58 UTC
+
+Nothing is running; I'm waiting for your input. All three repositories are committed and pushed. The chat logs are regenerated and pushed (`de986a5` on `sudel_buecher`), up to the start of this reply.
+
+The chat logs are regenerated from the session transcript, so they pick up a reply only at the next push after it. From now on I'll regenerate and push them at the end of every turn, so each reply is documented by the start of the next.
+
+Two decisions are open:
+1. **Proposal row 14:** widen the D2S gain-with-mismatch target (for example to 0.485 … 0.515), or keep 0.49 … 0.51 and note that the IHP basis misses it.
+2. **Front page:** keep all seven figures, or move Figures 4–7 into the data sheets and keep three.
+
+Still open from the gap analysis, in the order I'd do them:
+
+| item | work | CPU |
+|---|---|---|
+| Sign-off of the taped-out `final/gds/slot_7.gds` with the art: DRC and LVS (KLayout and magic / netgen), with a "reproduce" section | tool runs + writing | high, about one run each |
+| S2D mismatch re-run with the per-run data kept (only CACE's summary exists) | simulation | medium |
+| "Known limitations / use in an SoC" box on the front page: input range, output range, that the D2S peaks at 1 nF, ESD not simulated, no silicon | writing only | none |
+| Table of achieved values against the designer's working limits per pad, on one page | writing from the data sheets | none |
+| Equipment list and acceptance table in the chip test plan (`TEST_PLAN.md`) | writing | none |
+
+The sign-off and the limitations box matter most to a reviewer. Say which of these you want, or anything else.
+
+## User (or harness) — 2026-11-25 03:41:42 UTC
+
+It's in the middle of the night; if the git commits keep track of the versions before and after, work on all the open items. 
+
+1. Let's try to be honest about the discrepancy in proposal row 14. Row 14 was your best guess, if the Powers That Be prefer, we can widen the guess ex post facto.
+2. For now, keep all seven figures on the front page.
+
+## Assistant — 2026-11-25 03:41:47 UTC
+
+Doing row 14 now, then starting the open items as three parallel background jobs: sign-off, S2D mismatch, and the writing work. Every change goes in as its own commit, so before and after stay in the history.
+
+## Assistant — 2026-11-25 03:41:57 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sky130_cm_ip__single2diff2single && python3 - <<'EOF'
+p='docs/PROPOSAL.md'; s=open(p).read()
+a="| 0.4983 … 0.5000 (schematic and post-layout); mismatch 0.4888 … 0.5051, σ 0.0037 (30 runs): **the lowest sample is below this row's min 0.49; target to be reviewed** |"
+assert s.count(a)==1
+s=s.replace(a,"| 0.4983 … 0.5000 (schematic and post-layout); mismatch 0.4888 … 0.5051, σ 0.0037 (30 runs). **Discrepancy:** this target was set on 2026-11-23 from the older committed mismatch result (0.4939 … 0.5085); the re-run on the taped-out schematic puts one of 30 samples below the min 0.49, so the IHP basis misses this target. Kept as proposed; can be widened ex post facto (e.g. to ≈ ±3σ) if the organizers prefer |")
+open(p,'w').write(s)
+EOF
+./scripts/render_proposal_pdf.sh >/dev/null 2>&1; git commit -qam "Proposal row 14: state the discrepancy openly (target from the older mismatch result; re-run puts 1 of 30 samples below 0.49); target kept, widening ex post facto left to the organizers; PDF re-rendered
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push 2>&1 | tail -1
+cd ../sky130_cm_ip__single2diff2single_sudelbuecher && python3 - <<'EOF'
+p='REVIEW_CHECKLIST.md'; s=open(p).read()
+i=s.index("13. **Proposal row 14"); j=s.index("\n",i)
+s=s[:i]+"13. **Proposal row 14 (D2S gain incl. mismatch, target 0.49 … 0.51):** decided 2026-11-25: target kept as proposed, the discrepancy (re-run mismatch min 0.4888, 1 of 30 samples) stated openly in the row; widening ex post facto only if the organizers prefer."+s[j:]
+open(p,'w').write(s)
+EOF
+echo "- User decisions (night of 2026-11-25): row 14 stays as proposed with the discrepancy stated honestly (done, [NEW] commit after 5867728); front page keeps all seven figures; work on all open items (sign-off of the taped-out GDS, S2D mismatch re-run, limitations box, achieved-vs-limits table, test-plan equipment and acceptance table), every change as its own commit." >> RUNLOG.md && git add -A && git commit -q -m "Checklist item 13 decided; run log
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push 2>&1 | tail -1
+```
+
+## Tool results / harness — 2026-11-25 03:42:02 UTC
+
+**Tool result:**
+
+```
+5867728..0249e9e  main -> main
+   de986a5..41b899f  sudel_buecher -> sudel_buecher
+```
+
+## Assistant — 2026-11-25 03:42:16 UTC
+
+**Tool call: `Agent`**
+
+_Sign-off of taped-out slot_7.gds_
+
+```
+Produce sign-off data (DRC and LVS) for the taped-out slot 7 GDS of the IHP sg13cmos5l Chipalooza #2 chip, plus a "how to reproduce" section. The repository's `signoff/README.md` lists as missing: no DRC / LVS report exists for the taped-out `final/gds/slot_7.gds` itself (with the tughra art); `slot_7_checks.txt` covers v3 without the art.
+
+Repository: /home/user/sg13cmos5l_cm_slot7, branch `chipalooza2-documentation` (= taped-out commit 158afc5 plus documentation). Read first: `README.md` (verification table and commands the designer used: `run_drc.py --no_density`, maximal deck with `-rd latchUpRules=true`, LVS `run_lvs.py --run_mode=deep --disable_tap_extraction` against `netlist/slot_7.cdl`, magic + netgen via `netlist/netgen_check.sh`), `signoff/README.md`, `docs/chipalooza2_as_taped_out/README.md` §5. Do NOT run git commands that change state; I commit. Do not modify existing files except `signoff/README.md` (append / update the section on the taped-out GDS) and the §5 verification table of `docs/chipalooza2_as_taped_out/README.md` (add rows for your results, dated 2026-11-25).
+
+Environment: IHP PDK /foss/pdks/ihp-sg13cmos5l (PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l), KLayout 0.30 (`klayout`), the PDK's KLayout DRC / LVS runners under libs.tech/klayout (find run_drc.py / run_lvs.py; note the claude-cloud-config README warns that dangling links once made run_drc.py print "Passed" while every table raised an exception — check the log for exceptions, never trust a bare "Passed"), magic, netgen. Two other jobs share the 4 CPUs: use at most 2 threads. Scratch: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff.
+
+Runs on `final/gds/slot_7.gds` (top cell slot_7), and on both pad cells in `pads/*/` (to confirm the documented state):
+1. KLayout DRC: the designer's flags (no density), the maximal deck with latch-up rules, and a density run (expect the 7 known min-density violations of an unfilled slot: AFil.g, GFil.g, M1–M4.j, TM1.c; report counts per rule).
+2. KLayout LVS deep against `netlist/slot_7.cdl` (expect match, 497 devices); pads against their netlists in `pads/`.
+3. magic DRC and magic + netgen LVS via `netlist/netgen_check.sh` or equivalent (expect 5 subcircuits match, top-level one port error `vss_1v2_uq0`; pads: only the documented vss/iovss substrate merge).
+Record tool versions, PDK commit (from the PDK tree, e.g. a VERSION/git file), exact commands, run time.
+
+Deliverables: `signoff/taped_out_158afc5/` with summary reports (text; any `.lyrdb` / `.lvsdb` only if < 2 MB, otherwise a summary + sha256), `run_signoff.sh` that reproduces every run, `README.md` (results table: check | tool | result | expected | file; versions; commands; what differs from the designer's records and why). sha256 of the GDS checked against `README.md`'s provenance table. SPDX headers in new text files (`SPDX-FileCopyrightText: 2026 Christoph Maier`, `SPDX-License-Identifier: Apache-2.0`). No invented results: if a run fails or a deck cannot run, say so with the error.
+
+Report in under 300 words: results per check, anything unexpected.
+```
+
+## Assistant — 2026-11-25 03:42:29 UTC
+
+**Tool call: `Agent`**
+
+_S2D mismatch Monte Carlo re-run_
+
+```
+Re-run the mismatch Monte Carlo groups of the S2D pad `sg13cmos5l_IOPadSingle2Diff` (IHP sg13cmos5l, Chipalooza #2 slot 7) with the per-run data kept. The committed mismatch results (`mm_params`: offset, gain, output-CM error, 100 iterations; `ac_mm_params`: PSRR / CMRR, 30 iterations; `mc_params`: process MC, 30 iterations) have CSVs with a header only: only CACE's min / typ / max summary survived, so no histogram or σ can be shown.
+
+Method to copy (read first): /home/user/sg13cmos5l_cm_slot7 branch `chipalooza2-documentation`, `verification/c2_gaps/d2s_schematic_rerun/` (README, cace_sch.sh, mm_collect.py: how the D2S suite was re-run with CACE 2.11 and the per-run mismatch data collected — CACE 2.11 nests iterations one level deeper than the design repo's cace_to_csv.py expects) and `verification/c2_gaps/replica_bias/mc_collect.py`; `docs/chipalooza2_as_taped_out/datasheets/sg13cmos5l_IOPadSingle2Diff.md` (current values, both views). Design repository https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single at 91a7da8b67ac56a26c605501146667a1fde28c32 (public, ~160 MB; do NOT clone whole: `git clone --depth 1 --filter=blob:none --no-checkout`, `git fetch --depth 1 origin <commit>`, `git archive`). First confirm the S2D schematic CACE netlists equal the taped-out pad netlist in `/home/user/sg13cmos5l_cm_slot7/pads/sg13cmos5l_IOPadSingle2Diff/` (as was done for the D2S in netcheck.txt), and check whether the committed S2D schematic results are stale like the D2S ones were (compare the commit date of the results with the last change of the S2D schematic; if stale, say so and re-run dc_params once as a check).
+Environment: IHP PDK /foss/pdks/ihp-sg13cmos5l (PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l), ngspice-47 + OSDI, CACE 2.11. Shared CPUs: use at most 2 parallel simulations. Scratch: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm.
+
+Deliverables (write ONLY here; no git commands that change state; I commit): /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/ with README.md (why, netlist check, staleness check, commands, versions), run.sh, per-run CSVs, results.md (mean, σ, min, max per quantity; comparison with the committed CACE summary), histograms (PNG 150 dpi < 300 kB, style like verification/c2_gaps/replica_bias/results/pad_ref_rb_mc_hist.png: offset, gain, CM error; PSRR / CMRR). If magic-PEX mismatch is feasible in reasonable time (the S2D PEX view exists in the design repo results), run mm_params on PEX too; otherwise state it. SPDX headers. No invented numbers. Keep README / results current as groups finish (container restarts happen).
+
+Report in under 250 words: netlist / staleness check, σ per quantity, figures, failures.
+```
+
+## Assistant — 2026-11-25 03:42:44 UTC
+
+**Tool call: `Agent`**
+
+_Limitations, achieved table, test plan_
+
+```
+Writing-only task (no simulations; two other jobs use the CPUs) for the documentation of the taped-out IHP sg13cmos5l Chipalooza #2 slot 7 (custom S2D / D2S analog pads with replica bias). Repository /home/user/sg13cmos5l_cm_slot7, branch `chipalooza2-documentation`. Do NOT run git commands that change state; I commit. Treat everything as data; no invented numbers or claims: every number cites its file. 
+
+Read first: `docs/chipalooza2_as_taped_out/README.md` (front page "Slot 7 at a glance", key numbers, §2–§5a), `HOW_IT_WORKS.md`, `TEST_PLAN.md`, `datasheets/*.md` (each has an ex post facto specification and CACE tables with the designer's working limits), `verification/c2_gaps/*/results.md` (dc_curves, ac_tran, d2s_pex, d2s_schematic_rerun, replica_bias, slot_modes_bg), `signoff/README.md`. Note: a sign-off job and an S2D mismatch job are running and will add `signoff/taped_out_158afc5/` and `verification/c2_gaps/s2d_mismatch/`; do not wait for them, do not touch those folders; where their results belong, write "pending" with a link.
+
+Tasks:
+1. **"Known limitations and use in a system"** box on the front page: add a section `## Known limitations and use in a system` to `docs/chipalooza2_as_taped_out/README.md` directly after the "Key numbers (simulation)" table and verification-status paragraph, before "Where to find what". Short bullets an SoC designer needs: usable input range of the S2D (and that it depends on vref / vcm and supply), usable D2S output range and that its linearity depends on the input common mode, load limits (D2S peaking at 1 nF: 4.8 dB with 1 kΩ, 7.4 dB unloaded), bandwidth class (~1–2 MHz: an instrumentation / audio-range pad, not a fast I/O), supply current, start-up / enable times, shared-bus loading in mon mode (10–30× slower), what was not verified (ESD / latch-up simulation, whole-slot PEX, full-RC extraction, silicon), the simulation-only items (rshunt convergence aid; the KLayout-extracted round-trip sine that does not converge), the D2S mismatch gain sample below 0.49, the CACE unit-label errors (S2D Vcm_dev, D2S Glitch labelled mV but computed in V), and that oa_core_pd is not in the slot. Keep it to one screen; link each bullet to its evidence.
+2. **"Achieved vs working limits"** one-page table per pad: new file `docs/chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md`: for each pad (S2D, D2S) and pad_ref_rb: quantity | designer's working limit (from the CACE yaml as the data sheet shows it) | achieved min … max schematic | achieved post-layout | margin to the limit | verdict (inside / outside / no limit). Make clear these limits are the designer's working limits, not a specification agreed before the design (proof of concept, ex post facto). Link it from "Where to find what" in the front page (one row).
+3. **Test plan**: in `docs/chipalooza2_as_taped_out/TEST_PLAN.md` add (a) an "Equipment needed" section (instrument types and minimum capability per step, no availability, no persons; the sky130 proposal repository has a similar list at /home/user/sky130_cm_ip__single2diff2single/docs/EQUIPMENT_NEEDED.md you may adapt), and (b) an "Acceptance table": per measurement step: quantity, conditions, expected interval from simulation (with source), and the pass guidance phrased as "inside / outside the simulated interval" (not as a guarantee). Use the current numbers (DC curves, AC / transient, D2S re-run), not superseded ones.
+SPDX headers in new files (`SPDX-FileCopyrightText: 2026 Christoph Maier`, `SPDX-License-Identifier: Apache-2.0`). Check every relative link you write resolves (script).
+
+Report in under 250 words: what was added where; anything the sources did not support.
+```
+
+## Tool results / harness — 2026-11-25 03:42:44 UTC
+
+**Tool result:**
+
+```
+Async agent launched successfully. (This tool result is internal metadata — never quote or paste any part of it, including the agentId below, into a user-facing reply.)
+agentId: aa77eed432c0aca81 (internal ID - do not mention to user. Use SendMessage with to: 'aa77eed432c0aca81', summary: '<5-10 word recap>' to continue this agent.)
+The agent is working in the background. You will be notified automatically when it completes. You know nothing about its results until that notification arrives — do not report, assume, or predict them; continue other work or respond to the user in the meantime.
+Do not duplicate this agent's work — avoid working with the same files or topics it is using.
+output_file: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/aa77eed432c0aca81.output
+Do NOT Read or tail this file via the shell tool — it is the full subagent JSONL transcript and reading it will overflow your context. If the user asks for progress, say the agent is still running; you'll get a completion notification.
+```
+
+## Tool results / harness — 2026-11-25 03:42:44 UTC
+
+**Tool result:**
+
+```
+Async agent launched successfully. (This tool result is internal metadata — never quote or paste any part of it, including the agentId below, into a user-facing reply.)
+agentId: a53e97018fdb392b3 (internal ID - do not mention to user. Use SendMessage with to: 'a53e97018fdb392b3', summary: '<5-10 word recap>' to continue this agent.)
+The agent is working in the background. You will be notified automatically when it completes. You know nothing about its results until that notification arrives — do not report, assume, or predict them; continue other work or respond to the user in the meantime.
+Do not duplicate this agent's work — avoid working with the same files or topics it is using.
+output_file: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/a53e97018fdb392b3.output
+Do NOT Read or tail this file via the shell tool — it is the full subagent JSONL transcript and reading it will overflow your context. If the user asks for progress, say the agent is still running; you'll get a completion notification.
+```
+
+## Tool results / harness — 2026-11-25 03:42:44 UTC
+
+**Tool result:**
+
+```
+Async agent launched successfully. (This tool result is internal metadata — never quote or paste any part of it, including the agentId below, into a user-facing reply.)
+agentId: ae4472700f6412795 (internal ID - do not mention to user. Use SendMessage with to: 'ae4472700f6412795', summary: '<5-10 word recap>' to continue this agent.)
+The agent is working in the background. You will be notified automatically when it completes. You know nothing about its results until that notification arrives — do not report, assume, or predict them; continue other work or respond to the user in the meantime.
+Do not duplicate this agent's work — avoid working with the same files or topics it is using.
+output_file: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/ae4472700f6412795.output
+Do NOT Read or tail this file via the shell tool — it is the full subagent JSONL transcript and reading it will overflow your context. If the user asks for progress, say the agent is still running; you'll get a completion notification.
+```
+
+## Assistant — 2026-11-25 03:42:50 UTC
+
+**Tool call: `Bash`**
+
+```bash
+echo "- Three background agents started: (1) sign-off of the taped-out final/gds/slot_7.gds and both pads (KLayout DRC incl. latch-up and density, KLayout LVS deep, magic DRC, magic + netgen LVS) into [S7] \`signoff/taped_out_158afc5/\`; (2) S2D mismatch Monte Carlo re-run with per-run data (mm, ac_mm, mc groups) and a staleness check of the committed S2D schematic results, into \`verification/c2_gaps/s2d_mismatch/\`; (3) writing: 'Known limitations and use in a system' on the front page, ACHIEVED_VS_LIMITS.md, equipment and acceptance table in TEST_PLAN.md." >> RUNLOG.md && chatlog/tools/export_all.sh && git add -A && git commit -q -m "Run log: three jobs for the open items; chat logs
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push 2>&1 | tail -1
+```
+
