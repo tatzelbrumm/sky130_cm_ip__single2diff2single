@@ -1948,3 +1948,521 @@ df4c5054ee8ca481c3eb873687274f28cdb50b1e
 321ba06
 ```
 
+## Assistant — 2026-11-25 02:55:18 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/d2s_schematic_rerun/README.md`
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# D2S pad: full CACE suite re-run on the taped-out schematic
+
+**IHP sg13cmos5l schematic simulation** of `sg13cmos5l_IOPadDiff2Single` (D2S pad, `s7_an[1]`), all 15 parameter
+groups of its CACE file, run on 2026-11-25. Old vs new: **[results.md](results.md)**.
+
+Status: in progress (groups are added to results.md as they finish).
+
+## Why
+
+The committed schematic CACE results of the D2S pad (design repository
+tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single, `macros/sg13cmos5l_IOPadDiff2Single/verification/cace/results/`,
+present at commit 91a7da8b67ac56a26c605501146667a1fde28c32) were last written on 2026-10-21, while the D2S schematic
+changed until 2026-11-03 (layout backannotation, bias-tree dummies, vss / iovss tie). The cross-check in
+[../ac_tran](../ac_tran/results.md) (section 4, `tables/crosscheck.md`) re-ran the unchanged templates on the
+schematic at 91a7da8b and found 24 values more than 2 % off the committed ones (Zout at 1 kHz down to −14 %, t_on up
+to +53 %), while the same method reproduced the S2D results and the D2S PEX results exactly. The data sheet
+`docs/chipalooza2_as_taped_out/datasheets/sg13cmos5l_IOPadDiff2Single.md` was generated from those stale results.
+This folder re-runs every group on the current schematic and regenerates the data sheet from the new results.
+
+## Which netlist, and why it is the taped-out one
+
+CACE 2.11 always regenerates the schematic netlist (`cace_regenerate.py`, `regenerate_schematic_netlist`: xschem
+`-n -s -r -x -q --tcl "set top_is_subckt 1"` in `macros/<cell>/schematic/xschem` with the project xschemrc). The
+`netcheck` step of `run.sh` netlists the schematic of commit 91a7da8b exactly that way and compares it with the
+taped-out cell's netlist `pads/sg13cmos5l_IOPadDiff2Single/sg13cmos5l_IOPadDiff2Single.spice` of this repository (the
+LVS netlist that the taped-out GDS matches: `../d2s_pex/lvs_summary.txt`, netgen "Circuits match uniquely", 76 = 76
+devices, 36 = 36 nets). Result ([netcheck.txt](netcheck.txt)):
+
+- the pad netlist is, below its 4-line provenance header, byte-identical (same sha256) to the design repository's
+  `macros/sg13cmos5l_IOPadDiff2Single/netlist/schematic/sg13cmos5l_IOPadDiff2Single_magic.spice` at 91a7da8b;
+- the CACE netlist and the pad netlist are identical line by line (all subcircuits: bias_tree_pd, d2s_mpdda_pd,
+  d2s_out_p / d2s_out_n, d2s_sp2k, unit_r2, …, every device with its parameters), apart from the xschem `**`
+  path comments and **one line**: `Rsub iovss vss 1` in the top cell of the CACE netlist. Rsub carries
+  `lvs_ignore=open` in the schematic (the vss band and the iovss ties share the p-substrate; LVS sees one net), so
+  it is absent from the LVS netlist by construction; the PEX view of `../d2s_pex` adds the same 1 Ω tie
+  (`pex_add_port.py … vss iovss 1`).
+
+So the schematic simulated by CACE at 91a7da8b is the taped-out cell (plus the simulation-only substrate tie), and the
+suite is run on it. The CACE file and templates are those of 91a7da8b too (since 2026-11-03 they place en_ctrl_3v3
+and bias_gen_pd next to the cell, schematic, as in ../ac_tran and ../d2s_pex).
+
+## Method
+
+- `run.sh` `fetch`: shallow, blobless clone of the design repository, `git fetch --depth 1` of 91a7da8b, `git
+  archive` of only the D2S macro (schematic, CACE yaml / templates / committed results, netlist), the schematic
+  folders of the macros its xschemrc lists, and `scripts/cace`.
+- `cace_sch.sh`: per group `cace <yaml copy> -s schematic -p <group> -j 3` (the copy differs from the committed yaml
+  only in its runs / docs folders), templates **unchanged** (restored from a pristine copy and renetlisted before
+  every group, so a solver aid can never carry over), `XSCHEM_USER_LIBRARY_PATH` set to the other macros' xschem
+  folders as in ../d2s_pex. CSV per group with the design repository's `scripts/cace/cace_to_csv.py`; for
+  `mm_params` with `mm_collect.py` (the same CSV 
+… [3412 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 02:55:18 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/d2s_schematic_rerun/README.md (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 02:55:22 UTC
+
+**Tool call: `Bash`**
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch; /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/d2s_schematic_rerun/run.sh $S netcheck; tail -3 $S/progress.log
+```
+
+## Tool results / harness — 2026-11-25 02:55:23 UTC
+
+**Tool result:**
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# CACE schematic netlist (xschem, design commit 91a7da8b) vs taped-out LVS netlist pads/sg13cmos5l_IOPadDiff2Single/sg13cmos5l_IOPadDiff2Single.spice
+sha256 pads/sg13cmos5l_IOPadDiff2Single/sg13cmos5l_IOPadDiff2Single.spice without its 4-line header: b8d9103230bd7ced5c75a0fb38d56f078ec3cbf48d0f82a3772b85ff1edc2c1c
+sha256 design 91a7da8b67ac56a26c605501146667a1fde28c32:macros/sg13cmos5l_IOPadDiff2Single/netlist/schematic/sg13cmos5l_IOPadDiff2Single_magic.spice: b8d9103230bd7ced5c75a0fb38d56f078ec3cbf48d0f82a3772b85ff1edc2c1c
+lines (without ** comments): CACE 134, LVS 133
+diff LVS -> CACE (** comment lines dropped):
+14a15
+> Rsub iovss vss 1
+Rsub in the schematic:
+C {devices/res.sym} 330 -120 1 0 {name=Rsub value=1 footprint=1206 device=resistor lvs_ignore=open m=1} 
+ac_1nF_params: 2 of 2 runs -> /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/out/ac_1nF_params.csv
+=== ac_1nF_params done 2026-11-25T02:54:40Z rows=2
+=== tran_params start 2026-11-25T02:54:40Z aid=none
+```
+
+## Assistant — 2026-11-25 02:55:32 UTC
+
+**Tool call: `Bash`**
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch; cd $S; R=design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace; python3 /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/d2s_schematic_rerun/compare.py $R/sg13cmos5l_IOPadDiff2Single.yaml $R/results/sg13cmos5l_IOPadDiff2Single out c.md c.csv dc_params dc_3v0_params dc_sel_params dc_sel3_params ac_params ac_load_params ac_1nF_params && cut -d'|' -f2-4,6,9,12,14,16 c.md | tail -n +4
+```
+
+## Tool results / harness — 2026-11-25 02:55:32 UTC
+
+**Tool result:**
+
+```
+c.md: 44 rows, 28 flagged
+ group | quantity | unit | new min | new median | new max | max per-run Δ (at) | flag 
+---|---|---|---:|---:|---:|---|---
+ dc_params | Gain |  | 0.4983 | 0.5 | 0.5 | +0.05 % (corner_mos=ff, temp=125, vdd=3.3) |  
+ dc_params | Output offset | mV | 0.03202 | 0.06727 | 1.737 | -13.02 % (corner_mos=sf, temp=125, vdd=3.3) | Δ > 2 % 
+ dc_params | Integral nonlinearity | mV | 0.1208 | 0.4504 | 7.5 | -8.64 % (corner_mos=sf, temp=125, vdd=3.6) | Δ > 2 % 
+ dc_params | IO ring supply current | uA | 301.7 | 311.3 | 325.3 | +3.58 % (corner_mos=ff, temp=-40, vdd=3.6) | Δ > 2 % 
+ dc_params | Core ring supply current | nA | 0.008253 | 0.1185 | 23.89 | -0.00 % (corner_mos=ss, temp=-40, vdd=3.3) |  
+ dc_params | Quiescent current OP | uA | 216.6 | 225.5 | 238.6 | +5.35 % (corner_mos=ff, temp=-40, vdd=3.3) | Δ > 2 % 
+ dc_params | Quiescent current ON | uA | 216.2 | 225 | 238.5 | +5.35 % (corner_mos=ff, temp=-40, vdd=3.3) | Δ > 2 % 
+ dc_params | Minimum output-device current | uA | 104.7 | 113.3 | 120.3 | +9.32 % (corner_mos=ss, temp=-40, vdd=3.3) | Δ > 2 % 
+ dc_3v0_params | Gain |  | 0.4982 | 0.5 | 0.5002 | +0.06 % (corner_mos=ff, temp=125, vdd=3.0) |  
+ dc_3v0_params | Output offset | mV | 0.03151 | 0.04833 | 1.769 | -13.04 % (corner_mos=sf, temp=125, vdd=3.0) | Δ > 2 % 
+ dc_3v0_params | Integral nonlinearity | mV | 11.1 | 44.95 | 88.42 | +1.85 % (corner_mos=sf, temp=125, vdd=3.0) |  
+ dc_3v0_params | IO ring supply current | uA | 295.8 | 301.1 | 308.8 | +3.56 % (corn
+… [3725 more characters cut]
+```
+
+## Assistant — 2026-11-25 02:55:49 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/d2s_schematic_rerun && python3 - <<'EOF'
+p='compare.py'; s=open(p).read()
+rep=[
+("'| group | quantity | unit | old min | new min | Δ min | old median | new median | Δ median | old max | new max | Δ max | max per-run Δ (at) | runs old / new | flag |',\n         '|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|']",
+ "'| group | quantity | unit | old min | new min | Δ min | old median | new median | Δ median | old max | new max | Δ max | max per-run Δ (at) | max per-run \\\\|Δ\\\\| | runs old / new | flag |',\n         '|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---|---|']"),
+("'old_max', 'new_max', 'd_max_pct', 'max_run_d_pct', 'max_run_at', 'runs_old', 'runs_new', 'flag']]",
+ "'old_max', 'new_max', 'd_max_pct', 'max_run_d_pct', 'max_run_at', 'max_run_abs_d', 'runs_old', 'runs_new', 'flag']]"),
+("L.append(f'| {g} | (not run) | | | | | | | | | | | | | |')","L.append(f'| {g} | (not run) | | | | | | | | | | | | | | |')"),
+("""                worst, at = None, ''
+                for r, v in zip(dn, nv):
+                    kk = key(r, conds)
+                    if kk in om:
+                        d = rel(om[kk], v)
+                        if worst is None or abs(d) > abs(worst):
+                            worst, at = d, ', '.join(f'{c}={r[c]}' for c in conds if c != 'iterations')""",
+"""                worst, at, wabs = None, '', None
+                for r, v in zip(dn, nv):
+                    kk = key(r, conds)
+                    if kk in om:
+                        d = rel(om[kk], v)
+                        if worst is None or abs(d) > abs(worst):
+                            worst, at = d, ', '.join(f'{c}={r[c]}' for c in conds if c != 'iterations')
+                        if wabs is None or abs(v - om[kk]) > wabs:
+                            wabs = abs(v - om[kk])"""),
+("worst, at, nold = None, 'old: summary only', 0","worst, at, nold, wabs = None, 'old: summary only', 0, None"),
+("o3, worst, at, nold = (None, None, None), None, '', 0","o3, worst, at, nold, wabs = (None, None, None), None, '', 0, None"),
+("""f'{nold} / {len(dn)} | {flag} |')""","""f'{f(wabs)} | {nold} / {len(dn)} | {flag} |')"""),
+("[worst, at, nold, len(dn), flag]","[worst, at, wabs, nold, len(dn), flag]"),
+]
+for a,b in rep:
+    assert a in s, a[:60]
+    s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+tail -4 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/progress.log
+```
+
+## Tool results / harness — 2026-11-25 02:55:50 UTC
+
+**Tool result:**
+
+```
+=== thd_params start 2026-11-25T02:55:25Z aid=none
+thd_params: 3 of 3 runs -> /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/out/thd_params.csv
+=== thd_params done 2026-11-25T02:55:40Z rows=3
+=== noise_params start 2026-11-25T02:55:40Z aid=none
+```
+
+## Assistant — 2026-11-25 02:55:56 UTC
+
+**Tool call: `Bash`**
+
+```bash
+sed -n '7p' /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/datasheets/sg13cmos5l_IOPadDiff2Single.md; tail -3 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/progress.log
+```
+
+## Tool results / harness — 2026-11-25 02:55:56 UTC
+
+**Tool result:**
+
+```
+> **Scope: only what was taped out.** `sg13cmos5l_IOPadDiff2Single` is the pad cell that replaces `s7_an[1]` in the taped-out slot 7; the delivery's `pads/` files are copies from the design repository's `toplevel` at `91a7da8b`, the commit used here, and the chip GDS contains the cell unchanged (checked). Only a **schematic** view exists in the results directory. The pad's README (same commit) states that the committed CACE results **predate the layout** (the Miller capacitors CMA / CMB changed shape, 7.96 × 32.16 µm instead of 16 × 16 µm at equal area, and the output stage moved into the clamp frames) and that PEX and post-layout CACE were **not done** for this cell; the results below are therefore pre-layout.
+noise_params: 3 of 3 runs -> /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/out/noise_params.csv
+=== noise_params done 2026-11-25T02:55:54Z rows=3
+=== drive_params start 2026-11-25T02:55:54Z aid=none
+```
+
+## Assistant — 2026-11-25 02:56:03 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cat > /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/d2s_schematic_rerun/datasheet_intro.md <<'EOF'
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+> **Scope: only what was taped out.** `sg13cmos5l_IOPadDiff2Single` is the pad cell that replaces `s7_an[1]` in the taped-out slot 7; the delivery's `pads/` files are copies from the design repository's `toplevel` at `91a7da8b`, the commit used here, and the chip GDS contains the cell unchanged (checked). The tables below are a **re-run of the full CACE suite (15 groups) on the schematic as taped out** (2026-11-25, [d2s_schematic_rerun](../../../verification/c2_gaps/d2s_schematic_rerun/README.md)): the netlist CACE simulates is, line for line, the cell's LVS netlist `pads/sg13cmos5l_IOPadDiff2Single/sg13cmos5l_IOPadDiff2Single.spice` (LVS-matched to the GDS), plus the simulation-only substrate tie `Rsub` (vss to iovss, 1 Ω, `lvs_ignore=open`). They replace the schematic results committed in the design repository (2026-10-21), which predate the final schematic (changed until 2026-11-03) and differ from these by more than 2 % in many quantities ([old vs new](../../../verification/c2_gaps/d2s_schematic_rerun/results.md)). The yaml, templates and working limits are those of `91a7da8b`, unchanged. Post-layout (magic PEX) values of the same cell: [D2S post-layout](../../../verification/c2_gaps/d2s_pex/results.md).
+EOF
+tail -3 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/progress.log
+```
+
+## Tool results / harness — 2026-11-25 02:56:03 UTC
+
+**Tool result:**
+
+```
+noise_params: 3 of 3 runs -> /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/out/noise_params.csv
+=== noise_params done 2026-11-25T02:55:54Z rows=3
+=== drive_params start 2026-11-25T02:55:54Z aid=none
+```
+
+## Assistant — 2026-11-25 02:56:10 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/d2s_schematic_rerun && python3 - <<'EOF'
+p='run.sh'; s=open(p).read()
+a='''  python3 "$DS/tools/make_datasheet.py" "$CY" "$WORK/ds/raw.md" \\'''
+b='''  sed '1,/^-->$/d' "$HERE/datasheet_intro.md" > "$WORK/ds/intro.md"   # SPDX comment of the source files dropped
+  sed '1,/^-->$/d' "$HERE/datasheet_notes.md" > "$WORK/ds/notes.md"
+  python3 "$DS/tools/make_datasheet.py" "$CY" "$WORK/ds/raw.md" \\'''
+assert a in s; s=s.replace(a,b)
+a='''--intro "$HERE/datasheet_intro.md" --notes "$HERE/datasheet_notes.md"'''
+assert a in s; s=s.replace(a,'''--intro "$WORK/ds/intro.md" --notes "$WORK/ds/notes.md"''')
+open(p,'w').write(s)
+EOF
+grep -n "ds/" run.sh
+```
+
+## Tool results / harness — 2026-11-25 02:56:10 UTC
+
+**Tool result:**
+
+```
+47:# with the taped-out cell's LVS netlist pads/<cell>/<cell>.spice (its 4-line provenance header dropped).
+51:  tail -n +5 "$SLOT/pads/$T/$T.spice" > "$WORK/netcheck/pad_lvs.spice"
+55:    echo "# CACE schematic netlist (xschem, design commit ${C:0:8}) vs taped-out LVS netlist pads/$T/$T.spice"
+56:    echo "sha256 pads/$T/$T.spice without its 4-line header: $(sha256sum < "$WORK/netcheck/pad_lvs.spice" | cut -d' ' -f1)"
+106:  local R=$WORK/ds/$T g
+113:  sed '1,/^-->$/d' "$HERE/datasheet_intro.md" > "$WORK/ds/intro.md"   # SPDX comment of the source files dropped
+114:  sed '1,/^-->$/d' "$HERE/datasheet_notes.md" > "$WORK/ds/notes.md"
+115:  python3 "$DS/tools/make_datasheet.py" "$CY" "$WORK/ds/raw.md" \
+117:    --cell-path macros/$T --view "schematic=$R" --intro "$WORK/ds/intro.md" --notes "$WORK/ds/notes.md"
+118:  python3 "$HERE/ds_post.py" "$WORK/ds/raw.md" "$DS/$T.md" "$HERE/$T.regenerated.md"
+```
+
+## Assistant — 2026-11-25 02:56:14 UTC
+
+**Tool call: `Bash`**
+
+```bash
+sleep 60; tail -3 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/progress.log
+```
+
+## Tool results / harness — 2026-11-25 02:56:14 UTC
+
+**Tool result:**
+
+```
+<tool_use_error>Blocked: sleep 60 followed by: tail -3 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/progress.log. To wait for a condition, use Monitor with an until-loop (e.g. `until <check>; do sleep 2; done`). To wait for a command you started, use run_in_background: true. Do not chain shorter sleeps to work around this block.</tool_use_error>
+```
+
+## Assistant — 2026-11-25 02:56:16 UTC
+
+**Tool call: `ToolSearch`**
+
+```json
+{
+ "query": "select:Monitor",
+ "max_results": 1
+}
+```
+
+## Tool results / harness — 2026-11-25 02:56:16 UTC
+
+**Tool result:**
+
+```
+[tool_reference]
+```
+
+## Assistant — 2026-11-25 02:56:20 UTC
+
+**Tool call: `Monitor`**
+
+_D2S schematic CACE group progress_
+
+```json
+{
+ "timeout_ms": 1800000,
+ "command": "L=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/progress.log; tail -n 0 -f $L | grep --line-buffered -E \"done|WARNING|rror|Traceback\" & P=$!; while pgrep -f cace_sch.sh >/dev/null; do sleep 5; done; sleep 2; kill $P; echo \"cace_sch.sh finished\""
+}
+```
+
+## Tool results / harness — 2026-11-25 02:56:20 UTC
+
+**Tool result:**
+
+```
+Monitor started (task bviw6pgwc, expires in 30m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+```
+
+## Assistant — 2026-11-25 02:56:25 UTC
+
+**Tool call: `Bash`**
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch; cd $S; R=design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace; python3 /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/d2s_schematic_rerun/compare.py $R/sg13cmos5l_IOPadDiff2Single.yaml $R/results/sg13cmos5l_IOPadDiff2Single out c.md c.csv tran_params thd_params noise_params && cut -d'|' -f2-7,9,10,12,13,15,18 c.md | tail -n +6
+```
+
+## Tool results / harness — 2026-11-25 02:56:25 UTC
+
+**Tool result:**
+
+```
+c.md: 10 rows, 3 flagged
+ tran_params | Slew rate, rising | V/us | 1.76 | 1.749 | -0.65 % | 2.429 | -0.75 % | 3.058 | +0.11 % | 0.02112 |
+ tran_params | Slew rate, falling | V/us | 1.781 | 1.764 | -0.96 % | 2.429 | -1.50 % | 3.135 | -0.97 % | 0.03697 |
+ tran_params | Overshoot | % | -7e-05 | -6e-05 | +14.29 % | 0.0001 | +0.00 % | 9.115 | -2.20 % | 0.2957 |
+ tran_params | Settling time, rising | us | 0.2959 | 0.3027 | +2.29 % | 0.4581 | +0.41 % | 0.6761 | -1.90 % | 0.01311 |
+ tran_params | Settling time, falling | us | 0.3036 | 0.3107 | +2.35 % | 0.4564 | +0.69 % | 0.4965 | -19.46 % | 0.1444 |
+ thd_params | THD | dB | -73.2 | -73.33 | -0.17 % | -57.68 | +0.19 % | -38.66 | +0.53 % | 0.205 |
+ thd_params | Output amplitude | V | 0.25 | 0.25 | +0.00 % | 0.5 | +0.00 % | 0.7504 | +0.01 % | 4e-05 |
+ noise_params | Output noise 1 kHz | nV/rtHz | 607.6 | 605.1 | -0.40 % | 678.8 | -0.43 % | 715.4 | -0.43 % | 3.092 |
+ noise_params | Output noise 100 kHz | nV/rtHz | 142.6 | 142.6 | +0.03 % | 152.6 | +0.02 % | 156.5 | +0.03 % | 0.047 |
+ noise_params | Integrated output noise | uV | 222.7 | 223.3 | +0.24 % | 234.6 | +0.18 % | 235.6 | +0.20 % | 0.543 |
+```
+
+## Assistant — 2026-11-25 02:56:29 UTC
+
+**Tool call: `Bash`**
+
+```bash
+tail -2 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/progress.log; uptime
+```
+
+## Tool results / harness — 2026-11-25 02:56:29 UTC
+
+**Tool result:**
+
+```
+=== noise_params done 2026-11-25T02:55:54Z rows=3
+=== drive_params start 2026-11-25T02:55:54Z aid=none
+ 02:56:29 up  1:21,  0 user,  load average: 11.04, 6.81, 6.10
+```
+
+## Assistant — 2026-11-25 02:56:37 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cat > /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/d2s_schematic_rerun/datasheet_notes.md <<'EOF'
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+- **Re-run, not the committed results.** Every table of this sheet comes from the CACE re-run of 2026-11-25 on the taped-out schematic (CACE 2.11, ngspice-47 with the IHP OSDI models, IHP-Open-PDK `df4c5054`); the working limits and verdicts are those of the unchanged CACE file at `91a7da8b`. Differences to the earlier, committed results: [old vs new](../../../verification/c2_gaps/d2s_schematic_rerun/results.md).
+- **Solver aid:** SOLVER_AID_TEXT
+- **mm_params** now has its per-iteration data (the committed CSV had a header only, because CACE 2.11 nests the iterations one level deeper than the design repository's `cace_to_csv.py` expects), so its specification rows are min / median / max over the iterations of the CSV, not CACE's summary.
+- **Units:** the CSV column labels are those of the design repository's `cace_to_csv.py` and are not reliable (several hold SI values under a display-unit label, e.g. `Vos_out[mV]` and `t_on[us]` hold V and s); the generator rescales each column to the unit of CACE's own summary. CACE's yaml labels `Glitch_max` / `Glitch_min` as mV while the template computes them in V, so their summary values printed as "mV" are the V values × 1000 only through CACE's display; see `verification/c2_gaps/ac_tran/results.md`, remarks.
+EOF
+echo ok
+```
+
+## Tool results / harness — 2026-11-25 02:56:37 UTC
+
+**Tool result:**
+
+```
+ok
+```
+
+## Assistant — 2026-11-25 02:56:45 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/d2s_schematic_rerun && python3 - <<'EOF'
+p='datasheet_notes.md'; s=open(p).read()
+i=s.index(" CACE's yaml labels `Glitch_max`")
+s=s[:i]+"\n"
+open(p,'w').write(s)
+EOF
+tail -2 datasheet_notes.md
+```
+
+## Tool results / harness — 2026-11-25 02:56:45 UTC
+
+**Tool result:**
+
+```
+- **mm_params** now has its per-iteration data (the committed CSV had a header only, because CACE 2.11 nests the iterations one level deeper than the design repository's `cace_to_csv.py` expects), so its specification rows are min / median / max over the iterations of the CSV, not CACE's summary.
+- **Units:** the CSV column labels are those of the design repository's `cace_to_csv.py` and are not reliable (several hold SI values under a display-unit label, e.g. `Vos_out[mV]` and `t_on[us]` hold V and s); the generator rescales each column to the unit of CACE's own summary.
+```
+
+## Assistant — 2026-11-25 02:56:46 UTC
+
+Waiting for the remaining groups (drive, pd, enable, mm).
+
+## Assistant — 2026-11-25 02:56:49 UTC
+
+**Tool call: `Bash`**
+
+```bash
+tail -2 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/progress.log; date -u +%T; ls /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/_runs_sch/RUN_*/parameters/drive_params/ ; ps aux | grep -c "[n]gspice"
+```
+
+## Tool results / harness — 2026-11-25 02:56:49 UTC
+
+**Tool result:**
+
+```
+=== noise_params done 2026-11-25T02:55:54Z rows=3
+=== drive_params start 2026-11-25T02:55:54Z aid=none
+02:56:49
+run_00
+run_01
+run_02
+run_03
+run_04
+run_05
+run_06
+run_07
+run_08
+run_09
+sg13cmos5l_IOPadDiff2Single_tb_drive.sch
+1
+```
+
+## Assistant — 2026-11-25 02:56:56 UTC
+
+**Tool call: `Bash`**
+
+```bash
+L=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/progress.log; timeout 580 bash -c "until grep -q 'drive_params done' $L; do sleep 5; done"; tail -2 $L; date -u +%T
+```
+
+## Tool results / harness — 2026-11-25 03:06:36 UTC
+
+**Tool result:**
+
+```
+=== noise_params done 2026-11-25T02:55:54Z rows=3
+=== drive_params start 2026-11-25T02:55:54Z aid=none
+03:06:36
+```
+
+## Assistant — 2026-11-25 03:06:44 UTC
+
+**Tool call: `Bash`**
+
+```bash
+D=$(ls -d /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/_runs_sch/RUN_*/parameters/drive_params); for r in $D/run_*; do echo "$(basename $r) $(ls $r/*.data 2>/dev/null|wc -l) $(cat $r/conditions.yaml | tr '\n' ' ') $(tail -c 200 $r/ngspice_stdout.out 2>/dev/null | tail -1)"; done; ps -eo pid,etime,pcpu,args | grep "[n]gspice" | cut -c1-200
+```
+
+## Tool results / harness — 2026-11-25 03:06:44 UTC
+
+**Tool result:**
+
+```
+run_00 1 DUT_path: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/netlist/schematic/sg13cmos5l_IOPadDiff2Single.spice N: 0 cload: 1e-10 corner_c: typ corner_mos: ss corner_pnp: typ corner_r: typ en: '1.2' filename: sg13cmos5l_IOPadDiff2Single_tb_drive ibias: 5e-06 iterations: '0' rload: '1000' seed: '12345' sel: '0' simpath: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/_runs_sch/RUN_2026-11-25_02-55-55/parameters/drive_params/run_00 temp: '-40' vdbig: '3' vdd: '3.3' vddl: '1.2' vforce: '1.65' vicm: '1.65' vref: '1.65' vs12: '1.2' vs33: '3.3' vterm: '1.65'  Note: Simulation executed from .control section 
+run_01 1 DUT_path: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/netlist/schematic/sg13cmos5l_IOPadDiff2Single.spice N: 1 cload: 1e-10 corner_c: typ corner_mos: sf corner_pnp: typ corner_r: typ en: '1.2' filename: sg13cmos5l_IOPadDiff2Single_tb_drive ibias: 5e-06 iterations: '0' rload: '1000' seed: '12345' sel: '0' simpath: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/_runs_sch/RUN_2026-11-25_02-55-55/parameters/drive_params/run_01 temp: '-40' vdbig: '3' vdd: '3.3' vddl: '1.2' vforce: '1.65' vicm: '1.6
+… [6753 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:06:51 UTC
+
+**Tool call: `Bash`**
+
+```bash
+R=$(ls -d /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/_runs_sch/RUN_*/parameters/drive_params/run_02); wc -l $R/ngspice_std*.out; tail -15 $R/ngspice_stderr.out; tail -8 $R/ngspice_stdout.out; grep -n "^dc\|^op\|^tran\|meas\|^ *dc \|alter" $R/*.spice | head -30
+```
+
+## Tool results / harness — 2026-11-25 03:06:51 UTC
+
+**Tool result:**
+
+```
+wc: '/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/_runs_sch/RUN_2026-11-25_02-55-55/parameters/drive_params/run_02/ngspice_std*.out': No such file or directory
+tail: cannot open '/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/_runs_sch/RUN_2026-11-25_02-55-55/parameters/drive_params/run_02/ngspice_stderr.out' for reading: No such file or directory
+tail: cannot open '/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/d2s_sch/design/macros/sg13cmos5l_IOPadDiff2Single/verification/cace/_runs_sch/RUN_2026-11-25_02-55-55/parameters/drive_params/run_02/ngspice_stdout.out' for reading: No such file or directory
+55:dc Vd -3 3 6
+56:meas dc Vout_max find v(pad) at=3
+57:meas dc Vout_min find v(pad) at=-3
+60:alter @rf[resistance]=1m
+61:dc Vd -3 3 6
+63:meas dc Isc_src find isc at=3
+64:meas dc isnk find isc at=-3
+```
+
+## Assistant — 2026-11-25 03:06:57 UTC
+
+**Tool call: `Bash`**
+
+```bash
+timeout 280 bash -c 'while kill -0 17659 2>/dev/null; do sleep 5; done'; ps -o etime= -p 17659 || echo "finished"
+```
+

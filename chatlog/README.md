@@ -10,6 +10,7 @@ reminders, private e-mail addresses. Times are UTC (CET = UTC+1). Regenerated at
 | [agents/2026-11-25_design_rationale_and_plots.md](agents/2026-11-25_design_rationale_and_plots.md) | background agent "Design rationale and plots", started 2026-11-25 02:38 UTC  |
 | [agents/2026-11-24_award_docs_gap_analysis.md](agents/2026-11-24_award_docs_gap_analysis.md) | background agent "Award-docs gap analysis", started 2026-11-24 22:02 UTC  |
 | [agents/2026-11-23_sky130_s2d_d2s_core_amp_sims.md](agents/2026-11-23_sky130_s2d_d2s_core_amp_sims.md) | background agent "sky130 S2D/D2S core amp sims", started 2026-11-23 20:01 UTC (stopped by the user) |
+| [agents/2026-11-25_render_test_bench_schematics.md](agents/2026-11-25_render_test_bench_schematics.md) | background agent "Render test-bench schematics", started 2026-11-25 03:00 UTC  |
 | [agents/2026-11-25_ac_transient_noise_figures.md](agents/2026-11-25_ac_transient_noise_figures.md) | background agent "AC, transient, noise figures", started 2026-11-25 01:38 UTC  |
 | [agents/2026-11-23_ihp_d2s_pad_post_layout_sims.md](agents/2026-11-23_ihp_d2s_pad_post_layout_sims.md) | background agent "IHP D2S pad post-layout sims", started 2026-11-23 20:41 UTC  |
 | [agents/2026-11-23_ihp_replica_bias_pex_mc_sims.md](agents/2026-11-23_ihp_replica_bias_pex_mc_sims.md) | background agent "IHP replica bias PEX + MC sims", started 2026-11-23 20:41 UTC  |
