@@ -1287,3 +1287,21 @@ docs/cace_ci/00_overview.md:33:See [STATUS.md](STATUS.md). Plan source: `/headle
 … [2868 more characters cut]
 ```
 
+## Assistant — 2026-11-25 11:49:20 UTC
+
+**Tool call: `SubagentHandback`**
+
+```json
+{
+ "message": "The six award-named slots have now been checked at the commits pinned on `tapeout_nov_2026`. Two findings matter most:\n- **Slot 9:** the README a reviewer gets at the pinned commit is the short early version. The long one in the earlier clone came later.\n- **Slot 8:** its top README is thin. Its substance sits in generated sub-pages and in one note that the README does not link.\n\nClones are in /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/award_submodules/ (harness, slot_5 … slot_17), each checked out at its pinned SHA. Harness branch head: 2ef5a869 (2026-11-16). Nothing was pushed or modified.\n\n## 1. Pinned SHA vs the earlier clone's HEAD\n\n| Slot | Submodule URL | Pinned SHA | Earlier clone HEAD | Documentation difference |\n|---|---|---|---|---|\n| 5 | github.com/YacineSot/sg13cmos5l_yacinesot_ip__diff_opamp_cmfb | 4c6faf0c (10-29) | 70457514 | 1 commit: adds one table row (\"Top-Level Chip Layout \"Magic\"\") with image `results/top_magic.png`. Nothing else changed. |\n| 6 | github.com/RTimothyEdwards/sg13cmos5l_vyges_ip__pll_rosc | 13b8ab23 (11-08) | same | none |\n| 8 | github.com/adankvitschal/sg13g2_mh_ip__cmos_vref | 7f30fe3f (10-23) | 426b14ff | 1 commit: THKOX layout fix to `top.mag` and `slot_8.gds`. No documentation change. |\n| 9 | github.com/orpheus016/sg13cmos5l_spma_ip__instramp | 67b5a070 (11-06) | 3e3ebb70 | 8 later commits rewrote the documentation (details below). |\n| 16 | github.com/arjun2000ananth/SAR_ADC_IHP | 4475fec2 | same | none |\n| 17 | github.com/AouissiBrahim/SG13CMOS5L_LPVSV_Chipalooza_2 | 61c7da54 | same | none |\n\n**Slot 9 changes after the pin:**\n- **README:** grew from 107 lines / 965 words to 372 lines / 4727 words.\n- **New sections at HEAD:** design-team list; DRC/LVS/Harness badges with \"Status-Taped--Out\"; \"Quick Navigation & Reports\"; \"Building Blocks Description\"; \"Gain Configuration Table\"; \"Target Specifications vs. Simulated Performance\" (pre-layout and RC-PEX min/typ/max tables with \"Met (…)\" notes); \"Physical Verification & Tapeout Audit\"; \"Known Anomalies, Trade-offs & Future Work\"; \"Verification Flow & Reproduction\"; \"Acknowledgments & AI-Assisted Design Methodology\"; \"License\".\n- **New per-cell pages at HEAD:** `docs/pgia_top.md`, `docs/slot9_wrapper.md`, `docs/testing_procedure.md` (361 lines), `docs/ota_cmos5l.md`, `docs/output_buffer.md` and others.\n- **Removed at HEAD:** the per-directory READMEs (`xschem/*/README.md`, `gds/pgia_top/*.md`, `verilog/README.md`) and `archives/`.\n- **Links:** the pinned README links to `…/blob/main/…` absolute URLs, so a reviewer clicking through reaches current-main content, not the pinned files.\n\n## 2. Top-level README at the pinned SHA\n\n| Slot | Lines / words | Figures | Tables | Other |\n|---|---|---|---|---|\n| 5 | 158 / 1436 | 23 (all inside tables) | 6 | |\n| 6 | 322 / 3520 | 4 | 6 | |\n| 8 | 109 / 988 | 0 | 2 | |\n| 9 | 107 / 965 | 1 | 2 | 3 shields.io badges |\n| 16 | 485 
+… [14703 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 11:49:20 UTC
+
+**Tool result:**
+
+```
+{"success":true,"message":"Report delivered to your caller."}
+```
+
