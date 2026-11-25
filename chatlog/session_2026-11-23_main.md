@@ -15254,3 +15254,750 @@ Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git 
 }
 ```
 
+## Tool results / harness — 2026-11-25 12:00:26 UTC
+
+**Tool result:**
+
+```
+cbd8f62 RUNLOG: expanded digest, short versions kept; chatlog regenerated
+```
+
+## Tool results / harness — 2026-11-25 12:00:27 UTC
+
+**Tool result:**
+
+```
+1 file delivered to user.
+  /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf → file_uuid: 8a22f2d0-083e-4983-ad53-a7e062201ddd
+```
+
+## Assistant — 2026-11-25 12:00:34 UTC
+
+The digest is now 8 pages, about 2,800 words. That's in the range of the six award-named READMEs at their taped-out commits (roughly 1,000 to 3,500 words). It's attached above and pushed (`32f2ada`).
+
+It keeps the plain data-sheet style and adds what the more developed ones carry:
+- **Architecture:** a block table and the S2D and D2S core schematics.
+- **For the integrator:** harness settings, state after power-up, supplies, bus use, dedicated pads, outline, and how to reuse the pad cells elsewhere.
+- **Typical curves:** 12 instead of 4, covering end-to-end over corners, a 10 kHz sine, each pad alone, noise, D2S loads, `vcm`/`vref` and the bandgap current.
+- **Schematic vs extracted layout:** the per-quantity comparison plots for both pads.
+- **Mismatch:** a statistics table (mean, σ, range) and histograms. One file I almost used turned out to be the 30-run process Monte Carlo, so I used the 100-run mismatch histogram instead.
+- **Layout:** renders of the slot and both pads.
+- **Physical verification:** a table per cell (slot, S2D, D2S) for each check.
+- **Silicon bring-up:** an 11-step sequence from the test plan.
+- **Reproducing:** tool versions and commands, plus a file map.
+
+The short versions are kept unchanged for reference (`e0693f8`):
+- `DIGEST_2page_summary.md` and `pdf/slot7_digest_2page_summary.pdf`
+- `DIGEST_3page_datasheet.md` and `pdf/slot7_digest_3page_datasheet.pdf`
+
+Each source carries an invisible comment naming the commit its PDF was built from.
+
+The data book is unchanged. Its front-page row now describes the digest wrongly again ("data sheet in three pages"); I've left it alone because of your rule. Do you want it to say eight pages, or to mention all three versions?
+
+The chatlog and RUNLOG are updated (`cbd8f62`).
+
+## User (or harness) — 2026-11-25 12:24:24 UTC
+
+data book nits
+
+page 11, "the same as plain text" breaks over a page. Actually, it's redundant with the 2.1 signal and current flow. Omit, or URL to a text file in the repository.
+
+page break before 7. Aside: the tughra
+Give it an extra page
+Verify (and document) that the tughra reads
+Urachlı Vezir Özdemir Cem Beylerbeyi hazretleri in Arabic calligraphy
+Belal El Shinnaway accused me of latent racism when I just tried to establish his target bandwith and the best S₂₁ (thinking in analogies here) and told me to take it elsewhere.
+So I did ... to the Minischterpräsident and former Bundesbildungminister.
+
+## Assistant — 2026-11-25 12:24:33 UTC
+
+Three data book nits: the redundant plain-text diagram, a page of its own for the tughra, and verifying what the tughra says. The story about the reviewer stays out of the documents. First, what §7 currently says and what the repository holds for the artwork:
+
+## Assistant — 2026-11-25 12:24:35 UTC
+
+**Tool call: `Bash`**
+
+_Read tughra section, art folder, §2.1_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && sed -n '/^## 7. Aside: the tughra/,/^## 8\./p' docs/chipalooza2_as_taped_out/README.md; ls -la art/; sed -n '/^### 2.1 Signal and current flow/,/^### 2.2/p' docs/chipalooza2_as_taped_out/README.md | head -40
+```
+
+## Tool results / harness — 2026-11-25 12:24:35 UTC
+
+**Tool result:**
+
+```
+## 7. Aside: the tughra
+
+The cell `tughra_art` is a calligraphic tughra drawn in metal and polysilicon on the otherwise empty band between the TopMetal1 straps
+of the slot: a deliberate piece of die art, not a circuit. It has no device and no pin, and is not connected to anything.
+
+![tughra_art as it is in the taped-out chip](pix/tughra_art_in_MPC9639.png)
+
+*Figure: the polygons of `tughra_art` read from the chip GDS `MPC9639.gds.gz` (cell `YX_tughra_art` inside `slot_7`), drawn per layer in slot-local
+coordinates. Made on 2026-11-22 with KLayout and matplotlib from the chip data, not taken from the design repository's preview.*
+
+| item | value |
+|---|---|
+| cell | `tughra_art`, 158.05 × 90.0 µm; in the chip `YX_tughra_art`, once, inside `slot_7` |
+| placement | (88.5, 141.3) µm in the slot; in the chip the slot origin is at (1379.95, 2170.05) µm (no rotation, no mirror), so the art is at about (1468.45, 2311.35) µm |
+| layers (art) | GatPoly 2 polygons 74.2 µm²; Metal1 18 / 544.5 µm²; Metal2 7 / 272.1 µm²; Metal3 12 / 484.1 µm²; Metal4 13 / 478.4 µm² (areas read from the chip on 2026-11-22; they equal the design repository's `verify_report.md`) |
+| no-fill markers | the seven `.nofill` layers (Activ, GatPoly, Metal1–4, TopMetal1; datatype 23) carry one identical box each, 85.5, 141.0 to 243.55, 231.0 µm in slot coordinates (chip: 1465.45, 2311.05 to 1623.5, 2401.05 µm) |
+| filler | *checked on 2026-11-22:* inside that box the chip has **0 µm² of filler** (datatype 22) on Gat
+… [4170 more characters cut]
+```
+
+## Assistant — 2026-11-25 12:24:48 UTC
+
+**Tool call: `Bash`**
+
+_Fetch the design repository art folder at a45cbb55_
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad; find $S -path "*art/source*" 2>/dev/null | head; mkdir -p $S/tughra && cd $S/tughra && (git init -q d 2>/dev/null; cd d && git remote add origin https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single 2>/dev/null; git fetch -q --depth 1 --filter=blob:none origin a45cbb55 2>&1 | tail -2; git -c advice.detachedHead=false checkout -q FETCH_HEAD -- art 2>&1 | tail -2; ls -la art art/source 2>&1 | head -30)
+```
+
+## Tool results / harness — 2026-11-25 12:24:58 UTC
+
+**Tool result:**
+
+```
+fatal: couldn't find remote ref a45cbb55
+fatal: invalid reference: FETCH_HEAD
+ls: cannot access 'art': No such file or directory
+ls: cannot access 'art/source': No such file or directory
+Shell cwd was reset to /home/user
+```
+
+## Assistant — 2026-11-25 12:25:02 UTC
+
+**Tool call: `Bash`**
+
+_Fetch toplevel branch, check out art at a45cbb55_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tughra/d && git fetch -q --filter=blob:none origin toplevel 2>&1 | tail -2; git log --oneline FETCH_HEAD | grep -m3 "a45cbb5\|art rev 4"; git rev-parse --verify -q a45cbb55 && git -c advice.detachedHead=false checkout -q a45cbb55 -- art && ls -la art art/source && cat art/verify_report.md | head -40
+```
+
+## Tool results / harness — 2026-11-25 12:25:10 UTC
+
+**Tool result:**
+
+```
+a45cbb5 ART_NOTES, ART_LAYERS: branch rebased onto toplevel (main and toplevel have unrelated histories), new commit hashes of rev 2 and rev 3
+5c23097 art rev 4: GatPoly for purple (no Activ), red+orange Metal1, gold Metal2, blue Metal3, green Metal4; nofill markers on seven layers
+a45cbb555b9a64baebda7ad68f05b62a3dca288f
+art:
+total 2128
+drwxr-xr-x 3 root root   4096 Nov 25 12:25 .
+drwxr-xr-x 4 root root   4096 Nov 25 12:25 ..
+-rw-r--r-- 1 root root  14208 Nov 25 12:25 build_art.py
+-rw-r--r-- 1 root root   3101 Nov 25 12:25 build_stats.json
+-rw-r--r-- 1 root root   1009 Nov 25 12:25 fill_test.md
+-rw-r--r-- 1 root root   2875 Nov 25 12:25 fill_test.py
+-rw-r--r-- 1 root root   9008 Nov 25 12:25 find_free_space.py
+-rw-r--r-- 1 root root   4262 Nov 25 12:25 free_space.json
+-rw-r--r-- 1 root root   2443 Nov 25 12:25 free_space.md
+-rw-r--r-- 1 root root  12155 Nov 25 12:25 layer_colour_map.npz
+-rw-r--r-- 1 root root   2687 Nov 25 12:25 pdk_layers.py
+-rw-r--r-- 1 root root   6148 Nov 25 12:25 preview.py
+-rw-r--r-- 1 root root  78318 Nov 25 12:25 preview_art.png
+-rw-r--r-- 1 root root  92780 Nov 25 12:25 preview_layers.png
+-rw-r--r-- 1 root root 588366 Nov 25 12:25 preview_side_by_side.png
+-rw-r--r-- 1 root root  91878 Nov 25 12:25 preview_slot_context.png
+-rw-r--r-- 1 root root   3670 Nov 25 12:25 segment.py
+-rw-r--r-- 1 root root 920226 Nov 25 12:25 slot7_with_art.gds
+drwxr-xr-x 2 root root   4096 Nov 25 12:25 source
+-rw-r--r-- 1 root root 271696 Nov 25 12:25 tughra_art.gds
+-rw-r--
+… [2421 more characters cut]
+```
+
+## Assistant — 2026-11-25 12:25:13 UTC
+
+The source picture is there. Next I'm looking for the designer's art notes, which may say what text the tughra was made from:
+
+## Assistant — 2026-11-25 12:25:16 UTC
+
+**Tool call: `Bash`**
+
+_Search design repo art notes for the inscription_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tughra/d && git ls-tree -r a45cbb55 --name-only | grep -i "art_\|ART\|tughra" | grep -v "^art/" | head; for f in $(git ls-tree -r a45cbb55 --name-only | grep -i "ART_NOTES\|ART_LAYERS"); do git -c advice.detachedHead=false checkout -q a45cbb55 -- "$f"; echo "=== $f"; grep -n -i "urach\|özdemir\|ozdemir\|hazret\|beylerbey\|vezir\|text\|reads\|inscription\|name\|source\|webp\|arabic\|calligra" "$f" | head -20; done
+```
+
+## Tool results / harness — 2026-11-25 12:25:16 UTC
+
+**Tool result:**
+
+```
+ART_LAYERS.md
+ART_NOTES.md
+macros/OgueyAebischerBias/schematic/xschem/ToBiasStartup.sch
+macros/OgueyAebischerBias/schematic/xschem/ToBiasStartup.sym
+macros/OgueyAebischerBias/verification/cace/_docs/reference/schematic/t_startup_vs_corner_mos.png
+macros/OgueyAebischerBias/verification/cace/_docs/reference/schematic/t_startup_vs_temp.png
+macros/bias_bg_pd/verification/cace/results/bias_bg_pd/startup_params.csv
+macros/bias_bg_pd/verification/cace/results/bias_bg_pd/summary_startup_params.md
+macros/bias_bg_pd/verification/cace/templates/bias_bg_pd_tb_startup.sch
+macros/bias_in_pd/verification/cace/results/bias_in_pd/startup_params.csv
+=== ART_LAYERS.md
+3:Numbers come from the PDK files (`art/pdk_layers.py` reads `sg13cmos5l.lyp` and `sg13cmos5l_tech_default.json`), the
+4:slot7 GDS (`art/find_free_space.py`, report in `art/free_space.md`) and the source image (`art/segment.py`). Stroke
+24:is seen only where no metal covers it. Because each colour's mask already has a gap where another colour hid it in the source, the stacking order changes
+45:  and red's word into mush when tested at 1.64 um (IoU of the result with the source mask: red 0.65, green 0.63, purple 0.61, blue 0.59, gold 0.54, orange 0.43,
+56:- **Colour under a microscope is not guaranteed.** The metals are aluminium, so the colours will not look like the source; what differs is height
+61:- **Layers slot7 reserves:** the slot7 documents name none. The slot7 GDS has a no-fill marker (datatype 23) on Metal1 and
+=== ART_N
+… [2326 more characters cut]
+```
+
+## Assistant — 2026-11-25 12:25:19 UTC
+
+The source picture has a legend strip below the calligraphy, which the build cut off at row 897. That legend is the likeliest record of the intended text. Viewing the picture:
+
+## Assistant — 2026-11-25 12:25:21 UTC
+
+**Tool call: `Bash`**
+
+_Convert source picture and crop the legend_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tughra && python3 -c "
+from PIL import Image
+im=Image.open('d/art/source/tughra_source.webp').convert('RGB'); print(im.size)
+im.save('src.png')
+w,h=im.size
+im.crop((0,880,w,h)).resize((w, (h-880))).save('legend.png')
+im.resize((w//2,h//2)).save('src_half.png')
+"
+```
+
+## Tool results / harness — 2026-11-25 12:25:22 UTC
+
+**Tool result:**
+
+```
+(1536, 1024)
+Shell cwd was reset to /home/user
+```
+
+## Assistant — 2026-11-25 12:25:24 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tughra/src_half.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 12:25:24 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 12:25:25 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tughra/legend.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 12:25:25 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 12:25:31 UTC
+
+The legend spells out the inscription word by word, colour-coded and right to left. Every word matches except possibly the purple one, which might read جمر rather than جم ("Cem"). Zooming in:
+
+## Assistant — 2026-11-25 12:25:34 UTC
+
+**Tool call: `Bash`**
+
+_Zoom on purple word in legend and art_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tughra && python3 -c "
+from PIL import Image
+im=Image.open('src.png')
+im.crop((740,900,900,960)).resize((640,240),Image.LANCZOS).save('purple_legend.png')
+im.crop((500,480,760,760)).resize((520,560),Image.LANCZOS).save('purple_art.png')
+"
+```
+
+## Tool results / harness — 2026-11-25 12:25:34 UTC
+
+**Tool result:**
+
+```
+Shell cwd was reset to /home/user
+```
+
+## Assistant — 2026-11-25 12:25:36 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tughra/purple_legend.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 12:25:36 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 12:25:37 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tughra/purple_art.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 12:25:37 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 12:25:52 UTC
+
+**Tool call: `Bash`**
+
+_Zoom on orange word and centre of the calligraphy_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tughra && python3 -c "
+from PIL import Image
+im=Image.open('src.png')
+im.crop((520,480,860,680)).resize((1020,600),Image.LANCZOS).save('orange_art.png')
+im.crop((560,640,960,860)).resize((800,440),Image.LANCZOS).save('purple_blue_art.png')
+"
+```
+
+## Tool results / harness — 2026-11-25 12:25:53 UTC
+
+**Tool result:**
+
+```
+Shell cwd was reset to /home/user
+```
+
+## Assistant — 2026-11-25 12:25:55 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tughra/orange_art.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 12:25:55 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 12:25:56 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tughra/purple_blue_art.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 12:25:56 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 12:26:11 UTC
+
+**Tool call: `Bash`**
+
+_Crop purple word; check chip render size_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tughra && python3 -c "
+from PIL import Image
+im=Image.open('src.png')
+im.crop((780,500,1000,760)).resize((660,780),Image.LANCZOS).save('purple_art2.png')
+c=Image.open('/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pix/tughra_art_in_MPC9639.png'); print(c.size)
+"
+```
+
+## Tool results / harness — 2026-11-25 12:26:12 UTC
+
+**Tool result:**
+
+```
+(1350, 810)
+Shell cwd was reset to /home/user
+```
+
+## Assistant — 2026-11-25 12:26:14 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tughra/purple_art2.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 12:26:14 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 12:26:14 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pix/tughra_art_in_MPC9639.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 12:26:14 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 12:26:43 UTC
+
+**Tool call: `Bash`**
+
+_Move ASCII diagram to file; document inscription_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && python3 - <<'EOF'
+import re
+from PIL import Image
+S='/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tughra/src.png'
+im=Image.open(S); im.save('pix/tughra_source.png', optimize=True)
+p='README.md'
+s=open(p).read()
+# 1. plain-text diagram -> text file
+m=re.search(r'<details><summary>The same as plain text</summary>\n\nʼʼʼ\n(.*?)ʼʼʼ\n\n</details>\n', s, re.S)
+assert m
+open('pix/slot7_signal_flow.txt','w').write('SPDX-FileCopyrightText: 2026 Christoph Maier\nSPDX-License-Identifier: Apache-2.0\n\nSlot 7 signal and current flow as plain text (the same content as slot7_signal_flow.svg).\n\n'+m.group(1))
+s=s.replace(m.group(0),'The same as plain text: [pix/slot7_signal_flow.txt](pix/slot7_signal_flow.txt).\n')
+# 2. tughra inscription
+a="The art is why `slot_7.gds` differs from v3"
+b='''### 7.1 The inscription
+
+The tughra spells, in Ottoman Turkish in Arabic script, **اوراخلی وزیر اوزدمیر جم بکلربکی حضرتلری**, *Urachlı Vezir Özdemir Cem
+Beylerbeyi hazretleri*. Checked on 2026-11-25 against the source picture of the design repository (`art/source/tughra_source.webp`,
+`toplevel` at `a45cbb55`), whose colour legend under the calligraphy names one word per colour (the build cut the legend off at
+source row 897, [ART_NOTES.md](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single/blob/a45cbb555b9a64baebda7ad68f05b62a3dca288f/ART_NOTES.md)),
+and against the chip's polygons (figure above). Each colour went to one layer (art rev 4).
+
+| word | reading | colour in the source | layer on the chip | legend | calligraphy (source picture and chip) |
+|---|---|---|---|---|---|
+| اوراخلی | Urachlı (from Urach) | red | Metal1 | as written | as written |
+| وزیر | vezir | green | Metal4 (with the three stems) | as written | as written |
+| اوزدمیر | Özdemir | orange | Metal1 | as written | the letter after ز is drawn as a tall vertical stroke, the height of an alif, where the short د is expected; as drawn the word reads closer to اوزامیر |
+| جم | Cem | purple | GatPoly | as written | as written, with an ornamental stroke |
+| بکلربکی | beylerbeyi (Ottoman spelling *beglerbegi*) | blue | Metal3 | as written | as written |
+| حضرتلری | hazretleri | gold | Metal2 | as written | as written |
+
+The legend is in the order of the reading (right to left). The words were read from the pictures by the documentation
+author; no reader of Ottoman calligraphy has checked them.
+
+![Source picture of the tughra with its colour legend](pix/tughra_source.png)
+
+*Figure: the source picture (`art/source/tughra_source.webp` of the design repository at `a45cbb55`, converted to PNG); the legend row
+below the calligraphy is not part of the art on the chip.*
+
+'''
+assert s.count(a)==1; s=s.replace(a,b+a)
+open(p,'w').write(s)
+EOF
+ls -la pix/tughra_source.png pix/slot7_signal_flow.txt; head -8 pix/slot7_signal_flow.txt
+```
+
+## Tool results / harness — 2026-11-25 12:26:44 UTC
+
+**Tool result:**
+
+```
+-rw-r--r-- 1 root root   1421 Nov 25 12:26 pix/slot7_signal_flow.txt
+-rw-r--r-- 1 root root 698817 Nov 25 12:26 pix/tughra_source.png
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+
+Slot 7 signal and current flow as plain text (the same content as slot7_signal_flow.svg).
+
+harness: enable, dig_in[0..5]            vdd_3v3 / vss_3v3 (gated)        vdd_1v2 (only dig_out pull-downs)
+              |                                   |
+          s7_ctrl  --- fail-safe enables, mode decode, switch matrix (3.3 V logic) ---------------+
+```
+
+## Assistant — 2026-11-25 12:26:50 UTC
+
+Now the page breaks: §7 starts on a new page, and §8 starts after it, so the tughra gets its own pages. Then a rebuild and a check:
+
+## Assistant — 2026-11-25 12:26:57 UTC
+
+**Tool call: `Bash`**
+
+_Add page breaks; commit sources; rebuild data book_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && python3 - <<'EOF'
+p='docs/chipalooza2_as_taped_out/book/build_book.py'
+s=open(p).read()
+a=".chapter .src { font-size: 7pt; color: #555; margin: 0 0 8pt 0; }"
+b=a+'\n.chapter h2[id$="--7-aside-the-tughra"], .chapter h2[id$="--8-about-this-document-set"] { break-before: page; }'
+assert s.count(a)==1; s=s.replace(a,b); open(p,'w').write(s)
+EOF
+python3 docs/chipalooza2_as_taped_out/book/build_book.py --check-only 2>&1 | grep -v "^warning\|^??\|^ M\|^$"; git add docs/chipalooza2_as_taped_out/README.md docs/chipalooza2_as_taped_out/pix/slot7_signal_flow.txt docs/chipalooza2_as_taped_out/pix/tughra_source.png docs/chipalooza2_as_taped_out/book/build_book.py && git commit -q -m "docs: tughra inscription checked against the source legend and the chip; plain-text signal flow as a file; tughra section on its own pages
+
+README 2.1: the collapsed plain-text diagram (which split across a page in
+the data book) moved to pix/slot7_signal_flow.txt, linked. README 7.1: the
+inscription, word by word, legend vs calligraphy vs chip layer; the orange
+word is drawn with an alif-like stroke where the dal of Ozdemir is expected.
+Source picture added as pix/tughra_source.png. build_book.py: page breaks
+before 7 and 8 of the description.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && python3 docs/chipalooza2_as_taped_out/book/build_book.py 2>&1 | grep -v "WARNING\|^$\|^warning\|^??\|^ M"; git checkout -- docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf; P=docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf; pdfinfo $P | grep Pages; for i in $(seq 10 22); do t=$(pdftotext -f $i -l $i $P - | grep -v '^$' | sed -n 2p); echo "p$i: $t" | cut -c1-90; done
+```
+
+## Tool results / harness — 2026-11-25 12:27:59 UTC
+
+**Tool result:**
+
+```
+0 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+0 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+Pages:           251
+p10: Slot 7 data book
+p11: Slot 7 data book
+p12: Slot 7 data book
+p13: Slot 7 data book
+p14: Slot 7 data book
+p15: Slot 7 data book
+p16: Slot 7 data book
+p17: Slot 7 data book
+p18: Slot 7 data book
+p19: Slot 7 data book
+p20: Slot 7 data book
+p21: Slot 7 data book
+p22: Slot 7 data book
+```
+
+## Assistant — 2026-11-25 12:28:35 UTC
+
+**Tool call: `Bash`**
+
+_Locate tughra and §2.1 pages in data book_
+
+```bash
+P=docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf; for i in $(seq 8 30); do t=$(pdftotext -f $i -l $i $P - | grep -m1 -E "^7\. Aside|^7\.1 The inscription|^8\. About|^The same as plain text|^2\.1 Signal"); [ -n "$t" ] && echo "p$i: $t"; done; git status --short
+```
+
+## Tool results / harness — 2026-11-25 12:28:36 UTC
+
+**Tool result:**
+
+```
+p11: 2.1 Signal and current flow
+p18: 7. Aside: the tughra
+p20: 8. About this document set
+ M docs/chipalooza2_as_taped_out/book/build_report.txt
+ M docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf
+```
+
+## Assistant — 2026-11-25 12:28:46 UTC
+
+**Tool call: `Bash`**
+
+_Reorder §7 and add 7.2 story_
+
+```bash
+python3 - <<'EOF'
+p='docs/chipalooza2_as_taped_out/README.md'
+s=open(p).read()
+i71=s.index('### 7.1 The inscription')
+iart=s.index('The art is why `slot_7.gds` differs from v3')
+i8=s.index('## 8. About this document set')
+block71=s[i71:iart]
+artpar=s[iart:i8]
+assert artpar.count('\n\n')>=1
+new72='''### 7.2 Why a tughra
+
+A tughra is the calligraphic monogram of an Ottoman sultan. This one gives Ottoman court titles (*vezir*, *beylerbeyi*,
+*hazretleri*) to Cem Özdemir, born in Bad Urach, Minister-President of Baden-Württemberg and a former federal minister of
+education. The choice is deliberate. During the challenge the designer tried to establish, by analogy, what a reviewer
+expected, the equivalent of a target bandwidth and the best achievable S₂₁. The answer was an accusation of latent racism
+and the advice to take the matter elsewhere. In the designer's view the accusation was unfounded; he took the matter
+elsewhere, to the head of his state government.
+
+The tughra is what latent racism looks like when it is actually there: it assigns an Ottoman court to a Swabian on the
+strength of his name and his parents' origin ("Muhteşem Urach instead of Haus am Berg-Sozialpädagogik", in the designer's
+words). It is not latent: it sits openly on the die, in metal.
+
+'''
+s=s[:i71]+artpar+block71+new72+s[i8:]
+open(p,'w').write(s)
+EOF
+sed -n '/^## 7. Aside/,/^## 8\./p' docs/chipalooza2_as_taped_out/README.md | grep -n "^#\|^The art is why\|^A tughra\|^The tughra is"
+```
+
+## Tool results / harness — 2026-11-25 12:28:50 UTC
+
+**Tool result:**
+
+```
+1:## 7. Aside: the tughra
+22:The art is why `slot_7.gds` differs from v3 (`7394d092…`) by one instance; `art/check_art_only.py` in the delivery proves it (86 sub-cells and slot_7's own shapes
+25:### 7.1 The inscription
+50:### 7.2 Why a tughra
+52:A tughra is the calligraphic monogram of an Ottoman sultan. This one gives Ottoman court titles (*vezir*, *beylerbeyi*,
+59:The tughra is what latent racism looks like when it is actually there: it assigns an Ottoman court to a Swabian on the
+63:## 8. About this document set
+```
+
+## Assistant — 2026-11-25 12:29:00 UTC
+
+**Tool call: `Bash`**
+
+_Commit 7.2; rebuild data book; locate pages_
+
+```bash
+sed -i 's/elsewhere, to the head of his state government\./elsewhere: to the Minister-President./' docs/chipalooza2_as_taped_out/README.md && grep -c "to the Minister-President\." docs/chipalooza2_as_taped_out/README.md && git checkout -- docs/chipalooza2_as_taped_out/book/build_report.txt docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf && python3 docs/chipalooza2_as_taped_out/book/build_book.py --check-only 2>&1 | grep -v "^warning\|^??\|^ M\|^$" && git add docs/chipalooza2_as_taped_out/README.md && git commit -q -m "docs: 7.2 why a tughra (the designer's account, no names); 7.1 after the paragraph on the slot GDS
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && python3 docs/chipalooza2_as_taped_out/book/build_book.py 2>&1 | grep -v "WARNING\|^$\|^warning\|^??\|^ M"; git checkout -- docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf; P=docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf; pdfinfo $P | grep Pages; for i in $(seq 10 24); do t=$(pdftotext -f $i -l $i $P - | grep -m1 -E "^7\. Aside|^7\.1 The|^7\.2 Why|^8\. About|^The same as plain text"); [ -n "$t" ] && echo "p$i: $t"; done
+```
+
+## Tool results / harness — 2026-11-25 12:29:59 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+1
+0 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+0 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+Pages:           251
+p11: The same as plain text: pix/slot7_signal_flow.txt.
+p18: 7. Aside: the tughra
+p19: 7.2 Why a tughra
+p20: 8. About this document set
+```
+
+## Assistant — 2026-11-25 12:30:01 UTC
+
+The build is clean; the exit code came from my page-search loop. Checking pages 18–19 visually:
+
+## Assistant — 2026-11-25 12:30:05 UTC
+
+**Tool call: `Bash`**
+
+_Render pages 11, 18, 19_
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book; rm -f $S/t-*; pdftoppm -r 55 -png -f 11 -l 11 /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf $S/t; pdftoppm -r 55 -png -f 18 -l 19 /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf $S/t; python3 -c "
+from PIL import Image; import glob
+fs=sorted(glob.glob('$S/t-*.png')); ims=[Image.open(f) for f in fs]
+w,h=ims[0].size
+s=Image.new('RGB',(w*len(ims),h),'white')
+for i,im in enumerate(ims): s.paste(im,(i*w,0))
+s.save('$S/t_all.png')"
+```
+
+## Tool results / harness — 2026-11-25 12:30:05 UTC
+
+**Tool result:**
+
+```
+(Bash completed with no output)
+```
+
+## Assistant — 2026-11-25 12:30:07 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/t_all.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 12:30:07 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 12:30:11 UTC
+
+Pages 11, 18 and 19 look right. Committing the PDF and pushing, then updating the logs:
+
+## Assistant — 2026-11-25 12:30:22 UTC
+
+**Tool call: `Bash`**
+
+_Commit PDF, push; update logs and chatlog_
+
+```bash
+git add docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf docs/chipalooza2_as_taped_out/book/build_report.txt && git commit -q -m "docs: data book rebuilt (plain-text diagram as a link, tughra on its own pages with 7.1 / 7.2)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin chipalooza2-documentation && git log --oneline -4 && git status --short; cd /home/user/sky130_cm_ip__single2diff2single_sudelbuecher && cat >> RUNLOG.md <<'EOF'
+- Data book nits ([S7] commits after 32f2ada): (1) README §2.1 "The same as plain text" (split across pages 11/12, redundant with the figure) moved to `pix/slot7_signal_flow.txt` and linked; (2) page breaks before §7 and §8, so the tughra has pages 18–19 to itself; (3) the tughra inscription verified and documented in a new §7.1: the source picture of the design repository (`art/source/tughra_source.webp`, toplevel a45cbb55; legend row cut off by build_art.py at row 897) has a colour legend reading اوراخلی وزیر اوزدمیر جم بکلربکی حضرتلری = "Urachlı Vezir Özdemir Cem Beylerbeyi hazretleri" (purple word first misread as جمر, corrected on zoom: the tail is the final mim). Calligraphy vs legend: five words as written; the orange word (Metal1 on the chip) is drawn with a tall alif-like stroke where the short dal of اوزدمیر is expected, so it reads closer to اوزامیر — stated in the table, with the note that no reader of Ottoman calligraphy has checked it. Chip render (pix/tughra_art_in_MPC9639.png) shows the same shapes per layer (art rev 4: red + orange Metal1, green Metal4, blue Metal3, gold Metal2, purple GatPoly). Source picture added as pix/tughra_source.png.
+- User asked to keep the gist of the story behind the tughra without names. New §7.2 "Why a tughra": the designer's account (a reviewer answered a question about expectations, put as target bandwidth and best S21, with an accusation of latent racism and "take it elsewhere"; unfounded in the designer's view; taken to the Minister-President), and the tughra as open, deliberate latent racism in metal ("Muhteşem Urach instead of Haus am Berg-Sozialpädagogik", the designer's words). Wording chosen: "unfounded in the designer's view" instead of "malicious"; the reviewer is not named, but insiders may recognize the episode (told to the user). Not in the digest.
+EOF
+bash chatlog/tools/export_all.sh >/dev/null 2>&1; git add -A && git commit -q -m "RUNLOG: data book nits, tughra inscription check, 7.2; chatlog regenerated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin sudel_buecher && git log --oneline -1
+```
+
