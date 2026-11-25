@@ -16001,3 +16001,565 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin sudel_buecher && git log --oneline -1
 ```
 
+## Tool results / harness — 2026-11-25 12:30:32 UTC
+
+**Tool result:**
+
+```
+651e0fa docs: data book rebuilt (plain-text diagram as a link, tughra on its own pages with 7.1 / 7.2)
+77c7d48 docs: 7.2 why a tughra (the designer's account, no names); 7.1 after the paragraph on the slot GDS
+900db48 docs: tughra inscription checked against the source legend and the chip; plain-text signal flow as a file; tughra section on its own pages
+32f2ada docs: slot7_digest.pdf rebuilt (8 pages)
+a3e6663 RUNLOG: data book nits, tughra inscription check, 7.2; chatlog regenerated
+```
+
+## Assistant — 2026-11-25 12:30:35 UTC
+
+**Tool call: `SendUserFile`**
+
+```json
+{
+ "files": [
+  "/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf"
+ ],
+ "caption": "Data book: tughra on pages 18–19 (7.1 inscription, 7.2 why a tughra); plain-text diagram now a link",
+ "status": "normal",
+ "display": "attach"
+}
+```
+
+## Tool results / harness — 2026-11-25 12:30:37 UTC
+
+**Tool result:**
+
+```
+1 file delivered to user.
+  /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf → file_uuid: c8c304c3-e57e-4677-8e81-d82f388270db
+```
+
+## Assistant — 2026-11-25 12:30:45 UTC
+
+The three nits and the story are in the data book (attached, 251 pages, pushed as `651e0fa`). The digest is unchanged.
+
+One finding first: the inscription on the chip doesn't quite match its own legend. The source picture's legend reads exactly **اوراخلی وزیر اوزدمیر جم بکلربکی حضرتلری**, *Urachlı Vezir Özdemir Cem Beylerbeyi hazretleri*. In the calligraphy itself, five words are drawn as written. The sixth, Özdemir, is drawn with a tall stroke where the short د should be, so it reads closer to اوزامیر. That is my reading from the pictures; nobody who reads Ottoman calligraphy has checked it, and §7.1 says so.
+
+- **Plain-text diagram:** the collapsible plain-text block is gone from §2.1. It's now a separate file, `pix/slot7_signal_flow.txt`, and §2.1 links to it in one line, so nothing splits across page 11 any more.
+- **Tughra page:** §7 starts on page 18 and §8 on page 20, so the tughra has two pages to itself.
+- **Inscription check (new §7.1):** the source picture and its build notes are in the design repository at `a45cbb55`. The build cut off a colour legend under the calligraphy that names one word per colour, and each colour went to one layer on the chip. I compared each word in the legend, in the calligraphy, and in the chip's rendering. §7.1 has a table of word, reading, colour, layer and result, plus the source picture with its legend (`pix/tughra_source.png`).
+- **The story (new §7.2, "Why a tughra"):** no names. It reads as your account:
+  - a reviewer answered your question about what was expected (put as target bandwidth and best S₂₁) with an accusation of latent racism and "take it elsewhere";
+  - in your view the accusation was unfounded, and you took it elsewhere, to the Minister-President;
+  - the tughra is latent racism made open, in metal ("Muhteşem Urach instead of Haus am Berg-Sozialpädagogik", in your words).
+
+I wrote "unfounded in the designer's view" rather than "malicious". People in the challenge may recognise the episode even without a name.
+
+Your second message about the reviewer arrived after the commit that reordered §7, so §7.2 was written to it in a separate commit (`77c7d48`). The chatlog and RUNLOG are updated (`a3e6663`).
+
+## User (or harness) — 2026-11-25 12:58:34 UTC
+
+More nits:
+
+I speak USAmerican, not "centre of the band" etc.
+
+5. Bandgap reference 
+YOU chose the bandgap to minimize risk under acute threat that Tim and Belal would kick the design off the tapeout run.
+You got defensive on my behalf and I was getting so traumatized by Belal being Vogon that I didn't pay enough attention.
+The Oguey-Aebischer near and dear to me got kicked off.
+Diplomatically put that in.
+Eventually, this needs to be reported to Sultan Cem Özdemir.
+
+6.2 Fail-safe enables ls_up_fs : move caption to the following page where its paragraph is
+
+7. What the sources do not say: 
+I trusted your choice of sizing. 
+I want proof-of-concept for a custom cell, so detailed specifications are ONLY necessary to have Rules and Regulations that actively suppress originality an innovativeness in favor of social status hierarchy wrangling.
+Put that in more diplomatically.
+
+7. What was verified, and what was not
+Don't break the table across pages
+
+## Assistant — 2026-11-25 12:59:02 UTC
+
+Five nits. One flag before I start: the "report to Sultan Cem Özdemir" remark stays out of the documents unless you ask for it explicitly. Locating the pages:
+
+## Assistant — 2026-11-25 12:59:04 UTC
+
+**Tool call: `Bash`**
+
+_Locate the pages and headings the nits refer to_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && P=docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf; for i in $(seq 19 45); do t=$(pdftotext -f $i -l $i $P - | grep -E "^5\. Bandgap|^6\.2 |ls_up_fs|^7\. What|Figure.*ls_up" | head -4 | tr '\n' '|'); [ -n "$t" ] && echo "p$i: $t" | cut -c1-200; done; grep -n "^## \|^### " docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md | sed -n '/^.*## 5/,$p' | head -20; grep -n "^## 7" docs/chipalooza2_as_taped_out/glue_logic.md
+```
+
+## Tool results / harness — 2026-11-25 12:59:06 UTC
+
+**Tool result:**
+
+```
+p30: 5. Bandgap current reference (bg_core_pd)|
+p32: 6.2 Fail-safe enables: ls_up_fs|
+p33: ls_up_fs: fail-safe 1.2 V -> 3.3 V level shifter that needs no 1.2 V supply (sg13_hv)|ls_up_fs.sch|Figure 6.2: ls_up_fs (S), the level shifter of every slot input bit (7 instances in s7_ctrl).|
+p34: en_ctrl_3v3.spice (ls_up_fs)|7. What the sources do not say|• A matching specification for bias_dist_pd; Monte Carlo of ls_up_fs; ESD / latch-up simulation of either pad.|
+p35: ls_up_fs (core|outp outn vinp vinn bus0 bus1 vcm_rb vref_rb vcm_pad vref_pad. Every input bit passes through its own ls_up_fs:|slot's own vdd_1v2 is off and 0 while slot 7 is not selected. No 1.2
+p36: 7. What was verified, and what was not|
+p39: ls_up_fs shifter of the CACE, 7|
+419:## 5. Bandgap current reference (`bg_core_pd`)
+476:## 6. `bias_dist_pd` and the fail-safe enables
+478:### 6.1 `bias_dist_pd`: switchable 1 : 1 distribution
+507:### 6.2 Fail-safe enables: `ls_up_fs`
+540:## 7. What the sources do not say
+116:## 7. What was verified, and what was not
+```
+
+## Assistant — 2026-11-25 12:59:11 UTC
+
+**Tool call: `Bash`**
+
+_Render pages 32,33,36,37; read 6.2 and 7 source_
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book; rm -f $S/n-*; P=/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf; for p in 32 33 36 37; do pdftoppm -r 45 -png -f $p -l $p $P $S/n; done; python3 -c "
+from PIL import Image; import glob
+fs=sorted(glob.glob('$S/n-*.png')); ims=[Image.open(f) for f in fs]
+w,h=ims[0].size
+s=Image.new('RGB',(w*len(ims),h),'white')
+for i,im in enumerate(ims): s.paste(im,(i*w,0))
+s.save('$S/n_all.png')"; cd /home/user/sg13cmos5l_cm_slot7 && sed -n 507,551p docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md | cut -c1-250
+```
+
+## Tool results / harness — 2026-11-25 12:59:12 UTC
+
+**Tool result:**
+
+```
+### 6.2 Fail-safe enables: `ls_up_fs`
+
+Sources: `macros/en_ctrl_3v3/README.md`, `netlist/source/en_ctrl_3v3.spice` (S); slot use: [glue_logic.md](glue_logic.md) §2.
+
+![ls_up_fs schematic](pix/schematics/ls_up_fs.svg)
+
+*Figure 6.2: `ls_up_fs` (S), the level shifter of every slot input bit (7 instances in `s7_ctrl`).*
+
+Problem it solves (README "Why v2"): v1 sensed the slot supplies with ratioed detectors and shifted with a
+latch that needs the slot's 1.2 V; with that 1.2 V off and `enable` high its latch drew up to 152 µA. v2 uses the fact
+that the harness drives `enable` and `dig_in` from an always-on 1.2 V rail, so the bits are valid even while the slot's
+`vdd_1v2` is off, and shifts each bit **without any 1.2 V supply**, on the slot's switched `vdd_3v3` only:
+
+- **XN1** (hv NMOS 1 / 0.45, gate = the 1.2 V input) pulls node `x` low when the input is 1.
+- **Leaker:** 10 hv PMOS 0.3 / 20 in series (effectively 0.3 / 200), gates on the same input. With the input at 0 it has
+  full gate drive and pulls `x` high; with the input at 1.2 V it is "2–5× weaker" and loses to XN1. It is the only
+  static current, and only while the input is high: 28 … 92 nA over corners (netlist header).
+- **Latch XPF** (hv PMOS 0.3 / 5, gate `y` = NOT `x`): once `x` is high it holds it (hysteresis) against XN1's leakage.
+- Three `inv_hv` (1 / 0.45) give `y`, `out`, `out_b`.
+
+The input must be a real harness level: XN1 conducts 0.6 … 8 µA at a 0.67 V gate. Monte Carlo was not run; the README's
+argument 
+… [2038 more characters cut]
+```
+
+## Assistant — 2026-11-25 12:59:14 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/n_all.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 12:59:14 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 12:59:25 UTC
+
+**Tool call: `Bash`**
+
+_Read bandgap section and Oguey-Aebischer mentions_
+
+```bash
+sed -n 419,432p docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md | cut -c1-300; echo ----; sed -n '/^## 8. About this document set/,$p' docs/chipalooza2_as_taped_out/README.md | grep -n -i "oa_core\|oguey" | cut -c1-400; grep -rn -i "oguey\|oa_core" docs/chipalooza2_as_taped_out/README.md docs/AI_ASSISTANCE.md docs/chipalooza2_as_taped_out/log.md | cut -c1-200 | head -20
+```
+
+## Tool results / harness — 2026-11-25 12:59:25 UTC
+
+**Tool result:**
+
+```
+## 5. Bandgap current reference (`bg_core_pd`)
+
+Sources: `macros/bg_core_pd/README.md`, `netlist/schematic/bg_core_pd_magic.spice` (S); the principle comment of
+`bg_core` in `macros/bias_tree_pd/netlist/source/bias_ref.spice` (P).
+
+![bg_core_pd schematic](pix/schematics/bg_core_pd.svg)
+
+*Figure 5.1: `bg_core_pd` (S): PMOS mirror PB / PA / PO with stacked cascodes, NMOS pair NA / NB, Q1 and 8 × Q2
+(pnpMPA), R0, R1A, R1B (rhigh chains), start-up MS1 / MS2 / MS3, disable SKS / SVPG.*
+
+**Principle (Banba current-mode bandgap, no op amp).** The PMOS mirror forces equal currents into NA and NB; with equal
+gate voltage (`g`) and equal currents their sources are equal, so `ea = eb` (comment in `bias_ref.spice`). Each branch
+then carries a CTAT part through R1 and a PTAT part through R0:
+
+----
+10:> **The Oguey–Aebischer core `oa_core_pd` is not in the taped-out slot 7.** It was built and verified (cloud sessions C0 and
+13:> KLayout 0.30.12: none of the 88 cells of `final/gds/slot_7.gds` is `oa_core_pd` or one of its own sub-cells `oa_svpg`, `oa_pcas_c`, `oa_pmir_c`,
+14:> `oa_mcs_c`, `oa_ms1`, `oa_n10`, as listed in `macros/oa_core_pd/layout/gds/oa_core_pd.gds`). `macros/oa_core_pd/`
+docs/chipalooza2_as_taped_out/README.md:73:PEX of the whole slot, ESD / latch-up simulation of the pads, silicon measurement. The Oguey–Aebischer core `oa_core_pd` is
+docs/chipalooza2_as_taped_out/README.md:96:- **`oa_core_pd` is not in the slot:** the only reference is `bg_core_pd` ([§8](#8-about-this-doc
+… [1879 more characters cut]
+```
+
+## Assistant — 2026-11-25 12:59:27 UTC
+
+**Tool call: `Bash`**
+
+_Read §8 Oguey-Aebischer note_
+
+```bash
+sed -n 440,450p docs/chipalooza2_as_taped_out/README.md | cut -c1-600
+```
+
+## Tool results / harness — 2026-11-25 12:59:28 UTC
+
+**Tool result:**
+
+```
+> (`s7_version` in `config.txt` of the harness branch `tapeout_nov_2026`).
+>
+> **The Oguey–Aebischer core `oa_core_pd` is not in the taped-out slot 7.** It was built and verified (cloud sessions C0 and
+> C1: DRC, LVS, PEX; section 3) and used in the stage A / B test platforms ([test_platforms.md](test_platforms.md)), but the
+> taped-out `final/gds/slot_7.gds` contains only the bandgap core `bg_core_pd` (section 4.3; re-checked on 2026-11-23 with
+> KLayout 0.30.12: none of the 88 cells of `final/gds/slot_7.gds` is `oa_core_pd` or one of its own sub-cells `oa_svpg`, `oa_pcas_c`, `oa_pmir_c`,
+> `oa_mcs_c`, `oa_ms1`, `oa_n10`, as listed in `macros/oa_core_pd/layout/gds/oa_core_pd.gds`). `macros/oa_core_pd/`
+> in this repository is a copy of the macro that no harness script reads; the statement in this repository's top-level
+> README that both cores are placed in `slot_7.gds` describes the test platform, not `158afc5`.
+>
+> Adaptations made while copying (nothing else was changed): links to files of this repository that are unchanged since `158afc5`
+```
+
+## Assistant — 2026-11-25 12:59:42 UTC
+
+**Tool call: `Bash`**
+
+_Survey British spellings in book sources and digest_
+
+```bash
+FILES=$(python3 -c "
+import sys; sys.path.insert(0,'docs/chipalooza2_as_taped_out/book'); import build_book as b
+fs=[f.split('#')[0] for _,it in b.BOOK for f,_,_ in it]; print(' '.join(sorted(set(fs))+['docs/chipalooza2_as_taped_out/DIGEST.md']))"); echo "$FILES" | wc -w; grep -ohiE "\b\w*(centre|colour|licence|behaviour|analys(e|ed|ing)|modell(ed|ing)|labell(ed|ing)|favour|honour|neighbour|travell|cancell|(organi|optimi|minimi|maximi|characteri|summari|recogni|reali|utili|normali|synthesi|parametri|prioriti|emphasi|standardi|initiali|digiti|stabili|visuali|categori|customi|generali|speciali|symmetri|linearis|serialis|finalis|penalis)s(e|ed|es|ing|ation|ations)|grey|programme|catalogue|dialogue|fibre|aluminium|artefact|defence|offence|judgement|acknowledgement|metre|litre|travelled|learnt|whilst|amongst|tonne|storey|plough|sceptic|mould|manoeuvre|cheque|kerb|tyre|towards|afterwards|focussed|focussing)\w*\b" $FILES | sort | uniq -c | sort -rn
+```
+
+## Tool results / harness — 2026-11-25 12:59:46 UTC
+
+**Tool result:**
+
+```
+42
+      8 behaviour
+      7 colour
+      6 centre
+      5 artefact
+      5 analyses
+      4 licence
+      2 grey
+      2 cancellation
+      1 modelled
+      1 labelled
+      1 behavioural
+      1 afterwards
+      1 Licence
+      1 Analyses
+```
+
+## Assistant — 2026-11-25 12:59:55 UTC
+
+**Tool call: `Bash`**
+
+_Show contexts of British spellings_
+
+```bash
+FILES=$(python3 -c "
+import sys; sys.path.insert(0,'docs/chipalooza2_as_taped_out/book'); import build_book as b
+fs=[f.split('#')[0] for _,it in b.BOOK for f,_,_ in it]; print(' '.join(sorted(set(fs))+['docs/chipalooza2_as_taped_out/DIGEST.md','docs/chipalooza2_as_taped_out/book/build_book.py']))"); grep -noiE ".{0,40}\b(behaviour\w*|colour\w*|centre\w*|artefact\w*|analyses|licence\w*|grey|modelled|labelled|per cent|fulfil\w*|travelling)\b.{0,30}" $FILES | cut -c1-200
+```
+
+## Tool results / harness — 2026-11-25 12:59:55 UTC
+
+**Tool result:**
+
+```
+docs/RULES_COMPLIANCE_chipalooza2.md:43:| 12 | full behavioural description documented, any r
+docs/RULES_COMPLIANCE_chipalooza2.md:45:| 14 | standard open-source licence, preferably Apache 2.0 | need
+docs/chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md:152:or for dynamic behaviour on the PEX view, which was no
+docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md:343:### 4.2 `vcm_rb`: centre of the band
+docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md:361:.06 V offset of (gh + xp)/2 against the centre". Result: `m` within −65 �
+docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md:362:the band centre over all PVT and references (
+docs/chipalooza2_as_taped_out/README.md:94:and D2S `Glitch_max` / `Glitch_min` are labelled mV but computed in V, so CACE
+docs/chipalooza2_as_taped_out/README.md:174:s: gives `vcm` (S2D `vcm` = D2S `vref`, centre of the linear band) and `vref
+docs/chipalooza2_as_taped_out/README.md:350:of swap, mon, feed, ext are a simulator artefact, not a start-up problem:** th
+docs/chipalooza2_as_taped_out/README.md:399:`toplevel` at `a45cbb55`), whose colour legend under the calligraphy 
+docs/chipalooza2_as_taped_out/README.md:399:names one word per colour (the build cut the legend off
+docs/chipalooza2_as_taped_out/README.md:401:he chip's polygons (figure above). Each colour went to one layer (art rev 4)
+docs/chipalooza2_as_taped_out/README.md:403:| word | reading | colour in the source | layer on the 
+docs/chipalooza2_as_taped_out/README.md:415:![Source picture of the tughra with i
+… [3229 more characters cut]
+```
+
+## Assistant — 2026-11-25 13:00:11 UTC
+
+**Tool call: `Bash`**
+
+_Apply US spelling to prose in book sources and digest_
+
+```bash
+python3 - <<'EOF'
+import re, sys
+sys.path.insert(0,'docs/chipalooza2_as_taped_out/book'); import build_book as b
+files=sorted(set(f.split('#')[0] for _,it in b.BOOK for f,_,_ in it))+['docs/chipalooza2_as_taped_out/DIGEST.md']
+M={'behaviour':'behavior','behavioural':'behavioral','behaviours':'behaviors','colour':'color','colours':'colors','coloured':'colored',
+   'centre':'center','centres':'centers','centred':'centered','artefact':'artifact','artefacts':'artifacts','licence':'license','licences':'licenses',
+   'modelled':'modeled','modelling':'modeling','labelled':'labeled','labelling':'labeling','grey':'gray'}
+pat=re.compile(r'\b('+'|'.join(sorted(M,key=len,reverse=True))+r')\b', re.I)
+def fix_word(m):
+    w=m.group(0); r=M[w.lower()]
+    return r.capitalize() if w[0].isupper() else r
+# protect: `code`, "quotes", link/image targets ](...), URLs
+prot=re.compile(r'(`[^`]*`|"[^"\n]*"|\]\([^)]*\)|https?://\S+)')
+total=0
+for f in files:
+    s=open(f,encoding='utf-8').read(); out=[]; infence=False; n=0
+    for line in s.split('\n'):
+        if line.lstrip().startswith('ʼʼʼ'):
+            infence=not infence; out.append(line); continue
+        if infence: out.append(line); continue
+        parts=prot.split(line)
+        for i in range(0,len(parts),2):
+            new,k=pat.subn(fix_word,parts[i]); parts[i]=new; n+=k
+        out.append(''.join(parts))
+    if n:
+        open(f,'w',encoding='utf-8').write('\n'.join(out)); print(f,n); total+=n
+print('total',total)
+p='docs/chipalooza2_as_taped_out/book/build_book.py'
+s=open(p).read(); s=s.replace("<tr><td>Licence</td>","<tr><td>License</td>"); open(p,'w').write(s)
+EOF
+git diff --stat | tail -3
+```
+
+## Tool results / harness — 2026-11-25 13:00:12 UTC
+
+**Tool result:**
+
+```
+docs/RULES_COMPLIANCE_chipalooza2.md 2
+docs/chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md 1
+docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md 2
+docs/chipalooza2_as_taped_out/README.md 8
+docs/chipalooza2_as_taped_out/TEST_PLAN.md 2
+docs/chipalooza2_as_taped_out/datasheets/pad_ref_rb.md 1
+docs/chipalooza2_as_taped_out/datasheets/slot_7_system.md 1
+docs/chipalooza2_as_taped_out/pix/layout/README.md 1
+docs/chipalooza2_as_taped_out/pix/schematics/README.md 1
+docs/chipalooza2_as_taped_out/test_platforms.md 1
+signoff/README.md 2
+verification/c2_gaps/ac_tran/README.md 4
+verification/c2_gaps/dc_curves/README.md 2
+verification/c2_gaps/replica_bias/results.md 1
+verification/c2_gaps/slot_modes_bg/README.md 1
+verification/c2_gaps/slot_modes_bg/results.md 2
+docs/chipalooza2_as_taped_out/DIGEST.md 3
+total 35
+ verification/c2_gaps/slot_modes_bg/README.md              |  2 +-
+ verification/c2_gaps/slot_modes_bg/results.md             |  4 ++--
+ 18 files changed, 34 insertions(+), 34 deletions(-)
+```
+
+## Assistant — 2026-11-25 13:00:17 UTC
+
+**Tool call: `Bash`**
+
+_Review spelling diff lines_
+
+```bash
+git diff -U0 | grep "^[-+][^-+]" | cut -c1-170 | head -80
+```
+
+## Tool results / harness — 2026-11-25 13:00:17 UTC
+
+**Tool result:**
+
+```
+-| 12 | full behavioural description documented, any reasonable format; plain-text files for integration | met | [description](chipalooza2_as_taped_out/README.md), [glue_
++| 12 | full behavioral description documented, any reasonable format; plain-text files for integration | met | [description](chipalooza2_as_taped_out/README.md), [glue_l
+-| 14 | standard open-source licence, preferably Apache 2.0 | needs user decision | `LICENSE`: Solderpad Hardware License v2.1, which wraps Apache 2.0 and lets a user tre
++| 14 | standard open-source license, preferably Apache 2.0 | needs user decision | `LICENSE`: Solderpad Hardware License v2.1, which wraps Apache 2.0 and lets a user tre
+-or for dynamic behaviour on the PEX view, which was not simulated ([replica bias results](../../verification/c2_gaps/replica_bias/results.md), "Not resolved here").
++or for dynamic behavior on the PEX view, which was not simulated ([replica bias results](../../verification/c2_gaps/replica_bias/results.md), "Not resolved here").
+-| replica bias `pad_ref_rb` | vcm and vref for both pads | copies of the pads' input and folding nodes place vcm at the centre of the linear band and vref near 0.5 V; on
++| replica bias `pad_ref_rb` | vcm and vref for both pads | copies of the pads' input and folding nodes place vcm at the center of the linear band and vref near 0.5 V; on
+-## Repository and licence
++## Repository and license
+-`158afc5`, documentation on branch `chipalooza2-documentation`. Licence: Solderpad Hardw
+… [5707 more characters cut]
+```
+
+## Assistant — 2026-11-25 13:00:30 UTC
+
+**Tool call: `Bash`**
+
+_Add bandgap note, §7 paragraph, page breaks; check links_
+
+```bash
+git checkout -- docs/chipalooza2_as_taped_out/datasheets/pad_ref_rb.md && python3 - <<'EOF'
+p='docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md'
+s=open(p).read()
+a="""## 5. Bandgap current reference (`bg_core_pd`)
+
+"""
+b="""## 5. Bandgap current reference (`bg_core_pd`)
+
+> **Why this reference.** Slot 7 was planned around the designer's own reference, the Oguey–Aebischer core `oa_core_pd`
+> (built and verified, used in the test platforms, [test_platforms.md](test_platforms.md)). For the taped-out slot the AI
+> assistant recommended the Banba bandgap instead, as the lower-risk choice at a time when the slot's place on the tapeout
+> run seemed to depend on clearing the final review without open questions. The designer, under the pressure of that
+> review, accepted the recommendation without the scrutiny it deserved. The Oguey–Aebischer core is therefore not on this
+> chip ([README §8](README.md#8-about-this-document-set)); it remains the designer's preferred reference.
+
+"""
+assert s.count(a)==1; s=s.replace(a,b)
+a="- Why the bandgap, and not the Oguey–Aebischer core, became the slot's only reference."
+b=("- Why the bandgap, and not the Oguey–Aebischer core, became the slot's only reference: answered in section 5 (\"Why this\n"
+   "  reference\").\n\n"
+   "The sizes were chosen in the AI-assisted design sessions, and the designer relied on those choices; the gaps above are gaps\n"
+   "in the recorded reasoning, not known defects. Slot 7 is a proof of concept for a custom pad cell. The question it is built\n"
+   "to answer is whether matched-pair pads with a replica bias work on silicon. A detailed specification written before that\n"
+   "question is answered would mostly fix numbers in advance; for a first cell of its kind the designer prefers to\n"
+   "characterize what was built (the data sheets) and to set specifications once silicon has shown what the concept can do.")
+assert s.count(a)==1; s=s.replace(a,b)
+open(p,'w').write(s)
+p='docs/chipalooza2_as_taped_out/book/build_book.py'
+s=open(p).read()
+a='.chapter h2[id$="--7-aside-the-tughra"], .chapter h2[id$="--8-about-this-document-set"] { break-before: page; }'
+b=('/* manual page breaks (heading ids, after the file prefix) */\n'
+   '.chapter h2[id$="--7-aside-the-tughra"], .chapter h2[id$="--8-about-this-document-set"],\n'
+   '.chapter h3[id$="--62-fail-safe-enables-ls_up_fs"],\n'
+   '.chapter h2[id$="glue-logic--7-what-was-verified-and-what-was-not"] { break-before: page; }')
+assert s.count(a)==1; s=s.replace(a,b); open(p,'w').write(s)
+EOF
+python3 docs/chipalooza2_as_taped_out/book/build_book.py --check-only 2>&1 | grep -v "^warning\|^??\|^ M\|^$"; grep -rn "centre-of-the-band\|simulator-artefact" docs verification --include=*.md | head
+```
+
+## Tool results / harness — 2026-11-25 13:00:39 UTC
+
+**Tool result:**
+
+```
+0 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+```
+
+## Assistant — 2026-11-25 13:00:43 UTC
+
+No links depended on the renamed anchors. Committing (spelling as one commit, content and page breaks as another), then rebuilding and checking the affected pages:
+
+## Assistant — 2026-11-25 13:00:50 UTC
+
+**Tool call: `Bash`**
+
+_Commit sources; rebuild; locate pages_
+
+```bash
+git add docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md docs/chipalooza2_as_taped_out/book/build_book.py && git commit -q -m "docs: HOW_IT_WORKS 5 'Why this reference' (bandgap instead of the Oguey-Aebischer core) and 7 (sizing relied on; proof of concept, specification after silicon); page breaks before 6.2 and glue logic 7
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git add -A docs verification signoff && git reset -q docs/chipalooza2_as_taped_out/book/build_report.txt && git commit -q -m "docs: US spelling in prose (behavior, color, center, artifact, license, modeled, labeled, gray); quotations, code and file names unchanged
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git status --short && python3 docs/chipalooza2_as_taped_out/book/build_book.py 2>&1 | grep -v "WARNING\|^$\|^warning\|^??\|^ M"; P=docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf; pdfinfo $P | grep Pages; for i in $(seq 28 42); do t=$(pdftotext -f $i -l $i $P - | grep -m1 -E "^5\. Bandgap|^Why this reference|^6\.2 Fail|^7\. What"); [ -n "$t" ] && echo "p$i: $t"; done
+```
+
+## Tool results / harness — 2026-11-25 13:01:45 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+ M docs/chipalooza2_as_taped_out/book/build_report.txt
+0 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+Pages:           251
+p30: 5. Bandgap current reference (bg_core_pd)
+p33: 6.2 Fail-safe enables: ls_up_fs
+p34: 7. What the sources do not say
+p37: 7. What was verified, and what was not
+```
+
+## Assistant — 2026-11-25 13:01:50 UTC
+
+**Tool call: `Bash`**
+
+_Render pages 30,32,33,34,36,37_
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book; rm -f $S/n-*; P=/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf; for p in 30 32 33 34 36 37; do pdftoppm -r 40 -png -f $p -l $p $P $S/n; done; python3 -c "
+from PIL import Image; import glob
+fs=sorted(glob.glob('$S/n-*.png')); ims=[Image.open(f) for f in fs]
+w,h=ims[0].size
+s=Image.new('RGB',(w*len(ims),h),'white')
+for i,im in enumerate(ims): s.paste(im,(i*w,0))
+s.save('$S/n_all.png')"
+```
+
+## Tool results / harness — 2026-11-25 13:01:50 UTC
+
+**Tool result:**
+
+```
+(Bash completed with no output)
+```
+
+## Assistant — 2026-11-25 13:01:52 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/n_all.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 13:01:52 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 13:01:56 UTC
+
+All four layout points look right. Page 32 now ends early, which is the cost of starting 6.2 on a fresh page. Committing and pushing:
+
+## Assistant — 2026-11-25 13:02:06 UTC
+
+**Tool call: `Bash`**
+
+_Commit PDFs, push; update logs_
+
+```bash
+git add docs/chipalooza2_as_taped_out/pdf docs/chipalooza2_as_taped_out/book/build_report.txt && git commit -q -m "docs: data book and digest rebuilt (US spelling, bandgap note, 7 paragraph, page breaks)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin chipalooza2-documentation && git log --oneline -3 && git status --short; cd /home/user/sky130_cm_ip__single2diff2single_sudelbuecher && cat >> RUNLOG.md <<'EOF'
+- Data book nits, round 3 ([S7] three commits after a3e6663-era 651e0fa, PDFs rebuilt): (1) US spelling in prose of all data-book sources and the digest, 35 replacements (behavior, behavioral, color, center, artifact, license, modeled, labeled, gray); code spans, file names, URLs and quotations unchanged (HOW_IT_WORKS keeps a quoted "centre" from a source README; the pad_ref_rb data sheet keeps the CACE description verbatim); plural noun "analyses" left as is; the reference copies of the short digests left verbatim. (2) HOW_IT_WORKS §5 "Why this reference": the AI assistant recommended the Banba bandgap over the designer's Oguey–Aebischer core as the lower-risk choice while the slot's place on the run seemed to depend on clearing the final review; the designer accepted it under that pressure without the scrutiny it deserved; oa_core_pd therefore not on the chip, still the designer's preferred reference (user's account, no names). The user's remark about reporting it to the Minister-President was not put in the documents. (3) HOW_IT_WORKS §7: the sizing was relied on as chosen in the AI-assisted sessions; slot 7 is a proof of concept for a custom pad cell, so the designer characterizes what was built and sets specifications after silicon (diplomatic version of the user's view on up-front specifications). (4) Manual page breaks before HOW_IT_WORKS 6.2 (heading and sources line were stranded at the bottom of p. 32) and before glue logic §7 (table now whole on p. 37). Link check 0 problems; 251 pages.
+EOF
+bash chatlog/tools/export_all.sh >/dev/null 2>&1; git add -A && git commit -q -m "RUNLOG: data book nits round 3; chatlog regenerated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin sudel_buecher && git log --oneline -1
+```
+
