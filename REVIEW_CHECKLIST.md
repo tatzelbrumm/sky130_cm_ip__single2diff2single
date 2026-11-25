@@ -16,3 +16,4 @@ Items needing an organizer's approval: custom pads; license (Apache-2.0 or SHL-2
 [S7] branch `chipalooza2-documentation`:
 11. `signoff/README.md`: magic LVS property errors (`mm_ok`, antenna-diode W/L) in `bg_core_pd` and pad reports, not mentioned in their READMEs: accept or note?
 12. `docs/chipalooza2_as_taped_out/TEST_PLAN.md`: SPI sequence and expected intervals for the chip measurement.
+13. **Proposal row 14 (D2S gain incl. mismatch, target 0.49 … 0.51):** the re-run on the taped-out schematic gives mismatch samples 0.4888 … 0.5051 (σ 0.0037, 30 runs); one sample is below 0.49. Decide: widen the target (e.g. 0.485 … 0.515 ≈ ±3σ plus systematic) or keep it and note the IHP basis violates it.
