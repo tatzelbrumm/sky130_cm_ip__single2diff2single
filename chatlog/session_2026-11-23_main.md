@@ -10780,3 +10780,1527 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin sudel_buecher && git log --oneline -1
 ```
 
+## Tool results / harness — 2026-11-25 10:57:38 UTC
+
+**Tool result:**
+
+```
+94a9799 docs: remove two stale 'S2D mismatch re-run pending' notes (the re-run finished on 2026-11-25)
+d972056 RUNLOG: data book / digest request, rules renumbering, stale notes; chatlog regenerated
+```
+
+## Assistant — 2026-11-25 10:57:42 UTC
+
+The chatlog is updated (`d972056`). Before writing the full builder, I'm testing how WeasyPrint renders our SVG figures:
+
+## Assistant — 2026-11-25 10:57:45 UTC
+
+**Tool call: `Bash`**
+
+_Test WeasyPrint SVG rendering_
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book; mkdir -p $S && cd $S && D=/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pix && cat > t.html <<EOF
+<html><body><p>test</p><img style="width:100%" src="file://$D/slot7_signal_flow.svg"><img style="width:100%" src="file://$D/schematics/s2d_mpdda.svg"><details><summary>sum</summary><pre>hidden text</pre></details></body></html>
+EOF
+python3 -c "import weasyprint; weasyprint.HTML('t.html').write_pdf('t.pdf')" 2>&1 | tail -3; pdftoppm -r 60 -png t.pdf tp && ls tp*
+```
+
+## Tool results / harness — 2026-11-25 10:57:47 UTC
+
+**Tool result:**
+
+```
+tp-1.png
+Shell cwd was reset to /home/user
+```
+
+## Assistant — 2026-11-25 10:57:49 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/tp-1.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 10:57:49 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 10:58:19 UTC
+
+**Tool call: `Bash`**
+
+_Survey images vs embedded images_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && for d in verification/c2_gaps/*/; do n=$(ls $d/plots/*.png $d/results/*.png $d/*.png 2>/dev/null | wc -l); e=$(cat $d/*.md 2>/dev/null | grep -c '!\['); echo "$d imgs=$n embedded=$e"; done; ls docs/chipalooza2_as_taped_out/pix/plots/; grep -c '!\[' docs/chipalooza2_as_taped_out/*.md docs/chipalooza2_as_taped_out/datasheets/*.md; grep -n 'png' verification/c2_gaps/dc_curves/README.md | head -8; grep -n '^| `\?\[\?`\?[a-z_0-9]*\.svg' docs/chipalooza2_as_taped_out/pix/schematics/README.md | head -3
+```
+
+## Tool results / harness — 2026-11-25 10:58:20 UTC
+
+**Tool result:**
+
+```
+verification/c2_gaps/ac_tran/ imgs=20 embedded=0
+verification/c2_gaps/d2s_pex/ imgs=3 embedded=0
+verification/c2_gaps/d2s_schematic_rerun/ imgs=0 embedded=8
+verification/c2_gaps/dc_curves/ imgs=22 embedded=0
+verification/c2_gaps/klayout_pad_diodes/ imgs=2 embedded=0
+verification/c2_gaps/replica_bias/ imgs=2 embedded=2
+verification/c2_gaps/s2d_mismatch/ imgs=0 embedded=4
+verification/c2_gaps/slot_modes_bg/ imgs=2 embedded=0
+README.md
+bg_core_current_vs_temp.png
+bias_dist_mismatch_hist.png
+make_plots.py
+pad_ref_rb_vcm_vref_pvt.png
+pex_vs_schematic_d2s.png
+pex_vs_schematic_s2d.png
+docs/chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md:0
+docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md:9
+docs/chipalooza2_as_taped_out/README.md:9
+docs/chipalooza2_as_taped_out/TEST_PLAN.md:0
+docs/chipalooza2_as_taped_out/characterization_candidates.md:0
+docs/chipalooza2_as_taped_out/glue_logic.md:0
+docs/chipalooza2_as_taped_out/log.md:0
+docs/chipalooza2_as_taped_out/test_platforms.md:0
+docs/chipalooza2_as_taped_out/datasheets/README.md:0
+docs/chipalooza2_as_taped_out/datasheets/en_ctrl_3v3_level_shifter.md:0
+docs/chipalooza2_as_taped_out/datasheets/pad_ref_rb.md:2
+docs/chipalooza2_as_taped_out/datasheets/sg13cmos5l_IOPadDiff2Single.md:8
+docs/chipalooza2_as_taped_out/datasheets/sg13cmos5l_IOPadSingle2Diff.md:8
+docs/chipalooza2_as_taped_out/datasheets/slot_7_system.md:7
+40:| [slot_7.svg](slot_7.svg) | slot 7 top: s7_ctrl, s7_doutpd, bg_core_pd, bias_dist_pd, pad_ref_rb | `slot_7/schematic/xschem/slot_7.sch
+… [252 more characters cut]
+```
+
+## Assistant — 2026-11-25 10:59:45 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/book/build_book.py`
+
+```
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Build the slot 7 data book and the two-page digest as PDF from the Markdown documentation.
+
+    python3 docs/chipalooza2_as_taped_out/book/build_book.py [--sha <commit>] [--check-only]
+
+Needs pandoc (3.x) and WeasyPrint (tested with 70.0). Steps:
+  1. each Markdown file of BOOK is converted by pandoc (gfm reader, GitHub heading identifiers) to a JSON AST;
+  2. identifiers are prefixed per file; a link to a file that is part of the book becomes an internal link, every other
+     relative link becomes a GitHub link pinned to the source commit; images are resolved to local files;
+  3. figure galleries are added for plots / schematics / layouts that the text links to but does not embed;
+  4. cover, summary, table of contents (with page numbers) and the chapters go into one HTML file, which WeasyPrint
+     turns into a PDF with bookmarks.
+Every internal link is checked against the identifiers in the book; every relative link against the repository.
+Problems are printed and written to book/build_report.txt; --check-only stops after the checks.
+"""
+import argparse, datetime, html, json, os, re, subprocess, sys, urllib.parse
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.abspath(os.path.join(HERE, '..', '..', '..'))
+DOCS = 'docs/chipalooza2_as_taped_out'
+REPO_URL = 'https://github.com/tatzelbrumm/sg13cmos5l_cm_slot7'
+OUT_DIR = os.path.join(ROOT, DOCS, 'pdf')
+VG = 'verification/c2_gaps'
+
+# (part title, [(file, gallery spec or None, include h2 in TOC)])
+# gallery spec: (image glob roots relative to ROOT, caption source files)
+GAP_FOLDERS = ['d2s_pex', 'replica_bias', 'slot_modes_bg', 'dc_curves', 'ac_tran', 'd2s_schematic_rerun',
+               's2d_mismatch', 'klayout_pad_diodes']
+BOOK = [
+    ('Part I — Description', [
+        (f'{DOCS}/README.md#body', None, True),
+        (f'{DOCS}/HOW_IT_WORKS.md', None, True),
+        (f'{DOCS}/glue_logic.md', None, True),
+    ]),
+    ('Part II — Data sheets', [
+        (f'{DOCS}/datasheets/README.md', None, False),
+        (f'{DOCS}/datasheets/sg13cmos5l_IOPadSingle2Diff.md', None, True),
+        (f'{DOCS}/datasheets/sg13cmos5l_IOPadDiff2Single.md', None, True),
+        (f'{DOCS}/datasheets/pad_ref_rb.md', None, True),
+        (f'{DOCS}/datasheets/en_ctrl_3v3_level_shifter.md', None, True),
+        (f'{DOCS}/datasheets/slot_7_system.md', None, True),
+    ]),
+    ('Part III — Working limits and test plan', [
+        (f'{DOCS}/ACHIEVED_VS_LIMITS.md', None, True),
+        (f'{DOCS}/TEST_PLAN.md', None, True),
+        (f'{DOCS}/test_platforms.md', None, True),
+    ]),
+    ('Appendix A — Gap simulations after the tapeout', [
+        x for g in GAP_FOLDERS for x in (
+            (f'{VG}/{g}/README.md', None, False),
+            (f'{VG}/{g}/results.md', ([f'{VG}/{g}'], [f'{VG}/{g}/README.md', f'{VG}/{g}/results.md']), False))
+    ]),
+    ('Appendix B — Sign-off', [
+        ('signoff/README.md', None, False),
+        ('signoff/taped_out_158afc5/README.md', None, False),
+    ]),
+    ('Appendix C — Schematics', [
+        (f'{DOCS}/pix/schematics/README.md', ([f'{DOCS}/pix/schematics'], [f'{DOCS}/pix/schematics/README.md']), False),
+        (f'{DOCS}/pix/schematics/testbenches/README.md',
+         ([f'{DOCS}/pix/schematics/testbenches'], [f'{DOCS}/pix/schematics/testbenches/README.md']), False),
+    ]),
+    ('Appendix D — Layout', [
+        (f'{DOCS}/pix/layout/README.md', ([f'{DOCS}/pix/layout'], [f'{DOCS}/pix/layout/README.md']), False),
+    ]),
+    ('Appendix E — Design-rationale plots', [
+        (f'{DOCS}/pix/plots/README.md', ([f'{DOCS}/pix/plots'], [f'{DOCS}/pix/plots/README.md']), False),
+    ]),
+    ('Appendix F — Harness integration', [
+        ('README.md', None, False),
+        ('docs/FOR_TIM.md', None, False),
+        ('docs/slot_7.md', None, False),
+        ('docs/PROGRESS.md', None, False),
+    ]),
+    ('Appendix G — Chipalooza #2 rules', [
+        ('docs/RULES_COM
+… [20282 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 10:59:45 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/book/build_book.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 10:59:46 UTC
+
+**Tool call: `Bash`**
+
+_Run the link checks of the data book builder_
+
+```bash
+time python3 docs/chipalooza2_as_taped_out/book/build_book.py --check-only 2>&1 | tail -60
+```
+
+## Tool results / harness — 2026-11-25 10:59:52 UTC
+
+**Tool result:**
+
+```
+warning: uncommitted documentation changes; the pinned links point to 94a9799:
+?? docs/chipalooza2_as_taped_out/book/
+
+Traceback (most recent call last):
+  File "/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/book/build_book.py", line 474, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/book/build_book.py", line 470, in main
+    build_book(sha, a.check_only)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/book/build_book.py", line 356, in build_book
+    h, heads = book.convert(path, part=sel or None)
+               ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/book/build_book.py", line 179, in convert
+    md = open(os.path.join(ROOT, src), encoding='utf-8').read()
+         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/klayout_pad_diodes/results.md'
+
+real	0m5.865s
+user	0m2.369s
+sys	0m1.012s
+```
+
+## Assistant — 2026-11-25 10:59:57 UTC
+
+**Tool call: `Bash`**
+
+_Handle folders without results.md; rerun checks_
+
+```bash
+python3 - <<'EOF'
+p='docs/chipalooza2_as_taped_out/book/build_book.py'
+s=open(p).read()
+old="""    ('Appendix A — Gap simulations after the tapeout', [
+        x for g in GAP_FOLDERS for x in (
+            (f'{VG}/{g}/README.md', None, False),
+            (f'{VG}/{g}/results.md', ([f'{VG}/{g}'], [f'{VG}/{g}/README.md', f'{VG}/{g}/results.md']), False))
+    ]),"""
+new="""    ('Appendix A — Gap simulations after the tapeout', [
+        x for g in GAP_FOLDERS for x in (
+            [(f'{VG}/{g}/README.md', None, False),
+             (f'{VG}/{g}/results.md', ([f'{VG}/{g}'], [f'{VG}/{g}/README.md', f'{VG}/{g}/results.md']), False)]
+            if os.path.exists(os.path.join(ROOT, VG, g, 'results.md')) else
+            [(f'{VG}/{g}/README.md', ([f'{VG}/{g}'], [f'{VG}/{g}/README.md']), False)])
+    ]),"""
+assert s.count(old)==1; s=s.replace(old,new); open(p,'w').write(s)
+EOF
+python3 docs/chipalooza2_as_taped_out/book/build_book.py --check-only 2>&1 | tail -60
+```
+
+## Tool results / harness — 2026-11-25 11:00:04 UTC
+
+**Tool result:**
+
+```
+warning: uncommitted documentation changes; the pinned links point to 94a9799:
+?? docs/chipalooza2_as_taped_out/book/
+
+0 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+```
+
+## Assistant — 2026-11-25 11:00:07 UTC
+
+Zero problems on the first run looks too good, so I'm checking that the checker actually catches errors:
+
+## Assistant — 2026-11-25 11:00:09 UTC
+
+**Tool call: `Bash`**
+
+_Sanity-check link resolver catches errors_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/book && python3 - <<'EOF'
+import build_book as b, re
+book=b.Book('x'*40)
+for f in ['docs/chipalooza2_as_taped_out/README.md','docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md']:
+    book.convert(f)
+print('internal links', len(book.links), 'ids', len(book.ids))
+print([l for l in book.links][:5])
+print(book.resolve_link('docs/chipalooza2_as_taped_out/README.md','HOW_IT_WORKS.md#nonexistent-anchor'))
+print(book.resolve_link('docs/chipalooza2_as_taped_out/README.md','../nope.md'))
+print(b.problems)
+EOF
+```
+
+## Tool results / harness — 2026-11-25 11:00:10 UTC
+
+**Tool result:**
+
+```
+internal links 102 ids 48
+[('docs/chipalooza2_as_taped_out/README.md', 'docs-chipalooza2-as-taped-out-glue-logic'), ('docs/chipalooza2_as_taped_out/README.md', 'docs-chipalooza2-as-taped-out-datasheets-sg13cmos5l-iopadsingle2diff'), ('docs/chipalooza2_as_taped_out/README.md', 'verification-c2-gaps-dc-curves-results'), ('docs/chipalooza2_as_taped_out/README.md', 'docs-chipalooza2-as-taped-out-datasheets-sg13cmos5l-iopadsingle2diff'), ('docs/chipalooza2_as_taped_out/README.md', 'verification-c2-gaps-dc-curves-results')]
+#docs-chipalooza2-as-taped-out-how-it-works--nonexistent-anchor
+https://github.com/tatzelbrumm/sg13cmos5l_cm_slot7/blob/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/docs/nope.md
+['docs/chipalooza2_as_taped_out/README.md: link target does not exist: ../nope.md']
+```
+
+## Assistant — 2026-11-25 11:00:13 UTC
+
+**Tool call: `Bash`**
+
+_Build the data book PDF_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && time python3 docs/chipalooza2_as_taped_out/book/build_book.py 2>&1 | grep -v "^WARNING\|^$" | sort | uniq -c | sort -rn | head -30; pdfinfo docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf | grep -E "Pages|File size"
+```
+
+## Tool results / harness — 2026-11-25 11:01:24 UTC
+
+**Tool result:**
+
+```
+1 wrote docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf
+      1 warning: uncommitted documentation changes; the pinned links point to 94a9799:
+      1 ?? docs/chipalooza2_as_taped_out/book/
+      1 0 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+
+real	1m10.573s
+user	1m5.190s
+sys	0m2.401s
+Pages:           258
+File size:       15091771 bytes
+```
+
+## Assistant — 2026-11-25 11:01:28 UTC
+
+The data book has 258 pages and is 15 MB. Now a visual check, using contact sheets of the pages:
+
+## Assistant — 2026-11-25 11:01:31 UTC
+
+**Tool call: `Bash`**
+
+_Render page thumbnails into contact sheets_
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book; rm -f $S/pg-*; cd $S && pdftoppm -r 30 -png /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf pg && python3 - <<'EOF'
+from PIL import Image
+import glob
+fs=sorted(glob.glob('pg-*.png'))
+w,h=Image.open(fs[0]).size
+per=40
+for k in range(0,len(fs),per):
+    sheet=Image.new('RGB',(w*10,h*4),'white')
+    for i,f in enumerate(fs[k:k+per]):
+        sheet.paste(Image.open(f),((i%10)*w,(i//10)*h))
+    sheet.save(f'sheet{k//per:02d}.png')
+print(len(fs),w,h)
+EOF
+```
+
+## Tool results / harness — 2026-11-25 11:01:37 UTC
+
+**Tool result:**
+
+```
+258 249 351
+Shell cwd was reset to /home/user
+```
+
+## Assistant — 2026-11-25 11:01:39 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/sheet00.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 11:01:40 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## User (or harness) — 2026-11-25 11:01:40 UTC
+
+[Image: original 2490x1404, displayed at 2000x1128. Multiply coordinates by 1.25 to map to original image.]
+
+## Assistant — 2026-11-25 11:01:50 UTC
+
+**Tool call: `Bash`**
+
+_Fix TOC class and summary figures; rebuild_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && python3 - <<'EOF'
+p='docs/chipalooza2_as_taped_out/book/build_book.py'
+s=open(p).read()
+reps=[(".toc li.part { font-weight", ".toc li.tp { font-weight"),
+("        toc.append(('part', pid, ptitle))","        toc.append(('tp', pid, ptitle))"),
+(".summary h1 { bookmark-level: 1; }", ".summary h1 { bookmark-level: 1; }\n.summary img { max-height: 72mm; }\n.summary p:has(> img) { text-align: center; margin: 2pt 0 0 0; }")]
+for a,b in reps:
+    assert s.count(a)==1,a; s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+python3 docs/chipalooza2_as_taped_out/book/build_book.py 2>&1 | grep -v "^WARNING\|^$\|^warning\|^??"; S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book; cd $S && rm -f pg-* sheet* && pdftoppm -r 30 -png /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf pg && python3 - <<'EOF'
+from PIL import Image
+import glob
+fs=sorted(glob.glob('pg-*.png'))
+w,h=Image.open(fs[0]).size
+per=40
+for k in range(0,len(fs),per):
+    sheet=Image.new('RGB',(w*10,h*4),'white')
+    for i,f in enumerate(fs[k:k+per]):
+        sheet.paste(Image.open(f),((i%10)*w,(i//10)*h))
+    sheet.save(f'sheet{k//per:02d}.png')
+print(len(fs))
+EOF
+```
+
+## Tool results / harness — 2026-11-25 11:03:05 UTC
+
+**Tool result:**
+
+```
+0 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf
+247
+Shell cwd was reset to /home/user
+```
+
+## Assistant — 2026-11-25 11:03:07 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/sheet00.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 11:03:07 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## User (or harness) — 2026-11-25 11:03:07 UTC
+
+[Image: original 2490x1404, displayed at 2000x1128. Multiply coordinates by 1.25 to map to original image.]
+
+## Assistant — 2026-11-25 11:03:09 UTC
+
+The summary is down to five pages and the table of contents to three. Next, a closer look at the cover, the table of contents, a data-sheet table and a gallery page:
+
+## Assistant — 2026-11-25 11:03:12 UTC
+
+**Tool call: `Bash`**
+
+_Render cover and TOC page closer_
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book; cd $S && P=/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf; pdftotext -f 7 -l 9 $P - | grep -n "Appendix A\|Part II\|sg13cmos5l_IOPadSingle2Diff\|dc_curves\|Figures of" | head; for p in 1 7; do pdftoppm -r 70 -png -f $p -l $p $P z$p; done; ls z*
+```
+
+## Tool results / harness — 2026-11-25 11:03:12 UTC
+
+**Tool result:**
+
+```
+20:2. S2D pad (sg13cmos5l_IOPadSingle2Diff) ....................................................................................................................................... 19
+37:Part II — Data sheets ........................................................................................................... 36
+39:sg13cmos5l_IOPadSingle2Diff (S2D pad, s7_an[0]): characterization data sheet .......................................................... 38
+78:Part III — Working limits and test plan .................................................................................. 82
+89:S2D pad (sg13cmos5l_IOPadSingle2Diff, s7_an[0]) ........................................................................................................................... 83
+117:Appendix A — Gap simulations after the tapeout ................................................................... 98
+z1-001.png
+z7-007.png
+Shell cwd was reset to /home/user
+```
+
+## Assistant — 2026-11-25 11:03:14 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/z7-007.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 11:03:14 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 11:03:16 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/z1-001.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 11:03:16 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 11:03:20 UTC
+
+The cover says the summary fits "on two pages", but it takes five, so I'm correcting that sentence. Next, a gallery page and a wide table:
+
+## Assistant — 2026-11-25 11:03:25 UTC
+
+**Tool call: `Bash`**
+
+_Fix cover text; locate gallery pages_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && python3 - <<'EOF'
+p='docs/chipalooza2_as_taped_out/book/build_book.py'
+s=open(p).read()
+a="How to read it: the summary (next page) gives the slot on two pages; the"
+b="How to read it: the summary (next pages) gives the slot with its main figures and numbers; the"
+c="<tr><td>Licence</td><td>documentation Apache-2.0; design files as stated in the repository (<code>LICENSE</code>: SHL-2.1)</td></tr>"
+d="<tr><td>Licence</td><td>repository <code>LICENSE</code>: Solderpad Hardware License 2.1; the documentation files carry <code>SPDX-License-Identifier: Apache-2.0</code> (Appendix G, item 14)</td></tr>"
+for x,y in [(a,b),(c,d)]:
+    assert s.count(x)==1; s=s.replace(x,y)
+open(p,'w').write(s)
+EOF
+P=docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf; for i in $(seq 98 247); do t=$(pdftotext -f $i -l $i $P - | head -c 3000); if echo "$t" | grep -q "Figures of this folder"; then echo "$i: $(echo "$t" | grep -m1 'verification/\|pix/')"; fi; done | head -20; grep -c "" docs/chipalooza2_as_taped_out/book/build_report.txt; head -3 docs/RULES_COMPLIANCE_chipalooza2.md >/dev/null; grep -n "SPDX" docs/PROGRESS.md docs/FOR_TIM.md README.md | head
+```
+
+## Tool results / harness — 2026-11-25 11:03:30 UTC
+
+**Tool result:**
+
+```
+105: verification/c2_gaps/d2s_pex/plots/inl_per_corner.png
+125: verification/c2_gaps/dc_curves/plots/d2s_corners_noload_schematic.png
+143: verification/c2_gaps/ac_tran/plots/d2s_bode_corners.png
+164: verification/c2_gaps/s2d_mismatch/figures/s2d_mc_hist.png
+169: verification/c2_gaps/klayout_pad_diodes/plots/diode_step_27C.png
+181: docs/chipalooza2_as_taped_out/pix/schematics/bdp_slice.svg
+200: docs/chipalooza2_as_taped_out/pix/schematics/testbenches/d2s_mpdda_pd__tb_pd_enable.svg
+215: docs/chipalooza2_as_taped_out/pix/layout/IOPadDiff2Single.png
+227: docs/chipalooza2_as_taped_out/pix/plots/pex_vs_schematic_s2d.png
+1
+docs/FOR_TIM.md:2:SPDX-FileCopyrightText: 2026 Christoph Maier
+docs/FOR_TIM.md:3:SPDX-License-Identifier: Apache-2.0
+```
+
+## Assistant — 2026-11-25 11:03:35 UTC
+
+**Tool call: `Bash`**
+
+_Render gallery and table pages side by side_
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book; P=/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf; cd $S && for p in 126 182 45; do pdftoppm -r 60 -png -f $p -l $p $P y$p; done; python3 -c "
+from PIL import Image; import glob
+fs=sorted(glob.glob('y*.png')); ims=[Image.open(f) for f in fs]
+w=sum(i.size[0] for i in ims); h=max(i.size[1] for i in ims)
+s=Image.new('RGB',(w,h),'white'); x=0
+for i in ims: s.paste(i,(x,0)); x+=i.size[0]
+s.save('ytri.png')"
+```
+
+## Tool results / harness — 2026-11-25 11:03:36 UTC
+
+**Tool result:**
+
+```
+Shell cwd was reset to /home/user
+```
+
+## Assistant — 2026-11-25 11:03:37 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/ytri.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 11:03:37 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 11:03:42 UTC
+
+Data-sheet tables break numbers mid-digit ("1.99 / 8"), because I allowed breaks anywhere in table cells. Switching table cells to break only where a word doesn't fit:
+
+## Assistant — 2026-11-25 11:03:47 UTC
+
+**Tool call: `Bash`**
+
+_Fix table wrapping; rebuild and render spec page_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && python3 - <<'EOF'
+p='docs/chipalooza2_as_taped_out/book/build_book.py'
+s=open(p).read()
+a="th, td { border: 0.4pt solid #999; padding: 1.2pt 2.5pt; vertical-align: top; overflow-wrap: anywhere; }"
+b="th, td { border: 0.4pt solid #999; padding: 1.2pt 2.5pt; vertical-align: top; overflow-wrap: break-word; }\ntd code { overflow-wrap: break-word; }"
+assert s.count(a)==1; s=s.replace(a,b); open(p,'w').write(s)
+EOF
+python3 docs/chipalooza2_as_taped_out/book/build_book.py 2>&1 | grep -v "^WARNING\|^$\|^warning\|^??"; S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book; P=docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf; pdfinfo $P | grep Pages; n=$(pdftotext $P - | grep -n "" | head -0; for i in $(seq 30 60); do pdftotext -f $i -l $i $P - | grep -q "Specification (ex post facto" && echo $i && break; done); echo spec page $n; pdftoppm -r 60 -png -f $n -l $n $P $S/w; ls $S/w*
+```
+
+## Tool results / harness — 2026-11-25 11:04:34 UTC
+
+**Tool result:**
+
+```
+0 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf
+Pages:           250
+spec page 46
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/w-046.png
+```
+
+## Assistant — 2026-11-25 11:04:36 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/w-046.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 11:04:36 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 11:04:48 UTC
+
+**Tool call: `Bash`**
+
+_Inspect sign-off folder and data volumes_
+
+```bash
+ls signoff/taped_out_158afc5/ signoff/taped_out_158afc5/reports | head -70; sed -n 1,25p signoff/taped_out_158afc5/run_signoff.sh; git ls-files 'verification/c2_gaps/*' | grep -E '\.csv$' | wc -l; git ls-files -z 'verification/c2_gaps/*.csv' | xargs -0 du -cb | tail -1; git ls-files -z signoff | xargs -0 du -cb | tail -1
+```
+
+## Tool results / harness — 2026-11-25 11:04:49 UTC
+
+**Tool result:**
+
+```
+signoff/taped_out_158afc5/:
+README.md
+reports
+run_signoff.sh
+spice2cdl.py
+summarize.py
+
+signoff/taped_out_158afc5/reports:
+D2S.density.sg13cmos5l_IOPadDiff2Single_sg13cmos5l_IOPadDiff2Single_density.lyrdb
+D2S.density.txt
+D2S.drc.sg13cmos5l_IOPadDiff2Single_sg13cmos5l_IOPadDiff2Single_full.lyrdb
+D2S.drc.txt
+D2S.lvs.sg13cmos5l_IOPadDiff2Single.lvsdb
+D2S.lvs.txt
+D2S.lvs_spice_as_given.txt
+D2S.magicdrc.sg13cmos5l_IOPadDiff2Single.magic.drc.log
+D2S.magicdrc.sg13cmos5l_IOPadDiff2Single.magic.drc.rpt
+D2S.magicdrc.txt
+D2S.maxlu.sg13cmos5l_IOPadDiff2Single_maximal_lu.lyrdb
+D2S.maxlu.txt
+D2S.netgen.sg13cmos5l_IOPadDiff2Single.lvs.log
+D2S.netgen.sg13cmos5l_IOPadDiff2Single.lvs.out
+D2S.netgen.txt
+D2S.netlist.sg13cmos5l_IOPadDiff2Single.cdl
+S2D.density.sg13cmos5l_IOPadSingle2Diff_sg13cmos5l_IOPadSingle2Diff_density.lyrdb
+S2D.density.txt
+S2D.drc.sg13cmos5l_IOPadSingle2Diff_sg13cmos5l_IOPadSingle2Diff_full.lyrdb
+S2D.drc.txt
+S2D.lvs.sg13cmos5l_IOPadSingle2Diff.lvsdb
+S2D.lvs.txt
+S2D.lvs_spice_as_given.txt
+S2D.magicdrc.sg13cmos5l_IOPadSingle2Diff.magic.drc.log
+S2D.magicdrc.sg13cmos5l_IOPadSingle2Diff.magic.drc.rpt
+S2D.magicdrc.txt
+S2D.maxlu.sg13cmos5l_IOPadSingle2Diff_maximal_lu.lyrdb
+S2D.maxlu.txt
+S2D.netgen.sg13cmos5l_IOPadSingle2Diff.lvs.log
+S2D.netgen.sg13cmos5l_IOPadSingle2Diff.lvs.out
+S2D.netgen.txt
+S2D.netlist.sg13cmos5l_IOPadSingle2Diff.cdl
+bg_core_pd.magicdrc.bg_core_pd.magic.drc.log
+bg_core_pd.magicdrc.bg_core_pd.magic.drc.rpt
+bg_core_pd.magicdrc.txt
+files.txt
+runtimes.txt
+slot_7.den
+… [1734 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:04:52 UTC
+
+Now I'm rewriting the compliance table in the page's own numbering, with the statuses as of today. The section listing the files that would still have to be added stays unchanged.
+
+## Assistant — 2026-11-25 11:05:31 UTC
+
+**Tool call: `Bash`**
+
+_Rewrite rules table with page numbering; link check_
+
+```bash
+python3 - <<'EOF'
+p='docs/RULES_COMPLIANCE_chipalooza2.md'
+s=open(p).read()
+start=s.index('# Slot 7 against the Chipalooza #2 rules')
+end=s.index('## Files that would have to be added')
+new='''# Slot 7 against the Chipalooza #2 rules
+
+Designer: Christoph Maier. Rules: [opencircuitdesign.com/chipalooza/rules-2.html](https://opencircuitdesign.com/chipalooza/rules-2.html)
+("Chipalooza Challenge #2 (IHP SG13CMOS5L) · July 13–November 9, 2026"). Text read on 2026-11-23 and again on 2026-11-25; the
+page has no "last updated" date and no change notice. **Numbering: the page's own**: an unnumbered preamble (P), items 1–23,
+sub-items 5.1–5.7, 6.1–6.8 and 20.1–20.4. (The version of this table of 2026-11-23 used its own 1–24 split; replaced on
+2026-11-25.) Status: **met**, **partly**, **gap**, **not applicable** (n/a), **needs user decision**. Paths are relative to the
+root of this repository on branch `chipalooza2-documentation` (taped-out commit `158afc5` plus the documentation added since
+2026-11-22). "Design repository" = `tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single`; commits **V** = `9052bd35` (slot_7 v3 and
+its blocks), **T** = `91a7da8b` (pads).
+
+| # | rule (in a few words) | status | evidence (path) | action to close a gap |
+|---|---|---|---|---|
+| P | conform to all IHP SG13CMOS5L requirements (DRC, voltage limits) | partly | sign-off of the taped-out GDS, re-run 2026-11-25 ([`signoff/taped_out_158afc5/`](../signoff/taped_out_158afc5/README.md)): KLayout DRC 0, maximal deck with latch-up rules 0, LVS match (497 devices); density 7 rules open in the unfilled slot ("filled at chip level"); both pads DRC 0, density 4 violations each (not recorded before); magic DRC 48 "Metal1 overlap of Via1" markers in `bg_core_pd` (tool / PDK version; KLayout passes the same rules). Voltage limits: all slot devices are 3.3 V devices on `vdd_3v3` ([description §2.2](chipalooza2_as_taped_out/README.md#22-supplies-enable-and-fail-safe)) | antenna rules not run; chip-level DRC result for slot 7 not read ([description §5](chipalooza2_as_taped_out/README.md#5-verification-state)) |
+| 1 | start date 2026-07-13 | n/a | — | — |
+| 2 | 17 weeks, start to tapeout | n/a | taped out 2026-11-09 | — |
+| 3 | individuals or teams (≤ 3 preferred) | n/a | designer: Christoph Maier (harness `config.txt`: `slot_7: Maier`) | — |
+| 4 | proposals due 2026-07-27 (late ones accepted to 2026-08-10) | needs user decision | no Chipalooza #2 proposal is in this repository or was found in the design repository file lists at V / T | add the proposal as submitted, if it is to be part of the documentation (the Chipalooza #4 proposal is a different repository, see `README.md` "Further documentation") |
+| 5 | proposal contents (5.1–5.7); personal details kept out of the main proposal, which becomes part of the documentation | partly | see 5.1–5.7; the documents added since 2026-11-22 name only the designer | — |
+| 5.1 | type of IP block | met | [description](chipalooza2_as_taped_out/README.md) "Slot 7 at a glance" | — |
+| 5.2 | list of I/O, including test ports | met | [description §4](chipalooza2_as_taped_out/README.md#4-physical-interface-and-layout-hierarchy), [glue_logic.md](chipalooza2_as_taped_out/glue_logic.md), pad data sheets "Pins" | — |
+| 5.3 | functional description | met | [description §2](chipalooza2_as_taped_out/README.md#2-electrical-function), [HOW_IT_WORKS.md](chipalooza2_as_taped_out/HOW_IT_WORKS.md) | — |
+| 5.4 | target specification: average / min / max, absolute limits | gap | **no target specification existed** (proof of concept); ex post facto: characterized intervals in the [data sheets](chipalooza2_as_taped_out/datasheets/README.md), designer's working limits and margins in [ACHIEVED_VS_LIMITS.md](chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md) | decide whether the working limits are to be stated as the specification |
+| 5.5 | outline of a measurement test plan | met | [TEST_PLAN.md](chipalooza2_as_taped_out/TEST_PLAN.md) (§9 acceptance table) | — |
+| 5.6 | equipment available for testing (sent separately) | n/a here | equipment needed: [TEST_PLAN.md §8](chipalooza2_as_taped_out/TEST_PLAN.md#8-equipment); what the designer has is outside the repository | — |
+| 5.7 | CVs (sent separately) | n/a | outside the repository | — |
+| 6 | useful within an SoC | met | [description](chipalooza2_as_taped_out/README.md) "Known limitations and use in a system" (input / output ranges, loads, bandwidth class, currents, start-up, shared buses, mismatch) | — |
+| 6.1 | supplies 1.2 V (digital), 3.3 V (analog) | met | `vdd_3v3`; `vdd_1v2` for pull-downs only ([glue_logic.md](chipalooza2_as_taped_out/glue_logic.md)) | — |
+| 6.2–6.4 | harness bandgap 1.2 V, 1 bias voltage, 2 bias currents | not used | the slot has its own bandgap core `bg_core_pd` and bias distribution ([description §2.3](chipalooza2_as_taped_out/README.md#23-the-blocks)) | — |
+| 6.5 | 4 shared analog signals | met | `analog_bus0..3` through the harness switches ([glue_logic.md](chipalooza2_as_taped_out/glue_logic.md)) | — |
+| 6.6 | 24 digital inputs | met | `dig_in[0..5]` used | — |
+| 6.7 | 12 digital outputs | met | `dig_out` held low by `s7_doutpd` | — |
+| 6.8 | 0–4 dedicated analog pads; exceptions approved | partly | the two dedicated pads are replaced by custom pad cells (`pads/pads.txt`), which the harness owner's `config.txt` on `tapeout_nov_2026` carries (`s7_an[0]: sg13cmos5l_IOPadSingle2Diff`, `s7_an[1]: sg13cmos5l_IOPadDiff2Single`) | no written approval record is in this repository; add one if required |
+| 7 | target specification up to the designer; met post-layout; changes approved | gap | no specification (5.4); post-layout against the working limits: S2D and D2S CACE on magic PEX ([ACHIEVED_VS_LIMITS.md](chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md): one of 30 D2S Monte Carlo samples below the 0.49 gain limit) | as 5.4 |
+| 8 | up to 18 designs per test chip | n/a | slot 7 is on the taped-out chip (`config.txt` `s7_version` = `158afc5`) | — |
+| 9 | public repository with **all** files to reproduce and verify the block and to use it in a larger system | partly | use: `final/` (GDS, LEF, pin-less `.lib`, `.vh`), `pads/`, `netlist/`; verify: `netlist/`, [`signoff/taped_out_158afc5/run_signoff.sh`](../signoff/taped_out_158afc5/run_signoff.sh); the gap simulations ([`verification/c2_gaps/`](../verification/c2_gaps/)) fetch their sources from the design repository at V / T; schematics, CACE decks and layout scripts are only there | add the files of the list below |
+| 10 | verifiable with open-source EDA tools; AI not required to use, verify or modify | met | tools and versions: [AI_ASSISTANCE.md](AI_ASSISTANCE.md) §2; every `verification/c2_gaps/*/README.md` "Reproduce" | — |
+| 11 | all source files for all views in the repository; modifiable with open-source tools | gap | here: GDS, netlists, `art/` scripts; xschem sheets only for `macros/bg_core_pd` and `macros/oa_core_pd` (the latter not taped out); SVG renders of all sheets in [`pix/schematics/`](chipalooza2_as_taped_out/pix/schematics/README.md) are pictures, not sources | add the sources of the list below |
+| 12 | full behavioural description documented, any reasonable format; plain-text files for integration | met | [description](chipalooza2_as_taped_out/README.md), [glue_logic.md](chipalooza2_as_taped_out/glue_logic.md), [FOR_TIM.md](FOR_TIM.md), [slot_7.md](slot_7.md); data book PDF (`chipalooza2_as_taped_out/pdf/`); integration files `final/lef/slot_7.lef`, `final/lib/slot_7.lib` (pin-less stub), `final/vh/slot_7.vh`, `pads/pads.txt` | — |
+| 13 | no unnecessary data dumps; sign-off data (final DRC and LVS) required; simulation results as plots, raw data reproducible on demand | met for sign-off and plots; partly for raw data | sign-off of the final GDS: [`signoff/taped_out_158afc5/reports/`](../signoff/taped_out_158afc5/README.md) (DRC `.lyrdb`, LVS `.lvsdb`, netgen, 54 files, 6.2 MB with the designer's block reports in `signoff/`); plots: 9 on the front page, about 90 in data sheets and `verification/c2_gaps/*/plots`; the CSV files behind the plots are committed (86 files, 0.8 MB) | raw data are reproducible with each folder's `run.sh`, but only from the design repository (items 9, 11); decide whether the CSV files count as data dumps |
+| 14 | standard open-source licence, preferably Apache 2.0 | needs user decision | `LICENSE`: Solderpad Hardware License v2.1, which wraps Apache 2.0 and lets a user treat the work as Apache 2.0; the documentation added since 2026-11-22 carries `SPDX-License-Identifier: Apache-2.0` | confirm that SHL 2.1 is accepted, or relicense |
+| 15 | follow the repository template; sign-off scripts runnable by anyone cloning it | partly | this is a delivery repository for the harness (`README.md`); the design repository is the template fork (`Makefile`, `submission.yaml`, `verification/` at V); [`run_signoff.sh`](../signoff/taped_out_158afc5/run_signoff.sh) re-runs DRC / LVS of the taped-out GDS from a clone (needs the IHP open PDK and the IIC-OSIC-TOOLS `sak` scripts) | point users to the design repository as the template-conforming source, or add the template structure here |
+| 16 | post-layout verification over PVT, commercial range (≤ 110 °C acceptable) | met for the pads; partly for the slot | S2D and D2S pads: CACE on magic PEX, 5 corners × −40 / 27 / 125 °C × 3.0 / 3.3 / 3.6 V ([S2D data sheet](chipalooza2_as_taped_out/datasheets/sg13cmos5l_IOPadSingle2Diff.md), [D2S post-layout](../verification/c2_gaps/d2s_pex/results.md)); slot: tier-1 with extracted pads, `pad_ref_rb`, `bias_dist_pd` at 5 PVT points; DC, AC and transient curves of the loop in schematic, PEX and KLayout-extracted views ([slot data sheet](chipalooza2_as_taped_out/datasheets/slot_7_system.md), [`verification/c2_gaps/`](../verification/c2_gaps/)) | whole-slot PEX; the ss / sf −40 °C mode and power-up runs that abort in the simulator ([slot modes](../verification/c2_gaps/slot_modes_bg/results.md)) |
+| 17 | layout within the slot; designer wires the block into the wrapper | met | `final/gds/slot_7.gds` 537.15 × 273 µm, all 63 frame pins unchanged (`README.md`); the custom-pad slot wrapper was rebuilt by hand by the harness owner ([description §4.2](chipalooza2_as_taped_out/README.md#42-pads)) | — |
+| 18 | shared analog pins through multiplexers; note any resistance limit; sole access needs approval | partly | buses through the harness's per-slot switches; effect stated (mon: stable, 10–30× slower; [description](chipalooza2_as_taped_out/README.md) "Known limitations"); bus switch simulated as 10 kΩ ([TEST_PLAN.md §1](chipalooza2_as_taped_out/TEST_PLAN.md#1-what-can-be-observed-where)); no sole access of shared pins requested | state an allowed series resistance between pad and slot for `analog_bus0..3` |
+| 19 | harness chip documented (SPI, resources, pinout) | n/a | harness repository; registers used: [TEST_PLAN.md §2](chipalooza2_as_taped_out/TEST_PLAN.md) | — |
+| 20 | stages gated by reviews (20.1 proposal, 20.2 schematic, 20.3 layout, 20.4 final) | needs user decision | no review records in this repository | add review dates / outcomes if they are to be documented |
+| 21 | designs not ready at the final review miss the tapeout | n/a | taped out | — |
+| 22 | awards for completed designs | n/a | — | — |
+| 23 | updates announced in the forum | n/a | page re-read 2026-11-25: no change notice | — |
+
+'''
+s=s[:start]+new+s[end:]
+open(p,'w').write(s)
+EOF
+grep -n "^## 8\|^### 8\|^## 9\|^## 1\. \|^## 2\.2\|^## 4\.2\|^### 4.2\|^### 2.2" docs/chipalooza2_as_taped_out/TEST_PLAN.md docs/chipalooza2_as_taped_out/README.md | head; python3 docs/chipalooza2_as_taped_out/book/build_book.py --check-only 2>&1 | grep -v "^warning\|^??\|^$"
+```
+
+## Tool results / harness — 2026-11-25 11:05:38 UTC
+
+**Tool result:**
+
+```
+docs/chipalooza2_as_taped_out/TEST_PLAN.md:36:## 1. What can be observed where
+docs/chipalooza2_as_taped_out/TEST_PLAN.md:187:## 8. Equipment needed
+docs/chipalooza2_as_taped_out/TEST_PLAN.md:209:## 9. Acceptance table
+docs/chipalooza2_as_taped_out/README.md:114:## 1. Which version was taped out
+docs/chipalooza2_as_taped_out/README.md:164:### 2.2 Supplies, enable and fail-safe
+docs/chipalooza2_as_taped_out/README.md:259:### 4.2 Pads
+docs/chipalooza2_as_taped_out/README.md:403:## 8. About this document set
+ M docs/RULES_COMPLIANCE_chipalooza2.md
+1 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+  docs/RULES_COMPLIANCE_chipalooza2.md: internal anchor not found in the book: #docs-chipalooza2-as-taped-out-test-plan--8-equipment
+```
+
+## Assistant — 2026-11-25 11:05:41 UTC
+
+My own checker caught a wrong anchor in the new table (the heading is "8. Equipment needed"). Fixing it, and replacing my estimated plot counts with exact ones:
+
+## Assistant — 2026-11-25 11:05:44 UTC
+
+**Tool call: `Bash`**
+
+_Count committed plots exactly_
+
+```bash
+echo "verif png/svg: $(git ls-files 'verification/*.png' 'verification/*.svg' | sed 's/\.[a-z]*$//' | sort -u | wc -l)"; echo "pix/plots: $(git ls-files 'docs/chipalooza2_as_taped_out/pix/plots/*.png' | wc -l)"; git ls-files 'verification/*.png' 'verification/*.svg' | sed 's/\.[a-z]*$//' | sort -u | cut -d/ -f3 | sort | uniq -c; grep -c '^!\[\|^\!\[' docs/chipalooza2_as_taped_out/README.md; grep -n '^!\[' docs/chipalooza2_as_taped_out/README.md | cut -c1-80
+```
+
+## Tool results / harness — 2026-11-25 11:05:44 UTC
+
+**Tool result:**
+
+```
+verif png/svg: 54
+pix/plots: 5
+     20 ac_tran
+      3 d2s_pex
+     22 dc_curves
+      2 klayout_pad_diodes
+      2 replica_bias
+      3 s2d_mismatch
+      2 slot_modes_bg
+9
+19:![Signal and current flow of slot 7](pix/slot7_signal_flow.svg)
+23:![Round trip S2D → D2S, DC transfer at tt 27 °C](../../verification/c2_gap
+30:![Round trip error over corners](../../verification/c2_gaps/dc_curves/plots/r
+35:![S2D pad DC transfer](../../verification/c2_gaps/dc_curves/plots/s2d_transfe
+40:![D2S pad over corners at the slot operating point](../../verification/c2_gap
+45:![Round-trip Bode plot](../../verification/c2_gaps/ac_tran/plots/rt_bode_tt27
+49:![Round-trip step response](../../verification/c2_gaps/ac_tran/plots/rt_step_
+138:![Slot 7 signal and current flow: harness controls into s7_ctrl; bg_core_pd,
+384:![tughra_art as it is in the taped-out chip](pix/tughra_art_in_MPC9639.png)
+```
+
+## Assistant — 2026-11-25 11:05:46 UTC
+
+The counts disagree with the front page, which promises "36 figures" for DC curves and "23 figures" for AC/transient. Checking which is right:
+
+## Assistant — 2026-11-25 11:05:47 UTC
+
+**Tool call: `Bash`**
+
+_List DC and AC plot files by type_
+
+```bash
+git ls-files verification/c2_gaps/dc_curves | grep -v csv | sed 's/.*\.//' | sort | uniq -c; git ls-files verification/c2_gaps/ac_tran | grep -v csv | sed 's/.*\.//' | sort | uniq -c; git ls-files verification/c2_gaps/dc_curves/plots | head -40
+```
+
+## Tool results / harness — 2026-11-25 11:05:47 UTC
+
+**Tool result:**
+
+```
+1 gitignore
+      8 md
+     22 png
+      9 py
+      3 sh
+     14 svg
+      1 txt
+      1 gitignore
+      5 md
+     20 png
+      9 py
+      2 sh
+      3 svg
+      1 txt
+verification/c2_gaps/dc_curves/plots/d2s_corners_3v0_schematic.png
+verification/c2_gaps/dc_curves/plots/d2s_corners_noload_schematic.png
+verification/c2_gaps/dc_curves/plots/d2s_corners_pex.png
+verification/c2_gaps/dc_curves/plots/d2s_corners_schematic.png
+verification/c2_gaps/dc_curves/plots/d2s_corners_slot_3v0_schematic.png
+verification/c2_gaps/dc_curves/plots/d2s_corners_slot_schematic.png
+verification/c2_gaps/dc_curves/plots/d2s_linearity_criterion.png
+verification/c2_gaps/dc_curves/plots/d2s_range.png
+verification/c2_gaps/dc_curves/plots/d2s_range.svg
+verification/c2_gaps/dc_curves/plots/d2s_range_noload.png
+verification/c2_gaps/dc_curves/plots/d2s_range_noload.svg
+verification/c2_gaps/dc_curves/plots/d2s_range_slot.png
+verification/c2_gaps/dc_curves/plots/d2s_range_slot.svg
+verification/c2_gaps/dc_curves/plots/d2s_transfer_tt27_pex.png
+verification/c2_gaps/dc_curves/plots/d2s_transfer_tt27_pex.svg
+verification/c2_gaps/dc_curves/plots/d2s_transfer_tt27_schematic.png
+verification/c2_gaps/dc_curves/plots/d2s_transfer_tt27_schematic.svg
+verification/c2_gaps/dc_curves/plots/rt_error_corners.png
+verification/c2_gaps/dc_curves/plots/rt_error_corners.svg
+verification/c2_gaps/dc_curves/plots/rt_transfer_tt27.png
+verification/c2_gaps/dc_curves/plots/rt_transfer_tt27.svg
+verification/c2_gaps/dc_curves/plots/s2d_cor
+… [856 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:05:53 UTC
+
+**Tool call: `Bash`**
+
+_Find wrong figure counts_
+
+```bash
+cd /home/user && grep -rn "36 figures\|36 plots\|23 figures\|23 plots\|(36\|(23" sg13cmos5l_cm_slot7/docs sg13cmos5l_cm_slot7/verification --include=*.md | cut -c1-200; grep -rn "36 figures\|36 plots\|23 figures\|23 plots" sky130_cm_ip__single2diff2single/docs | cut -c1-200
+```
+
+## Tool results / harness — 2026-11-25 11:05:53 UTC
+
+**Tool result:**
+
+```
+sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/README.md:106:| Frequency response, steps, noise, enable transients | [AC / transient](../../verification/c2_gaps/ac_tran/README.md) (23 figures; read
+sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/README.md:107:| DC transfer, input / output range, linearity | [DC curves](../../verification/c2_gaps/dc_curves/README.md) (36 figures; read `results.
+```
+
+## Assistant — 2026-11-25 11:05:58 UTC
+
+**Tool call: `Bash`**
+
+_Fix figure counts and anchor; recheck_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && sed -i 's/ac_tran\/README.md) (23 figures;/ac_tran\/README.md) (20 figures;/; s/dc_curves\/README.md) (36 figures;/dc_curves\/README.md) (22 figures;/' docs/chipalooza2_as_taped_out/README.md && python3 - <<'EOF'
+p='docs/RULES_COMPLIANCE_chipalooza2.md'
+s=open(p).read()
+reps=[("(chipalooza2_as_taped_out/TEST_PLAN.md#8-equipment)","(chipalooza2_as_taped_out/TEST_PLAN.md#8-equipment-needed)"),
+("plots: 9 on the front page, about 90 in data sheets and `verification/c2_gaps/*/plots`;",
+ "plots: 7 figures on the front page; 54 figures in `verification/c2_gaps/` and 5 in `docs/chipalooza2_as_taped_out/pix/plots/`, all reprinted in the data book PDF;")]
+for a,b in reps:
+    assert s.count(a)==1,a; s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+git diff --stat; python3 docs/chipalooza2_as_taped_out/book/build_book.py --check-only 2>&1 | grep -v "^warning\|^??\|^ M\|^$"
+```
+
+## Tool results / harness — 2026-11-25 11:06:05 UTC
+
+**Tool result:**
+
+```
+docs/RULES_COMPLIANCE_chipalooza2.md    | 73 ++++++++++++++++++++-------------
+ docs/chipalooza2_as_taped_out/README.md |  4 +-
+ 2 files changed, 46 insertions(+), 31 deletions(-)
+0 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+[This command modified 1 file you've previously read: docs/chipalooza2_as_taped_out/README.md. Call Read before editing.]
+```
+
+## Assistant — 2026-11-25 11:06:08 UTC
+
+The renumbering breaks any reference elsewhere that cites the old row numbers, so I'm searching for those:
+
+## Assistant — 2026-11-25 11:06:10 UTC
+
+**Tool call: `Bash`**
+
+_Find references to old compliance row numbers_
+
+```bash
+cd /home/user && grep -rn "RULES_COMPLIANCE[^ ]*[^|]*\(row\|rule\|item\) [0-9]" sg13cmos5l_cm_slot7 sky130_cm_ip__single2diff2single --include=*.md | grep -v "^.*sudel" | cut -c1-220; grep -rn "rows\? [0-9]\+\(, [0-9]\+\)*\b" sg13cmos5l_cm_slot7/docs --include=*.md | grep -i "complian\|rule" | cut -c1-200
+```
+
+## Tool results / harness — 2026-11-25 11:06:10 UTC
+
+**Tool result:**
+
+```
+sg13cmos5l_cm_slot7/docs/AI_ASSISTANCE.md:21:| documentation | this repository: set up by a cloud agent from the brief `docs/launch/slot7_delivery_repo_TASK.md` (design repository @ `9052bd35`: "TASK 
+sg13cmos5l_cm_slot7/docs/RULES_COMPLIANCE_chipalooza2.md:74:repository's RUNLOG row 130, and the transitive dependencies of the pad macros beyond their `xschemrc` lists. Note also that
+```
+
+## Assistant — 2026-11-25 11:06:13 UTC
+
+**Tool call: `Bash`**
+
+_Inspect AI_ASSISTANCE reference to compliance rows_
+
+```bash
+sed -n 21p sg13cmos5l_cm_slot7/docs/AI_ASSISTANCE.md | grep -o "RULES_COMPLIANCE.\{0,200\}"; grep -rn "rules.*row\|row [0-9]* of\|(row\|rows [0-9]" sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/*.md | grep -iv "table row\|proposal row" | cut -c1-200 | head
+```
+
+## Tool results / harness — 2026-11-25 11:06:14 UTC
+
+**Tool result:**
+
+```
+RULES_COMPLIANCE_chipalooza2.md`, `../signoff/`) |
+sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/TEST_PLAN.md:23:| RL | `docs/replica_bias/RUNLOG.md` rows 121, 122, 129 | design repository @ `9052bd35` |
+sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/TEST_PLAN.md:119:| M1 swap | `0x23 = 0x0E`, `0x20 = 0x0E` | `0x0F` | `s7_an[0]` 0 … 1.0 V | `s7_an[1]` | D2S out = `vcm` − (in − `vref`) (FT). M
+sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/TEST_PLAN.md:161:  swap + feed at ss −40 °C in DC (MO, RL rows 121–122; power-up transients exist for all 8 modes there, SM §1); the 3.0 / 3.6 V
+sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/log.md:23:| 12 | user: the glue logic built on short notice is as important | `netlist/slot_7.spice` at `158afc5` (`s7_ctrl`, `s7_doutpd`, `slot_7`), 
+sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/log.md:24:| 13 | consistency check on the ss −40 °C claim | `modes.txt` (FAILED lines) against the delivery README ("feed and ext pass") | not a co
+```
+
+## Assistant — 2026-11-25 11:06:23 UTC
+
+No other document cites the old row numbers. I'm committing the two back-annotations separately, then writing the digest. First, the exact default-mode test steps from the test plan:
+
+## Assistant — 2026-11-25 11:06:28 UTC
+
+**Tool call: `Bash`**
+
+_Commit fixes; read test plan default mode_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && git add docs/chipalooza2_as_taped_out/README.md && git commit -q -m "docs: figure counts on the front page count figures, not files (DC curves 22, AC / transient 20)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git add docs/RULES_COMPLIANCE_chipalooza2.md && git commit -q -m "RULES_COMPLIANCE: use the rules page's own numbering (preamble, 1-23, 5.1-5.7, 6.1-6.8, 20.1-20.4) and update the statuses to 2026-11-25
+
+Sign-off of the taped-out GDS, D2S post-layout CACE, plots, SoC-use section,
+test-plan equipment and acceptance table now exist; statuses changed
+accordingly. Rules page re-read on 2026-11-25: no change notice.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git log --oneline -3; sed -n 100,125p docs/chipalooza2_as_taped_out/TEST_PLAN.md | cut -c1-260
+```
+
+## Tool results / harness — 2026-11-25 11:06:29 UTC
+
+**Tool result:**
+
+```
+7fe25e2 RULES_COMPLIANCE: use the rules page's own numbering (preamble, 1-23, 5.1-5.7, 6.1-6.8, 20.1-20.4) and update the statuses to 2026-11-25
+42fe27f docs: figure counts on the front page count figures, not files (DC curves 22, AC / transient 20)
+94a9799 docs: remove two stale 'S2D mismatch re-run pending' notes (the re-run finished on 2026-11-25)
+
+| step | SPI writes | stimulus | measure | simulated interval (source) |
+|---|---|---|---|---|
+| D1 | `0x51 = 0xCF` (bus switches 2 and 3 closed) | none on `analog[2]` / `[3]` | `vcm` on `analog[2]`, `vref` on `analog[3]`, high-impedance | slot, extracted blocks: `vcm` 1.115 … 1.366 V (tt 27 °C: 1.257 V), `vref` 0.444 … 0.576 V (tt 27 °C: 0.492 V)
+| D2 | as D1 (or `0x51 = 0x0F` to keep the buses off the references) | `s7_an[0]` swept 0 … 1.0 V (T1, MO: "Pad in swept 0 ... 1.0 V") | `s7_an[1]` | D2S out = `vcm` + (in − `vref`) with the `vcm` / `vref` of D1 (FT; README §2.1). Maximum deviation from t
+
+Context for D2 from the pad sheets (each pad simulated alone, not in the slot): S2D input range with `vref` = 0.5 V, low end 0 … 0.087 V,
+high end 1.057 … 1.299 V (SD, `window_params`); D2S output swing, minimum output 0.6354 … 0.7359 V, maximum 3.266 … 3.283 V (DS,
+`drive_params`, at the CACE input common mode 1.65 V). With `vcm` ≈ 1.26 V and `vref` ≈ 0.49 V an input of 0 V maps to about 0.77 V at
+the D2S output; at the slot's own operating point (D2S `vicm` = `vref` = 1.26 V) the D2S is linear (10 mV) over 0.211 … 2.317 V at
+tt 27 
+… [2089 more characters cut]
+```
+
+## Assistant — 2026-11-25 11:06:40 UTC
+
+Writing the digest source. It uses the same numbers and sources as the front page, in plain words: no opinions, no meta-commentary, two pages.
+
+## Assistant — 2026-11-25 11:06:54 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/DIGEST.md`
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Slot 7 in two pages
+
+**Custom analog pad pair (single-ended ↔ differential) with its own bandgap-referenced bias.**
+Chipalooza Challenge #2 (IHP SG13CMOS5L), slot 7, taped out on 2026-11-09. Designer: Christoph Maier.
+All numbers are simulations; no silicon results exist yet.
+
+## What it does
+
+Two custom I/O pads. The input pad (**S2D**, `s7_an[0]`) turns a pad voltage into a differential pair inside the chip,
+outp − outn = 2 (pad − vref). The output pad (**D2S**, `s7_an[1]`) turns a differential pair back into a pad voltage,
+pad = vref + (vinp − vinn)/2. The gains of 2 and ½ are set by matched transistors, not by resistors. An on-slot bandgap,
+a bias distribution and a replica-bias block supply both pads. In the default mode the output pad repeats the input pad,
+shifted up by about 0.77 V. Digital inputs select four other modes for test (swapped loop, monitoring and feeding the
+internal pair through the shared analog buses, external references).
+
+![Blocks and signal path of slot 7](pix/slot7_signal_flow.svg)
+
+## Key numbers
+
+Simulated over 5 process corners, −40 … 125 °C and 3.0 … 3.6 V unless stated; pads in extracted layout where available.
+
+| quantity | value |
+|---|---|
+| input range (S2D, linear within 1 mV) | −0.16 … 1.30 V at 27 °C; at least 0 … 0.98 V at every corner |
+| end-to-end transfer (default mode) | out = in + 0.77 V; error ≤ 0.9 mV at 27 °C, ≤ 6.5 mV at the worst corner (pad in 0 … 1 V) |
+| gains | S2D 1.9985 … 1.9993; D2S 0.4983 … 0.5000 |
+| output range (D2S, linear within 10 mV, 1 kΩ load) | 0.21 … 2.32 V at 27 °C; worst corner 0.33 … 2.26 V |
+| bandwidth, settling (end to end) | 1.1 … 1.7 MHz, no peaking; 1 % settling in 0.45 … 0.62 µs |
+| distortion | THD −78 dB at 10 kHz (27 °C) |
+| loads | 10 … 300 pF, 1 kΩ or open |
+| supply current (3.3 V) | slot 49 µA, pad pair 0.37 … 0.40 mA; off: below 0.1 µA |
+| offset from device mismatch (1 σ) | S2D input 5.3 mV; D2S output 6.3 mV |
+| area | slot 537 × 273 µm; each pad 80 × 180 µm |
+
+| | |
+|---|---|
+| ![End-to-end DC transfer at 27 °C](../../verification/c2_gaps/dc_curves/plots/rt_transfer_tt27.png) | ![End-to-end frequency response at 27 °C](../../verification/c2_gaps/ac_tran/plots/rt_bode_tt27.png) |
+| End to end, DC: output vs input pad at 27 °C (schematic and extracted layout overlap). | End to end, small signal: about 1.5 MHz bandwidth, no peaking. |
+
+## Status
+
+- **Taped out** as commit `158afc5`; the chip GDS contains it unchanged.
+- **Sign-off** of the taped-out layout, repeated on 2026-11-25: DRC clean (KLayout, including the latch-up rules), LVS match.
+- **Post-layout simulation** of both pads over the corners above; the slot simulated with its extracted pads and bias blocks.
+- **Not done:** silicon measurement, ESD and latch-up simulation of the pads, extraction of the whole slot.
+- No specification existed before the design. The numbers above are characterized results; the data book compares them
+  with the designer's working limits.
+
+## How to test it on the chip
+
+1. Enable slot 7 over SPI (default mode).
+2. Read `vcm` and `vref` on the shared analog buses 2 and 3 with a high-impedance meter (expected about 1.26 V and 0.49 V).
+3. Sweep `s7_an[0]` from 0 to 1 V and read `s7_an[1]`: expected `vcm` + (in − `vref`), within a few mV.
+
+Register settings, the other modes, equipment and acceptance limits are in the test plan.
+
+## More
+
+- Data book (description, data sheets, all figures, sign-off, test plan): `docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf`
+- Repository: [github.com/tatzelbrumm/sg13cmos5l_cm_slot7](https://github.com/tatzelbrumm/sg13cmos5l_cm_slot7), branch `chipalooza2-documentation`
+```
+
+## Tool results / harness — 2026-11-25 11:06:54 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/DIGEST.md (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 11:07:15 UTC
+
+**Tool call: `Bash`**
+
+_Verify pad size; fix digest facts_
+
+```bash
+grep -rn "80 × 180\|80 x 180\|180 µm" docs/chipalooza2_as_taped_out/README.md README.md | cut -c1-200 | head -5; python3 - <<'EOF'
+p='docs/chipalooza2_as_taped_out/DIGEST.md'
+s=open(p).read()
+reps=[("−0.16 … 1.30 V at 27 °C; at least 0 … 0.98 V at every corner","−0.16 … 1.30 V at 27 °C; at every corner at least 0.09 … 0.98 V"),
+("pad = vref + (vinp − vinn)/2. The gains","pad = vcm + (vinp − vinn)/2. The gains"),
+("| slot 49 µA, pad pair 0.37 … 0.40 mA; off: below 0.1 µA |","| slot 48 … 50 µA, pad pair 0.37 … 0.40 mA; off: below 0.1 µA |"),
+("| S2D input 5.3 mV; D2S output 6.3 mV |","| S2D input 5.3 mV (6.2 mV extracted); D2S output 6.3 mV |"),
+("the slot simulated with its extracted pads and bias blocks.","the slot simulated with its extracted pads, replica bias and bias distribution.")]
+for a,b in reps:
+    assert s.count(a)==1,a; s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+```
+
+## Tool results / harness — 2026-11-25 11:07:16 UTC
+
+**Tool result:**
+
+```
+docs/chipalooza2_as_taped_out/README.md:132:  (XOR 0 on every layer, same bounding box -0.62,0 to 80.62 × 180 µm).
+docs/chipalooza2_as_taped_out/README.md:269:80 µm wide and 180 µm high with ring pins `iovdd iovss vdd vss` and the bond pad `pad`. In the chip they are instances in
+```
+
+## Assistant — 2026-11-25 11:07:34 UTC
+
+**Tool call: `Bash`**
+
+_Add digest build; build and render digest_
+
+```bash
+python3 - <<'EOF'
+p='docs/chipalooza2_as_taped_out/DIGEST.md'
+s=open(p).read()
+reps=[("DRC clean (KLayout, including the latch-up rules), LVS match.","DRC clean (KLayout, including the latch-up rules; metal density is filled at chip level), LVS match."),
+("| End to end, small signal: about 1.5 MHz bandwidth, no peaking. |","| End to end, small signal at 27 °C: 1.1 … 1.5 MHz bandwidth depending on the load, no peaking. |")]
+for a,b in reps:
+    assert s.count(a)==1,a; s=s.replace(a,b)
+open(p,'w').write(s)
+p='docs/chipalooza2_as_taped_out/book/build_book.py'
+s=open(p).read()
+add='''
+
+DIGEST_SRC = f'{DOCS}/DIGEST.md'
+DIGEST_CSS = r\'\'\'
+@page { size: A4; margin: 13mm 14mm 13mm 14mm;
+  @bottom-left { content: "Chipalooza #2 (IHP SG13CMOS5L), slot 7 — documentation @ SHORTSHA"; font-size: 7pt; color: #666; }
+  @bottom-right { content: counter(page) " / " counter(pages); font-size: 7pt; color: #666; } }
+html { font-family: "DejaVu Sans", sans-serif; font-size: 8.9pt; line-height: 1.34; color: #111; }
+body { margin: 0; }
+a { color: #0645ad; text-decoration: none; }
+h1 { font-size: 17pt; margin: 0 0 3pt 0; }
+h2 { font-size: 11pt; margin: 9pt 0 3pt; border-bottom: 0.5pt solid #bbb; break-after: avoid; }
+p { margin: 3pt 0; }
+ul, ol { margin: 2pt 0; padding-left: 14pt; }
+li { margin: 1.2pt 0; }
+code { font-family: "DejaVu Sans Mono", monospace; font-size: 8pt; }
+table { border-collapse: collapse; width: 100%; margin: 4pt 0; font-size: 8.3pt; }
+th, td { border: 0.4pt solid #aaa; padding: 1.6pt 4pt; vertical-align: top; }
+th { background: #e9eef4; text-align: left; }
+td:first-child { width: 36%; }
+img { max-width: 100%; }
+p > img:only-child { display: block; margin: 3pt auto; max-height: 78mm; }
+table.figs td { border: none; width: 50%; font-size: 7.6pt; padding: 0 3pt; }
+table.figs th { display: none; }
+\'\'\'
+
+
+def build_digest(sha):
+    book = Book(sha)
+    book.files = {}                                   # the digest stands alone: every link goes to GitHub
+    h, _ = book.convert(DIGEST_SRC)
+    h = h.replace('<table>', '<table class="figs">', 2)
+    # the first table is the key-number table, the second the figure pair
+    h = h.replace('<table class="figs">', '<table>', 1)
+    doc = (f'<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Slot 7 in two pages</title>'
+           f'<meta name="author" content="Christoph Maier"><style>{DIGEST_CSS.replace("SHORTSHA", sha[:7])}</style></head>'
+           f'<body>{h}</body></html>')
+    import weasyprint
+    pdf = os.path.join(OUT_DIR, 'slot7_digest.pdf')
+    os.makedirs(OUT_DIR, exist_ok=True)
+    weasyprint.HTML(string=doc, base_url=ROOT).write_pdf(pdf)
+    print(f'wrote {os.path.relpath(pdf, ROOT)}')
+'''
+s=s.replace("\n\ndef main():", add+"\n\ndef main():",1)
+s=s.replace("    ap.add_argument('--check-only', action='store_true')","    ap.add_argument('--check-only', action='store_true')\n    ap.add_argument('--digest-only', action='store_true')")
+s=s.replace("    build_book(sha, a.check_only)","    if not a.digest_only:\n        build_book(sha, a.check_only)\n    if not a.check_only:\n        build_digest(sha)")
+open(p,'w').write(s)
+EOF
+python3 docs/chipalooza2_as_taped_out/book/build_book.py --digest-only 2>&1 | grep -v "^warning\|^??\|^ M\|^$\|WARNING"; cat docs/chipalooza2_as_taped_out/book/build_report.txt; pdfinfo docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf | grep Pages; S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book; rm -f $S/d-*; pdftoppm -r 70 -png docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf $S/d; ls $S/d-*
+```
+
+## Tool results / harness — 2026-11-25 11:07:36 UTC
+
+**Tool result:**
+
+```
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+# build_book.py report, source commit 94a9799e0317f5671f14db0131995f8a8e5b0b1f
+Pages:           2
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/d-1.png
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/d-2.png
+```
+
+## Assistant — 2026-11-25 11:07:39 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/d-1.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 11:07:39 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 11:07:39 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/d-2.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 11:07:39 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 11:07:55 UTC
+
+**Tool call: `Bash`**
+
+_Commit sources; build final PDFs_
+
+```bash
+python3 - <<'EOF'
+p='docs/chipalooza2_as_taped_out/README.md'
+s=open(p).read()
+a="| How this set was made; AI assistance |"
+i=s.index(a)
+row="| Everything as PDF | [data book](pdf/slot7_databook.pdf) (summary, contents, all chapters, data sheets, figures, appendices; about 250 pages) and [slot 7 in two pages](pdf/slot7_digest.pdf) ([source](DIGEST.md)); both made by [book/build_book.py](book/build_book.py) from the Markdown files |\n"
+s=s[:i]+row+s[i:]
+open(p,'w').write(s)
+p='docs/chipalooza2_as_taped_out/book/build_book.py'
+s=open(p).read()
+a="    if not a.check_only:\n        build_digest(sha)"
+b="    if not a.check_only:\n        build_digest(sha)\n        if a.digest_only:\n            for p in problems:\n                print('  ' + p)"
+assert s.count(a)==1; s=s.replace(a,b); open(p,'w').write(s)
+EOF
+printf '_build/\n__pycache__/\n' > docs/chipalooza2_as_taped_out/book/.gitignore
+sed -n 1,20p docs/chipalooza2_as_taped_out/book/build_book.py | head -3 >/dev/null
+git add docs/chipalooza2_as_taped_out/book/build_book.py docs/chipalooza2_as_taped_out/book/.gitignore docs/chipalooza2_as_taped_out/DIGEST.md docs/chipalooza2_as_taped_out/README.md && git status --short && git commit -q -m "docs: data book and two-page digest sources (book/build_book.py, DIGEST.md)
+
+build_book.py turns the Markdown documentation into one PDF data book (cover,
+summary, clickable contents with page numbers, parts, data sheets, appendices,
+figure galleries for plots that the text only links) and the two-page digest.
+Links to files in the book become internal; all other relative links become
+GitHub links pinned to the source commit; every link and anchor is checked.
+Front page: 'Where to find what' row for the PDFs.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git log --oneline -1 && python3 docs/chipalooza2_as_taped_out/book/build_book.py 2>&1 | grep -v "WARNING\|^$"; pdfinfo docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf | grep -E "Pages|size"; pdfinfo docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf | grep -E "Pages|size"
+```
+
+## Tool results / harness — 2026-11-25 11:08:41 UTC
+
+**Tool result:**
+
+```
+A  docs/chipalooza2_as_taped_out/DIGEST.md
+M  docs/chipalooza2_as_taped_out/README.md
+A  docs/chipalooza2_as_taped_out/book/.gitignore
+A  docs/chipalooza2_as_taped_out/book/build_book.py
+?? docs/chipalooza2_as_taped_out/book/build_report.txt
+?? docs/chipalooza2_as_taped_out/pdf/
+e6e035f docs: data book and two-page digest sources (book/build_book.py, DIGEST.md)
+warning: uncommitted documentation changes; the pinned links point to e6e035f:
+?? docs/chipalooza2_as_taped_out/book/build_report.txt
+?? docs/chipalooza2_as_taped_out/pdf/
+0 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+Pages:           250
+Page size:       595.276 x 841.89 pts (A4)
+File size:       15074849 bytes
+Pages:           2
+Page size:       595.276 x 841.89 pts (A4)
+File size:       397690 bytes
+```
+
+## Assistant — 2026-11-25 11:08:57 UTC
+
+**Tool call: `Bash`**
+
+_Branch-link fallback; rebuild; count PDF links_
+
+```bash
+python3 - <<'EOF'
+p='docs/chipalooza2_as_taped_out/book/build_book.py'
+s=open(p).read()
+a="""    def gh(self, path, frag=''):
+        p = os.path.join(ROOT, path)
+        kind = 'tree' if os.path.isdir(p) else 'blob'
+        return f'{REPO_URL}/{kind}/{self.sha}/{urllib.parse.quote(path.rstrip("/"))}' + (f'#{frag}' if frag else '')"""
+b="""    def gh(self, path, frag=''):
+        p = os.path.join(ROOT, path)
+        kind = 'tree' if os.path.isdir(p) else 'blob'
+        ref = self.sha
+        if subprocess.run(['git', 'cat-file', '-e', f'{self.sha}:{path.rstrip("/")}'], cwd=ROOT,
+                          capture_output=True).returncode:
+            # not in the source commit (e.g. the PDFs themselves, committed after it): link to the branch
+            ref = BRANCH
+            note = f'link to {path}: not in {self.sha[:7]}, linked to branch {BRANCH}'
+            if note not in problems_info:
+                problems_info.append(note)
+        return f'{REPO_URL}/{kind}/{ref}/{urllib.parse.quote(path.rstrip("/"))}' + (f'#{frag}' if frag else '')"""
+assert s.count(a)==1; s=s.replace(a,b)
+s=s.replace("problems = []\n","problems = []\nproblems_info = []   # not errors; listed in the report\nBRANCH = 'chipalooza2-documentation'\n",1)
+a="        fh.write(f'# build_book.py report, source commit {sha}\\n' + ''.join(p + '\\n' for p in problems))"
+b="        fh.write(f'# build_book.py report, source commit {sha}\\n' + ''.join(p + '\\n' for p in problems)\n                 + ''.join(f'note: {p}\\n' for p in problems_info))"
+assert s.count(a)==1,'rep'; s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+git add docs/chipalooza2_as_taped_out/book/build_book.py && git commit -q -m "build_book.py: link to the branch, not the pinned commit, for files that are not in the source commit (the PDFs themselves)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && python3 docs/chipalooza2_as_taped_out/book/build_book.py 2>&1 | grep -v "WARNING\|^$"; cat docs/chipalooza2_as_taped_out/book/build_report.txt; python3 - <<'EOF'
+from pypdf import PdfReader
+r=PdfReader('/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf')
+internal=external=0
+for pg in r.pages:
+    for a in pg.get('/Annots') or []:
+        a=a.get_object()
+        if a.get('/Subtype')!='/Link': continue
+        act=a.get('/A')
+        if act and act.get('/S')=='/URI': external+=1
+        else: internal+=1
+print('internal links',internal,'external links',external,'outline top entries',len(r.outline))
+import collections
+uris=[a.get_object()['/A']['/URI'] for pg in r.pages for a in (pg.get('/Annots') or []) if a.get_object().get('/A') and a.get_object()['/A'].get('/S')=='/URI']
+print(collections.Counter(u.split('/')[5] if 'sg13cmos5l_cm_slot7/' in u else u.split('/')[2] for u in uris).most_common(6))
+EOF
+```
+
+## Tool results / harness — 2026-11-25 11:09:44 UTC
+
+**Tool result:**
+
+```
+warning: uncommitted documentation changes; the pinned links point to 7727182:
+?? docs/chipalooza2_as_taped_out/book/build_report.txt
+?? docs/chipalooza2_as_taped_out/pdf/
+0 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+# build_book.py report, source commit 7727182d1701153d987ec8b516088953bc29a685
+note: link to docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf: not in 7727182, linked to branch chipalooza2-documentation
+note: link to docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf: not in 7727182, linked to branch chipalooza2-documentation
+internal links 742 external links 640 outline top entries 26
+[('blob', 433), ('github.com', 170), ('tree', 36), ('opencircuitdesign.com', 1)]
+```
+
+## Assistant — 2026-11-25 11:09:47 UTC
+
+The PDF now has 742 internal and 640 external links. The bookmark outline has 26 top-level entries where I expected 14 (cover, summary, contents and 11 parts), so I'm checking why:
+
+## Assistant — 2026-11-25 11:09:48 UTC
+
+**Tool call: `Bash`**
+
+_List top-level PDF bookmarks_
+
+```bash
+python3 -c "
+from pypdf import PdfReader
+r=PdfReader('docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf')
+for o in r.outline:
+    if isinstance(o,list): print('   [children:',len(o),']')
+    else: print(o.title[:80])
+"
+```
+
+## Tool results / harness — 2026-11-25 11:09:49 UTC
+
+**Tool result:**
+
+```
+Slot 7: custom S2D / D2S pad pair with a bandgap-referenced replica bias
+Summary: slot 7 at a glance
+   [children: 4 ]
+Contents
+Part I — Description
+   [children: 6 ]
+Part II — Data sheets
+   [children: 12 ]
+Part III — Working limits and test plan
+   [children: 6 ]
+Appendix A — Gap simulations after the tapeout
+   [children: 30 ]
+Appendix B — Sign-off
+   [children: 4 ]
+Appendix C — Schematics
+   [children: 4 ]
+Appendix D — Layout
+   [children: 2 ]
+Appendix E — Design-rationale plots
+   [children: 2 ]
+Appendix F — Harness integration
+   [children: 8 ]
+Appendix G — Chipalooza #2 rules
+   [children: 2 ]
+Appendix H — How this documentation was made
+   [children: 6 ]
+```
+
+## Assistant — 2026-11-25 11:09:50 UTC
+
+The structure is correct: pypdf lists each part's children as an extra entry, which accounts for the 26. Committing the PDFs and pushing:
+
+## Assistant — 2026-11-25 11:09:53 UTC
+
+**Tool call: `Bash`**
+
+_Commit PDFs and push_
+
+```bash
+git add docs/chipalooza2_as_taped_out/pdf docs/chipalooza2_as_taped_out/book/build_report.txt && git commit -q -m "docs: data book (250 pages) and two-page digest as PDF, built from 7727182
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && for i in 1 2 3 4; do git push -q origin chipalooza2-documentation && break; sleep $((2**i)); done; git log --oneline -8; git status --short
+```
+
+## Tool results / harness — 2026-11-25 11:09:58 UTC
+
+**Tool result:**
+
+```
+47269da docs: data book (250 pages) and two-page digest as PDF, built from 7727182
+7727182 build_book.py: link to the branch, not the pinned commit, for files that are not in the source commit (the PDFs themselves)
+e6e035f docs: data book and two-page digest sources (book/build_book.py, DIGEST.md)
+7fe25e2 RULES_COMPLIANCE: use the rules page's own numbering (preamble, 1-23, 5.1-5.7, 6.1-6.8, 20.1-20.4) and update the statuses to 2026-11-25
+42fe27f docs: figure counts on the front page count figures, not files (DC curves 22, AC / transient 20)
+94a9799 docs: remove two stale 'S2D mismatch re-run pending' notes (the re-run finished on 2026-11-25)
+4bca47c docs: point the open KLayout sine / diode items to the klayout_pad_diodes result
+4c5220a verification/c2_gaps/klayout_pad_diodes: results of the KLayout-pad diode investigation
+```
+
+## Assistant — 2026-11-25 11:10:07 UTC
+
+**Tool call: `Bash`**
+
+_Update RUNLOG and chatlog, push_
+
+```bash
+cd /home/user/sky130_cm_ip__single2diff2single_sudelbuecher && cat >> RUNLOG.md <<'EOF'
+- Data book and digest done ([S7] `e6e035f` sources, `7727182` builder fix, `47269da` PDFs): `docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf` (250 pages A4, 15 MB: cover, summary, clickable contents with page numbers, Parts I–III, Appendices A–H, PDF bookmarks, 742 internal and 640 external links) and `slot7_digest.pdf` (2 pages, source `DIGEST.md`). Builder `docs/chipalooza2_as_taped_out/book/build_book.py` (pandoc 3.1.3 + WeasyPrint 70.0): every relative link and anchor checked (0 problems); links pinned to the source commit, or to the branch for files not in it (the PDFs). Plots that the text only links (54 in verification/c2_gaps, 5 in pix/plots, all schematics and layouts) are reprinted as captioned galleries; CSV files are not reprinted (rule 13).
+- Errors found and back-annotated on the way, each its own commit: front page "Where to find what" counted files, not figures (DC curves 22, not 36; AC / transient 20, not 23) (`42fe27f`); `RULES_COMPLIANCE_chipalooza2.md` renumbered to the rules page and statuses updated (`7fe25e2`: sign-off of the final GDS, D2S post-layout, plots, SoC-use section, test-plan equipment now exist; item 13 asks the user whether the committed CSV files count as data dumps). Digest facts checked against the sources before the build (two own drafting errors caught: input range "0 … 0.98 V at every corner" is wrong at 125 °C, low end ≤ 0.086 V; D2S formula uses vcm, not vref, in the slot).
+- Digest editorial choices: title "Slot 7 in two pages", no person's name except the designer's; plain statements, no comparisons with other projects, no remarks about readers; limitations in one "Not done" line plus the "no specification" note.
+EOF
+bash chatlog/tools/export_all.sh >/dev/null 2>&1; git add -A && git commit -q -m "RUNLOG: data book and digest built; errors back-annotated; chatlog regenerated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin sudel_buecher && git log --oneline -1
+```
+
