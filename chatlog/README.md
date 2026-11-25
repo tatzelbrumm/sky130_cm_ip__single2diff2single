@@ -8,6 +8,7 @@ reminders, private e-mail addresses. Times are UTC (CET = UTC+1). Regenerated at
 |---|---|
 | [session_2026-11-23_main.md](session_2026-11-23_main.md) | the main conversation (user, coordinator) |
 | [agents/2026-11-25_design_rationale_and_plots.md](agents/2026-11-25_design_rationale_and_plots.md) | background agent "Design rationale and plots", started 2026-11-25 02:38 UTC  |
+| [agents/2026-11-25_fetch_chipalooza_2_rules.md](agents/2026-11-25_fetch_chipalooza_2_rules.md) | background agent "Fetch Chipalooza #2 rules", started 2026-11-25 10:54 UTC  |
 | [agents/2026-11-24_award_docs_gap_analysis.md](agents/2026-11-24_award_docs_gap_analysis.md) | background agent "Award-docs gap analysis", started 2026-11-24 22:02 UTC  |
 | [agents/2026-11-23_sky130_s2d_d2s_core_amp_sims.md](agents/2026-11-23_sky130_s2d_d2s_core_amp_sims.md) | background agent "sky130 S2D/D2S core amp sims", started 2026-11-23 20:01 UTC (stopped by the user) |
 | [agents/2026-11-25_render_test_bench_schematics.md](agents/2026-11-25_render_test_bench_schematics.md) | background agent "Render test-bench schematics", started 2026-11-25 03:00 UTC  |
