@@ -16938,3 +16938,1221 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin sudel_buecher && git log --oneline -1
 ```
 
+## Tool results / harness — 2026-11-25 13:52:34 UTC
+
+**Tool result:**
+
+```
+0 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+Pages:           251
+fbcc692 docs: data book rebuilt (pointers to art/README.md)
+f84a1c1 art/README.md: the tughra description next to the art files (same text as description 7, plus a table of the files in art/); pointers from description 7 and the root README; digest build refuses any mention of the die art
+dcb7361 RUNLOG: art/README.md, digest guard; chatlog regenerated
+```
+
+## Assistant — 2026-11-25 13:52:39 UTC
+
+The tughra story is now in two places, and the digest is guarded against it. Pushed to `chipalooza2-documentation` (`f84a1c1`, data book rebuilt in `fbcc692`).
+
+- **§7 of the description page** is unchanged, story included. It gained one line pointing to `art/README.md`.
+- **New `art/README.md`** sits next to `tughra_art.gds`, `add_art.py` and `check_art_only.py`. It has:
+  - the same text as §7: the description, the chip figure, the cell table, the inscription with the source picture, and "Why a tughra";
+  - its links rewritten for the new location (all resolve);
+  - a table of the files in `art/` with their usage lines, and links to where the art was built in the design repository at `a45cbb55`;
+  - a line at the top saying §7 holds the same text and the two must be kept in step.
+- **Root README:** the "Tughra art (2026-11-08)" paragraph now links to `art/README.md`.
+- **Digest guard:** the build script now stops with an error if `DIGEST.md` ever mentions the tughra, links into `art/`, or carries the story. I tested it with a planted word; it stopped, and I restored the file. The reason is written only in the build script, not in `DIGEST.md`, whose raw text is public. The digest PDF is unchanged.
+
+The data book doesn't reprint `art/README.md`, since it already has §7. It was rebuilt only for the two new pointer lines and is still 251 pages. The proposal stays frozen. The chatlog and RUNLOG are updated (`dcb7361`).
+
+## User (or harness) — 2026-11-25 13:53:20 UTC
+
+Done?
+
+## Assistant — 2026-11-25 13:53:24 UTC
+
+**Tool call: `Bash`**
+
+_Check all three working trees are clean and pushed_
+
+```bash
+for d in /home/user/sg13cmos5l_cm_slot7 /home/user/sky130_cm_ip__single2diff2single /home/user/sky130_cm_ip__single2diff2single_sudelbuecher; do cd $d; b=$(git branch --show-current); git fetch -q origin $b 2>/dev/null; echo "$d [$b] status:$(git status --porcelain | wc -l) ahead/behind:$(git rev-list --left-right --count HEAD...origin/$b 2>/dev/null)"; done
+```
+
+## Tool results / harness — 2026-11-25 13:53:25 UTC
+
+**Tool result:**
+
+```
+/home/user/sg13cmos5l_cm_slot7 [chipalooza2-documentation] status:0 ahead/behind:0	0
+/home/user/sky130_cm_ip__single2diff2single [main] status:0 ahead/behind:0	0
+/home/user/sky130_cm_ip__single2diff2single_sudelbuecher [sudel_buecher] status:0 ahead/behind:0	0
+```
+
+## Assistant — 2026-11-25 13:53:32 UTC
+
+Yes, done. All three working trees are clean and match their remote branches:
+
+| Repository and branch | Latest commit | What's there |
+|---|---|---|
+| `sg13cmos5l_cm_slot7` · `chipalooza2-documentation` | `fbcc692` | Data book (251 pages) |
+| | | Digest (8 pages), plus the 2- and 3-page versions kept for reference |
+| | | `art/README.md` |
+| | | Rules table renumbered to the rules page |
+| | | All nits up to your last round |
+| `sky130_cm_ip__single2diff2single` · `main` | unchanged | Proposal, frozen |
+| `sky130_cm_ip__single2diff2single` · `sudel_buecher` | `dcb7361` | RUNLOG and chatlog, current through this turn |
+
+**Open points for when you pick this up again:**
+1. **Data book front page:** it still calls the digest "data sheet in three pages", but the digest is now eight. Change it to eight pages, mention all three versions, or leave it?
+2. **Six decisions in the rules table (Appendix G):**
+   - whether to add the Chipalooza #2 proposal;
+   - whether to state the working limits as the specification;
+   - a written approval record for the custom pads;
+   - whether the Solderpad licence is acceptable or it should be Apache 2.0;
+   - whether to document review dates and outcomes;
+   - whether the committed CSV files count as data dumps.
+3. **Not simulated:**
+   - the 3.6 V corner and the 0.45 µm devices, checked against the PDK voltage limit;
+   - ESD and latch-up simulation;
+   - extraction of the whole slot;
+   - antenna DRC.
+4. **Unexplained:** the 55 mV range-end shift of the KLayout-extracted pads.
+5. **Tughra reading:** only an Ottoman-script reader can confirm how the orange word in the calligraphy reads.
+
+## User (or harness) — 2026-11-25 14:03:00 UTC
+
+1. change it to eight pages, mention the other two versions, with links
+2. add the Chipalooza #2 proposal as appendix
+3. let's try to be honest: you made an ad hoc specification; didn't quite meet it
+4. What's the difference between these licenses, anyhow? Leave as is, let them complain about a minor clercal detail #bikeshedding
+5. there was no ordinary review sequence. that's the point. don't mention it.
+6. leave the CSV files in and let them complain about throwing them out
+
+
+Not simulated:
+simulate them all, Tim will select which are his.
+
+Tughra reading: this is good enough for Chipalooza work.
+
+Point me to the URL of the files where the 55mV range-end shift shows up
+
+## Assistant — 2026-11-25 14:03:42 UTC
+
+Before starting, here's what I'm going to do with each point:
+- **1, 3, 5, 6** are documentation edits I'll do myself.
+- **2** depends on finding the Chipalooza #2 proposal first. Earlier searches didn't turn it up in this repository or the design repository.
+- **4:** I'll answer the licence question in the summary.
+- **The five checks not done yet:** voltage stress at 3.6 V and 0.45 µm, ESD, latch-up, whole-slot extraction and antenna DRC. They are independent and CPU-heavy, so I'll split them across three background agents. Each writes only to its own new folder and never commits; I review and commit their results. The antenna check is small, so I'll run it myself.
+
+First, the proposal:
+
+## Assistant — 2026-11-25 14:03:43 UTC
+
+**Tool call: `Bash`**
+
+_Search the user's repositories for the Chipalooza #2 proposal_
+
+```bash
+cd /home/user && gh api -X GET search/code -f q='chipalooza proposal slot 7 user:tatzelbrumm' --jq '.items[] | .repository.full_name + " " + .path' 2>&1 | head -20; gh api -X GET search/code -f q='Single2Diff proposal user:tatzelbrumm' --jq '.items[] | .repository.full_name + " " + .path' 2>&1 | head -20
+```
+
+## Tool results / harness — 2026-11-25 14:03:45 UTC
+
+**Tool result:**
+
+```
+tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single README.md
+tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single submission.yaml
+tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single README.md
+tatzelbrumm/sg13cmos5l_cm_ip__shared_levelshifters _claude_logs/2026-10-04_turn09_prompt_and_response.md
+tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single submission.yaml
+```
+
+## Assistant — 2026-11-25 14:03:48 UTC
+
+The search points at the design repository's default-branch `README.md` and `submission.yaml`. In the Chipalooza template, the proposal is typically the README. Checking:
+
+## Assistant — 2026-11-25 14:03:50 UTC
+
+**Tool call: `Bash`**
+
+_Read design repo main README and submission.yaml_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tughra/d && git fetch -q --filter=blob:none origin main 2>&1|tail -1; git log --oneline -5 FETCH_HEAD; git ls-tree --name-only FETCH_HEAD | head -30; git show FETCH_HEAD:README.md | head -60; echo ...; git show FETCH_HEAD:README.md | wc -l; git show FETCH_HEAD:submission.yaml | head -30
+```
+
+## Tool results / harness — 2026-11-25 14:03:52 UTC
+
+**Tool result:**
+
+```
+60f270a CLAUDE.md : salvaged updated version
+821e657 CLAUDE.md : add standing order to Claude LLMs not to use git by itself
+7e1dccb submission.yaml and README.md updated from sudelbuecher/description files
+4ee0514 macros/OgueyAebischerBias/ imported from sg13cmos5l_cm_ip__draft_single2diff2single
+50a9e54 CLAUDE.md : changed path in handoff file
+.designinit
+.gitattributes
+.gitignore
+CLAUDE.md
+LICENSE
+Makefile
+README.md
+final
+floorplan
+layout
+macros
+netlist
+render
+schematic
+scripts
+submission.yaml
+sudelbuecher
+testbenches
+verification
+# Single-to-Differential-to-Single Converter (ihp-sg13cmos5l)
+
+(c) 2026 Christoph Maier
+
+Derived from the *Chipalooza Analog Project* template,
+(c) 2026 Tim Edwards and Simon Dorrer — see [`LICENSE`](LICENSE).
+
+> [!IMPORTANT]
+> This repository requires the [IIC-OSIC-TOOLS](https://github.com/iic-jku/IIC-OSIC-TOOLS) container with tag `2026.08` or later.
+
+> [!TIP]
+> If you want to use `nix-shell` instead of the container, have a look here: [heichips26-template](https://github.com/HeiChips/heichips26-template).
+
+> [!TIP]
+> New to this flow? Start with the [**ihp-sg13cmos5l AMS chip design tutorial**](https://iic-jku.github.io/ihp-sg13cmos5l-ams-chip-template/index.html). This project follows the same analog flow and directory conventions, so the tutorial applies here as well.
+
+<p align="center">
+  <a href="render/img/sg13cmos5l_cm_ip__single2diff2single_white.png">
+    <img src="render/img/sg13cmos5l_cm_ip__single2diff2single_white.png" alt="Render 
+… [6262 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:03:54 UTC
+
+The README says it directly: "The full proposal is `sudelbuecher/description/s2d_d2s_pinbuffers.md` on the `sudel_buecher` branch". Fetching it and its history:
+
+## Assistant — 2026-11-25 14:03:57 UTC
+
+**Tool call: `Bash`**
+
+_Fetch the proposal file and its history_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tughra/d && git ls-tree -r --name-only FETCH_HEAD sudelbuecher | head -20; git fetch -q --filter=blob:none origin sudel_buecher 2>&1|tail -2; SB=$(git rev-parse FETCH_HEAD); echo SB=$SB; git log --format='%h %ad %s' --date=short $SB -- sudelbuecher/description/s2d_d2s_pinbuffers.md | head -20; git show $SB:sudelbuecher/description/s2d_d2s_pinbuffers.md | wc -l; git ls-tree --name-only $SB sudelbuecher/description/
+```
+
+## Tool results / harness — 2026-11-25 14:03:59 UTC
+
+**Tool result:**
+
+```
+sudelbuecher/logs/i_claude_rename.gitlog
+sudelbuecher/logs/inverter_magic_pex.err
+sudelbuecher/logs/inverter_magic_pex.out
+sudelbuecher/logs/magic-verify-all.err
+sudelbuecher/logs/magic-verify-all.out
+sudelbuecher/logs/make_build-top.makelog
+sudelbuecher/logs/make_klayout-verify-all.makelog
+sudelbuecher/logs/sim-all.err
+sudelbuecher/logs/sim-all.out
+sudelbuecher/logs/sim-view-xschem.err
+sudelbuecher/logs/sim-view-xschem.out
+SB=30da354aab5fabb2059f0a1ce504bef34cb11246
+6600fc1 2026-09-04 ../sudelbuecher/description : project description and cace walkthrough
+226
+sudelbuecher/description/LinkeListe.md
+sudelbuecher/description/cace_chipalooza_walkthrough.md
+sudelbuecher/description/cace_chipalooza_walkthrough.pdf
+sudelbuecher/description/cace_chipalooza_walkthrough.tex
+sudelbuecher/description/pin_mapping_proposal_DRAFT.md
+sudelbuecher/description/s2d_d2s_pinbuffers.md
+sudelbuecher/description/s2d_d2s_pinbuffers.pdf
+sudelbuecher/description/sg13cmos5l_pad_cell_internals.md
+Shell cwd was reset to /home/user
+```
+
+## Assistant — 2026-11-25 14:04:02 UTC
+
+The proposal is `s2d_d2s_pinbuffers.md` (with a PDF), committed on 2026-09-04 as `6600fc1` and unchanged since. Reading it:
+
+## Assistant — 2026-11-25 14:04:04 UTC
+
+**Tool call: `Bash`**
+
+_Read the Chipalooza #2 proposal_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tughra/d && git show 30da354:sudelbuecher/description/s2d_d2s_pinbuffers.md
+```
+
+## Tool results / harness — 2026-11-25 14:04:04 UTC
+
+**Tool result:**
+
+```
+## Proposal for IP block development for the opencircuitdesign 2026 Chipalooza challenge
+
+### IP Block name:
+
+# Single ended to differential and differential to single ended analog pin buffers
+
+### Designer/Design Team:
+
+*Christoph Maier*
+
+Email address: [*[e-mail redacted]*](mailto:[e-mail redacted])
+
+10 August 2026
+
+## Circuit description
+
+On-chip analog design building blocks (amplifiers, filters, comparators, ...) 
+should be fully differential in/differential out, for signal range and PSRR.  
+
+Multi-user shared design platform ASICs like Chipalooza, TinyTapeout, HeiChips, etc.  
+are severely I/O limited.  
+
+To alleviate the scarcity of I/O pins while facilitating fully differential designs in slots assigned to users, 
+some building blocks are useful:  
+  
+* differential-in to single-ended out class AB analog pin driver  
+* single-ended analog pin to fully differential internal signal buffer amplifier  
+  
+Generally, I'm more interested in all sorts of building blocks useful for an on-chip potbox [[http://opencircuitdesign.com/~tim/research/potbox/potbox.ps](http://opencircuitdesign.com/~tim/research/potbox/potbox.ps)] 
+than a self-contained circuit presentable as a student project.  
+
+To still allow a self-contained, demonstrable proof-of-concept slot, I intend to add  
+  
+* an internal common mode voltage reference to provide a sufficiently stable V<sub>CM</sub> for internal common mode feedback circuits  
+* a proof-of-concept fully differential circuit (e.g., a g<sub>m<
+… [13243 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:04:17 UTC
+
+**Tool call: `Bash`**
+
+_Find misses in ACHIEVED_VS_LIMITS_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && grep -n -i "outside\|not met\|below the\|above the\|exceed\|| no |\|fail" docs/chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md | cut -c1-260 | head -30; sed -n 1,30p docs/chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md | cut -c1-250
+```
+
+## Tool results / harness — 2026-11-25 14:04:17 UTC
+
+**Tool result:**
+
+```
+9:"partly derived from earlier measured bands" ([datasheets/README.md](datasheets/README.md)), not pass / fail criteria. A
+16:the limit's unit, computed here from the values shown; negative = outside. *Verdict*: inside / outside / no limit. "—" = no
+43:| *not CACE:* high end at the slot's `vref` 0.49 V / `vcm` 1.26 V (45 runs, [DC curves](../../verification/c2_gaps/dc_curves/results.md) §1b) | input range, high end | 1.0 V, the window_params limit applied for comparison | 0.980 … 1.351 V | — | −0.0
+119:| mm_params | gain | 0.49 … 0.51 | **0.48877** … 0.50508 | — | **−0.00123** | **outside** (1 of 30 samples, 3.1 σ below the mean 0.50011, σ 0.0037; [re-run](../../verification/c2_gaps/d2s_schematic_rerun/results.md) §1) |
+124:the one outside is the mismatch gain above ([data sheet](datasheets/sg13cmos5l_IOPadDiff2Single.md)). For comparison with
+127:top of the slot's `iref` lies slightly above the 6.25 µA of that grid.
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Achieved vs working limits: S2D pad, D2S pad, `pad_ref_rb`
+
+Back to [README.md](README.md). **The limits below are the designer's working limits, not a specification.** The design is a
+proof of concept and had no specification before it was characterized; the CACE files carry the designer's working limits,
+"partly derived from earlier measured bands" ([datasheets/README.md](datasheets/README.md)), not pass / fail criteria. A
+specification, if one is wanted, would be set ex
+… [1893 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:04:54 UTC
+
+**Tool call: `Agent`**
+
+_Voltage stress at 3.6 V_
+
+```
+Simulation task in /home/user/sg13cmos5l_cm_slot7 (branch chipalooza2-documentation). IHP sg13cmos5l PDK at /foss/pdks/ihp-sg13cmos5l (PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l); ngspice-47 with the IHP OSDI models, KLayout, magic, netgen installed.
+
+RULES: write ONLY inside the new folder verification/c2_gaps/voltage_stress/ (create it). Do NOT git commit, push, or modify any other file. Run at most ONE ngspice process at a time (other jobs share the 4 CPUs). Put bulky raw data in verification/c2_gaps/voltage_stress/_work/ and add a .gitignore for it. Every file you write gets an SPDX header (SPDX-FileCopyrightText: 2026 Christoph Maier / SPDX-License-Identifier: Apache-2.0) in the file's comment syntax. US spelling. No invented numbers: every value comes from a simulation or a file you cite.
+
+QUESTION. The PDK process specification (/foss/pdks/ihp-sg13cmos5l/libs.doc/doc/SG13CMOS5L_os_process_spec.pdf, Rev. 0.2, sections 2.1.4–2.1.6) states for the HV devices: "VGS ≤ 3.3 V (Maximum) @ 27°C" for HV-NMOS and HV-iNMOS with LG ≥ 0.6 µm and HV-PMOS with LG ≥ 0.5 µm (footnote: 1 FIT in 10 years for HCI), and drain-source breakdown BVDSS ≥ 5.2 V (iNMOS) / 5.3 V. Slot 7 runs from 3.3 V nominal; its characterization went to 3.6 V as a supply-tolerance corner, and its switches and 3.3 V logic use HV devices of W/L 1/0.45 µm (see docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md sizing tables, README §2.2 "Voltage limits (PDK)"). Find, by simulation, the largest terminal voltages every MOS device of the taped-out slot 7 and its two custom pads actually sees, and compare them with those PDK statements.
+
+HOW (reuse what exists; read these first): verification/c2_gaps/dc_curves/ (fetch.sh fetches the design repository at commits 91a7da8b (pads) and 9052bd35 (slot tier-1 decks)), verification/c2_gaps/ac_tran/ (slot.py builds the slot-level deck with schematic / magic-PEX / KLayout-extracted pads), verification/c2_gaps/slot_modes_bg/ (mode and power-up transients), verification/c2_gaps/klayout_pad_diodes/fix_diodes.py (the KLayout-converted pad netlists simulate antenna diodes at the wrong size unless fixed: apply this fix). Use the slot-level deck (bandgap, bias distribution, replica bias, glue logic, both pads) so that every device in slot 7 and both pads is present.
+1. DC operating points in the default mode at the five tier-1 PVT points and additionally at 3.6 V for all 5 corners × −40 / 27 / 125 °C, pad input 0, 0.5, 1.0 V and at the ends of the input range (e.g. −0.2 V and 3.3 V on the S2D pad), D2S loaded 1 kΩ ∥ 100 pF and unloaded. Also the disabled state and supplies-off-with-pad-driven state (fail-safe).
+2. Transients that can overshoot: power-up ramp of vdd_3v3 / pad ring to 3.6 V, enable on/off edges, a full-swing step on the S2D pad, mode switching.
+3. For every MOS instance (flattened), compute VGS, VGD, VDS, VGB (and VSB/VDB) from node voltages (write all node voltages; map instance terminals from the flattened netlist). Report per device type and gate length: the maximum |VGS|, |VGD|, |VDS|, and where (condition, node). Flag every device and condition where |VGS| or |VGD| exceeds 3.3 V, separately for devices with L meeting the spec's LG condition and those below it (0.45 µm), and any |VDS| near BVDSS.
+4. Plots: histogram or ranked bar chart of the per-device maximum |VGS| and |VDS| at 3.6 V; a table of the top 20.
+
+DELIVER in verification/c2_gaps/voltage_stress/: README.md (question, method, versions, how to reproduce, what it does NOT show — e.g. the spec's limit is a reliability (HCI) limit at 27 °C, not a breakdown limit), results.md (tables and verdicts, honest), run.sh (reproduces everything from a clean checkout), scripts, csv/ (small summary CSVs only), plots/ (PNG). Report back to me in under 400 words: the largest VGS / VDS found at 3.3 V nominal and at 3.6 V, which devices (type, W/L, block), whether any device with L below the spec's LG condition sees more than 3.3 V, and anything you could not do.
+```
+
+## Assistant — 2026-11-25 14:05:12 UTC
+
+**Tool call: `Agent`**
+
+_Pad ESD and latch-up sims_
+
+```
+Simulation task in /home/user/sg13cmos5l_cm_slot7 (branch chipalooza2-documentation). IHP sg13cmos5l PDK at /foss/pdks/ihp-sg13cmos5l (PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l); ngspice-47 with the IHP OSDI models, KLayout, magic, netgen installed.
+
+RULES: write ONLY inside the new folder verification/c2_gaps/pad_esd_latchup/ (create it). Do NOT git commit, push, or modify any other file. Run at most ONE ngspice process at a time (other jobs share the 4 CPUs). Bulky raw data in verification/c2_gaps/pad_esd_latchup/_work/ with a .gitignore. Every file you write gets an SPDX header (SPDX-FileCopyrightText: 2026 Christoph Maier / SPDX-License-Identifier: Apache-2.0). US spelling. No invented numbers. Be explicit about model validity.
+
+CONTEXT. Slot 7 has two custom analog pad cells, pads/sg13cmos5l_IOPadSingle2Diff (S2D input pad) and pads/sg13cmos5l_IOPadDiff2Single (D2S output pad, class-AB driver whose output devices are the pad's clamp frames), with antenna/ESD diodes dantenna (pad→iovss) and dpantenna (pad→iovdd), and in the D2S a 2 kΩ rppd secondary stage d2s_sp2k. Read docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md (sections on both pads: devices and sizes), docs/chipalooza2_as_taped_out/README.md §4.2, pads/*/ (GDS + SPICE), and the gap folders verification/c2_gaps/d2s_pex/ and verification/c2_gaps/dc_curves/ (fetch.sh fetches the design repository at 91a7da8b with the pad schematics, CACE templates and extracted netlists). Note: verification/c2_gaps/klayout_pad_diodes/ found that KLayout-converted netlists pass a=/p= to dantenna/dpantenna, which read only l/w — use the schematic or magic-PEX netlists, or fix the diode sizes. ESD and latch-up of these pads were never simulated.
+
+TASKS.
+1. ESD (HBM, JESD/ANSI-ESDA JS-001 style): 1.5 kΩ / 100 pF network charged to ±500 V, ±1 kV, ±2 kV, zapped into each pad with (a) iovss grounded, (b) iovdd grounded, (c) pad-to-pad where meaningful; ring supplies otherwise floating or through their decoupling as the chip would present them — check the harness pad ring (repository https://github.com/RTimothyEdwards/sg13cmos5l_ocd_chipalooza, branch tapeout_nov_2026, magic/custom_io/ or the padframe; and the IHP IO library cells in the PDK, e.g. libs.ref/sg13cmos5l_io) for a supply (power) clamp between iovdd and iovss, and model it if present; say so if absent or unknown. Report: peak pad voltage, peak voltage across every gate oxide connected to the pad path (input devices of the S2D, Miller caps, output devices of the D2S), peak diode currents and current densities vs. diode size, energy in the diodes. State clearly that the PDK diode / MOS models are not calibrated for ESD currents (no snapback, no high-injection / thermal), so results are indicative.
+2. CDM (optional, if quick): a simple charged-package model.
+3. Latch-up (JESD78 style): (a) I-test: inject ±100 mA (and the current at which the pad voltage reaches 1.5 × VDD) into each pad with the chip powered at 3.6 V, report where the current flows (which diode, which supply), pad voltage, effect on the circuit (output, bias); (b) overvoltage test: supply at 1.5 × 3.6 V (5.4 V) briefly, report device stress. State that SPICE models contain no parasitic SCR (the n-well/p-substrate PNPN structure), so trigger of latch-up itself cannot be simulated with these models; if you can, build a lumped parasitic PNP/NPN model from the layout geometry (well spacings, guard rings from the pad GDS) with clearly labeled assumed parameters, and report its trigger current as an estimate, with sensitivity to the assumed β and resistances. Also cite the KLayout latch-up DRC result: 0 violations (signoff/taped_out_158afc5/reports/*maxlu*).
+
+DELIVER in verification/c2_gaps/pad_esd_latchup/: README.md (question, method, models and their limits, harness pad-ring assumptions with sources, how to reproduce), results.md (tables, plots referenced, honest verdicts), run.sh, scripts, csv/ (small), plots/ (PNG). Report back to me in under 400 words: key numbers per pad, whether any gate oxide sees more than its rating in the HBM runs, the latch-up injection results, what was assumed, and what could not be done.
+```
+
+## Assistant — 2026-11-25 14:05:26 UTC
+
+**Tool call: `Agent`**
+
+_Whole-slot extraction and sims_
+
+```
+Simulation task in /home/user/sg13cmos5l_cm_slot7 (branch chipalooza2-documentation). IHP sg13cmos5l PDK at /foss/pdks/ihp-sg13cmos5l (PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l); ngspice-47 with the IHP OSDI models, KLayout 0.30.12, magic 8.3.685, netgen 1.5.324 installed.
+
+RULES: write ONLY inside the new folder verification/c2_gaps/slot_pex/ (create it). Do NOT git commit, push, or modify any other file. Run at most ONE ngspice process at a time and single-threaded magic (other jobs share the 4 CPUs). Bulky data (extracted netlists, raw files) in verification/c2_gaps/slot_pex/_work/ with a .gitignore; commit-size outputs only outside it. Every file you write gets an SPDX header (SPDX-FileCopyrightText: 2026 Christoph Maier / SPDX-License-Identifier: Apache-2.0). US spelling. No invented numbers.
+
+CONTEXT. The taped-out slot is final/gds/slot_7.gds (top cell slot_7: bg_core_pd, bias_dist_pd, pad_ref_rb, s7_ctrl, s7_doutpd, tughra_art, and routing; 537.15 × 273 µm). The two custom pads are separate cells in pads/ (placed by the harness), already extracted with magic (C-coupled) in earlier work. So far the slot-level simulations used KLayout-extracted blocks (pad_ref_rb, bias_dist_pd) and schematic bg_core_pd / glue logic, with schematic, magic-PEX or KLayout-extracted pads; a parasitic extraction of the WHOLE slot and full-RC extraction were never done. Read first: docs/chipalooza2_as_taped_out/README.md §4–5a, signoff/taped_out_158afc5/ (run_signoff.sh: how magic/netgen are run on this GDS, netlist/netgen_check.sh), verification/c2_gaps/ac_tran/ (slot.py: slot-level deck, the round-trip AC / step / sine benches), verification/c2_gaps/dc_curves/ (round-trip DC benches, fetch.sh for the design repository at 91a7da8b / 9052bd35), verification/c2_gaps/d2s_pex/ (how the pads were extracted; D2S needs ngspice rshunt=1e12), verification/c2_gaps/klayout_pad_diodes/ (KLayout-converted pad netlists have wrong diode sizes; don't use them unfixed).
+
+TASKS.
+1. Extract the whole slot_7 from final/gds/slot_7.gds with magic (C-coupled parasitics to substrate and coupling caps), one netlist for the whole slot; run netgen LVS of it against netlist/slot_7.spice (or the netgen netlist in netlist/) to show it is the same circuit; report device/net counts and the parasitic-capacitance total.
+2. Full-RC: if feasible within a few hours, extract with resistance too (magic extresist, or ext2spice with R), at least for the analog signal and bias nets; otherwise do it for pad_ref_rb and the two pads (which so far are C-only) and say what was left out.
+3. Simulate the slot with the extracted slot netlist plus the magic-PEX pads (and, if done, RC versions) in the default mode at the five tier-1 PVT points: round-trip DC transfer and error over pad in 0…1 V, AC transfer (unloaded, 1 kΩ ∥ 10 pF, 1 kΩ ∥ 100 pF), 0.25→0.75 V step, power-up/enable transient, vcm / vref, supply currents. Compare each result with the existing schematic-block runs (ac_tran, dc_curves, slot data sheet docs/chipalooza2_as_taped_out/datasheets/slot_7_system.md) in a table: value, previous, change.
+4. If time allows: the modes swap / mon / feed / ext at tt 27 °C.
+
+DELIVER in verification/c2_gaps/slot_pex/: README.md (question, method, versions, how to reproduce, what it does NOT show), results.md (tables, comparison, honest verdicts), run.sh, scripts, csv/ (small), plots/ (PNG: overlay of extracted vs previous for DC error, Bode, step). Report back to me in under 400 words: LVS result, parasitic totals, the main changes vs previous results, convergence aids used, and what could not be done.
+```
+
+## Tool results / harness — 2026-11-25 14:05:26 UTC
+
+**Tool result:**
+
+```
+Async agent launched successfully. (This tool result is internal metadata — never quote or paste any part of it, including the agentId below, into a user-facing reply.)
+agentId: ac1c7ffb4f24efa5f (internal ID - do not mention to user. Use SendMessage with to: 'ac1c7ffb4f24efa5f', summary: '<5-10 word recap>' to continue this agent.)
+The agent is working in the background. You will be notified automatically when it completes. You know nothing about its results until that notification arrives — do not report, assume, or predict them; continue other work or respond to the user in the meantime.
+Do not duplicate this agent's work — avoid working with the same files or topics it is using.
+output_file: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/ac1c7ffb4f24efa5f.output
+Do NOT Read or tail this file via the shell tool — it is the full subagent JSONL transcript and reading it will overflow your context. If the user asks for progress, say the agent is still running; you'll get a completion notification.
+```
+
+## Tool results / harness — 2026-11-25 14:05:26 UTC
+
+**Tool result:**
+
+```
+Async agent launched successfully. (This tool result is internal metadata — never quote or paste any part of it, including the agentId below, into a user-facing reply.)
+agentId: ada7afe514c13161e (internal ID - do not mention to user. Use SendMessage with to: 'ada7afe514c13161e', summary: '<5-10 word recap>' to continue this agent.)
+The agent is working in the background. You will be notified automatically when it completes. You know nothing about its results until that notification arrives — do not report, assume, or predict them; continue other work or respond to the user in the meantime.
+Do not duplicate this agent's work — avoid working with the same files or topics it is using.
+output_file: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/ada7afe514c13161e.output
+Do NOT Read or tail this file via the shell tool — it is the full subagent JSONL transcript and reading it will overflow your context. If the user asks for progress, say the agent is still running; you'll get a completion notification.
+```
+
+## Tool results / harness — 2026-11-25 14:05:26 UTC
+
+**Tool result:**
+
+```
+Async agent launched successfully. (This tool result is internal metadata — never quote or paste any part of it, including the agentId below, into a user-facing reply.)
+agentId: a7c0fe31fe640748a (internal ID - do not mention to user. Use SendMessage with to: 'a7c0fe31fe640748a', summary: '<5-10 word recap>' to continue this agent.)
+The agent is working in the background. You will be notified automatically when it completes. You know nothing about its results until that notification arrives — do not report, assume, or predict them; continue other work or respond to the user in the meantime.
+Do not duplicate this agent's work — avoid working with the same files or topics it is using.
+output_file: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/a7c0fe31fe640748a.output
+Do NOT Read or tail this file via the shell tool — it is the full subagent JSONL transcript and reading it will overflow your context. If the user asks for progress, say the agent is still running; you'll get a completion notification.
+```
+
+## Assistant — 2026-11-25 14:05:41 UTC
+
+**Tool call: `Bash`**
+
+_Find no-specification and proposal statements_
+
+```bash
+grep -rn -i "no specification\|not a specification\|had no specification\|without a specification\|specification existed\|specification before" docs/*.md docs/chipalooza2_as_taped_out/*.md docs/chipalooza2_as_taped_out/datasheets/*.md docs/chipalooza2_as_taped_out/book/build_book.py | grep -v "DIGEST_" | cut -c1-230; grep -rn -i "proposal" docs/chipalooza2_as_taped_out/README.md docs/RULES_COMPLIANCE_chipalooza2.md README.md | cut -c1-200 | head
+```
+
+## Tool results / harness — 2026-11-25 14:05:41 UTC
+
+**Tool result:**
+
+```
+docs/RULES_COMPLIANCE_chipalooza2.md:27:| 5.4 | target specification: average / min / max, absolute limits | gap | **no target specification existed** (proof of concept); ex post facto: characterized intervals in the [data sheets]
+docs/RULES_COMPLIANCE_chipalooza2.md:38:| 7 | target specification up to the designer; met post-layout; changes approved | gap | no specification (5.4); post-layout against the working limits: S2D and D2S CACE on magic PEX ([ACHIE
+docs/chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md:7:Back to [README.md](README.md). **The limits below are the designer's working limits, not a specification.** The design is a
+docs/chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md:8:proof of concept and had no specification before it was characterized; the CACE files carry the designer's working limits,
+docs/chipalooza2_as_taped_out/README.md:9:layout as stated), and the design had no specification before it was characterized (proof of concept).
+docs/chipalooza2_as_taped_out/README.md:81:For reuse in a system. All simulation, no silicon; "limits" are the designer's working limits, not a specification
+docs/chipalooza2_as_taped_out/README.md:109:| Which working limits were met, and by what margin? | [ACHIEVED_VS_LIMITS.md](ACHIEVED_VS_LIMITS.md) (per pad and `pad_ref_rb`; working limits, not a specification) |
+docs/chipalooza2_as_taped_out/README.md:209:How each block was started, and how far it got by the tapeout. ("Pass" in the CACE results quoted below means inside the de
+… [2889 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:05:51 UTC
+
+**Tool call: `Bash`**
+
+_Print the exact specification sentences_
+
+```bash
+D=docs/chipalooza2_as_taped_out; sed -n 7,10p $D/README.md; sed -n 81,82p $D/README.md; sed -n 209,211p $D/README.md; sed -n 7,11p $D/ACHIEVED_VS_LIMITS.md; sed -n 9,11p $D/TEST_PLAN.md; sed -n 212,214p $D/TEST_PLAN.md; sed -n 7,9p $D/datasheets/README.md; sed -n 88,92p $D/datasheets/sg13cmos5l_IOPadSingle2Diff.md; ls $D/datasheets/tools/; grep -n "no specification" $D/datasheets/tools/*.py | cut -c1-200
+```
+
+## Tool results / harness — 2026-11-25 14:05:51 UTC
+
+**Tool result:**
+
+```
+Designer: Christoph Maier. Chipalooza Challenge #2 (IHP sg13cmos5l), slot 7, taped out on 2026-11-09 as commit `158afc5` of
+this repository. No silicon results exist yet: every number below is a **simulation** (IHP sg13cmos5l; schematic or extracted
+layout as stated), and the design had no specification before it was characterized (proof of concept).
+
+For reuse in a system. All simulation, no silicon; "limits" are the designer's working limits, not a specification
+([achieved vs working limits](ACHIEVED_VS_LIMITS.md)).
+How each block was started, and how far it got by the tapeout. ("Pass" in the CACE results quoted below means inside the designer's *working limits*; the design is a proof of concept and had no specification. The observed intervals are in [datasheets/](datasheets/README.md).) "Kicked off" means a launch brief or cloud session recorded in the design repository (`docs/launch/`
+on `harness-test`; the `sudelbuecher/cloud_sessions/` briefs and reports and the chat logs on `sudel_buecher`). Readiness is as the blocks' own reports and READMEs state it;
+where a README is older than a later report, the later one is used and the stale statement is named. "In the slot" = present in the taped-out `slot_7` (section 4).
+Back to [README.md](README.md). **The limits below are the designer's working limits, not a specification.** The design is a
+proof of concept and had no specification before it was characterized; the CACE files carry the designer's working limits,
+"partly deri
+… [3126 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:06:18 UTC
+
+Writing all the documentation edits in one pass: the proposal copy, the honest ad hoc specification wording, the rules-table rows, and the front-page row for the digest.
+
+## Assistant — 2026-11-25 14:06:43 UTC
+
+**Tool call: `Bash`**
+
+_Proposal copy; honest specification wording across docs_
+
+```bash
+D=docs/chipalooza2_as_taped_out && git -C /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tughra/d show 30da354:sudelbuecher/description/s2d_d2s_pinbuffers.md > /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/prop.md && python3 - <<'EOF'
+import re
+D='docs/chipalooza2_as_taped_out'
+SP='/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/prop.md'
+orig=open(SP,encoding='utf-8').read()
+DR='https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single'
+hdr=f'''<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Chipalooza #2 proposal (as submitted, 10 August 2026)
+
+The proposal for slot 7 as submitted, reproduced unchanged below the line. Source: design repository
+[`sudelbuecher/description/s2d_d2s_pinbuffers.md`]({DR}/blob/30da354aab5fabb2059f0a1ce504bef34cb11246/sudelbuecher/description/s2d_d2s_pinbuffers.md)
+on branch `sudel_buecher` (last changed in commit `6600fc1`, 2026-09-04; PDF:
+[`s2d_d2s_pinbuffers.pdf`]({DR}/blob/30da354aab5fabb2059f0a1ce504bef34cb11246/sudelbuecher/description/s2d_d2s_pinbuffers.pdf)).
+What was taped out differs from it: see [README.md](README.md) and [ACHIEVED_VS_LIMITS.md](ACHIEVED_VS_LIMITS.md).
+
+---
+
+'''
+open(f'{D}/PROPOSAL_chipalooza2.md','w',encoding='utf-8').write(hdr+orig)
+
+def rep(path,a,b,count=1):
+    s=open(path,encoding='utf-8').read()
+    assert s.count(a)==count,(path,a[:70],s.count(a))
+    open(path,'w',encoding='utf-8').write(s.replace(a,b))
+AV='[ACHIEVED_VS_LIMITS.md](ACHIEVED_VS_LIMITS.md)'
+R=f'{D}/README.md'
+rep(R,"layout as stated), and the design had no specification before it was characterized (proof of concept).",
+ "layout as stated). The design is a proof of concept. Its specification is an ad hoc one, the working limits written into\nthe CACE files during the AI-assisted design, and the taped-out design does not quite meet it ([achieved vs limits](ACHIEVED_VS_LIMITS.md)).")
+rep(R,'"limits" are the designer\'s working limits, not a specification\n([achieved vs working limits](ACHIEVED_VS_LIMITS.md)).',
+ '"limits" are the working limits of the ad hoc specification, which the design does not quite meet\n([achieved vs working limits](ACHIEVED_VS_LIMITS.md)).')
+rep(R,"(per pad and `pad_ref_rb`; working limits, not a specification)","(per pad and `pad_ref_rb`; the ad hoc specification and where it is not met)")
+rep(R,"the design is a proof of concept and had no specification. The observed intervals",
+ "the design is a proof of concept with an ad hoc specification, see [achieved vs limits](ACHIEVED_VS_LIMITS.md). The observed intervals")
+rep(R,"[slot 7 in two pages](pdf/slot7_digest.pdf) ([source](DIGEST.md))".replace('slot 7 in two pages','data sheet in three pages'),
+ "[data sheet in eight pages](pdf/slot7_digest.pdf) ([source](DIGEST.md); shorter versions kept for reference: [two-page summary](pdf/slot7_digest_2page_summary.pdf), [three-page data sheet](pdf/slot7_digest_3page_datasheet.pdf))")
+rep(R,"| How this set was made; AI assistance |","| What was proposed for Chipalooza #2? | [the proposal as submitted](PROPOSAL_chipalooza2.md) |\n| How this set was made; AI assistance |")
+A=f'{D}/ACHIEVED_VS_LIMITS.md'
+rep(A,'''**The limits below are the designer's working limits, not a specification.** The design is a
+proof of concept and had no specification before it was characterized; the CACE files carry the designer's working limits,
+"partly derived from earlier measured bands" ([datasheets/README.md](datasheets/README.md)), not pass / fail criteria. A
+specification, if one is wanted, would be set ex post facto from the observed intervals. "Inside" therefore means "inside the
+designer's working limit in simulation", not "meets a specification" and not a guarantee; nothing here was measured on silicon.''',
+'''**The limits below are an ad hoc specification, and the taped-out design does not quite meet it.** No specification was set
+before the design (proof of concept). During the AI-assisted design the AI assistant wrote working limits into the CACE files,
+"partly derived from earlier measured bands" ([datasheets/README.md](datasheets/README.md)); they serve as the specification.
+Not met: one of 30 D2S Monte Carlo samples has a gain of 0.48877 against the lower limit 0.49 (D2S table, mm_params); at the
+slot's own `vref` / `vcm` the S2D input range ends at 0.980 V against the 1.0 V limit applied for comparison (S2D table). The
+tentative targets of the Chipalooza #2 proposal ("to be discussed": bandwidth below 1 MHz unless advised otherwise, 10 … 100 nA
+branch currents, some 10 mA class-AB output current into 100 pF; [proposal](PROPOSAL_chipalooza2.md)) were superseded by these
+limits during the design. "Inside" means "inside the working limit in simulation", not a guarantee; nothing here was measured
+on silicon.''')
+T=f'{D}/TEST_PLAN.md'
+rep(T,"and the design had no specification (proof of concept; see\n[datasheets/README.md](datasheets/README.md)).",
+ "and the design's only specification is the ad hoc one of the CACE working limits (see\n[ACHIEVED_VS_LIMITS.md](ACHIEVED_VS_LIMITS.md)).")
+rep(T,"none is a guaranteed limit, and the design had no specification.","none is a guaranteed limit (the specification is the ad hoc one of [ACHIEVED_VS_LIMITS.md](ACHIEVED_VS_LIMITS.md)).")
+rep(f'{D}/glue_logic.md',"(no specification existed)","(the ad hoc specification)")
+rep(f'{D}/datasheets/README.md',"**No specification existed:** the design is a proof of concept, so the CACE files carry the designer's *working limits* (partly derived from earlier measured bands), not pass / fail criteria.",
+ "**Specification:** the design is a proof of concept. Its specification is an ad hoc one, the *working limits* written into the CACE files during the AI-assisted design (partly derived from earlier measured bands), and the taped-out design does not quite meet it ([../ACHIEVED_VS_LIMITS.md](../ACHIEVED_VS_LIMITS.md)).")
+old='The design is a proof of concept and had **no specification** before it was characterized. The limits and verdicts in the CACE files (section \'CACE run summaries\') are the designer\'s *working limits*, in part set from earlier measured bands, so *Pass* means "inside the designer\'s working limit", not "meets a specification".'
+new='The design is a proof of concept with an **ad hoc specification**: the limits and verdicts in the CACE files (section \'CACE run summaries\'), the working limits written during the AI-assisted design, in part set from earlier measured bands. *Pass* means "inside that working limit"; where the taped-out design does not meet it is listed in [../ACHIEVED_VS_LIMITS.md](../ACHIEVED_VS_LIMITS.md).'
+for f in ['sg13cmos5l_IOPadSingle2Diff','sg13cmos5l_IOPadDiff2Single','pad_ref_rb','en_ctrl_3v3_level_shifter']:
+    s=open(f'{D}/datasheets/{f}.md',encoding='utf-8').read()
+    print(f, s.count(old))
+    if s.count(old)==1: open(f'{D}/datasheets/{f}.md','w',encoding='utf-8').write(s.replace(old,new))
+H=f'{D}/HOW_IT_WORKS.md'
+rep(H,"A detailed specification written before that\nquestion is answered would mostly fix numbers in advance; for a first cell of its kind the designer prefers to\ncharacterize what was built (the data sheets) and to set specifications once silicon has shown what the concept can do.",
+ "No detailed specification was written before the design;\nthe AI assistant set ad hoc working limits during the design, and the taped-out design does not quite meet them\n([ACHIEVED_VS_LIMITS.md](ACHIEVED_VS_LIMITS.md)). For a first cell of its kind the designer prefers to characterize what was\nbuilt and to set a specification once silicon has shown what the concept can do.")
+EOF
+grep -n "no specification" $D/datasheets/tools/make_datasheet.py | head -2; sed -n 130,136p $D/datasheets/tools/make_datasheet.py | cut -c1-200
+```
+
+## Tool results / harness — 2026-11-25 14:06:43 UTC
+
+**Tool result:**
+
+```
+sg13cmos5l_IOPadSingle2Diff 1
+sg13cmos5l_IOPadDiff2Single 1
+pad_ref_rb 1
+en_ctrl_3v3_level_shifter 1
+132:    "The design is a proof of concept and had **no specification** before it was characterized. The limits and verdicts in the CACE files (section 'CACE run summaries') are the "
+
+DISCLAIMER = (
+    "The design is a proof of concept and had **no specification** before it was characterized. The limits and verdicts in the CACE files (section 'CACE run summaries') are the "
+    "designer's *working limits*, in part set from earlier measured bands, so *Pass* means \"inside the designer's working limit\", not \"meets a specification\". "
+    "This section instead states, **ex post facto**, the interval each characterized quantity covered: the minimum and maximum over every run of the group's characterization grid "
+    "(corners, temperature, supply, … as listed), the value at typical conditions (default conditions of the CACE file: tt, 27 °C, 3.3 V, typical resistor / PNP corners) where such a run exists, an
+    "(CACE's own *typ* value). It is a description of what was simulated, **not a guarantee**; Monte Carlo rows are the observed range of the sampled iterations, not ±3σ; no silicon was measured.")
+```
+
+## Assistant — 2026-11-25 14:07:01 UTC
+
+**Tool call: `Bash`**
+
+_Generator, builder appendix, rules table rows; check_
+
+```bash
+python3 - <<'EOF'
+D='docs/chipalooza2_as_taped_out'
+p=f'{D}/datasheets/tools/make_datasheet.py'
+s=open(p,encoding='utf-8').read()
+a='''    "The design is a proof of concept and had **no specification** before it was characterized. The limits and verdicts in the CACE files (section 'CACE run summaries') are the "
+    "designer's *working limits*, in part set from earlier measured bands, so *Pass* means \\"inside the designer's working limit\\", not \\"meets a specification\\". "'''
+b='''    "The design is a proof of concept with an **ad hoc specification**: the limits and verdicts in the CACE files (section 'CACE run summaries'), the working limits written "
+    "during the AI-assisted design, in part set from earlier measured bands. *Pass* means \\"inside that working limit\\"; where the taped-out design does not meet it is listed in "
+    "[../ACHIEVED_VS_LIMITS.md](../ACHIEVED_VS_LIMITS.md). "'''
+assert s.count(a)==1; s=s.replace(a,b); open(p,'w',encoding='utf-8').write(s)
+# builder strings and appendix
+p=f'{D}/book/build_book.py'
+s=open(p,encoding='utf-8').read()
+reps=[("'simulations; the limits are the designer\\'s working limits, set after the design (no specification existed).</p>',",
+       "'simulations; the limits are the working limits of an ad hoc specification written during the AI-assisted design, which the design does not quite meet.</p>',"),
+      ("extracted layout as stated). The design had no specification before it was characterized; the limits quoted are the\ndesigner's working limits.</p>",
+       "extracted layout as stated). The specification is an ad hoc one, the working limits written during the AI-assisted\ndesign; the taped-out design does not quite meet it (Part III).</p>"),
+      ("    ('Appendix H — How this documentation was made', [",
+       "    ('Appendix I — Chipalooza #2 proposal', [\n        (f'{DOCS}/PROPOSAL_chipalooza2.md', None, False),\n    ]),\n    ('Appendix H — How this documentation was made', ["),
+      ("    'Appendix H — How this documentation was made':",
+       "    'Appendix I — Chipalooza #2 proposal':\n        '<p>The proposal for slot 7 as submitted (10 August 2026), unchanged.</p>',\n    'Appendix H — How this documentation was made':")]
+for a,b in reps:
+    assert s.count(a)==1,a[:60]; s=s.replace(a,b)
+open(p,'w',encoding='utf-8').write(s)
+# rules table
+p='docs/RULES_COMPLIANCE_chipalooza2.md'
+s=open(p,encoding='utf-8').read()
+import re
+L=s.split('\n')
+def setrow(num, new):
+    global L
+    idx=[i for i,l in enumerate(L) if l.startswith(f'| {num} |')]
+    assert len(idx)==1,num
+    if new is None: del L[idx[0]]
+    else: L[idx[0]]=new
+setrow('4',"| 4 | proposals due 2026-07-27 (late ones accepted to 2026-08-10) | met | the proposal as submitted, dated 10 August 2026: [PROPOSAL_chipalooza2.md](chipalooza2_as_taped_out/PROPOSAL_chipalooza2.md) (copied unchanged from the design repository, branch `sudel_buecher`) | — |")
+setrow('5.4',"| 5.4 | target specification: average / min / max, absolute limits | partly | the proposal gave tentative targets, \"to be discussed\" ([proposal](chipalooza2_as_taped_out/PROPOSAL_chipalooza2.md)); during the AI-assisted design an ad hoc specification replaced them: the working limits in the CACE files; characterized values in the [data sheets](chipalooza2_as_taped_out/datasheets/README.md) | — |")
+setrow('7',"| 7 | target specification up to the designer; met post-layout; changes approved | partly | the ad hoc specification (5.4) is not quite met: one of 30 D2S Monte Carlo samples has a gain of 0.48877 against 0.49; at the slot's own references the S2D input range ends at 0.980 V against 1.0 V ([ACHIEVED_VS_LIMITS.md](chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md)); post-layout: S2D and D2S CACE on magic PEX | — |")
+i=[i for i,l in enumerate(L) if l.startswith('| 13 | no unnecessary data dumps')][0]
+L[i]=re.sub(r'\| met for sign-off and plots; partly for raw data \|','| met |',L[i])
+L[i]=L[i].replace("the CSV files behind the plots are committed (86 files, 0.8 MB) | raw data are reproducible with each folder's `run.sh`, but only from the design repository (items 9, 11); decide whether the CSV files count as data dumps |",
+                  "the CSV files behind the plots are kept (86 files, 0.8 MB), so the plots can be redrawn without re-simulation; raw data are reproducible with each folder's `run.sh` (sources fetched from the design repository, items 9, 11) | — |")
+assert '| — |' in L[i][-8:], L[i][-200:]
+setrow('20',None)
+s='\n'.join(L)
+s=s.replace("items 1–23,\nsub-items 5.1–5.7, 6.1–6.8 and 20.1–20.4.","items 1–23,\nsub-items 5.1–5.7 and 6.1–6.8.")
+open(p,'w',encoding='utf-8').write(s)
+EOF
+grep -n "20\.1\|^| 20 \|items 1–23" docs/RULES_COMPLIANCE_chipalooza2.md | cut -c1-160; grep -n "^| 13 \|^| 4 \|^| 7 \|^| 5.4 " docs/RULES_COMPLIANCE_chipalooza2.md | cut -c1-120; python3 docs/chipalooza2_as_taped_out/book/build_book.py --check-only 2>&1 | grep -v "^warning\|^??\|^ M\|^$"; grep -rn -i "no specification" docs/chipalooza2_as_taped_out/*.md docs/chipalooza2_as_taped_out/datasheets/*.md docs/*.md | grep -v "DIGEST_\|PROPOSAL" | cut -c1-150
+```
+
+## Tool results / harness — 2026-11-25 14:07:08 UTC
+
+**Tool result:**
+
+```
+9:page has no "last updated" date and no change notice. **Numbering: the page's own**: an unnumbered preamble (P), items 1–23,
+22:| 4 | proposals due 2026-07-27 (late ones accepted to 2026-08-10) | met | the proposal as submitted, dated 10 August 
+27:| 5.4 | target specification: average / min / max, absolute limits | partly | the proposal gave tentative targets, "t
+38:| 7 | target specification up to the designer; met post-layout; changes approved | partly | the ad hoc specification 
+44:| 13 | no unnecessary data dumps; sign-off data (final DRC and LVS) required; simulation results as plots, raw data r
+0 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+docs/chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md:7:Back to [README.md](README.md). **The limits below are an ad hoc specification, and the taped-ou
+```
+
+## Assistant — 2026-11-25 14:07:12 UTC
+
+The link check is clean. One slip: I inserted Appendix I before Appendix H in the book order. Moving it after H, then committing the documentation changes:
+
+## Assistant — 2026-11-25 14:07:17 UTC
+
+**Tool call: `Bash`**
+
+_Fix appendix order; commit documentation edits_
+
+```bash
+python3 - <<'EOF'
+p='docs/chipalooza2_as_taped_out/book/build_book.py'
+s=open(p,encoding='utf-8').read()
+blk="    ('Appendix I — Chipalooza #2 proposal', [\n        (f'{DOCS}/PROPOSAL_chipalooza2.md', None, False),\n    ]),\n"
+assert s.count(blk)==1; s=s.replace(blk,'')
+i=s.index("    ('Appendix H — How this documentation was made', [")
+j=s.index("    ]),\n",i)+len("    ]),\n")
+s=s[:j]+blk+s[j:]
+open(p,'w',encoding='utf-8').write(s)
+EOF
+python3 -c "
+import sys; sys.path.insert(0,'docs/chipalooza2_as_taped_out/book'); import build_book as b; print([t for t,_ in b.BOOK])"; sed -n 9,10p docs/RULES_COMPLIANCE_chipalooza2.md | cut -c1-200; git add -A docs && git status --short && git commit -q -m "docs: Chipalooza #2 proposal as appendix I (unchanged copy); honest specification wording: ad hoc specification (CACE working limits written during the AI-assisted design), not quite met; rules table rows 4, 5.4, 7, 13 updated, item 20 removed; front page: digest in eight pages with links to the two short versions
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin chipalooza2-documentation && git log --oneline -1
+```
+
+## Tool results / harness — 2026-11-25 14:07:20 UTC
+
+**Tool result:**
+
+```
+['Part I — Description', 'Part II — Data sheets', 'Part III — Working limits and test plan', 'Appendix A — Gap simulations after the tapeout', 'Appendix B — Sign-off', 'Appendix C — Schematics', 'Appendix D — Layout', 'Appendix E — Design-rationale plots', 'Appendix F — Harness integration', 'Appendix G — Chipalooza #2 rules', 'Appendix H — How this documentation was made', 'Appendix I — Chipalooza #2 proposal']
+page has no "last updated" date and no change notice. **Numbering: the page's own**: an unnumbered preamble (P), items 1–23,
+sub-items 5.1–5.7 and 6.1–6.8. (The version of this table of 2026-11-23 used its own 1–24 split; replaced on
+M  docs/RULES_COMPLIANCE_chipalooza2.md
+M  docs/chipalooza2_as_taped_out/ACHIEVED_VS_LIMITS.md
+M  docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md
+A  docs/chipalooza2_as_taped_out/PROPOSAL_chipalooza2.md
+M  docs/chipalooza2_as_taped_out/README.md
+M  docs/chipalooza2_as_taped_out/TEST_PLAN.md
+M  docs/chipalooza2_as_taped_out/book/build_book.py
+M  docs/chipalooza2_as_taped_out/book/build_report.txt
+M  docs/chipalooza2_as_taped_out/datasheets/README.md
+M  docs/chipalooza2_as_taped_out/datasheets/en_ctrl_3v3_level_shifter.md
+M  docs/chipalooza2_as_taped_out/datasheets/pad_ref_rb.md
+M  docs/chipalooza2_as_taped_out/datasheets/sg13cmos5l_IOPadDiff2Single.md
+M  docs/chipalooza2_as_taped_out/datasheets/sg13cmos5l_IOPadSingle2Diff.md
+M  docs/chipalooza2_as_taped_out/datasheets/tools/make_datasheet.py
+M  docs/chipalooza2_as_taped_out/glue_logic.md
+?? 
+… [394 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:07:23 UTC
+
+The documentation edits are pushed (`80f224f`). I'll rebuild the PDFs once the agents' results are in. Now the antenna check, which I'm running myself. Looking at what the PDK provides:
+
+## Assistant — 2026-11-25 14:07:24 UTC
+
+**Tool call: `Bash`**
+
+_Look for the PDK antenna DRC deck and options_
+
+```bash
+ls /foss/pdks/ihp-sg13cmos5l/libs.tech/klayout/tech/drc/ /foss/pdks/ihp-sg13cmos5l/libs.tech/klayout/tech/drc/rule_decks/ 2>/dev/null | head -40; python3 /foss/pdks/ihp-sg13cmos5l/libs.tech/klayout/tech/drc/run_drc.py --help 2>&1 | head -40
+```
+
+## Tool results / harness — 2026-11-25 14:07:28 UTC
+
+**Tool result:**
+
+```
+/foss/pdks/ihp-sg13cmos5l/libs.tech/klayout/tech/drc/:
+docs
+ihp-sg13cmos5l.drc
+rule_decks
+run_drc.py
+testing
+
+/foss/pdks/ihp-sg13cmos5l/libs.tech/klayout/tech/drc/rule_decks/:
+antenna.drc
+beol
+density.drc
+feol
+forbidden
+geometry
+layers_def.drc
+pin
+sg13cmos5l_maximal.drc
+sg13cmos5l_tech_default.json
+usage: 
+    run_drc.py (--help | -h)
+    run_drc.py --path=<file_path>
+            [--table=<table_name>]... [--mp=<num_cores>] [--run_dir=<run_dir_path>]
+            [--topcell=<topcell_name>] [--run_mode=<mode>] [--drc_json=<json_path>]
+            [--minimum_drc | --min_drc] [--disable_extra_rules] [--no_feol] [--no_beol] [--density_sanity]
+            [--no_density] [--density_thr=<density_threads>] [--density_only] [--antenna]
+            [--antenna_only] [--no_offgrid] [--no_angle] [--no_recommended]
+    
+
+Run IHP SG13CMOS5L OpenSource DRC checks (CMOS only, M1-M4-TM1)
+
+options:
+  -h, --help            show this help message and exit
+  --path PATH           Path to the input GDS file to be processed.
+  --table TABLE         DRC table name(s) to execute (e.g., activ, metal1).
+                        This option can be used multiple times.
+  --mp MP               Number of parts to split the rule deck for parallel
+                        execution. [default: 1]
+  --run_dir RUN_DIR     Dir to store all run results. If not specified, a
+                        timestamped dir under the current path will be used.
+  --topcell TOPCELL     Top-level cell name to use from the input GDS
+… [1017 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:07:34 UTC
+
+**Tool call: `Bash`**
+
+_Read sign-off script structure_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5 && grep -n "drc\b\|drc)\|density\|maxlu\|STEPS\|run_step\|^[a-z_]*()" run_signoff.sh | head -40; sed -n 25,80p run_signoff.sh
+```
+
+## Tool results / harness — 2026-11-25 14:07:34 UTC
+
+**Tool result:**
+
+```
+10:#     STEP     any of: env drc maxlu density lvs magicdrc netgen summary  (default: all, in this order)
+12:#                SAK (directory of sak-drc.sh / sak-lvs.sh, default /foss/tools/sak)
+24:STEPS=${*:-env drc maxlu density lvs magicdrc netgen summary}
+59:run() {
+73:step_env() {
+89:		echo "sak scripts: $SAK (sha256 sak-drc.sh $(sha256sum "$SAK/sak-drc.sh" | cut -c1-16), sak-lvs.sh $(sha256sum "$SAK/sak-lvs.sh" | cut -c1-16))"
+115:# 1a. the PDK runner as the designer ran it: main deck + maximal deck (its default switches), no density
+116:step_drc() {
+118:		run "$c" drc python3 "$KLT/drc/run_drc.py" --path="${GDS[$c]}" --topcell="${TOP[$c]}" \
+119:			--run_dir="$OUT/$c/klayout_drc" --no_density --mp=1 --density_thr="$THR"
+124:step_maxlu() {
+127:		run "$c" maxlu klayout -b -r "$KLT/drc/rule_decks/sg13cmos5l_maximal.drc" \
+135:# 1c. density only (the slot and the pads are not filled; fill is done at chip level)
+136:step_density() {
+138:		run "$c" density python3 "$KLT/drc/run_drc.py" --path="${GDS[$c]}" --topcell="${TOP[$c]}" \
+139:			--run_dir="$OUT/$c/klayout_density" --density_only --density_thr="$THR"
+144:step_lvs() {
+158:# 3a. magic DRC, drc(full), with the IIC-OSIC-TOOLS script that wrote the committed pad / bg_core_pd reports
+159:step_magicdrc() {
+161:		mkdir -p "$OUT/$c/magic_drc"
+162:		run "$c" magicdrc sh "$SAK/sak-drc.sh" -m -w "$OUT/$c/magic_drc" "${GDS[$c]}"
+165:	mkdir -p "$OUT/bg_core_pd/magic_drc"
+166:	run bg_core_pd magicdrc sh "$SAK/sak-drc.sh" -m -w "$OUT
+… [1991 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:07:43 UTC
+
+**Tool call: `Bash`**
+
+_Add antenna step; run it on slot and pads_
+
+```bash
+python3 - <<'EOF'
+p='run_signoff.sh'
+s=open(p).read()
+s=s.replace("#     STEP     any of: env drc maxlu density lvs magicdrc netgen summary  (default: all, in this order)",
+            "#     STEP     any of: env drc maxlu density antenna lvs magicdrc netgen summary  (default: all, in this order)")
+s=s.replace("STEPS=${*:-env drc maxlu density lvs magicdrc netgen summary}","STEPS=${*:-env drc maxlu density antenna lvs magicdrc netgen summary}")
+a="# 1c. density only"
+b='''# 1d. antenna rules only (added 2026-11-25)
+step_antenna() {
+	for c in $CELLS; do
+		run "$c" antenna python3 "$KLT/drc/run_drc.py" --path="${GDS[$c]}" --topcell="${TOP[$c]}" \\
+			--run_dir="$OUT/$c/klayout_antenna" --antenna_only --mp=1 --density_thr="$THR"
+	done
+}
+
+'''
+assert s.count(a)==1; s=s.replace(a,b+a)
+s=s.replace("env|drc|maxlu|density|lvs|magicdrc|netgen|summary) \"step_$s\" ;;","env|drc|maxlu|density|antenna|lvs|magicdrc|netgen|summary) \"step_$s\" ;;")
+open(p,'w').write(s)
+EOF
+grep -n "antenna" run_signoff.sh | head; W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/antenna_run; rm -rf $W; time bash run_signoff.sh $W env antenna 2>&1 | tail -8; find $W -name "*.lyrdb" | head; cat $W/runtimes.txt | tail -3
+```
+
+## Tool results / harness — 2026-11-25 14:08:03 UTC
+
+**Tool result:**
+
+```
+10:#     STEP     any of: env drc maxlu density antenna lvs magicdrc netgen summary  (default: all, in this order)
+24:STEPS=${*:-env drc maxlu density antenna lvs magicdrc netgen summary}
+135:# 1d. antenna rules only (added 2026-11-25)
+136:step_antenna() {
+138:		run "$c" antenna python3 "$KLT/drc/run_drc.py" --path="${GDS[$c]}" --topcell="${TOP[$c]}" \
+139:			--run_dir="$OUT/$c/klayout_antenna" --antenna_only --mp=1 --density_thr="$THR"
+199:		env|drc|maxlu|density|antenna|lvs|magicdrc|netgen|summary) "step_$s" ;;
+sg13cmos5l_IOPadSingle2Diff.gds sha256 = README.md provenance table: OK
+sg13cmos5l_IOPadDiff2Single.gds sha256 = README.md provenance table: OK
+[2026-11-25T14:07:54Z] slot_7 antenna: python3 /foss/pdks/ihp-sg13cmos5l/libs.tech/klayout/tech/drc/run_drc.py --path=/home/user/sg13cmos5l_cm_slot7/final/gds/slot_7.gds --topcell=slot_7 --run_dir=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/antenna_run/slot_7/klayout_antenna --antenna_only --mp=1 --density_thr=2
+    rc=0, 3 s, log /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/antenna_run/logs/slot_7.antenna.log
+[2026-11-25T14:07:57Z] S2D antenna: python3 /foss/pdks/ihp-sg13cmos5l/libs.tech/klayout/tech/drc/run_drc.py --path=/home/user/sg13cmos5l_cm_slot7/pads/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.gds --topcell=sg13cmos5l_IOPadSingle2Diff --run_dir=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/antenna_run/S2D/klayout_antenna --
+… [2315 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:08:05 UTC
+
+Three seconds per cell is suspiciously fast for an antenna check, so I'm verifying the runs actually checked antenna rules:
+
+## Assistant — 2026-11-25 14:08:08 UTC
+
+**Tool call: `Bash`**
+
+_Inspect antenna run reports and logs_
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/antenna_run; for f in $(find $W -name "*_antenna.lyrdb"); do python3 - "$f" <<'EOF'
+import sys, xml.etree.ElementTree as ET
+t=ET.parse(sys.argv[1]).getroot()
+cats=[c.findtext('name') for c in t.iter('category')]
+items=t.find('items'); n=len(items) if items is not None else 0
+print(sys.argv[1].split('/')[-1], 'categories', len(cats), cats[:12], 'items', n)
+EOF
+done; tail -15 $W/logs/slot_7.antenna.log; grep -i "antenna\|rule" $W/slot_7/klayout_antenna/*.log | head -20
+```
+
+## Tool results / harness — 2026-11-25 14:08:08 UTC
+
+**Tool result:**
+
+```
+slot_7_slot_7_antenna.lyrdb categories 23 ['Ant.a', 'Ant.c', 'Ant.b_Metal1', 'Ant.e_Metal1', 'Ant.b_Metal2', 'Ant.e_Metal2', 'Ant.b_Metal3', 'Ant.e_Metal3', 'Ant.b_Metal4', 'Ant.e_Metal4', 'Ant.b_TopMetal1', 'Ant.e_TopMetal1'] items 0
+sg13cmos5l_IOPadSingle2Diff_sg13cmos5l_IOPadSingle2Diff_antenna.lyrdb categories 23 ['Ant.a', 'Ant.c', 'Ant.b_Metal1', 'Ant.e_Metal1', 'Ant.b_Metal2', 'Ant.e_Metal2', 'Ant.b_Metal3', 'Ant.e_Metal3', 'Ant.b_Metal4', 'Ant.e_Metal4', 'Ant.b_TopMetal1', 'Ant.e_TopMetal1'] items 0
+sg13cmos5l_IOPadDiff2Single_sg13cmos5l_IOPadDiff2Single_antenna.lyrdb categories 23 ['Ant.a', 'Ant.c', 'Ant.b_Metal1', 'Ant.e_Metal1', 'Ant.b_Metal2', 'Ant.e_Metal2', 'Ant.b_Metal3', 'Ant.e_Metal3', 'Ant.b_Metal4', 'Ant.e_Metal4', 'Ant.b_TopMetal1', 'Ant.e_TopMetal1'] items 0
+2026-11-25 14:07:57 +0000: Memory Usage (437836K) : Executing Ant.f_Via2
+2026-11-25 14:07:57 +0000: Memory Usage (437836K) : Evaluating cumulative ratio after Via3
+2026-11-25 14:07:57 +0000: Memory Usage (437836K) : Executing Ant.d_Via3
+2026-11-25 14:07:57 +0000: Memory Usage (437836K) : Executing Ant.f_Via3
+2026-11-25 14:07:57 +0000: Memory Usage (437836K) : Evaluating cumulative ratio after TopVia1
+2026-11-25 14:07:57 +0000: Memory Usage (437836K) : Executing Ant.d_TopVia1
+2026-11-25 14:07:57 +0000: Memory Usage (437836K) : Executing Ant.f_TopVia1
+2026-11-25 14:07:57 +0000: Memory Usage (437836K) : Executing rule Ant.g
+2026-11-25 14:07:57 +0000: Memory Usage (437836K) : Executing rule Ant.h
+2026-11-2
+… [4784 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:08:16 UTC
+
+**Tool call: `Bash`**
+
+_Check sign-off README and summarizer for antenna handling_
+
+```bash
+grep -n "antenna\|Antenna" README.md | head; grep -n "^| " README.md | head -12 | cut -c1-160; grep -n "def \|klayout_\|step" summarize.py | head -30
+```
+
+## Tool results / harness — 2026-11-25 14:08:16 UTC
+
+**Tool result:**
+
+```
+104:   (S2D: 34 + 33 MOS, 6 rhigh, 2 rppd, 2 + 2 antenna diodes); with that CDL both pads match. The design repository's
+111:Not done here: antenna rules (`run_drc.py --antenna`), chip-level DRC / LVS with the harness, PEX.
+14:| input | sha256 |
+16:| `final/gds/slot_7.gds` | `469f2327c4bc22b1d6fc1785fab2fd3830b6050e51989b361dc11b26be669c05` (= README "this file") |
+17:| `pads/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.gds` | `f4b0e07320821248872780b344d71845d08bc250a4bfc9bcf8633a39bdef0182` |
+18:| `pads/sg13cmos5l_IOPadDiff2Single/sg13cmos5l_IOPadDiff2Single.gds` | `13e176ab106d0cb307a6ebc42acf647ce38b6abc52183a9f1d9ffead2f6c2b17` |
+19:| `netlist/slot_7.cdl` | `af1e5f027f9f90c1d44d30faa886eb630bf789e194d9210e9ad2cf5a1b9028e8` |
+20:| `netlist/slot_7_netgen.spice` / `netlist/netgen_check.sh` | `a1e08178…` / `6cd4e7b4…` (full values in `reports/versions.txt`) |
+27:| check | tool | result | expected | file |
+29:| slot_7 DRC, designer's flags (`run_drc.py --no_density`: main deck + maximal deck) | KLayout 0.30.12, PDK deck | **0 violations** in 546 rule categories; 0
+30:| slot_7 maximal deck, `-rd latchUpRules=true` | KLayout, `sg13cmos5l_maximal.drc` | **0** in 271 categories (incl. LU.a/c/c1/d/d1 and 56 OffGrid rules); 0 e
+31:| slot_7 density (`run_drc.py --density_only`) | KLayout, `density.drc` | **7 violations, 1 each**: AFil.g (Activ 4.01 % < 35), GFil.g (GatPoly 3.64 % < 15),
+32:| slot_7 LVS vs `netlist/slot_7.cdl`, `--run_mode=deep --disable_tap_extraction` | 
+… [1733 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:08:22 UTC
+
+**Tool call: `Bash`**
+
+_Summarize antenna results with the existing summarizer_
+
+```bash
+python3 - <<'EOF'
+p='summarize.py'
+s=open(p).read()
+a='for step, sub in (("drc", "klayout_drc"), ("maxlu", "klayout_maximal_lu"), ("density", "klayout_density")):'
+assert s.count(a)==1
+s=s.replace(a,'for step, sub in (("drc", "klayout_drc"), ("maxlu", "klayout_maximal_lu"), ("density", "klayout_density"), ("antenna", "klayout_antenna")):')
+open(p,'w').write(s)
+EOF
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/antenna_run; bash run_signoff.sh $W summary 2>&1 | tail -2; ls $W/summary/ | head -30; cat $W/summary/summary.txt | grep antenna; head -12 $W/summary/slot_7.antenna.txt
+```
+
+## Tool results / harness — 2026-11-25 14:08:23 UTC
+
+**Tool result:**
+
+```
+S2D	antenna	1 report(s)	0 violations	0 exception/Traceback log lines
+D2S	antenna	1 report(s)	0 violations	0 exception/Traceback log lines
+D2S.antenna.sg13cmos5l_IOPadDiff2Single_sg13cmos5l_IOPadDiff2Single_antenna.lyrdb
+D2S.antenna.txt
+S2D.antenna.sg13cmos5l_IOPadSingle2Diff_sg13cmos5l_IOPadSingle2Diff_antenna.lyrdb
+S2D.antenna.txt
+files.txt
+runtimes.txt
+slot_7.antenna.slot_7_slot_7_antenna.lyrdb
+slot_7.antenna.txt
+summary.txt
+versions.txt
+slot_7	antenna	1 report(s)	0 violations	0 exception/Traceback log lines
+S2D	antenna	1 report(s)	0 violations	0 exception/Traceback log lines
+D2S	antenna	1 report(s)	0 violations	0 exception/Traceback log lines
+=== slot_7.antenna.txt
+command: python3 /foss/pdks/ihp-sg13cmos5l/libs.tech/klayout/tech/drc/run_drc.py --path=/home/user/sg13cmos5l_cm_slot7/final/gds/slot_7.gds --topcell=slot_7 --run_dir=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/antenna_run/slot_7/klayout_antenna --antenna_only --mp=1 --density_thr=2
+report slot_7/klayout_antenna/slot_7_slot_7_antenna.lyrdb: 23 rule categories, 0 items (violations)
+logs scanned: slot_7/klayout_antenna/drc_run_2026_11_25_14_07_54.log, slot_7/klayout_antenna/slot_7_slot_7_antenna.log, logs/slot_7.antenna.log
+=== S2D.antenna.txt
+command: python3 /foss/pdks/ihp-sg13cmos5l/libs.tech/klayout/tech/drc/run_drc.py --path=/home/user/sg13cmos5l_cm_slot7/pads/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.gds --topcell=sg13cmos5l_IOPadSingle2Diff --run_dir=/tmp/claude-0/
+… [2057 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:08:26 UTC
+
+The summarizer handles the new step cleanly. Copying the reports in and updating every place that said antenna rules weren't run:
+
+## Assistant — 2026-11-25 14:08:30 UTC
+
+**Tool call: `Bash`**
+
+_Copy antenna reports; find antenna-not-run statements_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/antenna_run; R=signoff/taped_out_158afc5/reports; cp $W/summary/*.antenna.* $R/; printf '# antenna step added 2026-11-25 (run_signoff.sh antenna; same tool versions)\n' >> $R/summary.txt; grep "antenna" $W/summary/summary.txt | grep -v "===" | grep -P "\t" >> $R/summary.txt; tail -4 $R/summary.txt; grep -rn -i "antenna" README.md docs/chipalooza2_as_taped_out/README.md docs/RULES_COMPLIANCE_chipalooza2.md docs/chipalooza2_as_taped_out/DIGEST.md signoff/README.md signoff/taped_out_158afc5/README.md docs/chipalooza2_as_taped_out/TEST_PLAN.md | grep -i "not run\|antenna rules\|not done\|antenna check\|| antenna" | cut -c1-230
+```
+
+## Tool results / harness — 2026-11-25 14:08:30 UTC
+
+**Tool result:**
+
+```
+# antenna step added 2026-11-25 (run_signoff.sh antenna; same tool versions)
+slot_7	antenna	1 report(s)	0 violations	0 exception/Traceback log lines
+S2D	antenna	1 report(s)	0 violations	0 exception/Traceback log lines
+D2S	antenna	1 report(s)	0 violations	0 exception/Traceback log lines
+docs/chipalooza2_as_taped_out/README.md:93:- **Not verified:** ESD and latch-up simulation of the pads (the slot's latch-up DRC rules report 0, a rule check), PEX of the whole slot, full-RC extraction of the pads and `pad_ref_rb` 
+docs/chipalooza2_as_taped_out/README.md:352:| [`../../verification/c2_gaps/slot_modes_bg/`](../../verification/c2_gaps/slot_modes_bg/) | slot modes at ss / −40 °C, `bg_core_pd` alone | **The ss / −40 °C failures of swap, mon
+docs/RULES_COMPLIANCE_chipalooza2.md:18:| P | conform to all IHP SG13CMOS5L requirements (DRC, voltage limits) | partly | sign-off of the taped-out GDS, re-run 2026-11-25 ([`signoff/taped_out_158afc5/`](../signoff/taped_out_158afc
+signoff/taped_out_158afc5/README.md:111:Not done here: antenna rules (`run_drc.py --antenna`), chip-level DRC / LVS with the harness, PEX.
+```
+
+## Assistant — 2026-11-25 14:08:35 UTC
+
+**Tool call: `Bash`**
+
+_Read exact antenna phrases and sign-off table rows_
+
+```bash
+grep -o "antenna rules not run[^;.]*" docs/chipalooza2_as_taped_out/README.md docs/RULES_COMPLIANCE_chipalooza2.md; sed -n 28,31p signoff/taped_out_158afc5/README.md | cut -c1-300; grep -n "both pads\|^| S2D / D2S" signoff/taped_out_158afc5/README.md | head -5 | cut -c1-140
+```
+
+## Tool results / harness — 2026-11-25 14:08:35 UTC
+
+**Tool result:**
+
+```
+docs/chipalooza2_as_taped_out/README.md:antenna rules not run ([signoff/taped_out_158afc5/](
+docs/RULES_COMPLIANCE_chipalooza2.md:antenna rules not run
+|---|---|---|---|---|
+| slot_7 DRC, designer's flags (`run_drc.py --no_density`: main deck + maximal deck) | KLayout 0.30.12, PDK deck | **0 violations** in 546 rule categories; 0 "exception" / "Traceback" / "ERROR" log lines | no violations, 0 exception lines | `slot_7.drc.txt`, `slot_7.drc.slot_7_slot_7_full.lyrdb` |
+| slot_7 maximal deck, `-rd latchUpRules=true` | KLayout, `sg13cmos5l_maximal.drc` | **0** in 271 categories (incl. LU.a/c/c1/d/d1 and 56 OffGrid rules); 0 exception lines | 0 | `slot_7.maxlu.txt`, `slot_7.maxlu.slot_7_maximal_lu.lyrdb` |
+| slot_7 density (`run_drc.py --density_only`) | KLayout, `density.drc` | **7 violations, 1 each**: AFil.g (Activ 4.01 % < 35), GFil.g (GatPoly 3.64 % < 15), M1.j (2.01 %), M2.j (0.94 %), M3.j (2.47 %), M4.j (0.98 %) < 35, TM1.c (TopMetal1 7.04 % < 25); no max-density rule violated | the same 7 min-
+36:| S2D / D2S DRC, `run_drc.py --no_density` | KLayout | **0 / 0** violations (546 categories each), 0 exception lines | 0 (committed `.lyr
+37:| S2D / D2S maximal + latch-up | KLayout | **0 / 0** (271 categories each) | not recorded | `S2D.maxlu.txt`, `D2S.maxlu.txt` |
+38:| S2D / D2S density | KLayout | **4 each**: M1.j, M2.j (min 35 %: S2D 17.37 / 15.41 %, D2S 24.31 / 18.74 %), M3.k, M4.k (max 60 %: 81.3 /
+39:| S2D / D2S KLayout LVS (deep, no tap extraction) against a CDL derived 
+… [206 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:08:45 UTC
+
+**Tool call: `Bash`**
+
+_Update sign-off README and docs; commit antenna results_
+
+```bash
+python3 - <<'EOF'
+p='signoff/taped_out_158afc5/README.md'
+s=open(p,encoding='utf-8').read()
+L=s.split('\n')
+i=[k for k,l in enumerate(L) if l.startswith('| slot_7 density (`run_drc.py --density_only`)')][0]
+L.insert(i+1,"| slot_7 antenna (`run_drc.py --antenna_only`, step `antenna`, added 2026-11-25) | KLayout, `antenna.drc` | **0 violations** in 23 categories (Ant.a … Ant.i, cumulative ratios per metal and via); 0 exception lines | 0 | `slot_7.antenna.txt`, `slot_7.antenna.slot_7_slot_7_antenna.lyrdb` |")
+j=[k for k,l in enumerate(L) if l.startswith('| S2D / D2S density')][0]
+L.insert(j+1,"| S2D / D2S antenna (`run_drc.py --antenna_only`, added 2026-11-25) | KLayout | **0 / 0** in 23 categories each | 0 | `S2D.antenna.txt`, `D2S.antenna.txt` and their `.lyrdb` |")
+s='\n'.join(L)
+a="Not done here: antenna rules (`run_drc.py --antenna`), chip-level DRC / LVS with the harness, PEX."
+b="Not done here: chip-level DRC / LVS with the harness (antenna effects of the chip-level routing included), PEX. The antenna\nrules above are checked per cell (slot and pads), added on 2026-11-25 as step `antenna` of `run_signoff.sh`."
+assert s.count(a)==1; s=s.replace(a,b)
+open(p,'w',encoding='utf-8').write(s)
+for p,a,b in [('docs/chipalooza2_as_taped_out/README.md','antenna rules not run (','antenna rules per cell 0 violations, added 2026-11-25 ('),
+              ('docs/RULES_COMPLIANCE_chipalooza2.md','antenna rules not run','antenna rules per cell (slot, both pads): 0 violations (added 2026-11-25)')]:
+    s=open(p,encoding='utf-8').read(); assert s.count(a)==1,(p,s.count(a)); open(p,'w',encoding='utf-8').write(s.replace(a,b))
+EOF
+grep -n "antenna" docs/RULES_COMPLIANCE_chipalooza2.md | cut -c1-120; git add signoff docs && git commit -q -m "signoff: antenna rules of the taped-out slot_7 and both pads (run_signoff.sh step antenna; 0 violations in 23 categories each); docs updated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin chipalooza2-documentation && git log --oneline -1; git status --short
+```
+
+## Tool results / harness — 2026-11-25 14:08:47 UTC
+
+**Tool result:**
+
+```
+18:| P | conform to all IHP SG13CMOS5L requirements (DRC, voltage limits) | partly | sign-off of the taped-out GDS, re-r
+fbe8916 signoff: antenna rules of the taped-out slot_7 and both pads (run_signoff.sh step antenna; 0 violations in 23 categories each); docs updated
+?? verification/c2_gaps/slot_pex/
+?? verification/c2_gaps/voltage_stress/
+```
+
+## Assistant — 2026-11-25 14:08:51 UTC
+
+Antenna DRC is done and committed (`fbe8916`). Now the URLs for the 55 mV range-end shift you asked about. Finding exactly where the numbers appear:
+
+## Assistant — 2026-11-25 14:08:53 UTC
+
+**Tool call: `Bash`**
+
+_Locate the 55 mV range-end shift in files_
+
+```bash
+grep -rn "55\.2\|55 mV\|32\.9" verification/c2_gaps/dc_curves/*.md verification/c2_gaps/dc_curves/tables/*.md verification/c2_gaps/klayout_pad_diodes/README.md | cut -c1-160; grep -n "^#" verification/c2_gaps/dc_curves/results.md | head -20; ls verification/c2_gaps/dc_curves/csv | grep -i "rt\|range" | head; ls verification/c2_gaps/klayout_pad_diodes/csv
+```
+
+## Tool results / harness — 2026-11-25 14:08:53 UTC
+
+**Tool result:**
+
+```
+verification/c2_gaps/dc_curves/results.md:126:| ss | 27 | 1.413 ... 1.887 | 1.062 ... 2.238 | 0.664 ... 2.639 | 55.20 / 3.83 / 0.17 |
+verification/c2_gaps/dc_curves/results.md:129:| ff | 27 | 1.284 ... 2.017 | 0.897 ... 2.400 | 0.614 ... 2.693 | 32.92 / 0.59 / 0.15 |
+verification/c2_gaps/dc_curves/results.md:201:  55 mV (high end lower by 7.7 … 55.2 mV, low end up to 32.9 mV higher at −40 °C); the reason was not investi
+verification/c2_gaps/dc_curves/tables/d2s.md:25:| ss | 27 | 3.0 | 1.413 ... 1.887 | (1.546 ... 1.752) | 0.797 / 2.976 | 55.20 | 0.5001 |
+verification/c2_gaps/dc_curves/tables/d2s.md:34:| ff | 27 | 3.0 | 1.284 ... 2.017 | (1.434 ... 1.867) | 0.770 / 2.983 | 32.92 | 0.4999 |
+verification/c2_gaps/dc_curves/tables/d2s.md:86:| ss | 27 | 3.0 | 1.413 ... 1.887 | (1.546 ... 1.752) | 0.797 / 2.976 | 55.20 | 0.5001 |
+verification/c2_gaps/dc_curves/tables/d2s.md:95:| ff | 27 | 3.0 | 1.284 ... 2.017 | (1.434 ... 1.867) | 0.770 / 2.983 | 32.92 | 0.4999 |
+verification/c2_gaps/dc_curves/tables/d2s.md:150:| ss | 27 | 3.0 | 1.413 ... 1.887 | (1.546 ... 1.752) | 0.797 / 3.000 | 55.21 | 0.5001 |
+verification/c2_gaps/dc_curves/tables/d2s.md:159:| ff | 27 | 3.0 | 1.284 ... 2.017 | (1.434 ... 1.866) | 0.770 / 3.000 | 32.92 | 0.5000 |
+verification/c2_gaps/dc_curves/tables/d2s.md:211:| ss | 27 | 3.0 | 1.413 ... 1.887 | (1.546 ... 1.752) | 0.797 / 3.000 | 55.21 | 0.5001 |
+verification/c2_gaps/dc_curves/tables/d2s.md:220:| ff | 27 | 3.0 | 1.284 ... 2.017 | (1.434 ... 1.866) | 0.770 / 3
+… [921 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:08:58 UTC
+
+**Tool call: `Bash`**
+
+_Read round-trip section and CSV headers_
+
+```bash
+sed -n 172,207p verification/c2_gaps/dc_curves/results.md | cut -c1-200; head -3 verification/c2_gaps/dc_curves/csv/rt_summary.csv | cut -c1-200; head -3 verification/c2_gaps/klayout_pad_diodes/csv/rt_range.csv | cut -c1-200; grep -n "^5\. \|\*\*DC round trip" verification/c2_gaps/klayout_pad_diodes/README.md
+```
+
+## Tool results / harness — 2026-11-25 14:08:58 UTC
+
+**Tool result:**
+
+```
+## 3. Round trip S2D → slot 7 (default mode) → D2S
+
+Conditions: the designer's tier-1 slot deck (design 9052bd35, `run_tier1.py`, imported): slot_7 default mode, replica
+bias `pad_ref_rb` and `bias_dist_pd` KLayout-extracted, `bg_core_pd` schematic, iref from the slot's bandgap, pad out
+unloaded (1 GΩ); **vref / vcm are the replica values as simulated** (not set by sources). Pad in swept −0.3 … 3.3 V in
+5 mV steps; the two custom pads in three views (both pads the same view): schematic, magic PEX, and the KLayout-extracted
+netlists that the designer's deck uses. PVT: the designer's five tier-1 points. 15 runs: 14 complete, 1 partial (PEX,
+sf −40 °C 3.0 V: ngspice aborted the sweep at pad in 1.435 V, "timestep too small" at the S2D pad's diode
+`d.x2s.x43.d1`; data up to 1.43 V are used, which covers the linear range there).
+
+| pads | PVT | replica vref / vcm [V] | max \|err\| pad in 0 … 1 V [mV] | pad in range, 1 mV [V] | pad out range, 1 mV [V] |
+|---|---|---|---|---|---|
+| schematic | tt 27 °C 3.3 V | 0.4923 / 1.2566 | 0.86 | -0.171 … 1.281 | 0.595 … 2.044 |
+| schematic | ss −40 °C 3.0 V | 0.4475 / 1.1148 | 1.33 | -0.243 … 1.055 | 0.427 … 1.721 |
+| schematic | ff 125 °C 3.6 V | 0.5709 / 1.2991 | 6.10 | 0.096 … 1.367 | 0.828 … 2.095 |
+| schematic | fs 125 °C 3.6 V | 0.5757 / 1.3655 | 3.10 | 0.028 … 1.440 | 0.821 … 2.229 |
+| schematic | sf −40 °C 3.0 V | 0.4441 / 1.1377 | 1.10 | -0.247 … 1.114 | 0.449 … 1.806 |
+
+err = pad out − (vcm + pad in − vref) with the replica's vcm / vr
+… [2093 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:09:05 UTC
+
+**Tool call: `Bash`**
+
+_Get full sha; read round-trip table rows_
+
+```bash
+git rev-parse fbe8916; sed -n 1,27p verification/c2_gaps/dc_curves/tables/rt.md | cut -c1-180 | sed -n 5,27p; grep -n "" verification/c2_gaps/klayout_pad_diodes/README.md | sed -n 119,128p | cut -c1-120
+```
+
+## Tool results / harness — 2026-11-25 14:09:05 UTC
+
+**Tool result:**
+
+```
+fbe8916bfdc5d6f127648df3f32adf48e72f9c54
+<!-- generated by dc_curves/rt.py, do not edit -->
+
+#### Round trip S2D -> slot 7 -> D2S (pad out unloaded), IHP sg13cmos5l simulation, slot 7 tier-1 deck (pads: schematic | magic PEX | KLayout-extracted)
+
+| pads | corner | T [°C] | V | replica vref / vcm [V] | D2S vref [V] | gain | offset [mV] | max |err| pad in 0 ... 1 V [mV] | pad in range 1 mV [V] | pad out range 1 mV [V] | pad 
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| schematic | tt | 27 | 3.3 | 0.4923 / 1.2566 | 1.2566 | 0.99875 | 0.05 | 0.86 | -0.171 ... 1.281 | 0.595 ... 2.044 | -0.297 ... 1.406 |
+| magic PEX (C-coupled) | tt | 27 | 3.3 | 0.4923 / 1.2566 | 1.2566 | 0.99875 | 0.06 | 0.87 | -0.171 ... 1.281 | 0.595 ... 2.044 | -0.297 ... 1.406 |
+| KLayout-extracted | tt | 27 | 3.3 | 0.4923 / 1.2566 | 1.2566 | 0.99871 | 0.07 | 0.90 | -0.172 ... 1.244 | 0.595 ... 2.007 | -0.298 ... 1.365 |
+| schematic | ss | -40 | 3.0 | 0.4475 / 1.1148 | 1.1148 | 0.99852 | 0.03 | 1.33 | -0.243 ... 1.055 | 0.427 ... 1.721 | <=-0.300 ... 1.198 |
+| magic PEX (C-coupled) | ss | -40 | 3.0 | 0.4475 / 1.1148 | 1.1148 | 0.99852 | 0.04 | 1.32 | -0.243 ... 1.055 | 0.427 ... 1.721 | <=-0.300 ... 1.198 |
+| KLayout-extracted | ss | -40 | 3.0 | 0.4475 / 1.1148 | 1.1148 | 0.99848 | 0.04 | 1.37 | -0.210 ... 1.048 | 0.460 ... 1.713 | <=-0.300 ... 1.183 |
+| schematic | ff | 125 | 3.6 | 0.5709 / 1.2991 | 1.2991 | 0.99870 | 1.71 | 6.10 | 0.096 ... 1.367 | 0.828 ... 2.095 | -0.058 ... 1.461 |
+| magic PEX (C-
+… [2283 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:09:24 UTC
+
+**Tool call: `Bash`**
+
+_Update RUNLOG and chatlog; push_
+
+```bash
+cd /home/user/sky130_cm_ip__single2diff2single_sudelbuecher && cat >> RUNLOG.md <<'EOF'
+- User decisions on the open points: (1) front page: digest in eight pages, with links to the two short versions; (2) add the Chipalooza #2 proposal as an appendix; (3) "be honest: you made an ad hoc specification; didn't quite meet it"; (4) licence: keep as is, no explanation; (5) reviews: no ordinary review sequence, don't mention; (6) keep the CSV files; simulate everything not yet simulated ("Tim will select which are his"); tughra reading good enough; asked for the URLs of the 55 mV range-end shift.
+- Proposal found in the design repository: `sudelbuecher/description/s2d_d2s_pinbuffers.md` (+ PDF) on `sudel_buecher` (commit 6600fc1, 2026-09-04; dated 10 August 2026), linked from the design repository's main README. Copied unchanged with a source header to [S7] `docs/chipalooza2_as_taped_out/PROPOSAL_chipalooza2.md`, data book Appendix I. Honest specification wording everywhere ("ad hoc specification: the CACE working limits written during the AI-assisted design; not quite met": D2S MC gain 0.48877 < 0.49; S2D input range at the slot's references 0.980 V < 1.0 V; proposal's tentative targets superseded): description page, known limitations, ACHIEVED_VS_LIMITS, TEST_PLAN, glue logic, data sheets + make_datasheet.py, HOW_IT_WORKS §7, data book cover / part intro; rules table rows 4 (met), 5.4 / 7 (partly), 13 (met, CSV kept), row 20 removed, row 14 unchanged ([S7] 80f224f).
+- Antenna DRC (by me): run_signoff.sh got a step `antenna` (`run_drc.py --antenna_only`), summarize.py reads it; slot_7 and both pads 0 violations in 23 categories each (cell level; chip-level routing is the harness's); reports in signoff/taped_out_158afc5/reports/, docs updated ([S7] fbe8916).
+- Three background agents started (write only to their own folders, no commits): verification/c2_gaps/voltage_stress/ (terminal voltages of every MOS at 3.3 / 3.6 V vs the PDK VGS limit), verification/c2_gaps/pad_esd_latchup/ (HBM, latch-up injection / overvoltage, model limits stated), verification/c2_gaps/slot_pex/ (magic extraction of the whole slot, LVS, RC if feasible, slot simulations vs earlier views).
+- 55 mV range-end shift located for the user: dc_curves/tables/rt.md (KLayout-extracted rows: e.g. fs 125 °C high end 1.385 vs 1.440 V, ss −40 °C low end −0.210 vs −0.243 V), dc_curves/results.md §3, csv/rt_summary.csv; follow-up klayout_pad_diodes/README.md item 5, csv/rt_range.csv. Note: the "55.20" in dc_curves/results.md §2 rows is a D2S INL value, unrelated.
+EOF
+bash chatlog/tools/export_all.sh >/dev/null 2>&1; git add -A && git commit -q -m "RUNLOG: user decisions, proposal, honest specification, antenna DRC, agents started; chatlog regenerated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin sudel_buecher && git log --oneline -1
+```
+
