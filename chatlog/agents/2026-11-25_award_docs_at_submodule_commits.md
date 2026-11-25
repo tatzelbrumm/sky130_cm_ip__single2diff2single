@@ -24,3 +24,58 @@ Tasks:
 
 Report concisely (aim for under 1500 words plus the matrix). Quote headings verbatim; give file paths with the SHA.
 
+## Assistant — 2026-11-25 11:43:48 UTC
+
+**Tool call: `Bash`**
+
+_Clone harness repo and show submodules_
+
+```bash
+D=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad; ls $D/award_docs/; mkdir -p $D/award_submodules && cd $D/award_submodules && git clone -q --filter=blob:none --no-checkout -b tapeout_nov_2026 https://github.com/RTimothyEdwards/sg13cmos5l_ocd_chipalooza harness 2>&1 | tail -3; cd harness && git show tapeout_nov_2026:.gitmodules
+```
+
+## Tool results / harness — 2026-11-25 11:43:50 UTC
+
+**Tool result:**
+
+```
+GAP_ANALYSIS.md
+SAR_ADC_IHP
+SG13CMOS5L_LPVSV_Chipalooza_2
+sg13cmos5l_spma_ip__instramp
+sg13cmos5l_vyges_ip__pll_rosc
+sg13cmos5l_yacinesot_ip__diff_opamp_cmfb
+sg13g2_mh_ip__cmos_vref
+vyges_upstream
+[submodule "dependencies/sg13cmos5l_ocd_ip__analog_switches"]
+	path = dependencies/sg13cmos5l_ocd_ip__analog_switches
+	url = https://github.com/RTimothyEdwards/sg13cmos5l_ocd_ip__analog_switches
+[submodule "dependencies/sg13cmos5l_ocd_ip__biasgen"]
+	path = dependencies/sg13cmos5l_ocd_ip__biasgen
+	url = https://github.com/RTimothyEdwards/sg13cmos5l_ocd_ip__biasgen
+[submodule "dependencies/sg13cmos5l_ocd_ip__por"]
+	path = dependencies/sg13cmos5l_ocd_ip__por
+	url = https://github.com/RTimothyEdwards/sg13cmos5l_ocd_ip__por
+[submodule "dependencies/slot_1"]
+	path = dependencies/slot_1
+	url = https://github.com/rcyaon/bidir-level-shifter
+[submodule "dependencies/slot_2"]
+	path = dependencies/slot_2
+	url = https://github.com/Belal-Elshinnawey/sg13cmos5l_slot2_backup
+[submodule "dependencies/slot_3"]
+	path = dependencies/slot_3
+	url = https://github.com/htfab/hsxo-cpz2
+[submodule "dependencies/slot_4"]
+	path = dependencies/slot_4
+	url = https://github.com/phdridha12/sg13cmos5l_Wind_Comp
+[submodule "dependencies/slot_5"]
+	path = dependencies/slot_5
+	url = https://github.com/YacineSot/sg13cmos5l_yacinesot_ip__diff_opamp_cmfb
+[submodule "dependencies/slot_6"]
+	path = dependencies/slot_6
+	url = https://github.com/RTimothyEdwards/sg13cmos5l_vyges_ip__pll_rosc
+[submodule "dependencies/slot_7"]
+	p
+… [1540 more characters cut]
+```
+
