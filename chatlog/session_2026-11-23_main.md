@@ -12304,3 +12304,179 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin sudel_buecher && git log --oneline -1
 ```
 
+## Tool results / harness — 2026-11-25 11:10:11 UTC
+
+**Tool result:**
+
+```
+b6105bf RUNLOG: data book and digest built; errors back-annotated; chatlog regenerated
+```
+
+## Assistant — 2026-11-25 11:10:14 UTC
+
+**Tool call: `SendUserFile`**
+
+```json
+{
+ "files": [
+  "/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf",
+  "/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf"
+ ],
+ "caption": "Slot 7: two-page digest and the 250-page data book",
+ "status": "normal",
+ "display": "attach"
+}
+```
+
+## Tool results / harness — 2026-11-25 11:10:15 UTC
+
+**Tool result:**
+
+```
+2 files delivered to user.
+  /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf → file_uuid: f725d8ad-9b31-49a3-855d-f2c278d598c1
+  /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf → file_uuid: 8423b216-3f50-4d7e-833d-9c601f078088
+```
+
+## Assistant — 2026-11-25 11:10:26 UTC
+
+Both PDFs are attached above and pushed to `chipalooza2-documentation` (`47269da`), in `docs/chipalooza2_as_taped_out/pdf/`.
+
+**Data book (`slot7_databook.pdf`, 250 pages, 15 MB)**
+- It starts with a cover, a five-page summary and a contents list with page numbers; every entry and every cross-reference is clickable.
+- Parts I–III hold the description, the six data sheets, and the working limits with the test plan.
+- Appendices A–H: post-tapeout simulations, sign-off, schematics, layout, design-rationale plots, harness integration, the rules table, and how the documents were made.
+- About 60 plots were only linked from the text, never shown. The book prints all of them with captions.
+- The CSV data behind the plots is left out, because rule 13 asks for plots, not raw data.
+- Links to files not reprinted (scripts, netlists) open on GitHub at the source commit.
+- One script, `docs/chipalooza2_as_taped_out/book/build_book.py`, rebuilds both PDFs after any change. It checks every link and anchor; the final build found no problems.
+
+**Two-page digest (`slot7_digest.pdf`, source `DIGEST.md`)**
+- It follows what the six award-named documentations have in common: what the block does, a block diagram, a key-numbers table, two plots, status, how to test it, and where to find more.
+- It is plain, honest about what wasn't done, and contains nothing about readers or other projects.
+- I titled it "Slot 7 in two pages" and kept the reader's name off the document. If you'd rather have it named, that's a one-line change.
+
+**Errors found and fixed in the Markdown sources, each its own commit**
+- **Rules numbering:** our compliance table used its own row numbers 1–24, not the rules page's. It now uses the page's numbering (an unnumbered preamble, items 1–23 with their sub-items), and the statuses are brought up to 2026-11-25.
+- **Figure counts:** the front page said 36 DC and 23 AC/transient figures. Those were file counts; there are 22 and 20 figures.
+- **Stale notes:** two "S2D mismatch re-run pending" notes remained after the re-run had finished.
+- **Rules page:** I re-read it today. It has no change notice and no documentation-specific award criteria.
+
+The chatlog and RUNLOG are up to date (`b6105bf` on `sudel_buecher`).
+
+**Decisions only you can make (Appendix G):**
+- Should the Chipalooza #2 proposal be added (item 4)?
+- Should the working limits be stated as the specification (items 5.4 and 7)?
+- Do you want a written approval record for the custom pads in the repository (item 6.8)?
+- Is the Solderpad licence (SHL 2.1) acceptable, or should it be Apache 2.0 (item 14)?
+- Should review dates and outcomes be documented (item 20)?
+- Do the committed CSV files (86 files, 0.8 MB) count as data dumps (item 13)?
+
+## User (or harness) — 2026-11-25 11:27:50 UTC
+
+while I'm reading, slowly ...
+in the databook, "where to find what" on its own page instead of breaking it up with the second page sparsely filled.
+
+## Assistant — 2026-11-25 11:27:53 UTC
+
+**Tool call: `Bash`**
+
+_Check for outside edits before changing files_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && git status --short && git diff --stat && git log --oneline -1
+```
+
+## Tool results / harness — 2026-11-25 11:27:53 UTC
+
+**Tool result:**
+
+```
+47269da docs: data book (250 pages) and two-page digest as PDF, built from 7727182
+```
+
+## Assistant — 2026-11-25 11:27:56 UTC
+
+Only my own edits touched those files; the working tree is clean. Moving "Where to find what" to its own page:
+
+## Assistant — 2026-11-25 11:28:03 UTC
+
+**Tool call: `Bash`**
+
+_Page break before Where to find what; rebuild; inspect_
+
+```bash
+python3 - <<'EOF'
+p='docs/chipalooza2_as_taped_out/book/build_book.py'
+s=open(p).read()
+a=".summary img { max-height: 72mm; }"
+b=".summary img { max-height: 72mm; }\n.summary h2[id$=\"--where-to-find-what\"] { break-before: page; }\n.summary h2[id$=\"--where-to-find-what\"] + table { break-inside: avoid; }"
+assert s.count(a)==1; s=s.replace(a,b); open(p,'w').write(s)
+EOF
+git add -A && git commit -q -m "build_book.py: 'Where to find what' of the summary on its own page
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && python3 docs/chipalooza2_as_taped_out/book/build_book.py 2>&1 | grep -v "WARNING\|^$"; P=docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf; pdfinfo $P | grep Pages; for i in 2 3 4 5 6 7 8; do echo "p$i: $(pdftotext -f $i -l $i $P - | grep -m2 -v '^$' | tr '\n' ' ' | cut -c1-90)"; done; S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book; rm -f $S/s-*; pdftoppm -r 40 -png -f 5 -l 7 $P $S/s; python3 -c "
+from PIL import Image; import glob
+fs=sorted(glob.glob('$S/s-*.png')); ims=[Image.open(f) for f in fs]
+s=Image.new('RGB',(sum(i.size[0] for i in ims),ims[0].size[1]),'white'); x=0
+for i in ims: s.paste(i,(x,0)); x+=i.size[0]
+s.save('$S/s_tri.png')"
+```
+
+## Tool results / harness — 2026-11-25 11:28:49 UTC
+
+**Tool result:**
+
+```
+0 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+Pages:           250
+p2: Summary: slot 7 at a glance Slot 7 data book 
+p3: Summary: slot 7 at a glance Slot 7 data book 
+p4: Summary: slot 7 at a glance Slot 7 data book 
+p5: Summary: slot 7 at a glance Slot 7 data book 
+p6: Summary: slot 7 at a glance Slot 7 data book 
+p7: Contents Slot 7 data book 
+p8: Contents Slot 7 data book
+```
+
+## Assistant — 2026-11-25 11:28:51 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/book/s_tri.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 11:28:51 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 11:28:52 UTC
+
+"Where to find what" is now whole, on page 6. Committing and pushing, with the chatlog updated:
+
+## Assistant — 2026-11-25 11:28:57 UTC
+
+**Tool call: `Bash`**
+
+_Commit rebuilt PDF, update logs, push_
+
+```bash
+git add -A && git commit -q -m "docs: data book rebuilt ('Where to find what' on its own page)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin chipalooza2-documentation && git log --oneline -2; cd /home/user/sky130_cm_ip__single2diff2single_sudelbuecher && echo "- User (reading the data book): 'Where to find what' on its own page instead of split across a sparsely filled page. Done: page break before it in the summary (builder [S7] commit after 47269da; data book rebuilt, still 250 pages; the table is now page 6 alone)." >> RUNLOG.md && bash chatlog/tools/export_all.sh >/dev/null 2>&1; git add -A && git commit -q -m "RUNLOG: data book layout fix; chatlog regenerated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin sudel_buecher && git log --oneline -1
+```
+
