@@ -193,7 +193,8 @@ ratings (the 3.3 V devices are the 5 V-class `g5v0d10v5` devices; exact rated va
 | 34 | supply currents, disabled | `enable` = 0 | | | 1 µA | | block 25 … 56 nA, ring 9 … 58 nA | TBD |
 | 35 | pad leakage, block unpowered | pad 0 … 3.3 V, 125 °C | −100 nA | | 100 nA | | S2D ≤ 25 nA, D2S ≤ 67 nA (125 °C); D2S pad leakage, pad off, post-layout −36.9 … +15.0 nA (48 runs) | TBD |
 
-D2S rows: "post-layout" values are IHP magic-PEX (C-coupled) simulations of the taped-out D2S pad cell made on 2026-11-23
+D2S rows: the schematic values come from CACE results committed on 2026-10-21, which predate the final D2S schematic
+(changed until 2026-11-03); a re-run of the schematic is in progress. The "post-layout" values are IHP magic-PEX (C-coupled) simulations of the taped-out D2S pad cell made on 2026-11-23
 (predecessor repository, branch `chipalooza2-documentation`, `verification/c2_gaps/d2s_pex/`; see [SOURCES.md](SOURCES.md) S9);
 unloaded closed-loop bandwidth post-layout 1.57 … 2.02 MHz (schematic 1.78 … 2.25 MHz); D2S output noise post-layout 0.142 … 0.156 µV/√Hz at
 100 kHz, 224 µV integrated (schematic 0.143 … 0.156 µV/√Hz, 234 µV). All D2S CACE groups except mismatch have post-layout results (all runs; the simulator option `rshunt` = 1 TΩ was
