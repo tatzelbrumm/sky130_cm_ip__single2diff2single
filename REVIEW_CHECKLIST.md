@@ -4,8 +4,8 @@
 2. §2 pin table: the new `dig_in[6..13]` map, the default reference (Banba = 00), the optional third pin `pad_aux`.
 3. §2 exceptions: custom-pad approval request; is "own references are inside the slot, no exception" acceptable to you?
 4. §3.4: harness bias voltage as `vcm` or `vref` source only works if its value falls in the window (TBD: harness spec).
-5. §4 target table: every value is a **target** chosen from IHP observed intervals with a margin (column "basis"); check margins, in particular rows 4, 5, 7 (mismatch), 16 (D2S INL at 3.0 V left TBD), 20 (THD), 29–30 (reference currents, tighter than IHP, tentative).
-6. §4 column "sky130 sim": all TBD by decision. The "basis" column now includes the IHP gap simulations of today (D2S post-layout rows 14–25, 31, 35; `vcm` / `vref` rows 27–28 with PEX and mismatch; bandgap row 29; notes under the table). Check that every target still has margin: closest are row 20 (D2S THD at 0.5 V: post-layout −57.7 dB vs target max −50 dB) and row 16 (D2S INL max 7.5 mV vs 10 mV).
+5. §4 target table: every value is a **target** chosen from IHP observed intervals with a margin (column "basis"); check margins, in particular rows 4, 5, 7 (mismatch), 16 (D2S INL: now at the slot operating point, ≤ 1.38 mV at 3.0 V; condition changed from 3.3 … 3.6 V to 3.0 … 3.6 V), 20 (THD), 29–30 (reference currents, tighter than IHP, tentative).
+6. §4 column "sky130 sim": all TBD by decision. The "basis" column now includes the IHP gap simulations of today (D2S post-layout rows 14–25, 31, 35; `vcm` / `vref` rows 27–28 with PEX and mismatch; bandgap row 29; notes under the table). Check that every target still has margin: closest are row 20 (D2S THD at 0.5 V: post-layout −57.7 dB vs target max −50 dB) and row 16 (D2S INL ≤ 1.38 mV vs 10 mV at the operating point).
 7. §5 test plan: 110 °C added as a temperature point (commercial limit); OK?
 8. §7 risks: bandgap start-up row rewritten (ss / −40 °C stall shown to be a simulator artefact). §6 port plan, fallback "buffers in the core behind foundry analog pads" if the custom pads are not approved: acceptable?
 9. §9 license, §10 AI paragraph: wording.

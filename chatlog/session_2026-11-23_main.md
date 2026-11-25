@@ -6491,3 +6491,704 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push 2>&1 | tail -1
 ```
 
+## Tool results / harness — 2026-11-25 00:11:40 UTC
+
+**Tool result:**
+
+```
+b04f12d..c4b33f5  chipalooza2-documentation -> chipalooza2-documentation
+c4b33f5 verification/c2_gaps/dc_curves: DC performance graphs of the S2D and D2S pads and the slot round trip (36 plots, schematic and magic PEX; input / output range tables per corner and supply; range vs vref / vcm); README, results, run.sh (reproduced byte-identical)
+   46338de..4e50635  sudel_buecher -> sudel_buecher
+```
+
+## Assistant — 2026-11-25 00:11:57 UTC
+
+The DC graphs are pushed to `chipalooza2-documentation` (`c4b33f5`), in `verification/c2_gaps/dc_curves/`:
+https://github.com/tatzelbrumm/sg13cmos5l_cm_slot7/tree/chipalooza2-documentation/verification/c2_gaps/dc_curves
+
+There are 36 plots in `plots/` (each as PNG and SVG), plus `README.md` (what each figure shows and how to read it), `results.md` (range tables and key numbers), the tables per corner in `tables/` and `run.sh`. The restart lost nothing: a rerun of `run.sh` in a fresh folder reproduced every table byte for byte. The pads' own CACE testbench was used, and the numbers agree with the committed CACE results to within 0.6 mV.
+
+**Figures to start with:**
+
+| figure | shows |
+|---|---|
+| `s2d_transfer_tt27_pex.png` (also `_schematic`) | S2D `outp`, `outn`, difference and common mode over pad input −0.3 … 3.3 V; linear range shaded |
+| `s2d_corners_*.png` | S2D difference and error from the ideal gain of 2, over 5 corners × 3 temperatures |
+| `s2d_range.png`, `s2d_range_slot.png` | S2D input range per corner and supply, at the test setting and at the slot's `vref` / `vcm` |
+| `s2d_vrefvcm_range.png` | S2D input range against the `vref` and `vcm` settings |
+| `d2s_transfer_tt27_*.png`, `d2s_corners_*.png` | D2S pad output and its error over differential input, loaded and unloaded, at 3.0 V and 3.3 V |
+| `d2s_range*.png` | D2S output range per corner and supply |
+| `rt_transfer_tt27.png`, `rt_error_corners.png` | round trip S2D → D2S in the slot, and its error across corners |
+
+The `*_linearity_criterion.png` figures show how the range ends are defined:
+- **S2D:** error under 1 mV, input-referred, as in the CACE file.
+- **D2S:** error under 10 mV, output-referred, the CACE INL limit.
+
+**Results** (IHP sg13cmos5l simulation, schematic and extracted layout):
+- **S2D input range** (`vref` 0.5 V): the high end is 1.057 V at worst (ss, −40 °C, 3.0 V) and up to 1.299 V. At tt 27 °C, 3.3 V the range is −0.149 … 1.245 V. At the slot's `vcm` of 1.26 V the high end drops to 0.980 V at ss / −40 °C / 3.0 V.
+- **D2S output range** at 3.3 V: 1.121 … 2.180 V at the worst corner, 0.985 … 2.314 V at tt 27 °C. The pad output clips at 0.64 … 0.74 V and 3.27 … 3.28 V.
+- **The large D2S INL at 3.0 V (87 mV) is an artefact of the test condition.** It comes from CACE's input common mode of 1.65 V. At the slot's actual 1.26 V, INL stays at or below 1.38 mV even at 3.0 V. Row 16 of the proposal currently lists the 3.0 V case as TBD with a "headroom limit"; this result answers it.
+- **Round trip:** 0.86 mV at most over 0 … 1 V at tt 27 °C, 6.1 mV at ff 125 °C 3.6 V.
+- **Layout effect:** extracted layout and schematic agree within 0.7 mV on range ends and 0.03 mV on the error curves.
+
+**Two things in the figures you should look at:**
+- **S2D:** at about 1.53 V input both outputs jump abruptly to their limits instead of clipping gradually (`s2d_transfer_tt27_pex.png`).
+- **D2S:** past about +1.75 V differential input the output snaps to the upper rail (`d2s_corners_pex.png`). On the negative side it clips smoothly.
+
+Both are well outside the linear ranges. I haven't investigated either.
+
+**Open points the job reported:**
+- The D2S needs the simulator's 1 TΩ resistor from every node to ground in both views; it makes no difference to the results.
+- The rerun D2S INL at 3.0 V is 1.2 % above the committed CACE value, and the job did not find the cause.
+- One round-trip run on the extracted layout (sf, −40 °C) stopped at 1.435 V input, after the linear range.
+- The KLayout-extracted pads move the round-trip range ends by up to 55 mV. Not investigated.
+
+The graphs are not yet embedded in the slot 7 description or the data sheets. Tell me which ones you want there, or which to change, and I'll make more. Separately, shall I correct row 16 of the proposal with the 1.26 V result?
+
+## User (or harness) — 2026-11-25 01:35:39 UTC
+
+yes, fix row 16 and embed the graphs. I'm still quite lost in the wealth of information, and so will be the reviewers.
+
+## Assistant — 2026-11-25 01:35:52 UTC
+
+First the proposal fix, then a reader-facing restructure. Checking the current structure of the slot 7 description and the DC results, so the summary takes its numbers from the files:
+
+## Assistant — 2026-11-25 01:35:53 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && grep -n '^#' README.md; sed -n 1,30p README.md | cut -c1-220; wc -l README.md; grep -n '^#' ../../verification/c2_gaps/dc_curves/results.md
+```
+
+## Tool results / harness — 2026-11-25 01:35:53 UTC
+
+**Tool result:**
+
+```
+5:# Slot 7: custom S2D / D2S pad pair with a bandgap-referenced replica bias (as taped out, November 2026)
+37:## 1. Which version was taped out
+57:## 2. Electrical function
+59:### 2.1 Signal and current flow
+87:### 2.2 Supplies, enable and fail-safe
+99:### 2.3 The blocks
+114:### 2.4 Modes
+131:### 2.5 Expected values
+138:## 3. Readiness of the blocks that were kicked off
+160:## 4. Physical interface and layout hierarchy
+162:### 4.1 Top level
+182:### 4.2 Pads
+225:### 4.3 Hierarchy of `slot_7` (from `final/gds/slot_7.gds` of `158afc5`, read on 2026-11-22)
+247:## 5. Verification state
+264:## 5a. Gap simulations of 2026-11-23
+276:## 6. Files
+294:## 7. Aside: the tughra
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Slot 7: custom S2D / D2S pad pair with a bandgap-referenced replica bias (as taped out, November 2026)
+
+> **Where this set comes from.** Copied on 2026-11-23 from
+> [`tatzelbrumm/sg13cmos5l_ocd_chipalooza`](https://github.com/tatzelbrumm/sg13cmos5l_ocd_chipalooza/tree/da4557a5b2ac84c6e05c5a683a019df4895b67e9/sudelbuecher/slots/slot_7),
+> branch `sudel_buecher` (commit `da4557a5b2ac84c6e05c5a683a019df4895b67e9`), directory `sudelbuecher/slots/slot_7/`
+> (README.md, glue_logic.md, test_platforms.md, characterization_candidates.md, log.md, datasheets/ with tools/, pix/).
+> It describes slot 7 **as taped out**, i.e. this repository at commit `158afc5afab0056bd6d216a4db3833e34a364949`
+> (`s7_version` in `config.txt` of the harness
+… [2339 more characters cut]
+```
+
+## Assistant — 2026-11-25 01:35:55 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves && sed -n 13,25p results.md; sed -n 74,82p results.md; sed -n 138,171p results.md | cut -c1-250
+```
+
+## Tool results / harness — 2026-11-25 01:35:55 UTC
+
+**Tool result:**
+
+```
+## Key numbers
+
+| quantity | conditions | result |
+|---|---|---|
+| S2D linear input range (1 mV, input-referred) | vref 0.5 V, vcm 1.2 V, 5 corners × 3 T × 3.0 / 3.3 / 3.6 V | high end 1.057 (ss −40 °C 3.0 V) … 1.299 V; low end ≤ 0 V except 125 °C (≤ 0.087 V); tt 27 °C 3.3 V: −0.149 … 1.245 V |
+| S2D at the slot's vref 0.49 V / vcm 1.26 V | same grid | high end 0.980 (ss −40 °C 3.0 V) … 1.351 V; tt 27 °C 3.3 V: −0.157 … 1.296 V |
+| D2S linear output range (10 mV, output-referred) | vicm = vref 1.65 V (CACE), 1 kΩ | 3.3 V: worst 1.121 … 2.180 V (ss −40 °C), tt 27 °C 0.985 … 2.314 V; 3.0 V: worst 1.449 … 1.851 V; 3.6 V: worst 0.737 … 2.558 V |
+| D2S at the slot's vicm = vref 1.26 V | 1 kΩ to 1.26 V | 3.3 V: worst ends 0.328 / 2.258 V (ff 125 °C), tt 27 °C 0.211 … 2.317 V; 3.0 V: worst 0.627 … 1.894 V (ss −40 °C) |
+| D2S INL (±1 V, CACE definition) | vicm 1.65 V / 1.26 V | 3.0 V: ≤ 88.4 / ≤ 1.38 mV; 3.3 V: ≤ 7.50 / ≤ 0.56 mV; 3.6 V: ≤ 0.49 / ≤ 0.50 mV |
+| D2S swing at vinp − vinn = ∓3 V | vicm 1.65 V, 1 kΩ, 3.3 V | 0.635 … 0.736 V / 3.266 … 3.283 V (unloaded: up to 3.300 V) |
+| Round trip, 1 mV range (pads schematic) | slot deck, replica bias, tt 27 °C 3.3 V | pad in −0.171 … 1.281 V → pad out 0.595 … 2.044 V; max \|err\| over 0 … 1 V 0.86 mV (6.10 mV at ff 125 °C 3.6 V) |
+| schematic vs magic PEX | all of the above | range ends within 0.7 mV, INL / error curves within 0.03 mV |
+
+### 1b. S2D at the slot's nominal replica values (vref 0.49 V, vcm 1.26 V)
+
+Same sweep with vref 0.4
+… [3365 more characters cut]
+```
+
+## Assistant — 2026-11-25 01:36:23 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sky130_cm_ip__single2diff2single && grep -n '^| 16 ' docs/PROPOSAL.md && python3 - <<'EOF'
+p='docs/PROPOSAL.md'; s=open(p).read()
+old=[l for l in s.split('\n') if l.startswith('| 16 ')][0]
+new="| 16 | D2S INL | ±1 V differential, input common mode = vref = vcm (≈ 1.26 V), `vdda` 3.0 … 3.6 V | | 0.5 mV | 10 mV | | at the slot's operating point ≤ 1.38 mV at 3.0 V, ≤ 0.56 mV at 3.3 V, ≤ 0.50 mV at 3.6 V (schematic and post-layout agree within 0.001 mV); the 87 … 88 mV at 3.0 V of the CACE suite are an artefact of its 1.65 V input common mode | TBD |"
+s=s.replace(old,new)
+open(p,'w').write(s)
+p='docs/SOURCES.md'; s=open(p).read()
+s=s.replace("\nMapping of PROPOSAL.md","| S12 | DC transfer curves, input / output ranges and linearity of both pads and the slot round trip, schematic and post-layout, over corners, temperatures and supplies | [`tatzelbrumm/sg13cmos5l_cm_slot7`](https://github.com/tatzelbrumm/sg13cmos5l_cm_slot7/tree/chipalooza2-documentation/verification/c2_gaps/dc_curves) branch `chipalooza2-documentation`, `verification/c2_gaps/dc_curves/` (`results.md` §2b, `run.sh`); made 2026-11-24 |\n\nMapping of PROPOSAL.md",1)
+s=s.replace("rows 14–25 S2 and S9;","rows 14–25 S2 and S9 (row 16 also S12);")
+open(p,'w').write(s)
+EOF
+grep -n '^| 16 ' docs/PROPOSAL.md | cut -c1-200; grep -c S12 docs/SOURCES.md; grep -n "16 (D2S INL" docs/*.md ../sky130_cm_ip__single2diff2single_sudelbuecher/REVIEW_CHECKLIST.md | cut -c1-150
+```
+
+## Tool results / harness — 2026-11-25 01:36:23 UTC
+
+**Tool result:**
+
+```
+175:| 16 | D2S INL | `vdda` 3.3 … 3.6 V | | 0.5 mV | 10 mV | | 0.12 … 7.4 mV; post-layout 0.12 … 7.5 mV; at 3.0 V 10.9 … 87.4 mV (headroom limit, schematic) | TBD; at 3.0 V: TBD |
+175:| 16 | D2S INL | ±1 V differential, input common mode = vref = vcm (≈ 1.26 V), `vdda` 3.0 … 3.6 V | | 0.5 mV | 10 mV | | at the slot's operating point ≤ 1.38 mV at 3.0 V, ≤ 0.56 mV at 3.3
+1
+../sky130_cm_ip__single2diff2single_sudelbuecher/REVIEW_CHECKLIST.md:7:5. §4 target table: every value is a **target** chosen from IHP observed inter
+../sky130_cm_ip__single2diff2single_sudelbuecher/REVIEW_CHECKLIST.md:8:6. §4 column "sky130 sim": all TBD by decision. The "basis" column now include
+```
+
+## Assistant — 2026-11-25 01:36:27 UTC
+
+Updating two other places that still call 3.0 V a headroom limit for the D2S INL (port plan and review checklist), then pushing:
+
+## Assistant — 2026-11-25 01:36:28 UTC
+
+**Tool call: `Bash`**
+
+```bash
+grep -n "headroom" docs/*.md | cut -c1-200; grep -n "row 16\|16 (D2S" ../sky130_cm_ip__single2diff2single_sudelbuecher/REVIEW_CHECKLIST.md | cut -c1-300
+```
+
+## Tool results / harness — 2026-11-25 01:36:28 UTC
+
+**Tool result:**
+
+```
+docs/PORT_PLAN.md:15:| D2S pad `sg13cmos5l_IOPadDiff2Single` (class-AB, output devices in the clamp frame) | yes | class-AB driver with `g5v0d10v5`; output devices integrated with the pad library's cl
+docs/PROPOSAL.md:262:| model differences (sky130 thresholds, headroom of the 3.3 V devices at 3.0 V) | narrower input and output windows | windows set by replica bias; targets of rows 8, 16, 21 confir
+7:5. §4 target table: every value is a **target** chosen from IHP observed intervals with a margin (column "basis"); check margins, in particular rows 4, 5, 7 (mismatch), 16 (D2S INL at 3.0 V left TBD), 20 (THD), 29–30 (reference currents, tighter than IHP, tentative).
+8:6. §4 column "sky130 sim": all TBD by decision. The "basis" column now includes the IHP gap simulations of today (D2S post-layout rows 14–25, 31, 35; `vcm` / `vref` rows 27–28 with PEX and mismatch; bandgap row 29; notes under the table). Check that every target still has margin: closest are
+```
+
+## Assistant — 2026-11-25 01:36:34 UTC
+
+**Tool call: `Bash`**
+
+```bash
+sed -i 's/| swing and INL at 3.0 V (IHP headroom limit) |/| swing and INL at 3.0 V at the operating input common mode (IHP: INL ≤ 1.4 mV at vicm 1.26 V, but 88 mV at 1.65 V) |/' docs/PORT_PLAN.md && grep -c "vicm 1.26" docs/PORT_PLAN.md && ./scripts/render_proposal_pdf.sh >/dev/null 2>&1 && git add -A && git commit -q -m "Proposal row 16: D2S INL at the slot's operating point (vicm 1.26 V) is <= 1.38 mV also at 3.0 V; the 87 mV of the CACE suite come from its 1.65 V input common mode. SOURCES S12 (DC curves); port plan; PDF re-rendered
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push 2>&1 | tail -1
+cd ../sky130_cm_ip__single2diff2single_sudelbuecher && sed -i 's/16 (D2S INL at 3.0 V left TBD)/16 (D2S INL: now at the slot operating point, ≤ 1.38 mV at 3.0 V; condition changed from 3.3 … 3.6 V to 3.0 … 3.6 V)/; s/row 16 (D2S INL max 7.5 mV vs 10 mV)/row 16 (D2S INL ≤ 1.38 mV vs 10 mV at the operating point)/' REVIEW_CHECKLIST.md && grep -c "1.38 mV" REVIEW_CHECKLIST.md
+```
+
+## Tool results / harness — 2026-11-25 01:36:39 UTC
+
+**Tool result:**
+
+```
+1
+   400c866..492345d  main -> main
+2
+```
+
+## Assistant — 2026-11-25 01:36:41 UTC
+
+Row 16 is fixed and pushed (`492345d`). Now the restructure for readers. Looking at the candidate figures for the front page first:
+
+## Assistant — 2026-11-25 01:36:42 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/plots/rt_transfer_tt27.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 01:36:42 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 01:36:43 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/dc_curves/plots/d2s_corners_slot_schematic.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 01:36:43 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 01:36:53 UTC
+
+Both work for the front page: the round trip shows the whole slot's behaviour, and the D2S figure is at the slot's real operating point. Checking the exact result file names I'll link to:
+
+## Assistant — 2026-11-25 01:36:55 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && ls verification/c2_gaps/*/ | head -60; ls verification/c2_gaps/replica_bias/results verification/c2_gaps/d2s_pex/plots verification/c2_gaps/slot_modes_bg/*.png; sed -n 31,36p docs/chipalooza2_as_taped_out/README.md | cut -c1-100
+```
+
+## Tool results / harness — 2026-11-25 01:36:55 UTC
+
+**Tool result:**
+
+```
+verification/c2_gaps/d2s_pex/:
+README.md
+cace_pex.sh
+compare.py
+csv
+lvs_summary.txt
+pex_sense.py
+plots
+plots.py
+results.md
+run.sh
+sg13cmos5l_IOPadDiff2Single_magic_pex_2.spice
+
+verification/c2_gaps/dc_curves/:
+README.md
+cace_dc.sh
+collect.py
+common.py
+crosscheck.py
+csv
+d2s.py
+fetch.sh
+jobs_rt.txt
+mkgroups.py
+plots
+results.md
+roundtrip.py
+rt.py
+run.sh
+s2d.py
+tables
+vrefvcm.py
+
+verification/c2_gaps/replica_bias/:
+README.md
+analyze.py
+bias_dist_copy.py
+bias_dist_mc.py
+gds_cell_compare.py
+lvs_check.sh
+mc_collect.py
+results
+results.md
+run.sh
+run_cace.sh
+spdx_stamp.py
+
+verification/c2_gaps/slot_modes_bg/:
+README.md
+bg_core.py
+bg_core_dc.csv
+bg_core_diag.csv
+bg_core_ramp.csv
+bg_core_ramp.png
+designer_modes_rerun_ss.txt
+jobs_modes.txt
+plots.py
+results.md
+results_tables.md
+run.sh
+verification/c2_gaps/slot_modes_bg/bg_core_ramp.png
+verification/c2_gaps/slot_modes_bg/slot_powerup_ss_m40.png
+
+verification/c2_gaps/d2s_pex/plots:
+f3dB_per_corner.png
+inl_per_corner.png
+iqp_per_corner.png
+
+verification/c2_gaps/replica_bias/results:
+bias_dist
+bias_dist_copy_error.png
+cace_pex
+cace_schematic
+gds_compare.log
+lvs_pex.log
+mc
+pad_ref_rb_mc_hist.png
+pex
+tables.md
+Designer: Christoph Maier. Slot 7 turns a single-ended pad signal into a differential pair and back:
+bias distribution and replica-bias block that give the pads their reference currents and common-mode
+3.3 V control block with fail-safe enables. Sections 2 and 3 are the electrical documentation and th
+the pins, layout hierarchy and verific
+… [163 more characters cut]
+```
+
+## Assistant — 2026-11-25 01:37:28 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && python3 - <<'EOF'
+p='README.md'; s=open(p).read()
+title="# Slot 7: custom S2D / D2S pad pair with a bandgap-referenced replica bias (as taped out, November 2026)\n"
+i0=s.index(title)+len(title)
+i1=s.index("## 1. Which version was taped out")
+old=s[i0:i1]
+bq_start=old.index("> **Where this set comes from.**")
+bq_end=old.index("\nDesigner: Christoph Maier.")
+blockquote=old[bq_start:bq_end].strip()
+intro=old[bq_end:].strip()
+D="../../verification/c2_gaps/"
+top=f'''
+Designer: Christoph Maier. Chipalooza Challenge #2 (IHP sg13cmos5l), slot 7, taped out on 2026-11-09 as commit `158afc5` of
+this repository. No silicon results exist yet: every number below is a **simulation** (IHP sg13cmos5l; schematic or extracted
+layout as stated), and the design had no specification before it was characterized (proof of concept).
+
+## Slot 7 at a glance
+
+**What it is.** Two custom analog I/O pads that turn a single-ended pad voltage into a differential pair inside the chip
+(**S2D**, input pad `s7_an[0]`) and a differential pair back into a pad voltage (**D2S**, output pad `s7_an[1]`), with the gain
+set by matched devices (2 and ½), not by resistors. A small on-slot bandgap, a bias distribution and a replica-bias block give
+both pads their 5 µA references and their common-mode / reference voltages; 3.3 V glue with fail-safe enables selects the modes.
+In the default mode the D2S pad reproduces the S2D pad voltage, shifted by `vcm − vref` ≈ 0.77 V.
+
+![Signal and current flow of slot 7](pix/slot7_signal_flow.svg)
+
+*Figure 1: blocks, references and signal path (details in [§2.1](#21-signal-and-current-flow) and [glue_logic.md](glue_logic.md)).*
+
+![Round trip S2D → D2S, DC transfer at tt 27 °C](../../verification/c2_gaps/dc_curves/plots/rt_transfer_tt27.png)
+
+*Figure 2: what the slot does, end to end: D2S pad output vs S2D pad input in the default mode, tt 27 °C 3.3 V, with the
+slot's own replica `vcm` / `vref`. The shaded band is the input range where the output is within 1 mV of the straight line:
+−0.171 … 1.281 V in → 0.595 … 2.044 V out. Schematic, extracted (magic PEX) and KLayout-extracted pads lie on top of each
+other. Above about 1.5 V input the S2D outputs saturate and the output stops at about 2.25 V.*
+
+![Round trip error over corners](../../verification/c2_gaps/dc_curves/plots/rt_error_corners.png)
+
+*Figure 3: the same as an error (pad out − expected), at the corner extremes of the slot simulation. Over the intended input
+range 0 … 1 V the error is at most 0.86 mV at tt 27 °C and 6.1 mV at ff 125 °C 3.6 V.*
+
+![S2D pad DC transfer](../../verification/c2_gaps/dc_curves/plots/s2d_transfer_tt27_pex.png)
+
+*Figure 4: the input pad alone (S2D, extracted layout): `outp`, `outn`, their difference (= 2 (pad − vref)) and their common
+mode vs pad voltage; shaded: linear input range (error < 1 mV input-referred).*
+
+![D2S pad over corners at the slot operating point](../../verification/c2_gaps/dc_curves/plots/d2s_corners_slot_schematic.png)
+
+*Figure 5: the output pad alone (D2S) at the slot's operating point (input common mode = vref = 1.26 V, 1 kΩ + 100 pF load),
+5 process corners × 3 temperatures: output (top) and error from the ideal ½ (vinp − vinn) (bottom, shaded ±10 mV).*
+
+### Key numbers (simulation)
+
+| quantity | value | conditions | source |
+|---|---|---|---|
+| S2D gain (outp − outn)/(pad − vref) | 1.9985 … 1.9993 | 5 corners × 3 T × 3.0 … 3.6 V; schematic = extracted | [S2D data sheet](datasheets/sg13cmos5l_IOPadSingle2Diff.md) |
+| S2D linear input range (1 mV) | −0.157 … 1.296 V at tt 27 °C 3.3 V; high end ≥ 0.980 V at every corner | vref 0.49 V, vcm 1.26 V | [DC curves](../../verification/c2_gaps/dc_curves/results.md) §1b |
+| S2D −3 dB bandwidth | 1.24 … 1.67 MHz | extracted layout, 5 corners × 3 T | [S2D data sheet](datasheets/sg13cmos5l_IOPadSingle2Diff.md) |
+| D2S gain pad / (vinp − vinn) | 0.4983 … 0.5000 | schematic and extracted | [DC curves](../../verification/c2_gaps/dc_curves/results.md) §2b |
+| D2S INL over ±1 V differential | ≤ 0.56 mV at 3.3 V, ≤ 1.38 mV at 3.0 V | slot operating point (vicm 1.26 V), 1 kΩ | [DC curves](../../verification/c2_gaps/dc_curves/results.md) §2b |
+| D2S linear output range (10 mV) | 0.211 … 2.317 V at tt 27 °C; worst 0.328 … 2.258 V | 3.3 V, slot operating point, 1 kΩ | [DC curves](../../verification/c2_gaps/dc_curves/results.md) §2b |
+| D2S bandwidth, slew rate | 1.43 … 2.71 MHz, 1.59 … 2.79 V/µs | extracted layout, 10 … 300 pF | [D2S post-layout](../../verification/c2_gaps/d2s_pex/results.md) |
+| round-trip error, pad in 0 … 1 V | ≤ 0.86 mV (tt 27 °C); ≤ 6.5 mV (ff 125 °C 3.6 V) | default mode, replica bias | [slot data sheet](datasheets/slot_7_system.md), Figure 3 |
+| `vcm` / `vref` from the replica | 1.115 … 1.395 V / 0.436 … 0.596 V; mismatch σ 5.4 / 3.8 mV | corners × −40 … 125 °C × 3.0 … 3.6 V | [replica data sheet](datasheets/pad_ref_rb.md), [replica bias](../../verification/c2_gaps/replica_bias/results.md) |
+| bandgap reference current | 3.83 … 6.37 µA (typ. 4.96 µA) | set by the resistor corner (−21 % / +28 %) | [bandgap](../../verification/c2_gaps/slot_modes_bg/results.md) |
+| supply current, enabled | slot 48.4 … 49.7 µA; pad ring 365 … 396 µA | 5 corners | [slot data sheet](datasheets/slot_7_system.md) |
+| supply current, disabled / pad leakage unpowered | slot 25 … 56 nA, ring 9 … 58 nA / ≤ 67 nA at 125 °C | | [slot data sheet](datasheets/slot_7_system.md), §2.2 |
+
+**Verification status.** Slot layout: KLayout DRC clean, LVS match (497 devices); both pads DRC clean and KLayout LVS match
+(magic LVS: only the accepted `vss` / `iovss` substrate merge); the chip GDS contains `158afc5` unchanged (XOR 0). Not done:
+PEX of the whole slot, ESD / latch-up simulation of the pads, silicon measurement. The Oguey–Aebischer core `oa_core_pd` is
+**not** in the taped-out slot (see [§8](#8-about-this-document-set)). Details: [§5](#5-verification-state), [signoff](../../signoff/README.md).
+
+## Where to find what
+
+| question | go to |
+|---|---|
+| How is the slot built, block by block? | [§2](#2-electrical-function); schematics: [pix/schematics/](pix/schematics/README.md); layout: [pix/layout/](pix/layout/README.md) |
+| What do the modes and the `dig_in` bits do? | [§2.4](#24-modes), [glue_logic.md](glue_logic.md) |
+| Which pins, where? | [§4](#4-physical-interface-and-layout-hierarchy) |
+| What does each pad do, in numbers? | data sheets: [S2D](datasheets/sg13cmos5l_IOPadSingle2Diff.md), [D2S](datasheets/sg13cmos5l_IOPadDiff2Single.md), [replica bias](datasheets/pad_ref_rb.md), [whole slot](datasheets/slot_7_system.md) ([how the data sheets were made](datasheets/README.md)) |
+| DC transfer, input / output range, linearity | [DC curves](../../verification/c2_gaps/dc_curves/README.md) (36 figures; read `results.md` first) |
+| What was verified, and what is open? | [§3](#3-readiness-of-the-blocks-that-were-kicked-off), [§5](#5-verification-state), [§5a](#5a-gap-simulations-of-2026-11-23), [signoff](../../signoff/README.md) |
+| How to measure the chip | [TEST_PLAN.md](TEST_PLAN.md) |
+| Earlier test platforms (not taped out) | [test_platforms.md](test_platforms.md) |
+| How this set was made; AI assistance | [§8](#8-about-this-document-set), [log.md](log.md), [../AI_ASSISTANCE.md](../AI_ASSISTANCE.md) |
+
+'''
+s=s[:i0]+top+s[i1:]
+s=s.rstrip()+"\n\n## 8. About this document set\n\n"+blockquote+"\n\n"+intro.replace("Designer: Christoph Maier. ","Original introduction: ")+"\n"
+open(p,'w').write(s)
+EOF
+grep -n '^#' README.md
+```
+
+## Tool results / harness — 2026-11-25 01:37:29 UTC
+
+**Tool result:**
+
+```
+5:# Slot 7: custom S2D / D2S pad pair with a bandgap-referenced replica bias (as taped out, November 2026)
+11:## Slot 7 at a glance
+45:### Key numbers (simulation)
+67:## Where to find what
+81:## 1. Which version was taped out
+101:## 2. Electrical function
+103:### 2.1 Signal and current flow
+131:### 2.2 Supplies, enable and fail-safe
+143:### 2.3 The blocks
+158:### 2.4 Modes
+175:### 2.5 Expected values
+182:## 3. Readiness of the blocks that were kicked off
+204:## 4. Physical interface and layout hierarchy
+206:### 4.1 Top level
+226:### 4.2 Pads
+269:### 4.3 Hierarchy of `slot_7` (from `final/gds/slot_7.gds` of `158afc5`, read on 2026-11-22)
+291:## 5. Verification state
+308:## 5a. Gap simulations of 2026-11-23
+320:## 6. Files
+338:## 7. Aside: the tughra
+362:## 8. About this document set
+```
+
+## Assistant — 2026-11-25 01:37:38 UTC
+
+Answering your question as I go. The front page is restructured; now adding figure sections to the four data sheets.
+
+## Assistant — 2026-11-25 01:37:39 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/datasheets && ls ../../../verification/c2_gaps/dc_curves/plots/*.png | xargs -n1 basename | tr '\n' ' '; grep -n "^## " sg13cmos5l_IOPadSingle2Diff.md | head; tail -3 sg13cmos5l_IOPadSingle2Diff.md
+```
+
+## Tool results / harness — 2026-11-25 01:37:40 UTC
+
+**Tool result:**
+
+```
+d2s_corners_3v0_schematic.png d2s_corners_noload_schematic.png d2s_corners_pex.png d2s_corners_schematic.png d2s_corners_slot_3v0_schematic.png d2s_corners_slot_schematic.png d2s_linearity_criterion.png d2s_range.png d2s_range_noload.png d2s_range_slot.png d2s_transfer_tt27_pex.png d2s_transfer_tt27_schematic.png rt_error_corners.png rt_transfer_tt27.png s2d_corners_pex.png s2d_corners_schematic.png s2d_linearity_criterion.png s2d_range.png s2d_range_slot.png s2d_transfer_tt27_pex.png s2d_transfer_tt27_schematic.png s2d_vrefvcm_range.png 16:## Pins
+33:## Default conditions
+50:## Specification (ex post facto, as characterized)
+167:## CACE run summaries (designer's working limits): schematic
+342:## CACE run summaries (designer's working limits): post-layout (magic PEX, C-coupled)
+482:## What is not in this sheet
+- Whether the simulated netlist equals the block as taped out (see `../characterization_candidates.md`).
+- Monte Carlo statistics beyond what the group's own summary reports (min / typ / max over the runs).
+- Measurements on silicon: none exist at the time of writing.
+```
+
+## Assistant — 2026-11-25 01:37:43 UTC
+
+**Tool call: `Bash`**
+
+```bash
+for f in *.md; do echo "$f: $(grep -n '^## ' $f | head -4 | tr '\n' ' ')"; done
+```
+
+## Tool results / harness — 2026-11-25 01:37:43 UTC
+
+**Tool result:**
+
+```
+README.md: 24:## Taped-out circuits without a data sheet, and why 33:## Data that are explicitly not used here 
+en_ctrl_3v3_level_shifter.md: 16:## Pins 33:## Default conditions 44:## Specification (ex post facto, as characterized) 86:## CACE run summaries (designer's working limits): schematic 
+pad_ref_rb.md: 16:## Pins 28:## Default conditions 42:## Specification (ex post facto, as characterized) 75:## CACE run summaries (designer's working limits): schematic 
+sg13cmos5l_IOPadDiff2Single.md: 16:## Pins 32:## Default conditions 50:## Specification (ex post facto, as characterized) 138:## CACE run summaries (designer's working limits): schematic 
+sg13cmos5l_IOPadSingle2Diff.md: 16:## Pins 33:## Default conditions 50:## Specification (ex post facto, as characterized) 167:## CACE run summaries (designer's working limits): schematic 
+slot_7_system.md: 15:## 1. Corner table (`results.txt`) 38:## 2. Modes (`modes.txt`) 73:## 3. Not covered
+```
+
+## Assistant — 2026-11-25 01:38:04 UTC
+
+**Tool call: `Bash`**
+
+```bash
+python3 - <<'EOF'
+V="../../../verification/c2_gaps/"
+S="../pix/schematics/"; L="../pix/layout/"
+note="<!-- Figures section added by hand on 2026-11-25, not produced by tools/make_datasheet.py: keep it when regenerating. -->\n"
+def fig(path,cap): return f"![{cap.split(':')[0]}]({path})\n\n*{cap}*\n\n"
+sections={
+"sg13cmos5l_IOPadSingle2Diff.md": ("## Specification (ex post facto, as characterized)",
+ "## Figures\n\n"+note+"\n"
+ +fig(V+"dc_curves/plots/s2d_transfer_tt27_pex.png","DC transfer, extracted layout, tt 27 °C 3.3 V: outp, outn, difference and common mode vs pad; shaded: linear input range (error < 1 mV input-referred)")
+ +fig(V+"dc_curves/plots/s2d_corners_pex.png","Difference and error vs the ideal 2 (pad − vref) over 5 corners × 3 temperatures, extracted layout")
+ +fig(V+"dc_curves/plots/s2d_range_slot.png","Linear input range per corner and supply at the slot's vref 0.49 V / vcm 1.26 V (schematic)")
+ +fig(V+"dc_curves/plots/s2d_vrefvcm_range.png","Linear input range vs the vref and vcm settings (schematic)")
+ +f"Schematics: [pad top]({S}sg13cmos5l_IOPadSingle2Diff.svg), [core amplifier s2d_mpdda]({S}s2d_mpdda.svg), [with power-down s2d_mpdda_pd]({S}s2d_mpdda_pd.svg), [matched unit unit_r2]({S}unit_r2.svg), [bias tree]({S}bias_tree_noab_pd.svg), [ESD]({S}s2d_pad_esd.svg). "
+ +f"Layout: [all layers]({L}IOPadSingle2Diff.png), [Metal2 and below]({L}IOPadSingle2Diff_frontend.png). More figures and the range tables: [DC curves]({V}dc_curves/README.md).\n\n"),
+"sg13cmos5l_IOPadDiff2Single.md": ("## Specification (ex post facto, as characterized)",
+ "## Figures\n\n"+note+"\n"
+ +fig(V+"dc_curves/plots/d2s_corners_slot_schematic.png","Output and error vs the ideal ½ (vinp − vinn) at the slot's operating point (vicm = vref = 1.26 V, 1 kΩ + 100 pF), 5 corners × 3 temperatures, 3.3 V (schematic; extracted layout within 0.7 mV)")
+ +fig(V+"dc_curves/plots/d2s_corners_slot_3v0_schematic.png","The same at iovdd 3.0 V: INL over ±1 V stays ≤ 1.38 mV at this operating point")
+ +fig(V+"dc_curves/plots/d2s_range_slot.png","Linear output range (error < 10 mV) per corner and supply at the slot's operating point")
+ +fig(V+"dc_curves/plots/d2s_corners_3v0_schematic.png","For comparison: the CACE test condition vicm = vref = 1.65 V at 3.0 V, where the 87 mV INL of the CACE table comes from (headroom at this common mode, not at the slot's)")
+ +fig(V+"d2s_pex/plots/f3dB_per_corner.png","Closed-loop −3 dB bandwidth per corner, schematic vs extracted layout")
+ +f"Schematics: [pad top]({S}sg13cmos5l_IOPadDiff2Single.svg), [driver d2s_mpdda_pd]({S}d2s_mpdda_pd.svg), [output stage P]({S}d2s_out_p.svg), [output stage N]({S}d2s_out_n.svg), [bias tree]({S}bias_tree_pd.svg). "
+ +f"Layout: [all layers]({L}IOPadDiff2Single.png), [Metal2 and below]({L}IOPadDiff2Single_frontend.png). Post-layout CACE of all groups: [D2S post-layout]({V}d2s_pex/results.md) (this sheet's tables are schematic only).\n\n"),
+"pad_ref_rb.md": ("## Specification (ex post facto, as characterized)",
+ "## Figures\n\n"+note+"\n"
+ +fig(V+"replica_bias/results/pad_ref_rb_mc_hist.png","vcm and vref, 100-run mismatch Monte Carlo, tt 27 °C 3.3 V (schematic): σ 5.4 mV / 3.8 mV")
+ +fig(V+"replica_bias/results/bias_dist_copy_error.png","bias_dist_pd: copy error of the 5 µA reference per output over corners, temperatures and output voltage")
+ +f"Schematics: [pad_ref_rb]({S}pad_ref_rb.svg), [bias_tree_rb]({S}bias_tree_rb.svg), [vcm_rb]({S}vcm_rb.svg), [vref_s2d_rb]({S}vref_s2d_rb.svg), [bypass_rb]({S}bypass_rb.svg), [bias_dist_pd]({S}bias_dist_pd.svg). "
+ +f"Layout: [pad_ref_rb]({L}slot_7_pad_ref_rb.png). Post-layout (C-coupled PEX) equals the schematic in DC to 0.1 mV: [replica bias]({V}replica_bias/results.md).\n\n"),
+"slot_7_system.md": ("## 1. Corner table (`results.txt`)",
+ "## Figures\n\n"+note+"\n"
+ +fig(V+"dc_curves/plots/rt_transfer_tt27.png","Round trip S2D → D2S in the default mode, tt 27 °C 3.3 V, replica vcm / vref; pads schematic, magic PEX and KLayout-extracted")
+ +fig(V+"dc_curves/plots/rt_error_corners.png","Round-trip error vs expected at the corner extremes of this sheet's table")
+ +fig(V+"slot_modes_bg/slot_powerup_ss_m40.png","Power-up from 0 V at ss −40 °C 3.0 V: every mode settles (the DC failures in the mode table below are a simulator artefact)")
+ +fig(V+"slot_modes_bg/bg_core_ramp.png","bg_core_pd start-up for 1 µs and 1 ms supply ramps")
+ +f"Schematic: [slot_7]({S}slot_7.svg), [s7_ctrl]({S}s7_ctrl.svg), [bg_core_pd]({S}bg_core_pd.svg). Layout: [slot_7]({L}slot_7.png). Analysis of the mode failures: [slot modes and bandgap]({V}slot_modes_bg/results.md).\n\n"),
+}
+import os
+for f,(anchor,txt) in sections.items():
+    s=open(f).read(); assert s.count(anchor)==1,(f,anchor)
+    s=s.replace(anchor,txt+anchor,1); open(f,'w').write(s)
+# check every link target exists
+import re
+for f in sections:
+    for m in re.findall(r'\]\(([^)#]+)\)', open(f).read()):
+        if m.startswith('http'): continue
+        if not os.path.exists(os.path.normpath(os.path.join('.',m))): print("MISSING",f,m)
+for m in re.findall(r'\]\(([^)#]+)\)', open('../README.md').read()):
+    if m.startswith('http'): continue
+    if not os.path.exists(os.path.normpath(os.path.join('..',m))): print("MISSING README",m)
+print("link check done")
+EOF
+```
+
+## Tool results / harness — 2026-11-25 01:38:04 UTC
+
+**Tool result:**
+
+```
+link check done
+```
+
+## Assistant — 2026-11-25 01:38:06 UTC
+
+All links resolve. Now the repository's front door: making the appended section of the root `README.md` (the only part I may edit there) start with a clear "start here".
+
+## Assistant — 2026-11-25 01:38:11 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && python3 - <<'EOF'
+p='README.md'; s=open(p).read()
+a="## Further documentation\n\nAdded after the tapeout; the files above are unchanged.\n"
+assert a in s
+s=s.replace(a,"## Further documentation\n\nAdded after the tapeout; the files above are unchanged.\n\n**Start here: [`docs/chipalooza2_as_taped_out/README.md`](docs/chipalooza2_as_taped_out/README.md)** — slot 7 at a glance\n(what it does, five figures, key numbers, verification status) and a table of where to find what.\n")
+open(p,'w').write(s)
+EOF
+git diff --stat; git diff README.md | grep '^[-+]' | grep -v '^+++\|^---' | head; git add -A docs README.md && git commit -q -m "Reader-facing structure: 'Slot 7 at a glance' (five figures, key numbers with sources, verification status) and 'Where to find what' at the top of the Chipalooza #2 description; provenance moved to section 8; figure sections in the S2D, D2S, replica-bias and slot data sheets; 'Start here' link in the appended README section
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push 2>&1 | tail -1
+```
+
+## Tool results / harness — 2026-11-25 01:38:13 UTC
+
+**Tool result:**
+
+```
+README.md                                          |   3 +
+ docs/chipalooza2_as_taped_out/README.md            | 131 ++++++++++++++++-----
+ .../datasheets/pad_ref_rb.md                       |  14 +++
+ .../datasheets/sg13cmos5l_IOPadDiff2Single.md      |  26 ++++
+ .../datasheets/sg13cmos5l_IOPadSingle2Diff.md      |  22 ++++
+ .../datasheets/slot_7_system.md                    |  22 ++++
+ 6 files changed, 190 insertions(+), 28 deletions(-)
++**Start here: [`docs/chipalooza2_as_taped_out/README.md`](docs/chipalooza2_as_taped_out/README.md)** — slot 7 at a glance
++(what it does, five figures, key numbers, verification status) and a table of where to find what.
++
+   c4b33f5..57372f0  chipalooza2-documentation -> chipalooza2-documentation
+```
+
+## Assistant — 2026-11-25 01:38:42 UTC
+
+**Tool call: `Agent`**
+
+_AC, transient, noise figures_
+
+```
+Produce AC, transient and noise FIGURES (curves, not only tables) for the taped-out IHP sg13cmos5l Chipalooza #2 slot 7: the S2D and D2S custom pads and the slot round trip S2D → D2S. Today these exist only as CACE scalar tables; reviewers need Bode plots, waveforms and spectra. Correct, readable, labelled, reproducible; no invented numbers.
+
+Prior work to reuse (read first): /home/user/sg13cmos5l_cm_slot7 branch `chipalooza2-documentation`:
+- `verification/c2_gaps/dc_curves/` (README.md, results.md, run.sh, common.py, s2d.py, d2s.py, rt.py, roundtrip.py, cace_dc.sh, fetch.sh): how the pads' own committed CACE testbenches were reused with only the analysis block replaced; plot style, colours per corner, label conventions; how the slot round trip is simulated in the designer's tier-1 slot deck with schematic / magic PEX / KLayout-extracted pads; operating points (S2D: vref 0.5 V, vcm 1.2 V in CACE; slot: vref 0.49 V, vcm 1.26 V; D2S at the slot operating point vicm = vref = 1.26 V, 1 kΩ + 100 pF; CACE D2S condition vicm 1.65 V). The D2S needs ngspice option rshunt=1e12 in both views for convergence (documented there).
+- `verification/c2_gaps/d2s_pex/` (D2S magic PEX netlist and method), `verification/c2_gaps/slot_modes_bg/` (slot power-up transients).
+- Committed CACE results for the scalar values to cross-check against: design repo https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single at 91a7da8b67ac56a26c605501146667a1fde28c32 (pads; S2D has schematic + PEX results) and 9052bd35928c6d40344e8e686c9abbe736bfadb9 (slot tier-1). Do NOT clone whole (~160 MB): `git clone --depth 1 --filter=blob:none --no-checkout`, `git fetch --depth 1 origin <commit>`, `git show`/`git archive`. The dc_curves fetch.sh may already do this.
+Environment: IHP PDK /foss/pdks/ihp-sg13cmos5l (PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l), ngspice + IHP OSDI, CACE 2.11, Python3 + matplotlib. 4 CPUs, you are the only job: up to 3 parallel ngspice. Scratch: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/actran.
+
+Figures, priority order (schematic and magic PEX where both exist; label which; corners tt/ss/ff/sf/fs × −40/27/125 °C as families where it adds information, otherwise tt 27 °C plus the extremes):
+1. Round trip in the slot (default mode, tier-1 deck, replica bias): (a) small-signal transfer pad_s2d → pad_d2s, magnitude and phase vs frequency, at pad_s2d DC 0.5 V, D2S output unloaded and with 1 kΩ ∥ 10 / 100 pF; −3 dB bandwidth per corner; (b) step response through the loop (e.g. 0.25 → 0.75 V input step, 10 ns edge), pad_s2d and pad_d2s vs time, settling marked; (c) a 10 kHz sine (0 … 1 V) through the loop: input, output and output − expected vs time, plus THD.
+2. S2D alone (CACE ac / tran testbench conditions): closed-loop Bode of (outp − outn)/(pad − vref) gain and phase; output common-mode response vs frequency; step response waveforms (outp, outn, difference) at 0.001 and 0.5 pF loads (the CACE cload values).
+3. D2S alone: Bode at the CACE loads (10 pF, 100 pF, 300 pF, 1 nF; 1 kΩ and unloaded) showing the peaking; output impedance vs frequency; PSRR (iovdd) vs frequency; large-signal step waveforms (slew) at 10 / 100 / 300 pF; at the slot operating point vicm 1.26 V where it differs from the CACE vicm 1.65 V.
+4. Noise: input-referred noise spectral density of the S2D and output noise density of the D2S vs frequency (10 Hz … 10 MHz), with the integrated values.
+5. Enable transients: S2D and D2S output and supply current at enable / disable.
+For each figure state conditions in the title; one idea per figure; PNG 150 dpi < 300 kB (+ SVG if small).
+
+Cross-check: your scalar values (bandwidth, peaking, slew, settling, noise at 1 kHz / 100 kHz, PSRR) must agree with the committed CACE CSVs at the same conditions; tabulate the comparison and explain any difference > 2 %.
+
+Deliverables (write ONLY here; do NOT run git commands that change state; I commit): /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/ac_tran/ with README.md (what each figure shows, how to read it, versions incl. `ngspice -v`, source commits, what it does NOT show), results.md (key numbers, cross-check table), run.sh reproducing everything, scripts, plots/, small CSV summaries < 300 kB. No raw files; total < 6 MB. Do not modify existing files. SPDX headers (`SPDX-FileCopyrightText: 2026 Christoph Maier`, `SPDX-License-Identifier: Apache-2.0`). Label "IHP sg13cmos5l simulation (schematic | magic PEX)". Write README.md and results.md early and keep them consistent as figures are added (the container may restart; a partial folder must explain itself).
+
+Report in under 400 words: figure list (one line each), key numbers, cross-check result, failures / TBDs.
+```
+
+## Tool results / harness — 2026-11-25 01:38:42 UTC
+
+**Tool result:**
+
+```
+Async agent launched successfully. (This tool result is internal metadata — never quote or paste any part of it, including the agentId below, into a user-facing reply.)
+agentId: a623e8daa9a4f01d3 (internal ID - do not mention to user. Use SendMessage with to: 'a623e8daa9a4f01d3', summary: '<5-10 word recap>' to continue this agent.)
+The agent is working in the background. You will be notified automatically when it completes. You know nothing about its results until that notification arrives — do not report, assume, or predict them; continue other work or respond to the user in the meantime.
+Do not duplicate this agent's work — avoid working with the same files or topics it is using.
+output_file: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/a623e8daa9a4f01d3.output
+Do NOT Read or tail this file via the shell tool — it is the full subagent JSONL transcript and reading it will overflow your context. If the user asks for progress, say the agent is still running; you'll get a completion notification.
+```
+
+## Assistant — 2026-11-25 01:38:51 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sky130_cm_ip__single2diff2single_sudelbuecher && cat >> RUNLOG.md <<'EOF'
+- (2026-11-25) User: fix proposal row 16 and embed the graphs; "still quite lost in the wealth of information, and so will be the reviewers". Done:
+  - [NEW] `492345d`: row 16 now at the slot operating point (vicm 1.26 V): D2S INL ≤ 1.38 mV at 3.0 V, ≤ 0.56 mV at 3.3 V; the 87–88 mV at 3.0 V come from CACE's 1.65 V input common mode. SOURCES S12; PORT_PLAN; PDF re-rendered; REVIEW_CHECKLIST items 5 / 6.
+  - [S7] `57372f0`: top of `docs/chipalooza2_as_taped_out/README.md` restructured: "Slot 7 at a glance" (what it is, five figures: signal flow, round-trip transfer, round-trip error over corners, S2D transfer, D2S at the slot operating point; key-numbers table with a source link per row; verification status) and "Where to find what" (question → link); provenance note moved to §8. Figure sections (with schematic and layout links) inserted into the S2D, D2S, pad_ref_rb and slot_7_system data sheets (marked as added by hand, not by make_datasheet.py). "Start here" link at the top of the appended section of the root README. All relative links checked by script.
+- User asked whether AC, transient and round-trip simulations exist. Answer: AC and transient only as CACE scalar tables (plus D2S bandwidth bars, slot power-up and bandgap ramp plots); round trip only DC. Background agent started for AC / transient / noise figures (round-trip Bode, step and sine through the loop; S2D / D2S Bode, step waveforms, Zout and PSRR vs frequency; noise spectra; enable transients), results to [S7] `verification/c2_gaps/ac_tran/`.
+EOF
+chatlog/tools/export_all.sh && git add -A && git commit -q -m "Run log: row 16, reader-facing restructure, AC / transient job; checklist; chat logs
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push 2>&1 | tail -1
+```
+
