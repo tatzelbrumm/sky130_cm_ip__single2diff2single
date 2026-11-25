@@ -12,7 +12,7 @@ the sky130 feasibility results.
 | block (IHP name) | in taped-out IHP slot 7 | port to sky130 | first check |
 |---|---|---|---|
 | S2D pad `sg13cmos5l_IOPadSingle2Diff` (DDA `s2d_mpdda`, own bias tree, ESD) | yes | core amplifier with `g5v0d10v5` devices, re-sized for the sky130 thresholds; ESD from the sky130 pad library inside a cell of foundry-pad size | gain, input window 0 … 1 V at `vdda` 3.0 V, CM error |
-| D2S pad `sg13cmos5l_IOPadDiff2Single` (class-AB, output devices in the clamp frame) | yes | class-AB driver with `g5v0d10v5`; output devices integrated with the pad library's clamp structure (approval) | swing and INL at 3.0 V (IHP headroom limit) |
+| D2S pad `sg13cmos5l_IOPadDiff2Single` (class-AB, output devices in the clamp frame) | yes | class-AB driver with `g5v0d10v5`; output devices integrated with the pad library's clamp structure (approval) | swing and INL at 3.0 V at the operating input common mode (IHP: INL ≤ 1.4 mV at vicm 1.26 V, but 88 mV at 1.65 V) |
 | `bg_core_pd` (Banba, `pnpMPA`, `rhigh`) | yes | sky130 vertical PNP, `res_xhigh_po` / `res_high_po`, start-up | current over PVT, start-up transient |
 | `oa_core_pd` (Oguey–Aebischer) | no (IHP test platforms only) | MOS-only, `g5v0d10v5` | current over PVT |
 | `bias_dist_pd`, bias trees | yes | same topology; 4-way reference select (new) | switch truth table |

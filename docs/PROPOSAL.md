@@ -172,7 +172,7 @@ ratings (the 3.3 V devices are the 5 V-class `g5v0d10v5` devices; exact rated va
 | 13 | S2D pad-ring supply current, enabled | default bias | | 116 µA | 135 µA | | 114.6 … 116.9 µA | TBD |
 | 14 | D2S gain `(pad−vref)/(vinp−vinn)` incl. mismatch | 3.3 … 3.6 V | 0.49 | 0.50 | 0.51 | | 0.4981 … 0.5000; post-layout 0.4983 … 0.5000; 0.4939 … 0.5085 (mismatch, schematic) | TBD |
 | 15 | D2S output offset incl. mismatch | | −20 mV | 0 | 20 mV | | 0.035 … 1.95 mV (PVT); post-layout 0.044 … 1.75 mV; −11.4 … 10.1 mV (mismatch, schematic) | TBD |
-| 16 | D2S INL | `vdda` 3.3 … 3.6 V | | 0.5 mV | 10 mV | | 0.12 … 7.4 mV; post-layout 0.12 … 7.5 mV; at 3.0 V 10.9 … 87.4 mV (headroom limit, schematic) | TBD; at 3.0 V: TBD |
+| 16 | D2S INL | ±1 V differential, input common mode = vref = vcm (≈ 1.26 V), `vdda` 3.0 … 3.6 V | | 0.5 mV | 10 mV | | at the slot's operating point ≤ 1.38 mV at 3.0 V, ≤ 0.56 mV at 3.3 V, ≤ 0.50 mV at 3.6 V (schematic and post-layout agree within 0.001 mV); the 87 … 88 mV at 3.0 V of the CACE suite are an artefact of its 1.65 V input common mode | TBD |
 | 17 | D2S −3 dB bandwidth | 10 … 300 pF | 1 MHz | 2 MHz | | | 1.58 … 3.01 MHz; post-layout 1.43 … 2.71 MHz | TBD |
 | 18 | D2S gain peaking | ≤ 300 pF | | 0 dB | 4 dB | | ≤ 2.9 dB; post-layout ≤ 2.5 dB | TBD |
 | 19 | D2S slew rate | 10 … 300 pF | 1 V/µs | 2.4 V/µs | | | 1.76 … 3.17 V/µs; post-layout 1.59 … 2.79 V/µs (settling 0.35 … 0.55 µs, overshoot ≤ 8 %) | TBD |
