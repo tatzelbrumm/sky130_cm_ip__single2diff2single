@@ -8573,3 +8573,57 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push 2>&1 | tail -1
 ```
 
+## Tool results / harness — 2026-11-25 03:29:37 UTC
+
+**Tool result:**
+
+```
+1
+   b345b40..5867728  main -> main
+   98a691a..8a4a8a5  sudel_buecher -> sudel_buecher
+```
+
+## Assistant — 2026-11-25 03:29:46 UTC
+
+The D2S re-run is done, and the documentation now describes the taped-out D2S circuit throughout. One proposal target needs your decision.
+
+**The re-run** (`c215450` on `chipalooza2-documentation`, in `verification/c2_gaps/d2s_schematic_rerun/`):
+- **Right netlist:** before running, the job checked that the netlist CACE simulates is the taped-out pad's netlist. The only difference is a substrate tie used in simulation only.
+- **Coverage:** all 15 groups, 189 runs, including mismatch with the per-run data kept this time.
+
+The data sheet `datasheets/sg13cmos5l_IOPadDiff2Single.md` is now regenerated from these results. 78 of its 79 rows are inside the working limits; the one outside is D2S gain with mismatch, at 0.48877 against a limit of 0.49, in 1 of 30 runs.
+
+Against the earlier committed results, the bias currents are up 3–5 % and the turn-on time is 15–53 % longer. Output impedance at 1 kHz is up to 17 % lower. Gain, bandwidth, supply rejection, slew rate, distortion and noise stay within 2 %.
+
+**A correction to what I reported on Monday.** Measured against the current schematic, the layout leaves the D2S DC behaviour unchanged: currents within 0.02 %, INL within 0.75 %. It lowers bandwidth and slew rate by about 11 % and makes settling and enable about 10 % slower, enable up to 31 %. The "+5 % current" and "up to +94 % enable time" I reported then came from the stale reference, not from the layout. I corrected that in four places:
+- the comparison plot, redrawn
+- `HOW_IT_WORKS.md`
+- the §5a summary on the front page
+- the D2S post-layout results file
+
+The stale-results warnings are gone.
+
+**The proposal** (`5867728` on `main`): D2S rows 14, 15, 22, 23, 25 and 31 now take their schematic values from the re-run, cited as source S13. `PROPOSAL.pdf` is re-rendered.
+
+**Decision for you, row 14:** the target for D2S gain including mismatch is 0.49 … 0.51. The IHP mismatch samples run from 0.4888 to 0.5051, with σ 0.0037, so one sample falls below the target's minimum. Options:
+- **Widen the target**, for example to 0.485 … 0.515, which is about ±3σ plus the systematic error.
+- **Keep it**, and state that the IHP basis already misses it.
+
+The row is flagged in the proposal and is item 13 of `REVIEW_CHECKLIST.md`.
+
+## User (or harness) — 2026-11-25 03:34:40 UTC
+
+still working on something, or waiting for my input?
+In any case, keep the chatlog up to date, your work needs to be documented.
+
+## Assistant — 2026-11-25 03:34:45 UTC
+
+**Tool call: `Bash`**
+
+```bash
+chatlog/tools/export_all.sh && git add -A && git commit -q -m "Chat logs regenerated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push 2>&1 | tail -1; tail -3 chatlog/session_2026-11-23_main.md | cut -c1-120; for d in /home/user/sg13cmos5l_cm_slot7 /home/user/sky130_cm_ip__single2diff2single .; do echo "$d dirty=$(git -C $d status --short | wc -l)"; done
+```
+
