@@ -1150,3 +1150,2585 @@ X6 iovdd s2d_block_0.s2d_casc_n_f_0.vbnc s2d_block_0.s2d_casc_n_f_0.yc iovss sg1
 … [1163 more characters cut]
 ```
 
+## Assistant — 2026-11-25 14:09:27 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PDKPATH=/foss/pdks/ihp-sg13cmos5l && for T in sg13cmos5l_IOPadSingle2Diff sg13cmos5l_IOPadDiff2Single; do for m in c rc0; do d=pads_$m/$T; mkdir -p $d; cp ../../../../pads/$T/$T.gds $d/; if [ $m = c ]; then o="-m 2"; else o="-m 3 -t 0 -r 100 -y 0"; fi; ( time sak-pex.sh -d $o -n ${T}_pex -w $d $d/$T.gds ) > $d/run.log 2>&1; echo "$T $m: $(grep -E 'Nets extracted|Nets output|real' $d/run.log | tr '\n' ' ')"; awk '{print toupper(substr($1,1,1))}' $d/$T.pex.spice | sort | uniq -c | tr '\n' ' '; echo; done; done
+```
+
+## Tool results / harness — 2026-11-25 14:09:34 UTC
+
+**Tool result:**
+
+```
+sg13cmos5l_IOPadSingle2Diff c: real	0m0.885s 
+      2        2 *       1 +       2 .     573 C     225 X 
+sg13cmos5l_IOPadSingle2Diff rc0: Nets extracted: 32 (0.380952) Nets output: 32 (0.380952) real	0m2.298s 
+      2        2 *       1 +       2 .    1894 C   10722 R     225 X 
+sg13cmos5l_IOPadDiff2Single c: real	0m1.181s 
+      2        2 *       1 +       2 .     482 C     293 X 
+sg13cmos5l_IOPadDiff2Single rc0: Nets extracted: 32 (0.463768) Nets output: 32 (0.463768) real	0m2.936s 
+      2        2 *       1 +       2 .    2507 C    9491 R     293 X
+```
+
+## Assistant — 2026-11-25 14:09:53 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cat docs/chipalooza2_as_taped_out/datasheets/slot_7_system.md | head -150; ls verification/c2_gaps/slot_modes_bg
+```
+
+## Tool results / harness — 2026-11-25 14:09:53 UTC
+
+**Tool result:**
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# slot_7 as a whole (taped-out circuit): tier-1 simulation data sheet
+
+> **Scope.** This is the only characterization of the **slot circuit as a system** and not a CACE suite: the designer's tier-1 simulation
+> of the slot-7 netlist with the two custom pads and the replica bias, from the design repository at `9052bd35` (v3, the version the delivery cites; the delivery states v3 has the same geometry as the v2 these runs
+> were started on, with renamed bandgap cells, and the taped-out `slot_7.gds` is v3 plus the tughra art, which has no devices or pins).
+> Blocks with a layout were simulated **from their extracted layout netlists** (both pads, `pad_ref_rb`, `bias_dist_pd`); `bg_core_pd` from its schematic netlist; `ls_up_fs` from its source netlist
+> (it had no layout at the time of the run). The slot's `s7_ctrl` glue was simulated in the mode runs. Slot `vdd_3v3` and pad-ring `iovdd` both 3.3 V (3.0 / 3.6 V at the corners), harness enable 1.2 V, S2D input swept 0 … 1.0 V, D2S output unloaded (1 GΩ);
+> expected D2S out = `vcm` + (in − `vref`). Source files: [`docs/slot7_hookup/tier1/results.txt`](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single/blob/9052bd35928c6d40344e8e686c9abbe736bfadb9/docs/slot7_hookup/tier1/results.txt), [`modes.txt`](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single/blob/9052bd35928c6d40344e8e686c9abbe736bfadb9/docs/slot7_hookup
+… [5661 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:10:03 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_modes_bg && sed -n 1,400p slot_modes.py; cat jobs_modes.txt | head -30; head -5 slot_modes_powerup.csv
+```
+
+## Tool results / harness — 2026-11-25 14:10:03 UTC
+
+**Tool result:**
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Slot 7 modes from power-up (IHP sg13cmos5l simulation): transient power-up, enable, mode bits, pad-in staircase.
+
+usage: python3 -I slot_modes.py <design-repo-tree> <work-dir> <out-dir> <job> [<job> ...]
+  job = <mode>:<mos>:<temp>:<vdd>[:<variant>]   e.g. swap:ss:-40:3.0
+  variant: "pu" (default; power-up transient, see below), "dcop" (the designer's DC sweep as in run_modes.py, stderr kept),
+           "dcns" (dcop plus .nodeset of the bandgap nodes g / vpc / vpg / ks / ibg at their running values: diagnosis)
+
+Same netlists and testbench as the designer's docs/slot7_hookup/tier1/run_modes.py at the design-repo commit (it is
+imported from there, via run_tier1.wrapped(), so the decks use the same views): both custom pads, pad_ref_rb and
+bias_dist_pd from their extracted layout netlists; bg_core_pd from its schematic netlist; ls_up_fs / s7_ctrl / hv_logic
+/ en_ctrl_3v3 from their source netlists. MOS corner on hv and lv, res_typ, pnp typ.
+
+"pu": vdd_3v3 and iovdd ramp 0 -> V in 10 us; v12 (1.2 V) and the mode bits d0..d5 are there from t = 0 (the harness
+writes the register before enabling), enable 0 -> 1.2 V at 20 us (100 ns edge). Pad in 0.5 V until 40 us (values
+"at 39 us" = settled with pad in 0.5 V), then a staircase 0 / 0.25 / 0.5 / 0.75 / 1.0 V (10 us each, 40 ... 90 us,
+sampled at each step's end; settle = pad-out change between 85 and 90 us). Pad out: 1 Gohm as in run_modes.py plus
+… [11209 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:10:27 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && grep -m2 pnpMPA pex_c/slot_7.pex.spice; grep -m2 rhigh pex_c/slot_7.pex.spice; grep -c '^C' design/macros/sg13cmos5l_IOPadSingle2Diff/netlist/pex/sg13cmos5l_IOPadSingle2Diff_magic_pex_2.spice; sed -n 4,6p pex_rc0/slot_7.pex.spice; cat ../../slot_modes_bg/slot_modes_powerup.csv | grep -E '^default|^swap|^mon|^feed|^ext' | grep -E 'tt|ss'
+```
+
+## Tool results / harness — 2026-11-25 14:10:27 UTC
+
+**Tool result:**
+
+```
+X23 vss_3v3 vss_3v3 bg_core_pd_0.bg_pnp_c_0.e2 pnpMPA a=4p p=8u
+X26 vss_3v3 vss_3v3 bg_core_pd_0.bg_pnp_c_0.e2 pnpMPA a=4p p=8u
+X19 a_68663_36612# a_68119_34538# vss_3v3 rhigh l=9.94u w=0.5u
+X22 a_67983_36612# a_68255_34538# vss_3v3 rhigh l=9.94u w=0.5u
+573
+.subckt slot_7 vss_1v2 vdd_1v2 vss_3v3 vdd_3v3 s7_an_0_vref s7_an_0_outp s7_an_0_outn
++ s7_an_0_vcm s7_an_0_en_3v3 s7_an_0_en_3v3_b s7_an_0_iref s7_an_1_vinp s7_an_1_vinn
++ s7_an_1_vref s7_an_1_iref s7_an_1_en_3v3_b s7_an_1_en_3v3 vbias dig_in[23] dig_in[22]
+default,ss,-40,3.0,pu0,1.77259,0.99486,1.11476,0.44747,48.3844,20.81,21.62,0.0,1.37,5,none
+swap,ss,-40,3.0,pu0,1.77259,0.99486,1.11476,0.44747,48.453,20.8,21.62,0.0,1.12,5,none
+mon,ss,-40,3.0,pu0,1.77259,0.99486,1.11476,0.44747,48.453,20.8,21.62,0.0,1.43,5,none
+feed,ss,-40,3.0,pu0,1.77259,0.99486,1.11476,0.44747,48.453,20.82,21.63,0.0,0.24,1,none
+ext,ss,-40,3.0,pu0,1.77259,0.99486,1.3,0.5,48.4526,20.81,21.16,0.0,4.92,5,none
+swap+feed,ss,-40,3.0,pu0,1.77259,0.99486,1.11476,0.44747,48.4874,20.82,21.63,0.0,0.24,1,none
+swap,ss,-40,3.0,pu,1.77259,0.99486,1.11476,0.44747,48.453,20.83,21.63,0.0,1.12,5,10p
+mon,ss,-40,3.0,pu,1.77259,0.99486,1.11476,0.44747,48.453,20.82,21.62,0.0,1.43,5,10p
+feed,ss,-40,3.0,pu,1.77259,0.99486,1.11476,0.44747,48.453,20.82,21.63,0.0,0.24,1,10p
+ext,ss,-40,3.0,pu,1.77259,0.99486,1.3,0.5,48.4526,20.82,25.98,0.0,4.92,5,10p
+swap+feed,ss,-40,3.0,pu,1.77259,0.99486,1.11476,0.44747,48.4874,20.8,21.62,0.0,0.24,1,10p
+default,ss,-40,3.0,pu,1.77259,
+… [323 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:10:37 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && python3 - <<'EOF'
+import re
+for f in ['pex_c/slot_7.pex.spice','pex_rc0/slot_7.pex.spice','pex_rc1/slot_7.pex.spice']:
+    t=open(f).read().replace('\n+',' ')
+    m=re.search(r'^\.subckt slot_7 (.*)$',t,re.M); print(f,len(m.group(1).split()), [p for p in m.group(1).split() if not p.startswith('dig_')])
+EOF
+sed -n 1,40p tier1/docs/slot7_hookup/tier1/run_tier1.py
+```
+
+## Tool results / harness — 2026-11-25 14:10:37 UTC
+
+**Tool result:**
+
+```
+pex_c/slot_7.pex.spice 59 ['vss_1v2', 'vdd_1v2', 'vss_3v3', 'vdd_3v3', 's7_an_0_outp', 's7_an_0_outn', 's7_an_0_vcm', 's7_an_0_iref', 's7_an_1_vinp', 's7_an_1_vinn', 's7_an_1_iref', 's7_an_1_en_3v3_b', 's7_an_1_en_3v3', 'vbias', 'ibias0', 'ibias1', 'analog_bus3', 'analog_bus1', 'analog_bus0', 'enable', 'clk', 'reset', 'vss_1v2_uq0']
+pex_rc0/slot_7.pex.spice 64 ['vss_1v2', 'vdd_1v2', 'vss_3v3', 'vdd_3v3', 's7_an_0_vref', 's7_an_0_outp', 's7_an_0_outn', 's7_an_0_vcm', 's7_an_0_en_3v3', 's7_an_0_en_3v3_b', 's7_an_0_iref', 's7_an_1_vinp', 's7_an_1_vinn', 's7_an_1_vref', 's7_an_1_iref', 's7_an_1_en_3v3_b', 's7_an_1_en_3v3', 'vbias', 'ibias0', 'ibias1', 'analog_bus3', 'analog_bus2', 'analog_bus1', 'analog_bus0', 'enable', 'clk', 'reset', 'vss_1v2_uq0']
+pex_rc1/slot_7.pex.spice 64 ['vss_1v2', 'vdd_1v2', 'vss_3v3', 'vdd_3v3', 's7_an_0_vref', 's7_an_0_outp', 's7_an_0_outn', 's7_an_0_vcm', 's7_an_0_en_3v3', 's7_an_0_en_3v3_b', 's7_an_0_iref', 's7_an_1_vinp', 's7_an_1_vinn', 's7_an_1_vref', 's7_an_1_iref', 's7_an_1_en_3v3_b', 's7_an_1_en_3v3', 'vbias', 'ibias0', 'ibias1', 'analog_bus3', 'analog_bus2', 'analog_bus1', 'analog_bus0', 'enable', 'clk', 'reset', 'vss_1v2_uq0']
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Simulate slot7_tier1.spice with both custom pads: round trip pad in -> S2D -> D2S -> pad out, references, currents.
+
+usage (repo env, from this directory): python3 -I run_tier1.py   -> results.txt (decks and logs in runs/)
+
+Blocks wi
+… [1608 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:11:10 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/prep.py`
+
+```
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Prepare the extracted netlists for simulation (IHP sg13cmos5l, magic PEX of the taped-out slot_7 and pads).
+
+Usage: python3 -I prep.py <work_dir>
+Reads  <work_dir>/pex_c/slot_7.pex.spice      magic C-coupled extraction of final/gds/slot_7.gds (sak-pex.sh -m 2)
+       <work_dir>/pex_rc/slot_7.pex.spice     magic full-RC extraction (sak-pex.sh -m 3 -t 0 -r 100 -y 0)
+       <work_dir>/pads_rc/<cell>/<cell>.pex.spice  full-RC extraction of the two pad cells (same settings)
+       the C-coupled pad netlists of the earlier slot runs (S2D: design repository 91a7da8b
+       netlist/pex/<cell>_magic_pex_2.spice; D2S: ../d2s_pex/<cell>_magic_pex_2.spice)
+Writes <work_dir>/nets/slot_7_{c,rc}.spice and <work_dir>/nets/<cell>_{c,rc}.spice.
+
+Slot: the extracted subckt is renamed slot_7_x; nodes that only capacitors touch (the floating GatPoly / metal of
+tughra_art and of unused pins) get 1 Tohm to vss_3v3 (scripts/cace/pex_for_sim.py --tie, as the pads); a wrapper
+.subckt slot_7 with the port order of the source netlist (design repository 9052bd35, macros/slot_7/netlist/source/
+slot_7.spice, which the earlier slot decks instantiate) maps the ports by name. Where the layout makes several source
+ports one net (C extraction: analog_bus2 = s7_an_0_vcm = s7_an_1_vref, analog_bus3 = s7_an_0_vref, the two pads' en /
+en_b), the wrapper joins them by 0 V sources, as the source netlist does (its Vs* joins). Harness pins the slot does not
+use (dig_in[6..23], clk, reset, ibias0/1, vbias; no device on them, netgen: disconnected) are tied to vss_3v3;
+vss_1v2_uq0 (the frame's second vss_1v2 strip, joined by the harness) to vss_1v2.
+Pads (full-RC): as ../d2s_pex/run.sh for the C view: vss port added and tied to iovss by 1 Ohm (pex_add_port.py),
+ports in symbol order, capacitor-only nodes 1 Tohm to iovss (pex_for_sim.py --tie iovss 1e12), subckt named as the cell.
+"""
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+SLOT = HERE.parents[2]
+WORK = Path(sys.argv[1]).resolve()
+NETS = WORK / 'nets'
+SCR = WORK / 'design' / 'scripts'
+S2D, D2S = 'sg13cmos5l_IOPadSingle2Diff', 'sg13cmos5l_IOPadDiff2Single'
+PAD_PORTS = {S2D: 'iovdd iovss vdd vss pad outp outn vcm vref iref en_3v3 en_3v3_b',
+             D2S: 'iovdd iovss vdd vss pad vinp vinn vref iref en_3v3 en_3v3_b'}
+SRC_PORTS = ('vdd_3v3 vss_3v3 enable dig_in0 dig_in1 dig_in2 dig_in3 dig_in4 dig_in5 analog_bus0 analog_bus1 analog_bus2 '
+             'analog_bus3 s7_an_0_vref s7_an_0_outp s7_an_0_outn s7_an_0_vcm s7_an_0_en_3v3 s7_an_0_en_3v3_b '
+             's7_an_0_iref s7_an_1_vinp s7_an_1_vinn s7_an_1_vref s7_an_1_iref s7_an_1_en_3v3_b s7_an_1_en_3v3 '
+             + ' '.join(f'dig_out{i}' for i in range(12)) + ' vdd_1v2 vss_1v2').split()
+# one net in the layout (netlist/slot_7.cdl, port mode 'comma'); the first name that the extraction keeps as a port is used
+GROUPS = [['s7_an_0_vcm', 'analog_bus2', 's7_an_1_vref'], ['analog_bus3', 's7_an_0_vref'],
+          ['s7_an_1_en_3v3', 's7_an_0_en_3v3'], ['s7_an_1_en_3v3_b', 's7_an_0_en_3v3_b']]
+SPDX = '* SPDX-FileCopyrightText: 2026 Christoph Maier\n* SPDX-License-Identifier: Apache-2.0\n'
+
+
+def subckt_ports(txt, name):
+    t = txt.replace('\n+', ' ')
+    m = re.search(r'^\.subckt\s+' + re.escape(name) + r'\s+(.*)$', t, re.M | re.I)
+    return m.group(1).split()
+
+
+def ext_name(p):
+    """source port name -> extracted name (dig_in0 -> dig_in[0])"""
+    m = re.fullmatch(r'(dig_in|dig_out)(\d+)', p)
+    return f'{m.group(1)}[{m.group(2)}]' if m else p
+
+
+def slot(view):
+    src = WORK / f'pex_{view}' / 'slot_7.pex.spice'
+    tied = NETS / f'slot_7_{view}_x.spice'
+    r = subprocess.run([sys.executable, '-I', str(SCR / 'cace' / 'pex_for_sim.py'), str(src), str(tied),
+                        '--tie', 'vss_3v3', '1e12'], capture_output=True, text=True, check=True)
+    note = r.stdout.strip()
+    txt = tied.rea
+… [3290 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 14:11:10 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/prep.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:11:28 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/lvs_collapse.py`
+
+```
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Device-only copy of a magic PEX netlist for netgen LVS: drop the parasitic capacitors and short the parasitic
+resistors (full-RC extraction), i.e. merge the nodes each R card connects. Devices (X cards: MOS, rhigh, pnpMPA, ...)
+are kept unchanged apart from the node renaming. A merged node takes the name of a subckt port if one is among them,
+else of a node without the '.n<k>' / '.t<k>' suffix magic gives the pieces of a resistive net.
+
+Usage: python3 -I lvs_collapse.py <pex.spice> <out.spice>
+Prints the counts: R cards shorted, C cards dropped, nodes before / after.
+"""
+import re
+import sys
+
+
+def main(src, dst):
+    stmts = []
+    for ln in open(src).read().splitlines():
+        if ln.startswith('+') and stmts:
+            stmts[-1] += ' ' + ln[1:]
+        else:
+            stmts.append(ln)
+    par = {}
+
+    def find(a):
+        while par.get(a, a) != a:
+            par[a] = par.get(par[a], par[a])
+            a = par[a]
+        return a
+
+    ports, nodes, nr, nc = set(), set(), 0, 0
+    for s in stmts:
+        t = s.split()
+        if t and t[0].lower() == '.subckt':
+            ports = set(t[2:])
+        elif t and t[0][0] in 'Rr':
+            nr += 1
+            a, b = find(t[1]), find(t[2])
+            nodes.update(t[1:3])
+            if a != b:
+                # keep the better name as the root
+                def rank(n):
+                    return (0 if n in ports else 1 if not re.search(r'\.[nt]\d+$', n) else 2, n)
+                ra, rb = sorted([a, b], key=rank)
+                par[rb] = ra
+        elif t and t[0][0] in 'Xx':
+            nodes.update(x for x in t[1:] if '=' not in x)
+    out = []
+    for s in stmts:
+        t = s.split()
+        if not t:
+            out.append(s)
+            continue
+        if t[0][0] in 'Cc':
+            nc += 1
+            continue
+        if t[0][0] in 'Rr':
+            continue
+        if t[0][0] in 'Xx':
+            pos = [i for i, x in enumerate(t) if '=' not in x][1:-1]  # nodes: between name and model
+            for i in pos:
+                t[i] = find(t[i])
+            out.append(' '.join(t))
+        else:
+            out.append(s)
+    open(dst, 'w').write('\n'.join(out) + '\n')
+    roots = {find(n) for n in nodes}
+    print(f'{src}: {nr} R shorted, {nc} C dropped, {len(nodes)} device/R nodes -> {len(roots)}')
+
+
+if __name__ == '__main__':
+    if len(sys.argv) != 3:
+        sys.exit(__doc__)
+    main(*sys.argv[1:])
+```
+
+## Tool results / harness — 2026-11-25 14:11:28 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/lvs_collapse.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:11:49 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/extract.sh`
+
+```
+#!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+#
+# Magic parasitic extraction of the whole taped-out slot (final/gds/slot_7.gds, top cell slot_7) and of the two custom
+# pad cells (pads/<cell>/<cell>.gds), and netgen LVS of each extraction (IHP sg13cmos5l; magic 8.3.685, netgen 1.5.324).
+# Usage: extract.sh <work_dir>
+#   pex_c   slot_7, C-coupled (sak-pex.sh -m 2: flattened, substrate and coupling capacitors, ext2spice cthresh 0.01 fF)
+#   pex_rc  slot_7, full-RC   (sak-pex.sh -m 3 -t 0 -r 100 -y 0: extresist on every net magic finds resistance for,
+#           threshold 0, resistors below 0.1 Ohm merged, no delay gating; coupling capacitors as in pex_c)
+#   pads_c / pads_rc  the two pad cells, same two settings (pads_c only for the counts: the simulations use the C-coupled
+#           pad netlists of the earlier runs, see prep.py)
+#   lvs_*   lvs_collapse.py (capacitors dropped, parasitic resistors shorted) + netgen against netlist/slot_7_netgen.spice
+#           (slot; as netlist/netgen_check.sh) or pads/<cell>/<cell>.spice (pads; vss port added as ../d2s_pex/run.sh)
+# Magic runs single-threaded, one at a time.
+set -euo pipefail
+HERE=$(cd "$(dirname "$0")" && pwd)
+SLOT=$(cd "$HERE/../../.." && pwd)
+WORK=$(realpath -m "$1")
+export PDK_ROOT=${PDK_ROOT:-/foss/pdks} PDK=${PDK:-ihp-sg13cmos5l}
+export PDKPATH=$PDK_ROOT/$PDK
+SETUP=$PDKPATH/libs.tech/netgen/${PDK}_setup.tcl
+RCOPT="-m 3 -t 0 -r 100 -y 0"
+S2D=sg13cmos5l_IOPadSingle2Diff
+D2S=sg13cmos5l_IOPadDiff2Single
+
+pex() {  # pex <out_dir> <gds> <subckt name> <sak-pex options...>
+  local d=$1 g=$2 n=$3; shift 3
+  rm -rf "$d"; mkdir -p "$d"
+  cp "$g" "$d/"
+  local t0=$(date +%s)
+  sak-pex.sh -d "$@" -n "$n" -w "$d" "$d/$(basename "$g")" > "$d/run.log" 2>&1
+  echo "  $(basename "$d"): $* -> $(ls "$d"/*.pex.spice), $(( $(date +%s) - t0 )) s"
+}
+
+echo "magic extraction"
+pex "$WORK/pex_c"  "$SLOT/final/gds/slot_7.gds" slot_7 -m 2
+pex "$WORK/pex_rc" "$SLOT/final/gds/slot_7.gds" slot_7 $RCOPT
+for T in $S2D $D2S; do
+  pex "$WORK/pads_c/$T"  "$SLOT/pads/$T/$T.gds" ${T}_pex -m 2
+  pex "$WORK/pads_rc/$T" "$SLOT/pads/$T/$T.gds" ${T}_pex $RCOPT
+done
+
+echo "netgen LVS"
+for v in c rc; do
+  d=$WORK/lvs_slot_$v; rm -rf "$d"; mkdir -p "$d"
+  python3 -I "$HERE/lvs_collapse.py" "$WORK/pex_$v/slot_7.pex.spice" "$d/lay.spice"
+  cp "$SLOT/netlist/slot_7_netgen.spice" "$d/sch.spice"
+  (cd "$d" && netgen -batch lvs "lay.spice slot_7" "sch.spice slot_7" "$SETUP" lvs.out < /dev/null > netgen.log 2>&1) || true
+  echo "  slot_7 $v: $(grep -E 'Netlists match|Netlists do not match' "$d/lvs.out" | tail -1); $(grep 'Final result' "$d/lvs.out")"
+  for T in $S2D $D2S; do
+    d=$WORK/lvs_pad_${v}_$T; rm -rf "$d"; mkdir -p "$d"
+    python3 -I "$HERE/lvs_collapse.py" "$WORK/pads_$v/$T/$T.pex.spice" "$d/lay.spice"
+    python3 -I "$WORK/design/scripts/pex_add_port.py" "$d/lay.spice" ${T}_pex vss iovss 1 > /dev/null
+    sed -i -e '/^Rport_vss/d' -e "s/\b${T}_pex\b/$T/" "$d/lay.spice"
+    grep -v -e '^\* PROVENANCE' -e '^\* commit' -e '^\* sha256' "$SLOT/pads/$T/$T.spice" > "$d/sch.spice"
+    (cd "$d" && netgen -batch lvs "lay.spice $T" "sch.spice $T" "$SETUP" lvs.out < /dev/null > netgen.log 2>&1) || true
+    echo "  $T $v: $(grep -E 'match uniquely|Netlists match|do not match' "$d/lvs.out" | tail -1); $(grep 'Final result' "$d/lvs.out")"
+  done
+done
+```
+
+## Tool results / harness — 2026-11-25 14:11:49 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/extract.sh (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:11:57 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && chmod +x extract.sh *.py && rm -rf _work/pex_rc0 _work/pex_rc1 _work/pex_rc _work/pads_c _work/pads_rc _work/pex_c _work/lvs_c && time ./extract.sh _work 2>&1
+```
+
+## Tool results / harness — 2026-11-25 14:12:10 UTC
+
+**Tool result:**
+
+```
+magic extraction
+  pex_c: -m 2 -> /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/pex_c/slot_7.pex.spice, 0 s
+  pex_rc: -m 3 -t 0 -r 100 -y 0 -> /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/pex_rc/slot_7.pex.spice, 3 s
+  sg13cmos5l_IOPadSingle2Diff: -m 2 -> /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/pads_c/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.pex.spice, 1 s
+  sg13cmos5l_IOPadSingle2Diff: -m 3 -t 0 -r 100 -y 0 -> /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/pads_rc/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.pex.spice, 2 s
+  sg13cmos5l_IOPadDiff2Single: -m 2 -> /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/pads_c/sg13cmos5l_IOPadDiff2Single/sg13cmos5l_IOPadDiff2Single.pex.spice, 1 s
+  sg13cmos5l_IOPadDiff2Single: -m 3 -t 0 -r 100 -y 0 -> /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/pads_rc/sg13cmos5l_IOPadDiff2Single/sg13cmos5l_IOPadDiff2Single.pex.spice, 3 s
+netgen LVS
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/pex_c/slot_7.pex.spice: 0 R shorted, 1568 C dropped, 262 device/R nodes -> 262
+  slot_7 c: Netlists match with 11 symmetries.; Final result: Top level cell failed pin matching.
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/pads_c/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.pex.spice: 0 R shorted, 573 C dropped, 61 device/R nodes -> 61
+  sg13cmos5l_IOPadSi
+… [1318 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:12:22 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && grep -c '^R' pex_rc/slot_7.pex.spice pads_rc/*/*.pex.spice; grep -E 'Nets extracted|Nets output' pex_rc/run.log pads_rc/*/run.log; grep -iE "property|mismatch" lvs_slot_rc/lvs.out | head; grep -A6 "^Subcircuit summary" lvs_slot_rc/lvs.out | tail -8; grep -B2 -A12 "Subcircuit summary" lvs_pad_rc_sg13cmos5l_IOPadDiff2Single/lvs.out | tail -14
+```
+
+## Tool results / harness — 2026-11-25 14:12:22 UTC
+
+**Tool result:**
+
+```
+pex_rc/slot_7.pex.spice:9831
+pads_rc/sg13cmos5l_IOPadDiff2Single/sg13cmos5l_IOPadDiff2Single.pex.spice:10198
+pads_rc/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.pex.spice:12427
+pex_rc/run.log:Nets extracted: 169 (0.435567)
+pex_rc/run.log:Nets output: 169 (0.435567)
+pads_rc/sg13cmos5l_IOPadDiff2Single/run.log:Nets extracted: 32 (0.463768)
+pads_rc/sg13cmos5l_IOPadDiff2Single/run.log:Nets output: 32 (0.463768)
+pads_rc/sg13cmos5l_IOPadSingle2Diff/run.log:Nets extracted: 32 (0.380952)
+pads_rc/sg13cmos5l_IOPadSingle2Diff/run.log:Nets output: 32 (0.380952)
+Resolving symmetries by property value.
+s7_an_0_en_3v3                             |s7_an_0_en_3v3,s7_an_1_en_3v3 **Mismatch** 
+analog_bus3                                |analog_bus3,s7_an_0_vref **Mismatch**      
+Subcircuit summary:
+Circuit 1: slot_7                          |Circuit 2: slot_7                          
+-------------------------------------------|-------------------------------------------
+sg13_hv_nmos (179->149)                    |sg13_hv_nmos (170->149)                    
+sg13_hv_pmos (268->216)                    |sg13_hv_pmos (223->216)                    
+rhigh (41->4)                              |rhigh (41->4)                              
+pnpMPA (9->2)                              |pnpMPA (9->2)                              
+Cell sg13cmos5l_IOPadDiff2Single (1) disconnected node: vss
+Subcircuit summary:
+Circuit 1: sg13cmos5l_IOPadDiff2Single     |Circuit 2: sg13cmos5l_IOPadDiff2Single     
+
+… [919 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:12:29 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && mkdir -p chk && cp pex_c/slot_7.gds chk/ && export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PDKPATH=/foss/pdks/ihp-sg13cmos5l && for i in 1 2; do sak-pex.sh -m 3 -t 0 -r 100 -y 0 -n slot_7 -w chk chk/slot_7.gds >/dev/null 2>&1; grep -c '^R' chk/slot_7.pex.spice; grep '^R' chk/slot_7.pex.spice | awk '{s+=$4} END {print s}'; done; grep '^R' pex_rc/slot_7.pex.spice | awk '{s+=$4} END {print s}'
+```
+
+## Tool results / harness — 2026-11-25 14:12:33 UTC
+
+**Tool result:**
+
+```
+10217
+1.86229e+06
+9925
+1.74918e+06
+1.74761e+06
+```
+
+## Assistant — 2026-11-25 14:12:45 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && rm -rf _work/chk && python3 -I prep.py _work && tail -12 _work/nets/slot_7_c.spice; tail -8 _work/nets/slot_7_rc.spice; head -6 _work/nets/sg13cmos5l_IOPadDiff2Single_rc.spice; grep -c . _work/nets/*
+```
+
+## Tool results / harness — 2026-11-25 14:12:45 UTC
+
+**Tool result:**
+
+```
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/design/macros/sg13cmos5l_IOPadSingle2Diff/netlist/pex/sg13cmos5l_IOPadSingle2Diff_magic_pex_2.spice -> /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/nets/sg13cmos5l_IOPadSingle2Diff_c.spice: 28 capacitor-only nodes tied to iovss through 1e12 Ohm
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/nets/sg13cmos5l_IOPadSingle2Diff_rc_raw.spice: sg13cmos5l_IOPadSingle2Diff_pex: port vss added, tied to iovss by 1 Ohm
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/nets/sg13cmos5l_IOPadSingle2Diff_rc_raw.spice -> /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/nets/sg13cmos5l_IOPadSingle2Diff_rc.spice: 28 capacitor-only nodes tied to iovss through 1e12 Ohm
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/d2s_pex/sg13cmos5l_IOPadDiff2Single_magic_pex_2.spice -> /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/nets/sg13cmos5l_IOPadDiff2Single_c.spice: 20 capacitor-only nodes tied to iovss through 1e12 Ohm
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/nets/sg13cmos5l_IOPadDiff2Single_rc_raw.spice: sg13cmos5l_IOPadDiff2Single_pex: port vss added, tied to iovss by 1 Ohm
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/nets/sg13cmos5l_IOPadDiff2Single_rc_raw.spice -> /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/nets/sg13cmos5l_IOPadDiff2Single_rc.spice: 20 capacitor-o
+… [4914 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:13:02 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps && cat dc_curves/csv/rt_summary.csv; sed -n 1,200p dc_curves/rt.py | head -120
+```
+
+## Tool results / harness — 2026-11-25 14:13:02 UTC
+
+**Tool result:**
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# round trip, IHP sg13cmos5l simulation, slot 7 tier-1 deck (pads: schematic | magic PEX | KLayout-extracted); rt.py
+pads,corner_mos,temp,vdd,vref_s2d,vcm,vref_d2s,gain,offset_mV,max_abs_err_0to1V_mV,in_lo_1mV,in_hi_1mV,out_lo_1mV,out_hi_1mV,in_lo_10mV,in_hi_10mV
+schematic,tt,27,3.3,0.4922591751,1.256639543,1.256639543,0.99875,0.053,0.858,-0.1709,1.2811,0.5954,2.0435,-0.2969,1.4064
+pex,tt,27,3.3,0.4922646955,1.256635784,1.256635784,0.99875,0.064,0.870,-0.1708,1.2812,0.5955,2.0436,-0.2969,1.4064
+klayout,tt,27,3.3,0.4922591751,1.256639543,1.256639543,0.99871,0.070,0.897,-0.1718,1.2445,0.5945,2.0070,-0.2979,1.3653
+schematic,ss,-40,3.0,0.4474819143,1.114790016,1.114790016,0.99852,0.032,1.329,-0.2427,1.0553,0.4267,1.7208,-0.3000,1.1978
+pex,ss,-40,3.0,0.4474862828,1.114772213,1.114772213,0.99852,0.043,1.318,-0.2426,1.0554,0.4267,1.7208,-0.3000,1.1978
+klayout,ss,-40,3.0,0.4474819143,1.114790016,1.114790016,0.99848,0.043,1.368,-0.2098,1.0476,0.4595,1.7130,-0.3000,1.1831
+schematic,ff,125,3.6,0.5709336188,1.299117963,1.299117963,0.99870,1.714,6.101,0.0963,1.3672,0.8278,2.0951,-0.0577,1.4615
+pex,ff,125,3.6,0.5709413784,1.299123556,1.299123556,0.99870,1.725,6.114,0.0964,1.3674,0.8279,2.0953,-0.0577,1.4616
+klayout,ff,125,3.6,0.5709336188,1.299117963,1.299117963,0.99865,2.362,6.483,0.0955,1.3272,0.8277,2.0557,-0.0646,1.4155
+schematic,fs,125,3.6,0.5756540463,1.36551876,1.36551876,0.99882,1.058,3.1
+… [6663 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:13:18 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps && grep -n "^def \|^    def " ac_tran/rt.py ac_tran/common.py dc_curves/common.py; sed -n '/^def f3db/,/^def [a-z_]*(/p' ac_tran/rt.py ac_tran/common.py | head -60
+```
+
+## Tool results / harness — 2026-11-25 14:13:18 UTC
+
+**Tool result:**
+
+```
+ac_tran/rt.py:33:def rd(path):
+ac_tran/rt.py:40:def tag(view, pt, ana, load=None):
+ac_tran/rt.py:45:def get(sdir, view, pt, ana, load=None, sfx=None):
+ac_tran/rt.py:50:def ac_scalars(d):
+ac_tran/rt.py:58:def step_scalars(d):
+ac_tran/rt.py:74:def harmonics(t, y, f0, n=7, t0=200e-6, periods=4):
+ac_tran/rt.py:84:def sine_scalars(d):
+ac_tran/rt.py:104:def plot_bode_tt(S, out):
+ac_tran/rt.py:133:def plot_bode_pvt(S, out):
+ac_tran/rt.py:161:def plot_f3(rows, out):
+ac_tran/rt.py:184:def plot_step_tt(S, out):
+ac_tran/rt.py:230:def plot_step_pvt(S, out):
+ac_tran/rt.py:258:def plot_sine(S, out):
+ac_tran/rt.py:302:def consistency(sdir, here, S, rows):
+ac_tran/rt.py:343:def main(sdir, here):
+ac_tran/common.py:28:def save(fig, path, svg_max=60e3):
+ac_tran/common.py:40:def _f(x):
+ac_tran/common.py:47:def load(path):
+ac_tran/common.py:69:def scalars(path):
+ac_tran/common.py:86:def committed(path):
+ac_tran/common.py:94:def find(runs, **kw):
+ac_tran/common.py:110:def logx_interp(f, y, f0):
+ac_tran/common.py:114:def first_fall(f, y, level, i0=0):
+ac_tran/common.py:123:def cross_times(t, y, level):
+ac_tran/common.py:130:def first_cross(t, y, level, rising=True, t0=0.0, t1=np.inf):
+ac_tran/common.py:139:def last_cross(t, y, level, t0=0.0, t1=np.inf):
+ac_tran/common.py:146:def integrate_psd(f, vn, f0=None, f1=None):
+ac_tran/common.py:156:def pvt_label(d):
+ac_tran/common.py:161:def title(fig, ax, text, view):
+dc_curves/common.py:24:def style():
+dc_curves/common.py:32:def load(path):
+dc_curves/comm
+… [226 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:13:21 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps && sed -n 1,75p ac_tran/rt.py; sed -n 1,60p ac_tran/common.py; sed -n 100,160p ac_tran/common.py; head -5 ac_tran/csv/rt_ac_summary.csv ac_tran/csv/rt_step_summary.csv
+```
+
+## Tool results / harness — 2026-11-25 14:13:22 UTC
+
+**Tool result:**
+
+```
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Slot-7 round trip pad_s2d -> S2D -> slot 7 (default mode) -> D2S -> pad_d2s: Bode, step, sine plots and scalars
+(IHP sg13cmos5l simulation; pads schematic | magic PEX | KLayout-extracted, the rest of the slot as the designer's
+tier-1 deck).
+
+Usage: rt.py <slot_out_dir> <ac_tran_dir>
+Reads the slot.py outputs, writes <ac_tran_dir>/plots/rt_*.png|svg and <ac_tran_dir>/csv/rt_*_summary.csv.
+"""
+import csv
+import glob
+import os
+import re
+import sys
+
+import numpy as np
+
+from common import COLOR, first_fall, logx_interp, last_cross, plt, save, style, title
+
+VIEWS = ['schematic', 'pex', 'klayout']
+VN = {'schematic': 'schematic', 'pex': 'magic PEX', 'klayout': 'KLayout-extracted'}
+VLS = {'schematic': '-', 'pex': '--', 'klayout': ':'}
+POINTS = [('tt', 27, 3.3), ('ss', -40, 3.0), ('ff', 125, 3.6), ('fs', 125, 3.6), ('sf', -40, 3.0)]
+LOADS = ['open', '10p', '100p']
+LN = {'open': 'unloaded (1 GΩ)', '10p': '1 kΩ ∥ 10 pF', '100p': '1 kΩ ∥ 100 pF'}
+LC = {'open': '#2a78d6', '10p': '#1baf7a', '100p': '#eb6834'}
+PTN = lambda c, t, v: f'{c} {t} °C {v} V'  # noqa: E731
+COND = ('slot 7 default mode, tier-1 deck (replica bias pad_ref_rb: vref_s2d ≈ 0.49 V, vcm ≈ 1.26 V; iref from '
+        'the slot bandgap); load = 1 kΩ to an ideal copy of vref_d2s, CL to ground')
+
+
+def rd(path):
+    with open(path) as f:
+        head = f.readline().split()
+    a = np.loadtxt(path, skiprows=1, ndmin=2)
+ 
+… [7029 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:14:16 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/sim.py`
+
+```
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Slot 7 round trip pad_s2d -> S2D -> slot 7 -> D2S -> pad_d2s with the slot as extracted from final/gds/slot_7.gds
+(IHP sg13cmos5l simulation, ngspice-47 with the IHP OSDI models).
+
+Usage: python3 -I sim.py <work_dir> <job> [<job> ...]      (one ngspice process at a time)
+  job = <view>:<mos>:<temp>:<vdd>:<analysis>[:<load>]
+  view  prev  the deck of the earlier slot runs (../ac_tran/slot.py, ../dc_curves/roundtrip.py, pads 'pex'): slot_7
+              source netlist (design repository 9052bd35) with pad_ref_rb / bias_dist_pd KLayout-extracted (converted
+              and wrapped by run_tier1.wrapped()), bg_core_pd schematic, s7_ctrl / ls_up_fs / hv_logic source netlists;
+              both pads magic C-coupled PEX (the netlists of those runs)
+        c     the whole slot magic C-coupled (prep.py: nets/slot_7_c.spice), pads magic C-coupled as 'prev'
+        rc    the whole slot magic full-RC (nets/slot_7_rc.spice), both pads magic full-RC (nets/<cell>_rc.spice)
+  analysis
+        op    operating point enabled (enable 1.2 V), then disabled (enable 0 V), pad in 0.5 V
+        dc    pad in -0.3 ... 3.3 V, 5 mV steps (as ../dc_curves/roundtrip.py)
+        ac    pad in 0.5 V DC + 1 V AC, dec 40 10 Hz ... 1 GHz, loads open, 1k|10p, 1k|100p in one deck (../ac_tran)
+        step  pad in 0.25 -> 0.75 V at 2 us (10 ns edges), back at 7 us, tran to 12 us, max step 2 ns (../ac_tran)
+        pu    power-up / enable: vdd_3v3 = iovdd 0 -> V in 10 us, enable 0 -> 1.2 V at 20 us (100 ns edge), pad in
+              0.5 V, pad out 1 Gohm + 10 pF (as ../slot_modes_bg 'pu'); tran to 40 us, 10 ns max step, uic
+        mode_<m>  m = swap | mon | feed | ext (tt only): DC as the designer's run_modes.py (design repository 9052bd35):
+              pad in 0 ... 1 V in 50 mV steps (feed: op, pad in 0.5 V); feed: bus0 / bus1 through 10 kohm from 1.45 /
+              1.05 V; ext: bus2 / bus3 through 10 kohm from 1.30 / 0.50 V; key dig_in3 = 1
+  load  (step) open | 10p | 100p; open = 1 Tohm / 1 aF; RL to an ideal copy of v(vref_d2s), CL to ground (../ac_tran)
+Options: .option gmin=1e-12 rshunt=1e12 in every run (the PEX pads need rshunt, ../d2s_pex; the earlier 'pex' runs had
+it too); transient additionally method=gear (as ../ac_tran), pu also cshunt=1e-15 (as ../slot_modes_bg).
+Writes <work_dir>/out/<tag>.<suffix> (wrdata) and <tag>.log; prints '<tag> ok|FAILED <seconds>'.
+"""
+import re
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+WORK = Path(sys.argv[1]).resolve()
+OUT = WORK / 'out'
+RUNS = WORK / 'runs'
+T1 = WORK / 'tier1' / 'docs' / 'slot7_hookup' / 'tier1'
+MAC = WORK / 'tier1' / 'macros'
+NETS = WORK / 'nets'
+PDK = '/foss/pdks/ihp-sg13cmos5l'
+PADS = ['sg13cmos5l_IOPadSingle2Diff', 'sg13cmos5l_IOPadDiff2Single']
+LOADS = {'open': ('1e12', '1e-18'), '10p': ('1k', '10p'), '100p': ('1k', '100p')}
+SAVE = 'v(padin) v(padout) v(vcm_s2d) v(vref_s2d) v(vref_d2s) v(outp) v(outn) v(vinp) v(vinn) i(vio) i(vslot)'
+MODES = {'default': ('0 0 0 0 0 0', 'direct'), 'swap': ('1 0 0 1 0 0', 'crossed'), 'mon': ('0 1 0 1 0 0', 'direct'),
+         'feed': ('0 0 1 1 0 0', 'feed'), 'ext': ('0 0 0 1 0 1', 'ext')}
+EXP = {'direct': 'v(vcm_s2d) + v(padin) - v(vref_s2d)', 'crossed': 'v(vcm_s2d) - v(padin) + v(vref_s2d)',
+       'feed': 'v(vcm_s2d) + (v(b0) - v(b1))/2', 'ext': '1.30 + v(padin) - 0.50'}
+
+
+def prefixed(src, dst, cell, pfx):
+    """copy a pad netlist with every subckt except the pad cell renamed to <pfx>_<name> (as ../ac_tran/slot.py)"""
+    txt = Path(src).read_text()
+    names = [n for n in re.findall(r'^\.subckt\s+(\S+)', txt, re.M | re.I) if n != cell]
+    for n in names:
+        txt = re.sub(r'(?<![\w.#$])' + re.escape(n) + r'(?![\w.#$])', f'{pfx}_{n}', txt)
+    Path(dst).write_text(txt)
+    return dst
+
+
+def includes(view, rdir):
+    rdir.mkdir(parents=True, exist_ok=True)
+    pv = 'rc' if view == 'rc
+… [5246 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 14:14:16 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/sim.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:14:24 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && sed -i 's/alter Ven dc = 0/alter Ven = 0/' sim.py && python3 -I sim.py _work prev:tt:27:3.3:op c:tt:27:3.3:op rc:tt:27:3.3:op; for v in prev c rc; do echo $v; cat _work/out/${v}_tt_27_3.3_op.op; cat _work/out/${v}_tt_27_3.3_op.opoff; done
+```
+
+## Tool results / harness — 2026-11-25 14:20:14 UTC
+
+**Tool result:**
+
+```
+prev_tt_27_3.3_op ok 31 s
+c_tt_27_3.3_op ok 37 s
+rc_tt_27_3.3_op ok 282 s
+prev
+ padin            v(padin)         v(padout)        v(vcm_s2d)       v(vref_s2d)      v(vref_d2s)      v(outp)          v(outn)          v(vinp)          v(vinn)          i(vio)           i(vslot)         v(b0)            v(b1)            v(b2)            v(b3)           
+ 5.000000000e-01  5.000000000e-01  1.264399259e+00  1.256598633e+00  4.922534971e-01  1.256598633e+00  1.276067219e+00  1.260593332e+00  1.276067215e+00  1.260593328e+00 -4.199973535e-04 -4.975047840e-05  6.980588189e-03  6.980042124e-03  1.256598633e+00  4.922534971e-01 
+ padin            v(padin)         v(padout)        v(vcm_s2d)       v(vref_s2d)      v(vref_d2s)      v(outp)          v(outn)          v(vinp)          v(vinn)          i(vio)           i(vslot)         v(b0)            v(b1)            v(b2)            v(b3)           
+ 5.000000000e-01  5.000000000e-01  1.835527758e-01  1.765196420e-01  3.441281812e-03  1.765196420e-01  1.765199120e-01  1.765196384e-01  1.097512060e+00  1.097512061e+00 -6.382698744e-09 -7.346144989e-09  6.962379915e-03  6.962379911e-03  1.765196420e-01  3.441281812e-03 
+c
+ padin            v(padin)         v(padout)        v(vcm_s2d)       v(vref_s2d)      v(vref_d2s)      v(outp)          v(outn)          v(vinp)          v(vinn)          i(vio)           i(vslot)         v(b0)            v(b1)            v(b2)            v(b3)           
+ 5.000000000e-01  5.000000000e-01  1.267526788e+00  1.
+… [1977 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:20:36 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/out && grep -iE "gmin|source step|singular|warning|note|time" rc_tt_27_3.3_op.log | head -20; grep -iE "gmin|source step|warning|note" c_tt_27_3.3_op.log | head; grep -c . rc_tt_27_3.3_op.log
+```
+
+## Tool results / harness — 2026-11-25 14:20:36 UTC
+
+**Tool result:**
+
+```
+nr1: WARNING: V(i2,c) voltage is greater than specified by vmax
+OSDI(debug) n.xs.xx.x458.nr1: WARNING: V(i1,c) voltage is greater than specified by vmax
+OSDI(debug) n.xs.xx.x458.nr1: WARNING: V(i2,c) voltage is greater than specified by vmax
+OSDI(debug) n.xs.xx.x452.nr1: WARNING: V(i1,c) voltage is greater than specified by vmax
+OSDI(debug) n.xs.xx.x452.nr1: WARNING: V(i2,c) voltage is greater than specified by vmax
+OSDI(debug) n.xs.xx.x449.nr1: WARNING: V(i1,c) voltage is greater than specified by vmax
+OSDI(debug) n.xs.xx.x449.nr1: WARNING: V(i2,c) voltage is greater than specified by vmax
+OSDI(debug) n.xs.xx.x441.nr1: WARNING: V(i1,c) voltage is greater than specified by vmax
+OSDI(debug) n.xs.xx.x441.nr1: WARNING: V(i2,c) voltage is greater than specified by vmax
+OSDI(debug) n.xs.xx.x439.nr1: WARNING: V(i1,c) voltage is greater than specified by vmax
+OSDI(debug) n.xs.xx.x439.nr1: WARNING: V(i2,c) voltage is greater than specified by vmax
+OSDI(debug) n.xs.xx.x437.nr1: WARNING: V(i1,c) voltage is greater than specified by vmax
+OSDI(debug) n.xs.xx.x437.nr1: WARNING: V(i2,c) voltage is greater than specified by vmax
+OSDI(debug) n.xs.xx.x433.nr1: WARNING: V(i1,c) voltage is greater than specified by vmax
+OSDI(debug) n.xs.xx.x433.nr1: WARNING: V(i2,c) voltage is greater than specified by vmax
+OSDI(debug) n.xs.xx.x430.nr1: WARNING: V(i1,c) voltage is greater than specified by vmax
+OSDI(debug) n.xs.xx.x430.nr1: WARNING: V(i2,c) voltage is greater than specified by vmax
+OSDI(debug) 
+… [1110 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:20:40 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/out && grep -vE "OSDI|vmax" rc_tt_27_3.3_op.log | head -60
+```
+
+## Tool results / harness — 2026-11-25 14:20:41 UTC
+
+**Tool result:**
+
+```
+Reference value :  0.00000e+00
+No. of Data Rows : 1
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+ Reference value :  0.00000e+00
+No. of Data Rows : 1
+SLOTDONE
+Note: Simulation executed from .control section 
+
+--- stderr ---
+Note: Starting dynamic gmin stepping
+Warning: Dynamic gmin stepping failed
+Note: Starting true gmin stepping
+Note: True gmin stepping completed
+Note: Starting dynamic gmin stepping
+Warning: Dynamic gmin stepping failed
+Note: Starting true gmin stepping
+Note: True gmin stepping completed
+
+--- wall time 281.5 s
+```
+
+## Assistant — 2026-11-25 14:20:53 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cat /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/.spiceinit; cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/out && grep -i "solver" prev_tt_27_3.3_op.log c_tt_27_3.3_op.log | head -3
+```
+
+## Tool results / harness — 2026-11-25 14:20:54 UTC
+
+**Tool result:**
+
+```
+*  a custom spiceinit file for IHP-Open-PDK 
+
+* export PDK_ROOT and PDK environmental variables first and add it to your .bashrc
+* export PDK_ROOT= installation_specific_directory/IHP-Open-PDK
+* export PDK=ihp-sg13g2 or ihp-sg13cmos5l
+
+setcs sourcepath = (  $sourcepath $PDK_ROOT/$PDK/libs.tech/ngspice/models $PDK_ROOT/$PDK/libs.ref/sg13cmos5l_stdcell/spice )
+setcs sourcepath = (  $sourcepath $PDK_ROOT/$PDK/libs.tech/ngspice/models $PDK_ROOT/$PDK/libs.ref/sg13cmos5l_io/spice )
+*echo $sourcepath
+
+*option tnom=28
+*option list
+
+* KLU solver still do not work correctly for every simulation
+*option klu
+
+*option node
+*option opts
+*option warn=1
+*option maxwarns=10
+*option savecurrents
+
+*set ngbehavior=hsa
+*set noinit
+
+* add OSDI 
+osdi  '$PDK_ROOT/$PDK/libs.tech/ngspice/osdi/psp103.osdi'
+osdi  '$PDK_ROOT/$PDK/libs.tech/ngspice/osdi/psp103_nqs.osdi'
+osdi  '$PDK_ROOT/$PDK/libs.tech/ngspice/osdi/r3_cmc.osdi'
+osdi  '$PDK_ROOT/$PDK/libs.tech/ngspice/osdi/mosvar.osdi'
+osdi  '$PDK_ROOT/$PDK/libs.tech/ngspice/osdi/cap_cmomi.osdi'
+osdi  '$PDK_ROOT/$PDK/libs.tech/ngspice/osdi/cap_cmomf.osdi'
+prev_tt_27_3.3_op.log:Using SPARSE 1.3 as Direct Linear Solver
+c_tt_27_3.3_op.log:Using SPARSE 1.3 as Direct Linear Solver
+```
+
+## Assistant — 2026-11-25 14:21:03 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='sim.py'; s=open(p).read()
+s=s.replace("""        rc    the whole slot magic full-RC (nets/slot_7_rc.spice), both pads magic full-RC (nets/<cell>_rc.spice)
+""","""        rc    the whole slot magic full-RC (nets/slot_7_rc.spice), both pads magic full-RC (nets/<cell>_rc.spice);
+              ngspice's KLU solver (.option klu): with the default SPARSE 1.3 the full-RC op took 282 s (tt 27 C)
+        ck    as c, with KLU (check of the solver's effect on the c results)
+""")
+s=s.replace("""    return pads + [str(NETS / f'slot_7_{view}.spice')]""","""    return pads + [str(NETS / f"slot_7_{'rc' if view == 'rc' else 'c'}.spice")]""")
+s=s.replace("""    opt = '.option gmin=1e-12 rshunt=1e12' +""","""    opt = '.option gmin=1e-12 rshunt=1e12' + (' klu' if view in ('rc', 'ck') else '') +""")
+open(p,'w').write(s)
+EOF
+grep -n "klu\|slot_7_" sim.py | head; python3 -I sim.py _work rc:tt:27:3.3:op ck:tt:27:3.3:op; for v in rc ck; do cat _work/out/${v}_tt_27_3.3_op.op | tail -1; grep -i solver _work/out/${v}_tt_27_3.3_op.log|head -1; done
+```
+
+## Tool results / harness — 2026-11-25 14:22:20 UTC
+
+**Tool result:**
+
+```
+13:        c     the whole slot magic C-coupled (prep.py: nets/slot_7_c.spice), pads magic C-coupled as 'prev'
+14:        rc    the whole slot magic full-RC (nets/slot_7_rc.spice), both pads magic full-RC (nets/<cell>_rc.spice);
+15:              ngspice's KLU solver (.option klu): with the default SPARSE 1.3 the full-RC op took 282 s (tt 27 C)
+78:    return pads + [str(NETS / f"slot_7_{'rc' if view == 'rc' else 'c'}.spice")]
+86:    opt = '.option gmin=1e-12 rshunt=1e12' + (' klu' if view in ('rc', 'ck') else '') + (' method=gear' if ana in ('step', 'pu') else '') + \
+rc_tt_27_3.3_op ok 63 s
+ck_tt_27_3.3_op ok 14 s
+ 5.000000000e-01  5.000000000e-01  1.266813110e+00  1.261549483e+00  4.948467405e-01  1.261549482e+00  1.270108035e+00  1.259776843e+00  1.270107984e+00  1.259776792e+00 -4.199464814e-04 -4.961064613e-05  6.932289558e-03  6.931926907e-03  1.261549418e+00  4.948467142e-01 
+Using KLU as Direct Linear Solver
+ 5.000000000e-01  5.000000000e-01  1.267526788e+00  1.261531749e+00  4.940613182e-01  1.261531749e+00  1.279191261e+00  1.267328580e+00  1.279191257e+00  1.267328576e+00 -4.200373607e-04 -4.962767289e-05  6.980698963e-03  6.980279274e-03  1.261531749e+00  4.940613182e-01 
+Using KLU as Direct Linear Solver
+```
+
+## Assistant — 2026-11-25 14:22:35 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+pts=[('tt',27,3.3),('ss',-40,3.0),('ff',125,3.6),('fs',125,3.6),('sf',-40,3.0)]
+L=['# SPDX-FileCopyrightText: 2026 Christoph Maier','# SPDX-License-Identifier: Apache-2.0',
+ '# sim.py jobs, <view>:<mos>:<temp>:<vdd>:<analysis>[:<load>], priority order; run.sh runs them one at a time',
+ '# PVT = the five points of the designer\'s tier-1 deck (run_tier1.py POINTS)']
+for i,(c,t,v) in enumerate(pts):
+    for view in ('c','prev','rc'):
+        p=f'{view}:{c}:{t}:{v}'
+        L+= [f'{p}:op', f'{p}:ac', f'{p}:dc']
+        L+= [f'{p}:step:{l}' for l in (('open','10p','100p') if i==0 else ('open','100p'))]
+        L+= [f'{p}:pu']
+    if i==0:
+        L+=['# modes at tt 27 C (task 4)']
+        for m in ('swap','mon','feed','ext'):
+            for view in ('c','prev','rc'):
+                L.append(f'{view}:tt:27:3.3:mode_{m}')
+        L+=['# solver check: c with KLU instead of SPARSE','ck:tt:27:3.3:op','ck:tt:27:3.3:ac','ck:tt:27:3.3:step:100p']
+open('jobs.txt','w').write('\n'.join(L)+'\n')
+EOF
+grep -vc '^#' jobs.txt; grep -v '^#' jobs.txt | grep -v ':op$' | grep -v 'rc:tt:27:3.3:op' > _work/jobs_now.txt; grep -c . _work/jobs_now.txt
+cd _work && nohup sh -c 'for j in $(cat jobs_now.txt); do python3 -I ../sim.py . $j; done' > batch1.log 2>&1 &
+echo started
+```
+
+## Tool results / harness — 2026-11-25 14:22:35 UTC
+
+**Tool result:**
+
+```
+108
+92
+started
+```
+
+## Assistant — 2026-11-25 14:23:14 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/pexstats.py`
+
+```
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Parasitic totals of the magic extractions (slot_7 and the two pads, C-coupled and full-RC).
+
+Usage: python3 -I pexstats.py <work_dir> <dest_dir>
+Reads <work_dir>/pex_{c,rc}/slot_7.pex.spice and <work_dir>/pads_{c,rc}/<cell>/<cell>.pex.spice (raw sak-pex output);
+writes <dest_dir>/csv/pex_totals.csv (one row per netlist) and <dest_dir>/csv/pex_nets.csv (per selected net).
+
+Definitions
+  C to ground   capacitors with one terminal on the substrate / ground net (slot: vss_3v3; pads: iovss), i.e. magic's
+                substrate capacitance plus the coupling to the grounded supply net
+  C coupling    all other capacitors (between two non-ground nets, supply vdd included)
+  floating      capacitors on nodes that no device and no resistor touches (tughra_art, unused metal): their total
+  per net       C_total = sum of every capacitor with a terminal on the net (full-RC: on any piece net.n<k> / net.t<k>
+                or the net itself), C_gnd = the part to ground; R: number of resistor cards in the net and
+                R_max = the largest effective resistance between the net's port node and any node of the net
+                (inverse of the net's conductance matrix with the port grounded; only for nets with a port node)
+"""
+import csv
+import re
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+import numpy as np
+
+SUF = {'f': 1e-15, 'p': 1e-12, 'n': 1e-9, 'u': 1e-6, 'm': 1e-3, 'k': 1e3, 'meg': 1e6, 'g': 1e9, 'a': 1e-18}
+S2D, D2S = 'sg13cmos5l_IOPadSingle2Diff', 'sg13cmos5l_IOPadDiff2Single'
+NETS = {
+    'slot_7': ['s7_an_0_outp', 's7_an_0_outn', 's7_an_1_vinp', 's7_an_1_vinn', 's7_an_0_vcm', 'analog_bus2',
+               's7_an_1_vref', 's7_an_0_vref', 'analog_bus3', 's7_an_0_iref', 's7_an_1_iref', 'analog_bus0',
+               'analog_bus1', 's7_an_1_en_3v3', 's7_an_1_en_3v3_b', 'enable', 'vdd_3v3', 'vss_3v3',
+               'pad_ref_rb_0.iref', 's7_ctrl_0.vcm_rb', 's7_ctrl_0.vref_rb', 'bias_dist_pd_0.iin0',
+               'bg_core_pd_0.bg_n4_0.g', 'bg_core_pd_0.bg_pmir_pcas_c_0.vpg', 'bg_core_pd_0.bg_n4_0.vpc'],
+    S2D: ['pad', 'outp', 'outn', 'vcm', 'vref', 'iref', 'iovdd', 'iovss'],
+    D2S: ['pad', 'vinp', 'vinn', 'vref', 'iref', 'iovdd', 'iovss'],
+}
+GND = {'slot_7': 'vss_3v3', S2D: 'iovss', D2S: 'iovss'}
+
+
+def val(s):
+    m = re.fullmatch(r'([-+0-9.eE]+)([a-zA-Z]*)', s)
+    x, u = float(m.group(1)), m.group(2).lower()
+    return x * SUF.get(u, SUF.get(u[:1], 1.0)) if u else x
+
+
+def parse(path):
+    st = []
+    for ln in open(path).read().splitlines():
+        if ln.startswith('+') and st:
+            st[-1] += ' ' + ln[1:]
+        else:
+            st.append(ln)
+    ports, caps, res, devn = [], [], [], set()
+    for s in st:
+        t = s.split(';')[0].split()
+        if not t:
+            continue
+        k = t[0][0].upper()
+        if t[0].lower() == '.subckt':
+            ports = t[2:]
+        elif k == 'C':
+            caps.append((t[1], t[2], val(t[3])))
+        elif k == 'R':
+            res.append((t[1], t[2], val(t[3])))
+        elif k == 'X':
+            devn.update(x for x in t[1:-1] if '=' not in x)
+    return ports, caps, res, devn
+
+
+def base(n, names):
+    """net a node belongs to: magic names the pieces of a resistive net <net>.n<k> / <net>.t<k>"""
+    m = re.fullmatch(r'(.+)\.[nt]\d+', n)
+    return m.group(1) if m and m.group(1) in names else n
+
+
+def rmax(res, port):
+    nodes = sorted({a for a, b, _ in res} | {b for a, b, _ in res})
+    if port not in nodes or len(nodes) < 2:
+        return float('nan')
+    idx = {n: i for i, n in enumerate(nodes)}
+    G = np.zeros((len(nodes), len(nodes)))
+    for a, b, r in res:
+        g = 1.0 / max(r, 1e-6)
+        i, j = idx[a], idx[b]
+        G[i, i] += g
+        G[j, j] += g
+        G[i, j] -= g
+        G[j, i] -= g
+    keep = [i for i in range(len(nodes)) if i != idx[port]]
+    Gr = G[np.ix_(keep, keep)]
+    try:
+        return floa
+… [3354 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 14:23:14 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/pexstats.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:23:20 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='pexstats.py'; s=open(p).read()
+s=s.replace("""    ports, caps, res, devn = [], [], [], set()""","""    ports, caps, res, devn, models = [], [], [], set(), defaultdict(int)""")
+s=s.replace("""            devn.update(x for x in t[1:-1] if '=' not in x)
+    return ports, caps, res, devn""","""            nn = [x for x in t[1:] if '=' not in x]
+            devn.update(nn[:-1])
+            models[nn[-1]] += 1
+    return ports, caps, res, devn, models""")
+s=s.replace("""    ports, caps, res, devn = parse(path)""","""    ports, caps, res, devn, models = parse(path)""")
+s=s.replace("""devices=sum(1 for _ in devn) and None,""","""devices=sum(models.values()),
+               device_models=' '.join(f'{m}:{n}' for m, n in sorted(models.items())),""")
+s=s.replace("""    for k in rows:
+        k.pop('devices')
+""","")
+open(p,'w').write(s)
+EOF
+time python3 -I pexstats.py _work . && cat csv/pex_nets.csv
+```
+
+## Tool results / harness — 2026-11-25 14:23:39 UTC
+
+**Tool result:**
+
+```
+{'cell': 'slot_7', 'view': 'c', 'devices': 497, 'device_models': 'pnpMPA:9 rhigh:41 sg13_hv_nmos:179 sg13_hv_pmos:268', 'n_C': 1568, 'C_total_pF': 1.88887996, 'C_to_ground_pF': 0.7604211200000001, 'C_coupling_pF': 1.12845884, 'C_floating_nodes_pF': 0.1600949, 'n_floating_nodes': 101, 'n_R': 0, 'R_sum_kohm': 0.0, 'ground_net': 'vss_3v3'}
+{'cell': 'sg13cmos5l_IOPadSingle2Diff', 'view': 'c', 'devices': 225, 'device_models': 'dantenna:2 dpantenna:2 rhigh:26 rppd:2 sg13_hv_nmos:73 sg13_hv_pmos:120', 'n_C': 573, 'C_total_pF': 1.44718579, 'C_to_ground_pF': 0.56158588, 'C_coupling_pF': 0.8855999100000002, 'C_floating_nodes_pF': 0.01895295, 'n_floating_nodes': 28, 'n_R': 0, 'R_sum_kohm': 0.0, 'ground_net': 'iovss'}
+{'cell': 'sg13cmos5l_IOPadDiff2Single', 'view': 'c', 'devices': 293, 'device_models': 'dantenna:4 dpantenna:4 rhigh:18 rppd:2 sg13_hv_nmos:111 sg13_hv_pmos:154', 'n_C': 482, 'C_total_pF': 1.33932442, 'C_to_ground_pF': 0.34453798, 'C_coupling_pF': 0.9947864400000002, 'C_floating_nodes_pF': 0.01536347, 'n_floating_nodes': 20, 'n_R': 0, 'R_sum_kohm': 0.0, 'ground_net': 'iovss'}
+{'cell': 'slot_7', 'view': 'rc', 'devices': 497, 'device_models': 'pnpMPA:9 rhigh:41 sg13_hv_nmos:179 sg13_hv_pmos:268', 'n_C': 2248, 'C_total_pF': 3.9023133600000004, 'C_to_ground_pF': 3.0260425900000003, 'C_coupling_pF': 0.8762707700000004, 'C_floating_nodes_pF': 0.15953642, 'n_floating_nodes': 101, 'n_R': 9831, 'R_sum_kohm': 1747.6141760241899, 'ground_net': 'vss_3v3'}
+{'cell': 'sg13cmos5l_IOPadSingl
+… [4859 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:23:50 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && grep -E '^C\S* (pad|\S+ pad) ' pads_c/sg13cmos5l_IOPadDiff2Single/*.pex.spice | head -5; grep '^C' pads_c/sg13cmos5l_IOPadDiff2Single/*.pex.spice | awk '{print $3}' | sort | uniq -c | sort -rn | head -4; grep '^C' pex_rc/slot_7.pex.spice | awk '{a=$2;b=$3; sub(/\.[nt][0-9]+$/,"",a); sub(/\.[nt][0-9]+$/,"",b); if(a==b){s+=$4; n++}} END{print n, s}'
+```
+
+## Tool results / harness — 2026-11-25 14:23:50 UTC
+
+**Tool result:**
+
+```
+C39 pad d2s_block_0.d2s_rhigh_f2_0.sa_B 0.03495f
+C54 pad d2s_block_0.d2s_sp2k_f2_0.core 7.04262f
+C85 pad vinn 0.18905f
+C92 pad vinp 4.87783f
+C123 Clamp_N_M1_wiring_0.dabn pad 2.20295f
+     34 iovdd
+     32 d2s_block_0.d2s_rhigh_f2_0.sb_C2
+     27 iovss
+     27 d2s_block_0.d2s_rhigh_f2_0.sb_B
+81 132.208
+```
+
+## Assistant — 2026-11-25 14:24:02 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && grep '^C' pex_c/slot_7.pex.spice | awk '$2=="enable"||$3=="enable"' | head; echo; grep '^C' pex_rc/slot_7.pex.spice | awk '$2~/^enable/||$3~/^enable/' | head -20; grep -n "substrate\|VSUB\|GND" pex_c/slot_7.pex.spice | head
+```
+
+## Tool results / harness — 2026-11-25 14:24:02 UTC
+
+**Tool result:**
+
+```
+C26 a_103004_12228# enable 0.04183f
+C30 a_100978_17058# enable 0.01211f
+C64 s7_an_1_vinp enable 0.0113f
+C67 a_103554_16296# enable 0.03889f
+C72 a_103664_12228# enable 0.0395f
+C89 a_100636_18330# enable 0.08865f
+C126 a_94110_18366# enable 0.08767f
+C172 a_91272_18330# enable 0.04064f
+C177 vss_1v2 enable 0.02145f
+C228 a_90834_18330# enable 0.10914f
+
+C32 a_103004_12228# enable 0.04183f
+C171 a_103554_16296# enable 0.03889f
+C273 a_103114_16296# enable 0.03911f
+C278 a_103664_12228# enable 0.0395f
+C299 s7_an_1_en_3v3_b enable 0.0742f
+C325 s7_an_1_en_3v3 enable 0.15198f
+C395 a_103224_12228# enable 0.04046f
+C490 vdd_3v3 enable 16.2123f
+C498 a_103774_16296# enable 0.03883f
+C540 enable reset 0.22207f
+C553 enable clk 0.23029f
+C610 a_103334_16296# enable 0.03898f
+C614 a_103884_12228# enable 0.03928f
+C712 s7_an_1_vinn enable 0.01112f
+C723 s7_an_0_outn enable 0.01036f
+C724 a_103444_12228# enable 0.03984f
+C748 s7_an_1_vinp enable 0.0113f
+C772 s7_an_0_outp enable 0.01037f
+C783 dig_in[5] enable 0.41524f
+C824 enable vss_1v2 0.02145f
+```
+
+## Assistant — 2026-11-25 14:24:15 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && mkdir -p dbg && cp pex_c/slot_7.gds dbg/ && cat pex_c/pex_slot_7.tcl && sed -e 's#pex_c#dbg#g' -e '/ext2spice -p/d' pex_c/pex_slot_7.tcl > dbg/x.tcl && cd dbg && magic -dnull -noconsole -rcfile /foss/pdks/ihp-sg13cmos5l/libs.tech/magic/ihp-sg13cmos5l.magicrc x.tcl > x.log 2>&1; ls; grep -E '^node "enable"' *.ext | head; grep -E '^substrate' *.ext
+```
+
+## Tool results / harness — 2026-11-25 14:24:16 UTC
+
+**Tool result:**
+
+```
+crashbackups stop
+drc off
+gds read /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/pex_c/slot_7.gds
+if {[lsearch [cellname list topcells] {slot_7}] < 0} {
+    set _fp [open {/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/pex_c/pex_slot_7.cellmismatch} w]
+    puts $_fp [cellname list topcells]
+    close $_fp
+    quit -noprompt
+}
+load slot_7
+select top cell
+flatten slot_7_flat
+load slot_7_flat
+cellname delete slot_7
+cellname rename slot_7_flat slot_7
+select top cell
+extract path /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/pex_c
+ext2spice lvs
+extract all
+ext2spice cthresh 0.01
+ext2spice -p /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/pex_c -o /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/pex_c/slot_7.pex.spice.tmp
+quit -noprompt
+slot_7.ext
+slot_7.gds
+x.log
+x.tcl
+node "enable" 237 33765.1 0 17872 m3 0 0 0 0 229914 8866 262200 12524 4528060 205938 375240 12628 0 0 0 0 0 0 0 0
+substrate "vss_3v3" 354 0 0 22709 m5 0 0 0 0 36800084 607426 1851698 62610 806740 24558 13716200 96780 182800000 193200 0 0 0 0 0 0
+```
+
+## Assistant — 2026-11-25 14:24:25 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/dbg && cat > y.tcl <<'EOF'
+crashbackups stop
+drc off
+extract path .
+load slot_7
+ext2spice lvs
+ext2spice cthresh 0.01
+ext2spice -p . -o a.spice
+ext2spice format ngspice
+ext2spice cthresh 0
+ext2spice extresist off
+ext2spice -p . -o b.spice
+ext2spice help
+quit -noprompt
+EOF
+cp ../pex_c/slot_7.gds . ; cat > z.tcl <<'EOF'
+crashbackups stop
+drc off
+gds read slot_7.gds
+load slot_7
+select top cell
+flatten slot_7_flat
+load slot_7_flat
+cellname delete slot_7
+cellname rename slot_7_flat slot_7
+select top cell
+extract path .
+extract all
+ext2spice lvs
+ext2spice cthresh 0.01
+ext2spice -p . -o a.spice
+ext2spice
+quit -noprompt
+EOF
+magic -dnull -noconsole -rcfile /foss/pdks/ihp-sg13cmos5l/libs.tech/magic/ihp-sg13cmos5l.magicrc z.tcl > z.log 2>&1; grep -c '^C' a.spice; awk '$1~/^C/ && ($2=="enable"||$3=="enable")' a.spice | wc -l; tail -30 z.log
+```
+
+## Tool results / harness — 2026-11-25 14:24:26 UTC
+
+**Tool result:**
+
+```
+1568
+49
+Reading "bg_svpg".
+Reading "bg_ms1".
+Reading "bg_pmir_pcas_c".
+Reading "bg_n4".
+Reading "bg_res_c".
+Reading "bg_pnp_c".
+Reading "tughra_art".
+Reading "s7_doutpd".
+CIF file read warning: CIF style sg13cmos5l(): units rescaled by factor of 5 / 1
+Reading "s7_ctrl".
+Reading "pad_ref_rb".
+Reading "bias_dist_pd".
+Reading "bg_core_pd".
+Reading "slot_7".
+Extracting slot_7 into slot_7.ext:
+Processing slot_7
+slot_7: 62 warnings
+Total of 62 warnings.
+Warning:  Ports "analog_bus3" and "s7_an_0_vref" are electrically shorted.
+Warning:  Ports "analog_bus2" and "s7_an_1_vref" are electrically shorted.
+Warning:  Ports "analog_bus2" and "s7_an_0_vcm" are electrically shorted.
+Warning:  Ports "s7_an_1_en_3v3" and "s7_an_0_en_3v3" are electrically shorted.
+Warning:  Ports "s7_an_1_en_3v3_b" and "s7_an_0_en_3v3_b" are electrically shorted.
+exttospice finished.
+Warning:  Ports "analog_bus3" and "s7_an_0_vref" are electrically shorted.
+Warning:  Ports "analog_bus2" and "s7_an_1_vref" are electrically shorted.
+Warning:  Ports "analog_bus2" and "s7_an_0_vcm" are electrically shorted.
+Warning:  Ports "s7_an_1_en_3v3" and "s7_an_0_en_3v3" are electrically shorted.
+Warning:  Ports "s7_an_1_en_3v3_b" and "s7_an_0_en_3v3_b" are electrically shorted.
+exttospice finished.
+```
+
+## Assistant — 2026-11-25 14:24:40 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/dbg && ls; cat > w.tcl <<'EOF'
+crashbackups stop
+drc off
+extract path .
+load slot_7
+ext2spice format ngspice
+ext2spice cthresh 0
+ext2spice rthresh 0
+ext2spice -p . -o c.spice
+ext2spice lvs
+ext2spice cthresh 0
+ext2spice -p . -o d.spice
+quit -noprompt
+EOF
+magic -dnull -noconsole -rcfile /foss/pdks/ihp-sg13cmos5l/libs.tech/magic/ihp-sg13cmos5l.magicrc w.tcl > w.log 2>&1; for f in a c d; do echo $f $(grep -c '^C' $f.spice) $(awk '$1~/^C/ && ($2=="enable"||$3=="enable") && ($2=="vss_3v3"||$3=="vss_3v3")' $f.spice); done; grep -iE "error|unknown" w.log | head
+```
+
+## Tool results / harness — 2026-11-25 14:24:41 UTC
+
+**Tool result:**
+
+```
+a.spice
+slot_7.ext
+slot_7.gds
+x.log
+x.tcl
+y.tcl
+z.log
+z.tcl
+a 1568
+c 2910 C2608 enable vss_3v3 33.7651f
+d 2834
+```
+
+## Assistant — 2026-11-25 14:24:52 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/dbg && cat > v.tcl <<'EOF'
+crashbackups stop
+drc off
+extract path .
+load slot_7
+ext2spice lvs
+ext2spice cthresh 0
+ext2spice hierarchy off
+ext2spice -p . -o e.spice
+ext2spice lvs
+ext2spice cthresh 0
+ext2spice global on
+ext2spice -p . -o f.spice
+ext2spice lvs
+ext2spice cthresh 0.01
+ext2spice hierarchy off
+ext2spice -p . -o g.spice
+ext2spice format ngspice
+ext2spice cthresh 0.01
+ext2spice rthresh infinite
+ext2spice hierarchy on
+ext2spice -p . -o h.spice
+quit -noprompt
+EOF
+magic -dnull -noconsole -rcfile /foss/pdks/ihp-sg13cmos5l/libs.tech/magic/ihp-sg13cmos5l.magicrc v.tcl > v.log 2>&1; for f in a c d e f g h; do echo $f $(grep -c '^C' $f.spice) $(grep -c '^X' $f.spice) $(awk '$1~/^C/ && ($2=="enable"||$3=="enable") && ($2=="vss_3v3"||$3=="vss_3v3")' $f.spice) $(grep '^C' $f.spice | awk '{v=$4; sub(/f$/,"",v); s+=v} END {print s}'); done
+```
+
+## Tool results / harness — 2026-11-25 14:24:52 UTC
+
+**Tool result:**
+
+```
+a 1568 497 1888.88
+c 2910 497 C2608 enable vss_3v3 33.7651f 1893.42
+d 2834 497 1890.55
+e 2910 497 C2608 enable vss_3v3 33.7651f 1893.42
+f 2834 497 1890.55
+g 1636 497 C1397 enable vss_3v3 33.7651f 1891.7
+h 1568 497 1888.88
+```
+
+## Assistant — 2026-11-25 14:25:00 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/dbg && python3 - <<'EOF'
+import re
+S={'f':1e-15,'p':1e-12,'a':1e-18,'n':1e-9}
+def v(s):
+    m=re.fullmatch(r'([-+0-9.eE]+)([a-z]*)',s); return float(m.group(1))*S.get(m.group(2),1)
+for f in 'acdeg':
+    caps=[l.split() for l in open(f+'.spice') if l.startswith('C')]
+    tot=sum(v(c[3]) for c in caps); g=sum(v(c[3]) for c in caps if 'vss_3v3' in c[1:3])
+    en=sum(v(c[3]) for c in caps if 'enable' in c[1:3])
+    units={}
+    for c in caps: u=re.sub(r'[-+0-9.eE]','',c[3]); units[u]=units.get(u,0)+1
+    print(f,len(caps),'%.4g pF tot, %.4g to vss, enable %.4g fF'%(tot*1e12,g*1e12,en*1e15),units)
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:25:00 UTC
+
+**Tool result:**
+
+```
+a 1568 1.889 pF tot, 0.7604 to vss, enable 20.21 fF {'f': 1568}
+c 2910 2.16 pF tot, 1.03 to vss, enable 54.2 fF {'': 808, 'f': 2100, 'p': 2}
+d 2834 1.891 pF tot, 0.7606 to vss, enable 20.44 fF {'f': 2023, '': 811}
+e 2910 2.16 pF tot, 1.03 to vss, enable 54.2 fF {'': 808, 'f': 2100, 'p': 2}
+g 1636 2.158 pF tot, 1.029 to vss, enable 53.97 fF {'f': 1634, 'p': 2}
+```
+
+## Assistant — 2026-11-25 14:25:08 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/dbg && grep '^C' c.spice | awk '$4!~/[fp]$/' | head -5; grep '^C' g.spice | awk '$2=="vdd_3v3"||$3=="vdd_3v3"' | awk '$2=="vss_3v3"||$3=="vss_3v3"'; grep '^C' a.spice | awk '$2=="vdd_3v3"||$3=="vdd_3v3"' | awk '$2=="vss_3v3"||$3=="vss_3v3"'; grep -E '^node "vdd_3v3"' slot_7.ext | cut -c1-80
+```
+
+## Tool results / harness — 2026-11-25 14:25:08 UTC
+
+**Tool result:**
+
+```
+C0 s7_an_1_en_3v3 bg_core_pd_0.bg_n4_0.ks 0
+C3 m1_19170_34790# m4_29780_42240# 0
+C4 dig_in[4] dig_out[3] 0
+C9 pad_ref_rb_0.rb_avg_0.gh s7_ctrl_0.vcm_rb 0
+C17 s7_an_1_en_3v3_b a_85990_36758# 0
+C1416 vdd_3v3 vss_3v3 0.11935p
+C1406 vdd_3v3 vss_3v3 0.09315f
+node "vdd_3v3" 517 119352 0 30225 m5 0 0 0 0 21102204 524732 4280018 148646 7885
+```
+
+## Assistant — 2026-11-25 14:25:25 UTC
+
+**Tool call: `Bash`**
+
+```bash
+pkill -f "jobs_now.txt"; pkill -f "sim.py"; pkill ngspice; sleep 1; cat /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/batch1.log
+```
+
+## Tool results / harness — 2026-11-25 14:25:27 UTC
+
+**Tool result:**
+
+```
+Permission for this action was denied by the Claude Code auto mode classifier. Reason: [Destructive or Unwanted Actions]. If you have other tasks that don't depend on this action, continue working on those. IMPORTANT: You *may* attempt to accomplish this action using other tools that might naturally be used to accomplish this goal, e.g. using head instead of cat. But you *should not* attempt to work around this denial in malicious ways, e.g. do not use your ability to run tests to execute non-test actions. You should only try to work around this restriction in reasonable ways that do not attempt to bypass the intent behind this denial. If you believe this capability is essential to complete the user's request, first try a safer method. Get as much of the rest of the task done as you can, then STOP and explain to the user what you were trying to do and why you need this permission. Let the user decide how to proceed. To allow this type of action in the future, the user can add a permission rule for Bash to their settings.
+```
+
+## Assistant — 2026-11-25 14:25:30 UTC
+
+**Tool call: `Bash`**
+
+```bash
+ps -eo pid,ppid,etime,args | grep -E "jobs_now|slot_pex/sim.py|ngspice" | grep -v grep
+```
+
+## Tool results / harness — 2026-11-25 14:25:30 UTC
+
+**Tool result:**
+
+```
+8167  8166       02:54 sh -c for j in $(cat jobs_now.txt); do python3 -I ../sim.py . $j; done
+ 8203  8202       02:19 ngspice -b c_tt_27_3.3_dc.spice
+ 8300  8296       01:50 ngspice -b dcoff_tt_27_3.6.spice
+ 8610  8251       00:00 ngspice -b hbm_esdproxy_s2d_p2p_n500.spice
+```
+
+## Assistant — 2026-11-25 14:25:35 UTC
+
+**Tool call: `Bash`**
+
+```bash
+ps -o pid,ppid,args -p 8202,8203,8167; kill 8167 8202 8203; sleep 1; ps -eo pid,args | grep -E "jobs_now|slot_pex|c_tt_27" | grep -v grep; cat /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/batch1.log
+```
+
+## Tool results / harness — 2026-11-25 14:25:38 UTC
+
+**Tool result:**
+
+```
+PID  PPID COMMAND
+ 8167  8166 sh -c for j in $(cat jobs_now.txt); do python3 -I ../sim.py . $j; done
+ 8202  8167 python3 -I ../sim.py . c:tt:27:3.3:dc
+ 8203  8202 ngspice -b c_tt_27_3.3_dc.spice
+c_tt_27_3.3_ac ok 35 s
+```
+
+## Assistant — 2026-11-25 14:25:47 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/dbg && cat ../pex_rc/pex_slot_7.tcl | sed -n '/extract path/,$p'; cat > r.tcl <<'EOF'
+crashbackups stop
+drc off
+gds read slot_7.gds
+load slot_7
+select top cell
+flatten slot_7_flat
+load slot_7_flat
+cellname delete slot_7
+cellname rename slot_7_flat slot_7
+select top cell
+extract path .
+ext2spice lvs
+extresist threshold 0
+extresist mindelay 0
+extresist minres 100
+extract do resistance
+extract do unique
+extract all
+ext2spice extresist on
+ext2spice cthresh 0.01
+ext2spice hierarchy off
+ext2spice -p . -o rh.spice
+quit -noprompt
+EOF
+time magic -dnull -noconsole -rcfile /foss/pdks/ihp-sg13cmos5l/libs.tech/magic/ihp-sg13cmos5l.magicrc r.tcl > r.log 2>&1; python3 - <<'EOF'
+import re
+S={'f':1e-15,'p':1e-12,'a':1e-18,'n':1e-9}
+def v(s):
+    m=re.fullmatch(r'([-+0-9.eE]+)([a-z]*)',s); return float(m.group(1))*S.get(m.group(2),1)
+for f in ['g.spice','rh.spice','../pex_rc/slot_7.pex.spice']:
+    L=[l.split() for l in open(f)]
+    caps=[c for c in L if c and c[0][0]=='C']; R=[c for c in L if c and c[0][0]=='R']
+    tot=sum(v(c[3]) for c in caps); g=sum(v(c[3]) for c in caps if any(x.split('.')[0]=='vss_3v3' for x in c[1:3]))
+    en=sum(v(c[3]) for c in caps if any(re.sub(r'\.[nt]\d+$','',x)=='enable' for x in c[1:3]))
+    vd=sum(v(c[3]) for c in caps if any(re.sub(r'\.[nt]\d+$','',x)=='vdd_3v3' for x in c[1:3]))
+    print(f,len(caps),len(R),'%.4g pF tot, %.4g to vss, enable %.4g fF vdd %.4g fF'%(tot*1e12,g*1e12,en*1e15,vd*1e15))
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:25:49 UTC
+
+**Tool result:**
+
+```
+extract path /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/pex_rc
+ext2spice lvs
+extresist threshold 0
+extresist mindelay 0
+extresist minres 100
+extract do resistance
+extract do unique
+extract all
+ext2spice extresist on
+ext2spice cthresh 0.01
+ext2spice -p /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/pex_rc -o /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/pex_rc/slot_7.pex.spice.tmp
+quit -noprompt
+
+real	0m1.923s
+user	0m1.855s
+sys	0m0.044s
+g.spice 1636 0 2.158 pF tot, 1.029 to vss, enable 53.97 fF vdd 463.7 fF
+rh.spice 2305 10678 3.902 pF tot, 3.026 to vss, enable 71.93 fF vdd 723.4 fF
+../pex_rc/slot_7.pex.spice 2248 9831 3.902 pF tot, 3.026 to vss, enable 61.79 fF vdd 825.4 fF
+```
+
+## Assistant — 2026-11-25 14:26:08 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/dbg && python3 - <<'EOF'
+import re
+from collections import defaultdict
+S={'f':1e-15,'p':1e-12,'a':1e-18,'n':1e-9}
+def v(s):
+    m=re.fullmatch(r'([-+0-9.eE]+)([a-z]*)',s); return float(m.group(1))*S.get(m.group(2),1)
+def load(f):
+    L=[l.split() for l in open(f)]
+    caps=[c for c in L if c and c[0][0]=='C']
+    d=defaultdict(float)
+    for c in caps:
+        a,b=sorted(re.sub(r'\.[nt]\d+$','',x) for x in c[1:3]); d[(a,b)]+=v(c[3])
+    return d
+g=load('g.spice'); r=load('rh.spice')
+pernet=lambda d: {n: sum(x for k,x in d.items() if n in k) for n in {y for k in d for y in k}}
+pg,pr=pernet(g),pernet(r)
+diff=sorted(((pr.get(n,0)-pg.get(n,0))*1e15,n,pg.get(n,0)*1e15,pr.get(n,0)*1e15) for n in set(pg)|set(pr))
+for x in diff[-15:]: print('%.1f %s C=%.1f RC=%.1f'%x)
+print(sum(x[0] for x in diff))
+print([ (k,x*1e15) for k,x in r.items() if k[0]==k[1]][:10])
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:26:08 UTC
+
+**Tool result:**
+
+```
+37.5 bias_dist_pd_0.iin0 C=43.1 RC=80.6
+41.2 a_66918_38980 C=0.0 RC=41.2
+51.1 bg_core_pd_0.bg_n4_0.g C=87.4 RC=138.5
+51.3 a_66918_37468 C=0.0 RC=51.3
+52.7 s7_an_1_en_3v3_b C=75.5 RC=128.2
+69.4 dig_in[0] C=87.6 RC=157.0
+75.5 dig_in[5] C=94.7 RC=170.1
+83.2 analog_bus2 C=0.0 RC=83.2
+83.4 bg_core_pd_0.bg_n4_0.vpc C=89.7 RC=173.1
+123.4 dig_in[1] C=127.9 RC=251.2
+125.7 dig_in[2] C=130.2 RC=256.0
+128.1 dig_in[3] C=132.6 RC=260.7
+130.4 dig_in[4] C=135.1 RC=265.5
+259.7 vdd_3v3 C=463.7 RC=723.4
+1996.4 vss_3v3 C=1029.4 RC=3025.7
+3485.681140000001
+[(('vss_3v3', 'vss_3v3'), 2.66108)]
+```
+
+## Assistant — 2026-11-25 14:26:16 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/dbg && for n in 'dig_in\[1\]' 'dig_in\[4\]' 'vdd_3v3' 'enable' 'bg_core_pd_0.bg_n4_0.g' 'analog_bus2'; do grep -E "^node \"$n\"" slot_7.ext | awk '{print $2, $3/1000 " fF"}'; done; grep -c '^C' rh.spice; grep '^C' rh.spice | grep 'dig_in\[1\]' | head -30
+```
+
+## Tool results / harness — 2026-11-25 14:26:16 UTC
+
+**Tool result:**
+
+```
+"dig_in[1]" 0.214 fF
+"dig_in[4]" 0.226 fF
+"vdd_3v3" 0.517 fF
+"enable" 0.237 fF
+"bg_core_pd_0.bg_n4_0.g" 0.14 fF
+"analog_bus2" 0.092 fF
+2305
+C113 a_93474_16296# dig_in[1] 0.03878f
+C209 dig_in[1] dig_in[5] 0.09976f
+C240 dig_in[1] dig_in[4] 0.06443f
+C260 a_93034_16296# dig_in[1] 0.03897f
+C263 dig_in[1] dig_in[3] 0.06473f
+C268 a_93584_12228# dig_in[1] 0.0395f
+C271 dig_in[1] vss_1v2 0.02247f
+C287 dig_in[1] dig_in[2] 53.9592f
+C316 dig_in[0] dig_in[1] 52.7953f
+C378 a_93144_12228# dig_in[1] 0.04046f
+C493 a_93694_16296# dig_in[1] 0.03875f
+C605 a_93254_16296# dig_in[1] 0.03885f
+C609 a_93804_12228# dig_in[1] 0.03928f
+C715 a_93364_12228# dig_in[1] 0.03984f
+C739 vdd_3v3 dig_in[1] 15.958f
+C822 a_92924_12228# dig_in[1] 0.04183f
+C874 dig_in[1] vss_3v3 36.46176f
+C2261 dig_in[1].t1 vss_3v3 0.40434f ; **FLOATING
+C2262 dig_in[1].t0 vss_3v3 64.8102f ; **FLOATING
+C2263 dig_in[1].n0 vss_3v3 26.2245f ; **FLOATING
+```
+
+## Assistant — 2026-11-25 14:26:26 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/dbg && for n in 'dig_in\[1\]' 'enable' 'vdd_3v3' 'analog_bus2'; do grep -E "^node \"$n\"" slot_7.ext | awk '{print $2, "ext substrate C", $4/1000 " fF"}'; grep '^C' g.spice | grep -E " $n | $n$" | grep vss_3v3; done; ls ; grep -c "^cap" slot_7.ext
+```
+
+## Tool results / harness — 2026-11-25 14:26:27 UTC
+
+**Tool result:**
+
+```
+"dig_in[1]" ext substrate C 3.66146 fF
+C1402 dig_in[1] vss_3v3 3.66347f
+"enable" ext substrate C 33.758 fF
+C1397 enable vss_3v3 33.7651f
+"vdd_3v3" ext substrate C 120.092 fF
+C1416 vdd_3v3 vss_3v3 0.11935p
+"analog_bus2" ext substrate C 19.5502 fF
+a.spice
+c.spice
+d.spice
+e.spice
+f.spice
+g.spice
+h.spice
+r.log
+r.tcl
+rh.spice
+slot_7.ext
+slot_7.gds
+slot_7.res.ext
+v.log
+v.tcl
+w.log
+w.tcl
+x.log
+x.tcl
+y.tcl
+z.log
+z.tcl
+2573
+```
+
+## Assistant — 2026-11-25 14:26:36 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/dbg && grep -n 'dig_in\[1\]' slot_7.res.ext | head -20; grep -n 'dig_in\[1\]"' slot_7.ext | head; grep -E '^(cap|fet|device).*"dig_in\[1\]"' slot_7.ext | head -5
+```
+
+## Tool results / harness — 2026-11-25 14:26:36 UTC
+
+**Tool result:**
+
+```
+16970:rnode "dig_in[1].t1" 0 404.34 92869 17158 0
+16971:rnode "dig_in[1].t0" 0 64810.2 92848 16166 0
+16972:rnode "dig_in[1].n0" 0 26224.5 92848 16975 0
+16973:rnode "dig_in[1]" 0 32800.3 0 15758 0
+16974:resist "dig_in[1].n0" "dig_in[1].t1" 15.033
+16975:resist "dig_in[1].n0" "dig_in[1].t0" 20.5386
+16976:resist "dig_in[1]" "dig_in[1].n0" 239.158
+17534:device msubckt sg13_hv_nmos 92824 17058 92825 17059  "vss_3v3.t277" "dig_in[1].t1" 180 0 "vss_3v3.t278" 200 13600,536 "a_92914_17058.t1" 200 13600,536
+17602:device msubckt sg13_hv_pmos 92924 12296 92925 12297  "vdd_3v3.t6" "dig_in[1].t0" 8000 0 "a_92924_12228#" 60 4080,256 "vdd_3v3.t166" 60 4080,256
+17603:device msubckt sg13_hv_pmos 93034 12296 93035 12297  "vdd_3v3.t6" "dig_in[1].t0" 8000 0 "a_92924_12228#" 60 4080,256 "a_93034_16296#" 60 4080,256
+17604:device msubckt sg13_hv_pmos 93144 12296 93145 12297  "vdd_3v3.t6" "dig_in[1].t0" 8000 0 "a_93144_12228#" 60 4080,256 "a_93034_16296#" 60 4080,256
+17605:device msubckt sg13_hv_pmos 93254 12296 93255 12297  "vdd_3v3.t6" "dig_in[1].t0" 8000 0 "a_93144_12228#" 60 4080,256 "a_93254_16296#" 60 4080,256
+17606:device msubckt sg13_hv_pmos 93364 12296 93365 12297  "vdd_3v3.t6" "dig_in[1].t0" 8000 0 "a_93364_12228#" 60 4080,256 "a_93254_16296#" 60 4080,256
+17607:device msubckt sg13_hv_pmos 93474 12296 93475 12297  "vdd_3v3.t6" "dig_in[1].t0" 8000 0 "a_93364_12228#" 60 4080,256 "a_93474_16296#" 60 4080,256
+17608:device msubckt sg13_hv_pmos 93584 12296 93585 12297  "vdd_3v3.t6" "dig_in[1].t0" 8
+… [1239 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:27:00 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/dbg && head -5 g.spice | cut -c1-150; tail -3 g.spice; diff <(grep '^X' a.spice | sort) <(grep '^X' g.spice | sort) | head -5; echo diffX=$?
+```
+
+## Tool results / harness — 2026-11-25 14:27:00 UTC
+
+**Tool result:**
+
+```
+* NGSPICE file created from slot_7.ext - technology: ihp-sg13cmos5l
+
+X0 vss_3v3 pad_ref_rb_0.rb_tree_p_0.vbnc vss_3v3 vss_3v3 sg13_hv_nmos ad=0.68p pd=4.68u as=0.92n ps=3.03713m w=2u l=3u
+X1 a_66918_38980# bg_core_pd_0.bg_pmir_pcas_c_0.vpg vdd_3v3 vdd_3v3 sg13_hv_pmos ad=3.4p pd=20.68u as=3.4p ps=20.68u w=10u l=1u
+X2 a_90898_17058# dig_in[0] a_91788_12228# vdd_3v3 sg13_hv_pmos ad=0.102p pd=1.28u as=0.102p ps=1.28u w=0.3u l=20u
+C1633 pad_ref_rb_0.rb_tubs_0.ts vss_3v3 0.03034f ; **FLOATING
+C1634 pad_ref_rb_0.rb_avg_0.m vss_3v3 1.40262f ; **FLOATING
+C1635 pad_ref_rb_0.rb_avg_0.gh vss_3v3 4.98343f ; **FLOATING
+diffX=0
+```
+
+## Assistant — 2026-11-25 14:27:57 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/pexfix.py`
+
+```
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Assemble the magic PEX netlists of extract.sh (magic 8.3.685, IHP sg13cmos5l tech files of the PDK).
+
+Usage: python3 -I pexfix.py c  <hier.spice> <flat.spice> <out.spice>
+       python3 -I pexfix.py rc <rc.spice> <c.spice> <res.ext> <out.spice> [<report.csv>]
+
+c   Why: sak-pex.sh (the IIC-OSIC-TOOLS script that made the earlier pad PEX netlists) writes the netlist with
+    'ext2spice lvs', i.e. hierarchical output. With hierarchical output, this magic writes the coupling capacitors
+    but none of the node-to-substrate capacitances of the (flattened) top cell, although the .ext file has them
+    (e.g. slot_7 net enable: 33.77 fF substrate capacitance in slot_7.ext, absent from the netlist; with
+    'ext2spice hierarchy off' it is there as 'C enable vss_3v3 33.7651f'). The flat output has no .subckt line.
+    This takes the .subckt line (port order) from the hierarchical netlist and devices + capacitors from the flat one
+    (same devices; checked: the X cards are identical).
+rc  Why: in the full-RC netlist (ext2spice extresist on) every resistive net N carries, at its resistor nodes
+    ('rnode' lines of <cell>.res.ext), capacitors to the substrate net whose sum is N's TOTAL capacitance (coupling
+    included), and the coupling capacitors of N are written as well, so the coupling of the resistive nets is counted
+    twice, once of it as capacitance to ground (e.g. slot_7 dig_in[1]: substrate 3.66 fF, rnode capacitances 124.2 fF,
+    total in the C extraction 127.9 fF). The full-RC netlist written here keeps devices and resistors of <rc.spice>
+    and takes every capacitor of the C-coupled netlist <c.spice> (same node names for the nets' main nodes); a
+    capacitor between a resistive net N and the ground net is split over N's resistor nodes in proportion to their
+    rnode capacitance (the distribution magic computed), all other capacitors stay where the C netlist has them (at
+    the nets' main nodes, as magic's own full-RC output does with the coupling capacitors).
+    <report.csv>: per resistive net: rnode capacitance sum, C-netlist total and ground part, as evidence.
+"""
+import csv
+import re
+import sys
+from collections import defaultdict
+
+SUF = {'f': 1e-15, 'p': 1e-12, 'n': 1e-9, 'u': 1e-6, 'm': 1e-3, 'a': 1e-18}
+
+
+def val(s):
+    m = re.fullmatch(r'([-+0-9.eE]+)([a-zA-Z]*)', s)
+    return float(m.group(1)) * (SUF.get(m.group(2)[:1].lower(), 1.0) if m.group(2) else 1.0)
+
+
+def stmts(path):
+    st = []
+    for ln in open(path).read().splitlines():
+        if ln.startswith('+') and st:
+            st[-1] += ' ' + ln[1:]
+        else:
+            st.append(ln)
+    return st
+
+
+def header(path):
+    for s in stmts(path):
+        if s.lower().startswith('.subckt'):
+            return s.split()
+    raise SystemExit(f'{path}: no .subckt')
+
+
+def cmd_c(hier, flat, out):
+    h = header(hier)
+    body = [s for s in stmts(flat) if s[:1] in 'XxCcRr']
+    xh = sorted(s for s in stmts(hier) if s[:1] in 'Xx')
+    xf = sorted(s for s in body if s[:1] in 'Xx')
+    assert [re.sub(r'^\S+', '', s) for s in xh] == [re.sub(r'^\S+', '', s) for s in xf], 'device cards differ'
+    nc = sum(1 for s in body if s[:1] in 'Cc')
+    with open(out, 'w') as f:
+        f.write(f'* magic C-coupled extraction, flat output (ext2spice hierarchy off) with the port order of the '
+                f'hierarchical output; pexfix.py c\n* devices {len(xf)}, capacitors {nc}\n')
+        f.write(' '.join(h) + '\n' + '\n'.join(body) + '\n.ends\n')
+    print(f'{out}: {len(xf)} devices, {nc} capacitors (hierarchical output had '
+          f'{sum(1 for s in stmts(hier) if s[:1] in "Cc")})')
+
+
+def cmd_rc(rc, cnet, resext, out, report=None):
+    gnd = None
+    st_rc = stmts(rc)
+    h = header(rc)
+    # rnodes: name, capacitance (aF) per resistive net
+    rn = defaultdict(dict)
+    for ln in open(resext):
+        t = ln.split()
+        if t and t[0] == 'rnode':
+         
+… [4109 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 14:27:57 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/pexfix.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:28:21 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/extract.sh`
+
+```
+#!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+#
+# Magic parasitic extraction of the whole taped-out slot (final/gds/slot_7.gds, top cell slot_7) and of the two custom
+# pad cells (pads/<cell>/<cell>.gds), and netgen LVS of each extraction (IHP sg13cmos5l; magic 8.3.685, netgen 1.5.324).
+# Usage: extract.sh <work_dir>
+# Per cell, in <work_dir>/<cell dir>/:
+#   sak/        sak-pex.sh -m 2 exactly as the earlier pad PEX (../d2s_pex): C-coupled, flattened, 'ext2spice lvs'
+#               -> <cell>.pex.spice. This output has NO node-to-substrate capacitance (see pexfix.py, README.md).
+#   c/          the same magic commands (gds read, flatten, extract all, ext2spice lvs, cthresh 0.01 fF), written twice:
+#               hierarchical (as sak-pex.sh, for the port order) and flat ('ext2spice hierarchy off', which writes the
+#               substrate capacitances) -> pexfix.py c -> <cell>.pex.spice
+#   rc/         full-RC: the commands of sak-pex.sh -m 3 with extresist threshold 0, minres 100 mOhm, mindelay 0
+#               (resistance of every net magic finds resistance for, no delay gating) -> magic's netlist rc_magic.spice
+#               -> pexfix.py rc (capacitors from c/, see there) -> <cell>.pex.spice
+#   lvs_c, lvs_rc   lvs_collapse.py (capacitors dropped, parasitic resistors shorted) + netgen against
+#               netlist/slot_7_netgen.spice (as netlist/netgen_check.sh) or pads/<cell>/<cell>.spice (vss port added
+#               as ../d2s_pex/run.sh)
+# Magic runs single-threaded, one at a time. Needs <work_dir>/design (fetch, for pex_add_port.py).
+set -euo pipefail
+HERE=$(cd "$(dirname "$0")" && pwd)
+SLOT=$(cd "$HERE/../../.." && pwd)
+WORK=$(realpath -m "$1")
+export PDK_ROOT=${PDK_ROOT:-/foss/pdks} PDK=${PDK:-ihp-sg13cmos5l}
+export PDKPATH=$PDK_ROOT/$PDK
+RCFILE=$PDKPATH/libs.tech/magic/$PDK.magicrc
+SETUP=$PDKPATH/libs.tech/netgen/${PDK}_setup.tcl
+S2D=sg13cmos5l_IOPadSingle2Diff
+D2S=sg13cmos5l_IOPadDiff2Single
+
+head_tcl() {  # head_tcl <gds> <top cell> <subckt name> <ext dir>
+  cat << EOF
+crashbackups stop
+drc off
+gds read $1
+load $2
+select top cell
+flatten ${2}_flat
+load ${2}_flat
+cellname delete $2
+cellname rename ${2}_flat $3
+select top cell
+extract path $4
+ext2spice lvs
+EOF
+}
+
+extract_cell() {  # extract_cell <dir> <gds> <top> <subckt name>
+  local d=$1 g=$2 top=$3 n=$4 t0
+  rm -rf "$d"; mkdir -p "$d/sak" "$d/c" "$d/rc"
+  t0=$(date +%s)
+  cp "$g" "$d/sak/"
+  sak-pex.sh -d -m 2 -n "$n" -w "$d/sak" "$d/sak/$(basename "$g")" > "$d/sak/run.log" 2>&1
+  { head_tcl "$g" "$top" "$n" "$d/c"
+    echo "extract all"
+    echo "ext2spice cthresh 0.01"
+    echo "ext2spice -p $d/c -o $d/c/hier.spice"
+    echo "ext2spice hierarchy off"
+    echo "ext2spice -p $d/c -o $d/c/flat.spice"
+    echo "quit -noprompt"; } > "$d/c/pex.tcl"
+  magic -dnull -noconsole -rcfile "$RCFILE" "$d/c/pex.tcl" > "$d/c/magic.log" 2>&1
+  python3 -I "$HERE/pexfix.py" c "$d/c/hier.spice" "$d/c/flat.spice" "$d/c/$top.pex.spice"
+  { head_tcl "$g" "$top" "$n" "$d/rc"
+    echo "extresist threshold 0"
+    echo "extresist mindelay 0"
+    echo "extresist minres 100"
+    echo "extract do resistance"
+    echo "extract do unique"
+    echo "extract all"
+    echo "ext2spice extresist on"
+    echo "ext2spice cthresh 0.01"
+    echo "ext2spice -p $d/rc -o $d/rc/rc_magic.spice"
+    echo "quit -noprompt"; } > "$d/rc/pex.tcl"
+  magic -dnull -noconsole -rcfile "$RCFILE" "$d/rc/pex.tcl" > "$d/rc/magic.log" 2>&1
+  python3 -I "$HERE/pexfix.py" rc "$d/rc/rc_magic.spice" "$d/c/$top.pex.spice" "$d/rc/$n.res.ext" \
+    "$d/rc/$top.pex.spice" "$d/rc/rnode_caps.csv"
+  echo "  $top: $(( $(date +%s) - t0 )) s; $(grep -E 'Nets extracted' "$d/rc/magic.log")"
+}
+
+lvs() {  # lvs <dir> <pex netlist> <top> <subckt name in pex> <reference> <netgen cell>
+  local d=$1
+  rm -rf "$d"; mkdir -p "$d"
+  python3 -I "$HERE/lvs_collapse.py" "$2" "$d/lay.spice"
+  if [ "$3" != slot_7 ]; then
+    python3 -I "$WORK/design/scripts/pex_add_port.py" "$d/lay.spice
+… [955 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 14:28:21 UTC
+
+**Tool result:**
+
+```
+The file /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/extract.sh has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:28:26 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && rm -rf _work/pex_c _work/pex_rc _work/pads_c _work/pads_rc _work/lvs_* _work/dbg && time ./extract.sh _work 2>&1
+```
+
+## Tool results / harness — 2026-11-25 14:28:28 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+magic extraction
+Traceback (most recent call last):
+  File "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/pexfix.py", line 162, in <module>
+    cmd_c(*sys.argv[2:5])
+    ~~~~~^^^^^^^^^^^^^^^^
+  File "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/pexfix.py", line 62, in cmd_c
+    assert [re.sub(r'^\S+', '', s) for s in xh] == [re.sub(r'^\S+', '', s) for s in xf], 'device cards differ'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: device cards differ
+
+real	0m1.631s
+user	0m1.471s
+sys	0m0.132s
+```
+
+## Assistant — 2026-11-25 14:28:33 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='pexfix.py'; s=open(p).read()
+s=s.replace("""    xh = sorted(s for s in stmts(hier) if s[:1] in 'Xx')
+    xf = sorted(s for s in body if s[:1] in 'Xx')
+    assert [re.sub(r'^\\S+', '', s) for s in xh] == [re.sub(r'^\\S+', '', s) for s in xf], 'device cards differ'""",
+"""    xh = sorted(re.sub(r'^\\S+', '', s) for s in stmts(hier) if s[:1] in 'Xx')
+    xf = sorted(re.sub(r'^\\S+', '', s) for s in body if s[:1] in 'Xx')
+    assert xh == xf, 'device cards differ'""")
+open(p,'w').write(s)
+EOF
+grep -n "xh = \|assert" pexfix.py; time ./extract.sh _work 2>&1
+```
+
+## Tool results / harness — 2026-11-25 14:28:35 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+60:    xh = sorted(re.sub(r'^\S+', '', s) for s in stmts(hier) if s[:1] in 'Xx')
+62:    assert xh == xf, 'device cards differ'
+magic extraction
+Traceback (most recent call last):
+  File "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/pexfix.py", line 162, in <module>
+    cmd_c(*sys.argv[2:5])
+    ~~~~~^^^^^^^^^^^^^^^^
+  File "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/pexfix.py", line 62, in cmd_c
+    assert xh == xf, 'device cards differ'
+           ^^^^^^^^
+AssertionError: device cards differ
+
+real	0m1.582s
+user	0m1.469s
+sys	0m0.097s
+```
+
+## Assistant — 2026-11-25 14:28:39 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_slot_7/c && diff <(grep '^X' hier.spice | sed 's/^X[0-9]* //' | sort) <(grep '^X' flat.spice | sed 's/^X[0-9]* //' | sort) | head -6; grep -c '^X' hier.spice flat.spice
+```
+
+## Tool results / harness — 2026-11-25 14:28:39 UTC
+
+**Tool result:**
+
+```
+hier.spice:497
+flat.spice:497
+```
+
+## Assistant — 2026-11-25 14:28:44 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 -c "
+import sys,re; sys.argv=['x']; exec(open('pexfix.py').read().split(\"if __name__\")[0])
+a=sorted(re.sub(r'^\S+','',s) for s in stmts('_work/x_slot_7/c/hier.spice') if s[:1] in 'Xx')
+b=sorted(re.sub(r'^\S+','',s) for s in stmts('_work/x_slot_7/c/flat.spice') if s[:1] in 'Xx')
+d=[(x,y) for x,y in zip(a,b) if x!=y]; print(len(a),len(b),len(d)); print(d[:2])
+"
+```
+
+## Tool results / harness — 2026-11-25 14:28:44 UTC
+
+**Tool result:**
+
+```
+499 498 431
+[('', ' a_100636_18330# a_101538_16570# vdd_3v3 vdd_3v3 sg13_hv_pmos ad=0.34p pd=2.68u as=0.34p ps=2.68u w=1u l=0.45u'), (' a_100636_18330# a_101538_16570# vdd_3v3 vdd_3v3 sg13_hv_pmos ad=0.34p pd=2.68u as=0.34p ps=2.68u w=1u l=0.45u', ' a_100636_18330# a_101538_16570# vss_3v3 vss_3v3 sg13_hv_nmos ad=0.34p pd=2.68u as=0.34p ps=2.68u w=1u l=0.45u')]
+```
+
+## Assistant — 2026-11-25 14:28:50 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_slot_7/c && grep -n '^[Xx]' hier.spice | awk 'NF<4' ; grep -n '^[Xx]' flat.spice | awk -F: 'length($2)<20'
+```
+
+## Tool results / harness — 2026-11-25 14:28:50 UTC
+
+**Tool result:**
+
+```
+(Bash completed with no output)
+```
+
+## Assistant — 2026-11-25 14:28:54 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 -c "
+import sys,re; exec(open('pexfix.py').read().split(\"if __name__\")[0])
+for f in ['hier','flat']:
+  L=[s for s in stmts('_work/x_slot_7/c/%s.spice'%f) if s[:1] in 'Xx' and len(s.split())<5]; print(f,L[:5])
+"
+```
+
+## Tool results / harness — 2026-11-25 14:28:55 UTC
+
+**Tool result:**
+
+```
+hier ['', '']
+flat ['']
+```
+
+## Assistant — 2026-11-25 14:29:00 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && sed -i "s/s\[:1\] in '/s[:1] and s[:1] in '/g; s/s\[:1\] in \"/s[:1] and s[:1] in \"/g" pexfix.py && grep -n 's\[:1\]' pexfix.py | head; time ./extract.sh _work 2>&1
+```
+
+## Tool results / harness — 2026-11-25 14:29:13 UTC
+
+**Tool result:**
+
+```
+59:    body = [s for s in stmts(flat) if s[:1] and s[:1] in 'XxCcRr']
+60:    xh = sorted(re.sub(r'^\S+', '', s) for s in stmts(hier) if s[:1] and s[:1] in 'Xx')
+61:    xf = sorted(re.sub(r'^\S+', '', s) for s in body if s[:1] and s[:1] in 'Xx')
+63:    nc = sum(1 for s in body if s[:1] and s[:1] in 'Cc')
+69:          f'{sum(1 for s in stmts(hier) if s[:1] and s[:1] in "Cc")})')
+127:    body = [s for s in st_rc if s[:1] and s[:1] in 'XxRr']
+131:        f.write(f'* devices {sum(1 for s in body if s[:1] and s[:1] in "Xx")}, resistors {sum(1 for s in body if s[:1] and s[:1] in "Rr")}'
+magic extraction
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_slot_7/c/slot_7.pex.spice: 497 devices, 1636 capacitors (hierarchical output had 1568)
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_slot_7/rc/slot_7.pex.spice: 206 resistive nets, 3437 capacitors; C nodes not in the RC netlist: ['a_100636_18330#', 'a_100726_18366#', 'a_100978_17058#', 'a_101258_16570#', 'a_101538_16570#'] ... (118)
+  slot_7: 3 s; Nets extracted: 169 (0.435567)
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_sg13cmos5l_IOPadSingle2Diff/c/sg13cmos5l_IOPadSingle2Diff.pex.spice: 225 devices, 589 capacitors (hierarchical output had 573)
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_sg13cmos5l_IOPadSingle2Diff/rc/sg13cmos5l_IOPadSingle2Diff.pex.spice: 76 resistive nets, 3412 capacitors; C nodes not in the RC netlist: ['s2d_block_0.s2d_tai
+… [2522 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:29:19 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_slot_7/rc && grep 'a_100636_18330' slot_7.res.ext | head; grep 'a_100636_18330' rc_magic.spice | head -5; grep -c 'a_100636_18330' ../c/slot_7.pex.spice
+```
+
+## Tool results / harness — 2026-11-25 14:29:19 UTC
+
+**Tool result:**
+
+```
+killnode "a_100636_18330#"
+rnode "a_100636_18330.t1" 0 128.074 101856 17228 0
+rnode "a_100636_18330.t2" 0 1162.4 100681 18954 0
+rnode "a_100636_18330.n0" 0 1276.06 101856 16958 0
+rnode "a_100636_18330.t0" 0 134.606 101818 16670 0
+resist "a_100636_18330.n0" "a_100636_18330.t1" 6.06773
+resist "a_100636_18330.t0" "a_100636_18330.n0" 6.54876
+resist "a_100636_18330.n0" "a_100636_18330.t2" 59.4526
+device msubckt sg13_hv_pmos 100636 18854 100637 18855  "vdd_3v3.t6" "a_100636_18330.t2" 180 0 "vdd_3v3.t27" 200 13600,536 "a_99654_18330.t1" 200 7600,276
+device msubckt sg13_hv_nmos 100636 18366 100637 18367  "vss_3v3.t46" "a_100636_18330.t2" 180 0 "a_99654_18330.t0" 200 13600,536 "a_100726_18366.t0" 200 7600,276
+X98 a_100636_18330.t1 a_101538_16570.t2 vss_3v3.t38 vss_3v3.t37 sg13_hv_nmos ad=0.34p pd=2.68u as=0.34p ps=2.68u w=1u l=0.45u
+X197 a_100636_18330.t0 a_101538_16570.t2 vdd_3v3.t25 vdd_3v3.t22 sg13_hv_pmos ad=0.34p pd=2.68u as=0.34p ps=2.68u w=1u l=0.45u
+X348 a_100726_18366.t0 a_100636_18330.t2 a_99654_18330.t0 vss_3v3.t46 sg13_hv_nmos ad=0.19p pd=1.38u as=0.34p ps=2.68u w=1u l=0.45u
+X404 a_99654_18330.t1 a_100636_18330.t2 vdd_3v3.t27 vdd_3v3.t6 sg13_hv_pmos ad=0.19p pd=1.38u as=0.34p ps=2.68u w=1u l=0.45u
+R9891 a_100636_18330.n0 a_100636_18330.t2 59.4531
+15
+```
+
+## Assistant — 2026-11-25 14:29:25 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_slot_7/rc && grep '^C.*a_100636_18330' rc_magic.spice; grep '^C.*a_100636_18330' ../c/slot_7.pex.spice
+```
+
+## Tool results / harness — 2026-11-25 14:29:25 UTC
+
+**Tool result:**
+
+```
+C1496 a_100636_18330.t1 vss_3v3 0.32696f
+C1497 a_100636_18330.n0 vss_3v3 1.27606f
+C1498 a_100636_18330.t0 vss_3v3 0.13461f
+C118 a_100636_18330# a_100726_18366# 0.02973f
+C211 a_100636_18330# enable 0.08865f
+C496 a_91090_18366# a_100636_18330# 0.33251f
+C504 a_100636_18330# a_99654_18330# 0.81264f
+C682 a_100636_18330# a_99910_18366# 0.01936f
+C776 s7_an_1_en_3v3 a_100636_18330# 0.08012f
+C833 a_100636_18330# s7_an_1_en_3v3_b 0.66868f
+C862 a_100636_18330# a_101538_16570# 0.2764f
+C1049 a_100636_18330# vdd_3v3 0.33532f
+C1132 a_99420_18366# a_100636_18330# 0.01948f
+C1513 a_100636_18330# vss_3v3 1.16375f ; **FLOATING
+```
+
+## Assistant — 2026-11-25 14:29:33 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/pexfix.py",
+ "offset": 72,
+ "limit": 60
+}
+```
+
+## Tool results / harness — 2026-11-25 14:29:33 UTC
+
+**Tool result:**
+
+```
+72	def cmd_rc(rc, cnet, resext, out, report=None):
+73	    gnd = None
+74	    st_rc = stmts(rc)
+75	    h = header(rc)
+76	    # rnodes: name, capacitance (aF) per resistive net
+77	    rn = defaultdict(dict)
+78	    for ln in open(resext):
+79	        t = ln.split()
+80	        if t and t[0] == 'rnode':
+81	            n = t[1].strip('"')
+82	            m = re.fullmatch(r'(.+)\.[nt]\d+', n)
+83	            rn[m.group(1) if m else n][n] = float(t[3]) * 1e-18
+84	    # nets' main-node names in the rc netlist: the net name itself (magic keeps it for the first rnode)
+85	    rc_nodes = set()
+86	    for s in st_rc:
+87	        t = s.split()
+88	        if t and t[0][:1] in 'XxRr':
+89	            rc_nodes.update(x for x in t[1:] if '=' not in x and not x.startswith(';'))
+90	    caps = []
+91	    for s in stmts(cnet):
+92	        t = s.split(';')[0].split()
+93	        if t and t[0][:1] in 'Cc':
+94	            caps.append((t[1], t[2], val(t[3])))
+95	    gnd = 'vss_3v3' if any('vss_3v3' in c[:2] for c in caps) else 'iovss'
+96	    # main node of a resistive net: '<net>' with or without the trailing '#'
+97	    main = {}
+98	    for net in rn:
+99	        cand = [x for x in (net, net + '#') if x in rn[net] or x in rc_nodes]
+100	        main[net] = cand[0] if cand else None
+101	    netof = {}
+102	    for net, d in rn.items():
+103	        for x in (net, net + '#'):
+104	            netof[x] = net
+105	    out_caps, k = [], 0
+106	    tot = defaultdict(float)
+107	    gpart = defaultdict(float)
+108	    for a, b
+… [1341 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:29:43 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='pexfix.py'; s=open(p).read()
+old="""    out_caps, k = [], 0
+    tot = defaultdict(float)"""
+new="""    # only rnodes that the netlist has; a net whose main node magic removed ('killnode') is represented by its rnode
+    # of largest capacitance
+    for net in rn:
+        rn[net] = {n: w for n, w in rn[net].items() if n in rc_nodes}
+    rep = {}
+    for net, d in rn.items():
+        for x in (net, net + '#'):
+            if x not in rc_nodes and d:
+                rep[x] = max(d, key=d.get)
+    out_caps, k = [], 0
+    tot = defaultdict(float)"""
+assert old in s; s=s.replace(old,new)
+old2="""        else:
+            out_caps.append(f'C{k} {a} {b} {c:.6g}')
+            k += 1
+    missing = sorted({x for a, b, _ in caps for x in (a, b) if x not in rc_nodes and x != gnd and x in netof})"""
+new2="""        else:
+            out_caps.append(f'C{k} {rep.get(a, a)} {rep.get(b, b)} {c:.6g}')
+            k += 1
+    missing = sorted({rep.get(x, x) for a, b, _ in caps for x in (a, b)} - rc_nodes - {gnd})"""
+assert old2 in s; s=s.replace(old2,new2)
+s=s.replace("""    print(f'{out}: {len(rn)} resistive nets, {len(out_caps)} capacitors; C nodes not in the RC netlist: '""",
+"""    print(f'{out}: {len(rn)} resistive nets, {len(rep)} main nodes mapped to an rnode, {len(out_caps)} capacitors; '
+          f'capacitor nodes without device or resistor: '""")
+open(p,'w').write(s)
+EOF
+./extract.sh _work 2>&1 | grep -E "rc/|lvs_"
+```
+
+## Tool results / harness — 2026-11-25 14:29:56 UTC
+
+**Tool result:**
+
+```
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_slot_7/rc/slot_7.pex.spice: 206 resistive nets, 252 main nodes mapped to an rnode, 3461 capacitors; capacitor nodes without device or resistor: ['a_33780_33690#', 'a_35280_33530#', 'a_66079_34624#', 'a_66215_34624#', 'a_66351_34624#'] ... (125)
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_sg13cmos5l_IOPadSingle2Diff/rc/sg13cmos5l_IOPadSingle2Diff.pex.spice: 76 resistive nets, 49 main nodes mapped to an rnode, 3436 capacitors; capacitor nodes without device or resistor: ['a_11844_25374#', 'a_11844_25510#', 'a_11844_25646#', 'a_11844_25782#', 'a_11844_25918#'] ... (29)
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_sg13cmos5l_IOPadDiff2Single/rc/sg13cmos5l_IOPadDiff2Single.pex.spice: 78 resistive nets, 31 main nodes mapped to an rnode, 3592 capacitors; capacitor nodes without device or resistor: ['a_10054_29666#', 'a_10190_29666#', 'a_10326_29666#', 'a_10462_29666#', 'a_10598_29666#'] ... (21)
+  lvs_c: Netlists match with 11 symmetries. Final result: Top level cell failed pin matching.
+  lvs_c: Final result: Circuits match uniquely. Final result: Circuits match uniquely.
+  lvs_c: Final result: Circuits match uniquely. Final result: Circuits match uniquely.
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_slot_7/rc/slot_7.pex.spice: 9427 R shorted, 3461 C dropped, 5793 device/R nodes -> 262
+  lvs_rc: Netlists match with 11 symmetries. Final resul
+… [609 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:30:04 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_slot_7 && python3 - <<'EOF'
+import re
+def nodes(f,kinds):
+    S=set()
+    for l in open(f):
+        t=l.split()
+        if t and t[0][0] in kinds: S.update(x for x in t[1:] if '=' not in x and not x.startswith(';'))
+    return S
+cdev=nodes('c/slot_7.pex.spice','X'); rdev=nodes('rc/slot_7.pex.spice','XR'); rcap=nodes('rc/slot_7.pex.spice','C')
+ccap=nodes('c/slot_7.pex.spice','C')
+fl_c={n for n in ccap if n not in cdev}
+fl_rc={n for n in rcap if n not in rdev}
+x=sorted(fl_rc-fl_c); print(len(fl_c),len(fl_rc),x[:10])
+for n in x[:3]:
+    print(n, [l.strip() for l in open('c/slot_7.pex.spice') if l.startswith('X') and n in l.split()][:2])
+    print(open('rc/slot_7.res.ext').read().count(n.rstrip('#')))
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:30:04 UTC
+
+**Tool result:**
+
+```
+1156 2127 ['1.00003e-15', '1.0007e-16', '1.0015e-16', '1.00178e-17', '1.00633e-15', '1.0064e-16', '1.00652e-15', '1.0069e-16', '1.00752e-17', '1.007e-17']
+1.00003e-15 []
+0
+1.0007e-16 []
+0
+1.0015e-16 []
+0
+```
+
+## Assistant — 2026-11-25 14:30:12 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_slot_7 && python3 - <<'EOF'
+def nodes(f,kinds):
+    S=set()
+    for l in open(f):
+        t=l.split(';')[0].split()
+        if not t or t[0][0] not in kinds: continue
+        if t[0][0]=='X': S.update([x for x in t[1:] if '=' not in x][:-1])
+        else: S.update(t[1:3])
+    return S
+cdev=nodes('c/slot_7.pex.spice','X'); rdev=nodes('rc/slot_7.pex.spice','XR'); rcap=nodes('rc/slot_7.pex.spice','C')
+ccap=nodes('c/slot_7.pex.spice','C')
+fl_c={n for n in ccap if n not in cdev}; fl_rc={n for n in rcap if n not in rdev}
+x=sorted(fl_rc-fl_c); print(len(fl_c),len(fl_rc),x[:30])
+import subprocess
+for n in x[:3]:
+    print(n, sum(1 for l in open('c/slot_7.pex.spice') if l.startswith('X') and n in l.split()), subprocess.run(['grep','-c',n.rstrip('#'),'rc/slot_7.res.ext'],capture_output=True,text=True).stdout.strip(), subprocess.run(['grep','-m3',n.rstrip('#'),'rc/rc_magic.spice'],capture_output=True,text=True).stdout)
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:30:12 UTC
+
+**Tool result:**
+
+```
+125 125 []
+```
+
+## Assistant — 2026-11-25 14:30:24 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='pexstats.py'; s=open(p).read()
+old=s[s.index("def main(work, dest):"):s.index("    (dest / 'csv').mkdir")]
+new='''def main(work, dest):
+    work, dest = Path(work), Path(dest)
+    rows, nets = [], []
+    for view in ('sak', 'c', 'rc'):
+        for c in ('slot_7', S2D, D2S):
+            r, n = stats(c, view, work / f'x_{c}' / view / f'{c}.pex.spice')
+            rows.append(r)
+            nets += n
+'''
+s=s.replace(old,new)
+s=s.replace("""Reads <work_dir>/pex_{c,rc}/slot_7.pex.spice and <work_dir>/pads_{c,rc}/<cell>/<cell>.pex.spice (raw sak-pex output);""",
+"""Reads <work_dir>/x_<cell>/{sak,c,rc}/<cell>.pex.spice (extract.sh) for slot_7 and the two pads;""")
+s=s.replace("""'# magic PEX of the taped-out slot_7.gds and pads (c = C-coupled sak-pex.sh -m 2, rc = full-RC -m 3 -t 0 -r 100'
+           ' -y 0); pexstats.py; %s\\n')""","""'# magic PEX of the taped-out slot_7.gds and pads (extract.sh: sak = sak-pex.sh -m 2 as the earlier pad PEX, no '
+           'substrate capacitance; c = C-coupled with substrate capacitance; rc = full-RC); pexstats.py; %s\\n')""")
+open(p,'w').write(s)
+EOF
+grep -n "sak = sak" pexstats.py; python3 -I pexstats.py _work . | cut -c1-400; grep -E "slot_7,(sak|c|rc),(s7_an_0_outp|s7_an_1_vinp|vdd_3v3|enable|s7_an_0_vcm)," csv/pex_nets.csv
+```
+
+## Tool results / harness — 2026-11-25 14:30:44 UTC
+
+**Tool result:**
+
+```
+138:           '# magic PEX of the taped-out slot_7.gds and pads (extract.sh: sak = sak-pex.sh -m 2 as the earlier pad PEX, no '
+{'cell': 'slot_7', 'view': 'sak', 'devices': 497, 'device_models': 'pnpMPA:9 rhigh:41 sg13_hv_nmos:179 sg13_hv_pmos:268', 'n_C': 1568, 'C_total_pF': 1.88887996, 'C_to_ground_pF': 0.7604211200000001, 'C_coupling_pF': 1.12845884, 'C_floating_nodes_pF': 0.1600949, 'n_floating_nodes': 101, 'n_R': 0, 'R_sum_kohm': 0.0, 'ground_net': 'vss_3v3'}
+{'cell': 'sg13cmos5l_IOPadSingle2Diff', 'view': 'sak', 'devices': 225, 'device_models': 'dantenna:2 dpantenna:2 rhigh:26 rppd:2 sg13_hv_nmos:73 sg13_hv_pmos:120', 'n_C': 573, 'C_total_pF': 1.44718579, 'C_to_ground_pF': 0.56158588, 'C_coupling_pF': 0.8855999100000002, 'C_floating_nodes_pF': 0.01895295, 'n_floating_nodes': 28, 'n_R': 0, 'R_sum_kohm': 0.0, 'ground_net': 'iovss'}
+{'cell': 'sg13cmos5l_IOPadDiff2Single', 'view': 'sak', 'devices': 293, 'device_models': 'dantenna:4 dpantenna:4 rhigh:18 rppd:2 sg13_hv_nmos:111 sg13_hv_pmos:154', 'n_C': 482, 'C_total_pF': 1.33932442, 'C_to_ground_pF': 0.34453798, 'C_coupling_pF': 0.9947864400000002, 'C_floating_nodes_pF': 0.01536347, 'n_floating_nodes': 20, 'n_R': 0, 'R_sum_kohm': 0.0, 'ground_net': 'iovss'}
+{'cell': 'slot_7', 'view': 'c', 'devices': 497, 'device_models': 'pnpMPA:9 rhigh:41 sg13_hv_nmos:179 sg13_hv_pmos:268', 'n_C': 1636, 'C_total_pF': 2.15783734, 'C_to_ground_pF': 1.0293785, 'C_coupling_pF': 1.1284588400000002, 'C_floating_nodes_pF': 0.1600949, 'n_floating_
+… [2603 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:30:50 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_slot_7 && grep -E '^C\S* (s7_an_0_outp \S+|\S+ s7_an_0_outp) ' sak/slot_7.pex.spice | sort -k4; echo; grep -E '^C\S* (s7_an_0_outp \S+|\S+ s7_an_0_outp) ' c/slot_7.pex.spice | sort -k4; grep -E '^node "s7_an_0_outp"' c/slot_7.ext | cut -c1-60
+```
+
+## Tool results / harness — 2026-11-25 14:30:50 UTC
+
+**Tool result:**
+
+```
+C1261 enable s7_an_0_outp 0.01037f
+C553 s7_ctrl_0.vcm_rb s7_an_0_outp 0.05241f
+C1179 s7_ctrl_0.vref_rb s7_an_0_outp 0.06098f
+C348 s7_an_1_en_3v3 s7_an_0_outp 0.0611f
+C948 a_97124_18366# s7_an_0_outp 0.09621f
+C881 a_94828_18366# s7_an_0_outp 0.09642f
+C243 a_95976_18366# s7_an_0_outp 0.09748f
+C619 analog_bus1 s7_an_0_outp 0.09878f
+C1187 analog_bus3 s7_an_0_outp 0.10366f
+C923 s7_an_0_vcm s7_an_0_outp 0.15098f
+C762 s7_an_1_en_3v3_b s7_an_0_outp 0.23861f
+C651 analog_bus0 s7_an_0_outp 0.2777f
+C1037 a_95318_18366# s7_an_0_outp 0.29261f
+C1308 a_97614_18366# s7_an_0_outp 0.29261f
+C568 a_96466_18366# s7_an_0_outp 0.29261f
+C405 s7_an_1_vinn s7_an_0_outp 0.29679f
+C433 s7_an_0_outn s7_an_0_outp 1.07345f
+C622 s7_an_0_outp s7_an_1_vinp 1.5977f
+C1403 s7_an_0_outp vss_3v3 11.62055f
+C141 vdd_3v3 s7_an_0_outp 2.0084f
+
+C465 enable s7_an_0_outp 0.01037f
+C1068 s7_ctrl_0.vcm_rb s7_an_0_outp 0.05241f
+C921 s7_ctrl_0.vref_rb s7_an_0_outp 0.06098f
+C664 s7_an_1_en_3v3 s7_an_0_outp 0.0611f
+C713 s7_an_0_outp a_97124_18366# 0.09621f
+C87 s7_an_0_outp a_94828_18366# 0.09642f
+C824 s7_an_0_outp a_95976_18366# 0.09748f
+C1216 s7_an_0_outp analog_bus1 0.09878f
+C143 s7_an_0_outp analog_bus3 0.10366f
+C29 s7_an_0_outp s7_an_0_vcm 0.15098f
+C122 s7_an_0_outp s7_an_1_en_3v3_b 0.23861f
+C1108 s7_an_0_outp analog_bus0 0.2777f
+C1118 s7_an_0_outp a_97614_18366# 0.29261f
+C408 s7_an_0_outp a_95318_18366# 0.29261f
+C535 s7_an_0_outp a_96466_18366# 0.29261f
+C756 s7_an_0_outp s7_an_1_vinn 0.29679f
+C784 s7_an_0_outp s7_an_0_outn 1
+… [179 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:30:58 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/x_slot_7 && grep -E '^cap .*"s7_an_0_outp"' c/slot_7.ext | grep -E 'vss_3v3' ; grep -E '^cap .*"vss_3v3"' c/slot_7.ext | awk '{s+=$4} END {print NR, s/1000 " fF coupling to vss_3v3 in ext"}'; grep -E '^cap .*"enable"' c/slot_7.ext | grep vss_3v3; grep -E '^node "enable"' c/slot_7.ext | cut -c1-40; grep -E '^substrate' c/slot_7.ext | cut -c1-60; grep -c '^cap' c/slot_7.ext
+```
+
+## Tool results / harness — 2026-11-25 14:30:58 UTC
+
+**Tool result:**
+
+```
+0 0 fF coupling to vss_3v3 in ext
+node "enable" 237 33765.1 0 17872 m3 0 0
+substrate "vss_3v3" 354 0 0 22709 m5 0 0 0 0 36800084 607426
+2573
+```
+
+## Assistant — 2026-11-25 14:31:07 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work && for c in slot_7 sg13cmos5l_IOPadSingle2Diff sg13cmos5l_IOPadDiff2Single; do e=$(ls x_$c/c/*.ext); awk -v f=$e '/^node/{n+=$4} /^substrate/{s+=$4} /^cap/{k+=$4} END {printf "%s: node->substrate %.4g pF (substrate line %.4g), coupling %.4g pF, sum %.4g pF\n", f, n/1e6, s/1e6, k/1e6, (n+k)/1e6}' $e; done; grep -E '^node "s7_an_0_outp"|^equiv "s7_an_0_outp"|^equiv .*"s7_an_0_outp"' x_slot_7/c/slot_7.ext | cut -c1-80
+```
+
+## Tool results / harness — 2026-11-25 14:31:08 UTC
+
+**Tool result:**
+
+```
+x_slot_7/c/slot_7.ext: node->substrate 1.032 pF (substrate line 0), coupling 1.13 pF, sum 2.162 pF
+x_sg13cmos5l_IOPadSingle2Diff/c/sg13cmos5l_IOPadSingle2Diff_pex.ext: node->substrate 1.007 pF (substrate line 0), coupling 0.8868 pF, sum 1.893 pF
+x_sg13cmos5l_IOPadDiff2Single/c/sg13cmos5l_IOPadDiff2Single_pex.ext: node->substrate 1.003 pF (substrate line 0), coupling 0.9954 pF, sum 1.999 pF
+node "s7_an_0_outp" 38 3473.18 107010 24745 m3 0 0 0 0 171540 9476 361804 12824 
+equiv "s7_an_0_outp" "s7_ctrl_0.outp"
+```
+
+## Assistant — 2026-11-25 14:31:29 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex && python3 - <<'EOF'
+p='prep.py'; s=open(p).read()
+s=s.replace("""Reads  <work_dir>/pex_c/slot_7.pex.spice      magic C-coupled extraction of final/gds/slot_7.gds (sak-pex.sh -m 2)
+       <work_dir>/pex_rc/slot_7.pex.spice     magic full-RC extraction (sak-pex.sh -m 3 -t 0 -r 100 -y 0)
+       <work_dir>/pads_rc/<cell>/<cell>.pex.spice  full-RC extraction of the two pad cells (same settings)
+       the C-coupled pad netlists of the earlier slot runs (S2D: design repository 91a7da8b
+       netlist/pex/<cell>_magic_pex_2.spice; D2S: ../d2s_pex/<cell>_magic_pex_2.spice)
+Writes <work_dir>/nets/slot_7_{c,rc}.spice and <work_dir>/nets/<cell>_{c,rc}.spice.""",
+"""Reads  <work_dir>/x_slot_7/{c,rc}/slot_7.pex.spice   magic C-coupled / full-RC extraction of final/gds/slot_7.gds
+       <work_dir>/x_<cell>/{c,rc}/<cell>.pex.spice     the same for the two pad cells (extract.sh)
+       the C-coupled pad netlists of the earlier slot runs (S2D: design repository 91a7da8b
+       netlist/pex/<cell>_magic_pex_2.spice; D2S: ../d2s_pex/<cell>_magic_pex_2.spice; sak-pex.sh -m 2)
+Writes <work_dir>/nets/slot_7_{c,rc}.spice and <work_dir>/nets/<cell>_{prev,c,rc}.spice.""")
+s=s.replace("""Pads (full-RC): as ../d2s_pex/run.sh""","""Pads (c, rc): as ../d2s_pex/run.sh""")
+s=s.replace("""    src = WORK / f'pex_{view}' / 'slot_7.pex.spice'""","""    src = WORK / 'x_slot_7' / view / 'slot_7.pex.spice'""")
+s=s.replace("""    out = NETS / f'{cell}_c.spice'
+    subprocess.run""","""    out = NETS / f'{cell}_prev.spice'
+    subprocess.run""")
+s=s.replace("""def pad_rc(cell):
+    src = WORK / 'pads_rc' / cell / f'{cell}.pex.spice'
+    tmp = NETS / f'{cell}_rc_raw.spice'""","""def pad_x(cell, view):
+    src = WORK / f'x_{cell}' / view / f'{cell}.pex.spice'
+    tmp = NETS / f'{cell}_{view}_raw.spice'""")
+s=s.replace("""    out = NETS / f'{cell}_rc.spice'
+    subprocess.run([sys.executable, '-I', str(SCR / 'cace' / 'pex_for_sim.py'), str(tmp), str(out), '--tie', 'iovss',""",
+"""    out = NETS / f'{cell}_{view}.spice'
+    subprocess.run([sys.executable, '-I', str(SCR / 'cace' / 'pex_for_sim.py'), str(tmp), str(out), '--tie', 'iovss',""")
+s=s.replace("""        pad_c(c)
+        pad_rc(c)""","""        pad_c(c)
+        pad_x(c, 'c')
+        pad_x(c, 'rc')""")
+open(p,'w').write(s)
+p='sim.py'; s=open(p).read()
+s=s.replace("""        c     the whole slot magic C-coupled (prep.py: nets/slot_7_c.spice), pads magic C-coupled as 'prev'
+        rc    the whole slot magic full-RC (nets/slot_7_rc.spice), both pads magic full-RC (nets/<cell>_rc.spice);""",
+"""        c     the whole slot magic C-coupled (prep.py: nets/slot_7_c.spice), pads as 'prev' (nets/<cell>_prev.spice)
+        cc    the whole slot magic C-coupled, both pads magic C-coupled re-extracted with their substrate capacitance
+              (nets/<cell>_c.spice; the 'prev' pad netlists lack it, see pexfix.py / README.md)
+        rc    the whole slot magic full-RC (nets/slot_7_rc.spice), both pads magic full-RC (nets/<cell>_rc.spice);""")
+s=s.replace("""    pv = 'rc' if view == 'rc' else 'c'""","""    pv = {'rc': 'rc', 'cc': 'c'}.get(view, 'prev')""")
+open(p,'w').write(s)
+EOF
+grep -n "pv = \|slot_7_{" sim.py; rm -rf _work/nets _work/out _work/runs; python3 -I prep.py _work 2>&1 | grep -v "^/.*->" ; ls _work/nets
+```
+
+## Tool results / harness — 2026-11-25 14:31:29 UTC
+
+**Tool result:**
+
+```
+69:    pv = {'rc': 'rc', 'cc': 'c'}.get(view, 'prev')
+80:    return pads + [str(NETS / f"slot_7_{'rc' if view == 'rc' else 'c'}.spice")]
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/nets/sg13cmos5l_IOPadSingle2Diff_c_raw.spice: sg13cmos5l_IOPadSingle2Diff_pex: port vss added, tied to iovss by 1 Ohm
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/nets/sg13cmos5l_IOPadSingle2Diff_rc_raw.spice: sg13cmos5l_IOPadSingle2Diff_pex: port vss added, tied to iovss by 1 Ohm
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/nets/sg13cmos5l_IOPadDiff2Single_c_raw.spice: sg13cmos5l_IOPadDiff2Single_pex: port vss added, tied to iovss by 1 Ohm
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/nets/sg13cmos5l_IOPadDiff2Single_rc_raw.spice: sg13cmos5l_IOPadDiff2Single_pex: port vss added, tied to iovss by 1 Ohm
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/nets/sg13cmos5l_IOPadSingle2Diff_c.spice
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/nets/sg13cmos5l_IOPadSingle2Diff_rc.spice
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/nets/sg13cmos5l_IOPadDiff2Single_c.spice
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_pex/_work/nets/sg13cmos5l_IOPadDiff2Single_rc.spice
+sg13cmos5l_IOPadDiff2Single_c.spice
+sg13cmos5l_IOPadDiff2Single_prev.spice
+sg13cmos5l_IOPadDiff2Single_rc.spice
+sg13cmos5l_IOPadSingle2Diff_c.spice
+sg13cmos5l_IOPadSingle2Diff_prev.spice
+
+… [67 more characters cut]
+```
+

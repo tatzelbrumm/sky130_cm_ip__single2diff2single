@@ -1025,3 +1025,700 @@ XBN v
 … [3023 more characters cut]
 ```
 
+## Assistant — 2026-11-25 14:09:44 UTC
+
+**Tool call: `Bash`**
+
+_Check Python packages and ngspice version_
+
+```bash
+python3 -c "import numpy, matplotlib; print(numpy.__version__, matplotlib.__version__)"; python3 --version; ngspice -v | head -3
+```
+
+## Tool results / harness — 2026-11-25 14:09:47 UTC
+
+**Tool result:**
+
+```
+2.5.3 3.11.2
+Python 3.13.18
+******
+** ngspice-47 : Circuit level simulation program
+** Compiled with KLU Direct Linear Solver
+```
+
+## Assistant — 2026-11-25 14:10:25 UTC
+
+**Tool call: `Bash`**
+
+_Read rest of slot_7 and hv_logic netlists_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/_work/tier1/macros && sed -n 60,200p slot_7/netlist/source/slot_7.spice; cat hv_logic/netlist/source/hv_logic.spice | grep -v "^\*" | head -60
+```
+
+## Tool results / harness — 2026-11-25 14:10:25 UTC
+
+**Tool result:**
+
+```
+XT2 vddh vss ld ld_b outn vinn tg_hv
+XT3 vddh vss lx lx_b outp vinn tg_hv
+XT4 vddh vss lx lx_b outn vinp tg_hv
+XT5 vddh vss sb sb_b outp bus0 tg_hv
+XT6 vddh vss sb sb_b outn bus1 tg_hv
+XT7 vddh vss bd bd_b bus0 vinp tg_hv
+XT8 vddh vss bd bd_b bus1 vinn tg_hv
+XT9 vddh vss rc rc_b vcm_rb vcm_pad tg_hv
+XT10 vddh vss rc rc_b vref_rb vref_pad tg_hv
+.ends s7_ctrl
+
+* s7_doutpd: holds the unused dig_out[11:0] low while the slot's vdd_1v2 is on, as the fallback slot did (hv NMOS 0.5u /
+* 0.45u per output, gate vdd_1v2, source vss_1v2, bulk = substrate vss_3v3). Back-annotated from agent A's layout.
+.subckt s7_doutpd d0 d1 d2 d3 d4 d5 d6 d7 d8 d9 d10 d11 vdd_1v2 vss_1v2 vss_3v3
+XM0 d0 vdd_1v2 vss_1v2 vss_3v3 sg13_hv_nmos w=0.5u l=0.45u ng=1 m=1
+XM1 d1 vdd_1v2 vss_1v2 vss_3v3 sg13_hv_nmos w=0.5u l=0.45u ng=1 m=1
+XM2 d2 vdd_1v2 vss_1v2 vss_3v3 sg13_hv_nmos w=0.5u l=0.45u ng=1 m=1
+XM3 d3 vdd_1v2 vss_1v2 vss_3v3 sg13_hv_nmos w=0.5u l=0.45u ng=1 m=1
+XM4 d4 vdd_1v2 vss_1v2 vss_3v3 sg13_hv_nmos w=0.5u l=0.45u ng=1 m=1
+XM5 d5 vdd_1v2 vss_1v2 vss_3v3 sg13_hv_nmos w=0.5u l=0.45u ng=1 m=1
+XM6 d6 vdd_1v2 vss_1v2 vss_3v3 sg13_hv_nmos w=0.5u l=0.45u ng=1 m=1
+XM7 d7 vdd_1v2 vss_1v2 vss_3v3 sg13_hv_nmos w=0.5u l=0.45u ng=1 m=1
+XM8 d8 vdd_1v2 vss_1v2 vss_3v3 sg13_hv_nmos w=0.5u l=0.45u ng=1 m=1
+XM9 d9 vdd_1v2 vss_1v2 vss_3v3 sg13_hv_nmos w=0.5u l=0.45u ng=1 m=1
+XM10 d10 vdd_1v2 vss_1v2 vss_3v3 sg13_hv_nmos w=0.5u l=0.45u ng=1 m=1
+XM11 d11 vdd_1v2 vss_1v2 vss_3v3 sg13_hv_nmos w=0.5u l=0.45u ng=1 m=1
+.en
+… [2939 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:10:31 UTC
+
+**Tool call: `Bash`**
+
+_Read en_ctrl_3v3 and bg_core_pd netlists_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/_work/tier1/macros && grep -v "^\*" en_ctrl_3v3/netlist/source/en_ctrl_3v3.spice | head -40; grep -v "^\*" bg_core_pd/netlist/schematic/bg_core_pd_magic.spice | head -50
+```
+
+## Tool results / harness — 2026-11-25 14:10:31 UTC
+
+**Tool result:**
+
+```
+.subckt ls_up_fs vddh vss in out out_b
+XN1 x in vss vss sg13_hv_nmos w=1u l=0.45u ng=1
+XPL10 l9 in vddh vddh sg13_hv_pmos w=0.3u l=20u ng=1
+XPL9 l8 in l9 vddh sg13_hv_pmos w=0.3u l=20u ng=1
+XPL8 l7 in l8 vddh sg13_hv_pmos w=0.3u l=20u ng=1
+XPL7 l6 in l7 vddh sg13_hv_pmos w=0.3u l=20u ng=1
+XPL6 l5 in l6 vddh sg13_hv_pmos w=0.3u l=20u ng=1
+XPL5 l4 in l5 vddh sg13_hv_pmos w=0.3u l=20u ng=1
+XPL4 l3 in l4 vddh sg13_hv_pmos w=0.3u l=20u ng=1
+XPL3 l2 in l3 vddh sg13_hv_pmos w=0.3u l=20u ng=1
+XPL2 l1 in l2 vddh sg13_hv_pmos w=0.3u l=20u ng=1
+XPL1 x in l1 vddh sg13_hv_pmos w=0.3u l=20u ng=1
+XPF x y vddh vddh sg13_hv_pmos w=0.3u l=5u ng=1
+XI1 vddh vss x y inv_hv
+XI2 vddh vss y out_b inv_hv
+XI3 vddh vss out_b out inv_hv
+.ends ls_up_fs
+
+.subckt en_ctrl_3v3 vddh vddl vss en_1v2 sel0_1v2 sel1_1v2 vdd1v2_sense vdd3v3_sense en_3v3 sel0_3v3 sel1_3v3 en_3v3_b
+XE vddh vss en_1v2 en_3v3 en_3v3_b ls_up_fs
+XS0 vddh vss sel0_1v2 sel0_3v3 sel0_b ls_up_fs
+XS1 vddh vss sel1_1v2 sel1_3v3 sel1_b ls_up_fs
+.ends en_ctrl_3v3
+.subckt bg_core_pd vdd vss iout en_3v3 en_3v3_b
+XMS2 ks g vss vss sg13_hv_nmos w=10u l=1u ng=1 m=1 mm_ok=1
+XMS3 vpc ks vss vss sg13_hv_nmos w=0.5u l=2u ng=1 m=1 mm_ok=1
+XPB vpg vpg vdd vdd sg13_hv_pmos w=40u l=1u ng=4 m=1 mm_ok=1
+XPBC vpc vpc vpg vdd sg13_hv_pmos w=40u l=1u ng=4 m=1 mm_ok=1
+XNB vpc g eb vss sg13_hv_nmos w=20u l=4u ng=2 m=1 mm_ok=1
+XQ2 vss vss e2 pnpMPA a=4e-12 p=8e-06 m=8
+XPA ca vpg vdd vdd sg13_hv_pmos w=40u l=1u ng=4 m=1 mm_ok=1
+XPAC g vpc ca vdd sg13_hv_pmos w=40u l
+… [2529 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:11:31 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/vs.py`
+
+```
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Terminal voltages of every MOS device of slot 7 and its two custom pads (IHP sg13cmos5l simulation, ngspice).
+
+Usage: python3 -I vs.py <work_dir> <job> [<job> ...]
+  job = <kind>:<mos>:<temp>:<vdd>[:<variant>]        e.g. dc:tt:27:3.3:open, pu:ff:-40:3.6, topo:tt:27:3.3
+  kind   topo  flattened netlist (ngspice 'listing e'): every MOS instance with its four terminal nodes -> topo.csv
+         dc    default mode, enable 1.2 V, DC sweep of the S2D pad source -0.2 ... max(3.3, vdd) V in 50 mV steps;
+               variant open (D2S pad 1 Gohm only) | 1k (1 kOhm from the D2S pad to vterm = v(vref_d2s), as
+               ../ac_tran; 100 pF is irrelevant at DC) | 1kgnd (1 kOhm from the D2S pad to ground)
+         dcoff disabled: enable 0, otherwise as dc open
+         fs    fail-safe, slot vdd_3v3 = 0 and vdd_1v2 = 0, enable 0, pad ring iovdd = <vdd>; both pads driven from
+               one source swept 0 ... <vdd>, each through 1 kOhm
+         fs0   fail-safe, all supplies 0 V (vdd_3v3 = iovdd = vdd_1v2 = 0, enable 0), both pads driven as fs
+         pu    power-up transient: vdd_3v3, iovdd (and vdd_1v2 to 1.2 V) ramp 0 -> V in 10 us (from all nodes at 0 V,
+               uic), enable 0 -> 1.2 V at 20 us (100 ns edge), S2D pad 0.5 V, end 40 us
+               variant fast: ramp in 1 us, enable already 1.2 V from t = 0, end 20 us
+         en    enable edges at V: from the enabled operating point, enable 1.2 -> 0 V at 2 us, 0 -> 1.2 V at 22 us
+               (10 ns edges), end 42 us; S2D pad 0.5 V
+         step  full-swing S2D pad steps from the enabled operating point (pad 0 V): 0 -> V at 2 us, V -> -0.2 V at
+               12 us, -0.2 -> 0.5 V at 22 us (10 ns edges), end 32 us; variant open | 100p (1 kOhm to vterm + 100 pF)
+         mode  mode switching at V (mode bits through the key, 10 ns edges): default, swap at 2 us, mon 12 us,
+               feed 22 us, ext 32 us, all_high 42 us, default 52 us, end 62 us; analog_bus0/1 driven (10 kOhm to 1.45 /
+               1.05 V) during feed, analog_bus2/3 (10 kOhm to 1.30 / 0.50 V) during ext (voltage-controlled switches,
+               as ../slot_modes_bg); S2D pad 0.5 V
+Writes <work_dir>/dev/<tag>.csv.gz (per MOS instance: max |VGS|, |VGD|, |VDS|, |VGB|, |VSB|, |VDB| and where),
+<work_dir>/nodes/<tag>.csv.gz (max / min of every node), <work_dir>/log/<tag>.log; the raw file is deleted after
+evaluation unless KEEP_RAW=1.
+
+Deck: the designer's tier-1 slot deck (design repository commit 9052bd35, docs/slot7_hookup/tier1/run_tier1.py,
+imported) as ../ac_tran/slot.py builds it for the KLayout view: slot_7 source netlist (s7_ctrl glue logic, s7_doutpd,
+ls_up_fs, hv_logic), bg_core_pd schematic, pad_ref_rb, bias_dist_pd and both custom pads KLayout-extracted (converted
+by run_tier1.wrapped()), the pads' antenna diodes given their extracted size by ../klayout_pad_diodes/fix_diodes.py.
+vdd_3v3 = iovdd = <vdd>; pads' vdd / vss pins on iovdd / 0 (as run_tier1.py; the extracted pads have no separate
+core-supply pins). .option gmin=1e-12 as the designer. If a DC sweep fails, it is rerun once with rshunt=1e12 (1 Tohm
+from every node to ground, solver aid as ../ac_tran); transients use method=gear cshunt=1e-15 (as run_tier1.py's own
+transient) and a 10 ns maximum time step (as ../slot_modes_bg); a failed transient is rerun once with a 2 ns maximum
+step. Aids are recorded in the log and in the dev CSV header.
+"""
+import gzip
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+import numpy as np
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(HERE.parent / 'klayout_pad_diodes'))
+import fix_diodes  # noqa: E402
+import rawread  # noqa: E402
+
+WORK = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else None
+PDK = '/foss/pdks/ihp-sg13cmos5l'
+PADS = ['sg13cmos5l_IOPadSingle2Diff', 'sg13cmos5l_IOPadDiff2Single']
+MODES = {'default': '
+… [10779 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 14:11:31 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/vs.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:11:55 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/rawread.py`
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Minimal reader of an ngspice binary raw file (one real plot): read(path) -> (names, scale, data[points, vars])."""
+import numpy as np
+
+
+def read(path):
+    with open(path, 'rb') as f:
+        buf = f.read()
+    k = buf.index(b'Binary:\n')
+    head = buf[:k].decode('latin-1').splitlines()
+    nv = npt = None
+    names = []
+    invars = False
+    for ln in head:
+        if ln.startswith('No. Variables:'):
+            nv = int(ln.split(':')[1])
+        elif ln.startswith('No. Points:'):
+            npt = int(ln.split(':')[1])
+        elif ln.startswith('Flags:') and 'complex' in ln:
+            raise ValueError('complex raw file not supported')
+        elif ln.startswith('Variables:'):
+            invars = True
+        elif invars and ln.strip():
+            names.append(ln.split()[1])
+    assert nv == len(names), (nv, len(names))
+    data = np.frombuffer(buf, dtype='<f8', offset=k + 8)
+    npt = min(npt, data.size // nv)
+    data = data[:npt * nv].reshape(npt, nv)
+    return names, data[:, 0], data
+```
+
+## Tool results / harness — 2026-11-25 14:11:55 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/rawread.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:11:57 UTC
+
+**Tool call: `Bash`**
+
+_Run topology extraction job_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1 && time python3 -I vs.py _work topo:tt:27:3.3 2>&1 | tail -5; ls _work _work/runs/*; grep -c . _work/topo.csv
+```
+
+## Tool results / harness — 2026-11-25 14:12:01 UTC
+
+**Tool result:**
+
+```
+~~~^^^^^^
+  File "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/vs.py", line 300, in run
+    w = csv.DictWriter(fo, fieldnames=list(rows[0].keys()))
+                                           ~~~~^^^
+IndexError: list index out of range
+
+real	0m4.035s
+user	0m5.089s
+sys	0m1.644s
+_work:
+design
+log
+repo
+runs
+tier1
+topo.csv
+
+_work/runs/topo_tt_27_3.3:
+bias_dist_pd_flat.spice
+pad_ref_rb_flat.spice
+sg13cmos5l_IOPadDiff2Single_flat.spice
+sg13cmos5l_IOPadSingle2Diff_flat.spice
+topo_tt_27_3.3.raw
+topo_tt_27_3.3.spice
+0
+```
+
+## Assistant — 2026-11-25 14:12:09 UTC
+
+**Tool call: `Bash`**
+
+_Inspect expanded listing output_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/_work/runs/topo_tt_27_3.3 && cp /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/.spiceinit . && PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l ngspice -b topo_tt_27_3.3.spice > /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/topo.out 2>&1; S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/topo.out; wc -l $S; grep -n -i "sg13_hv" $S | head -10; tail -20 $S
+```
+
+## Tool results / harness — 2026-11-25 14:12:16 UTC
+
+**Tool result:**
+
+```
+4699 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/topo.out
+43:   281 : n.xs.xc.xle.xn1.nsg13_hv_nmos xs.xc.xle.x enable 0 0 xs.xc.xle.xn1:sg13g2_hv_nmos_psp w=    1.000000000000000e-06     l=    4.500000000000000e-07     nf=    1.000000000000000e+00     mult=    1.000000000000000e+00     as=    3.400000000000000e-13     ad=    3.400000000000000e-13     ps=    2.680000000000000e-06     pd=    2.680000000000000e-06     dta=    0.000000000000000e+00     ngcon=2 delvto=0 factuo=1
+52:   406 : n.xs.xc.xle.xpl10.nsg13_hv_pmos xs.xc.xle.l9 enable vdd_3v3 vdd_3v3 xs.xc.xle.xpl10:sg13g2_hv_pmos_psp w=    3.000000000000000e-07     l=    2.000000000000000e-05     nf=    1.000000000000000e+00     mult=    1.000000000000000e+00     as=    1.020000000000000e-13     ad=    1.020000000000000e-13     ps=    1.280000000000000e-06     pd=    1.280000000000000e-06     dta=    0.000000000000000e+00     ngcon=2 delvto=0 factuo=1
+61:   406 : n.xs.xc.xle.xpl9.nsg13_hv_pmos xs.xc.xle.l8 enable xs.xc.xle.l9 vdd_3v3 xs.xc.xle.xpl9:sg13g2_hv_pmos_psp w=    3.000000000000000e-07     l=    2.000000000000000e-05     nf=    1.000000000000000e+00     mult=    1.000000000000000e+00     as=    1.020000000000000e-13     ad=    1.020000000000000e-13     ps=    1.280000000000000e-06     pd=    1.280000000000000e-06     dta=    0.000000000000000e+00     ngcon=2 delvto=0 factuo=1
+70:   406 : n.xs.xc.xle.xpl8.nsg13_hv_pmos xs.xc.xle.l7 enable xs.xc.xle.l8 vdd_3v3 xs.xc.xle.xpl8:sg13g2_hv_p
+… [20544 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:12:22 UTC
+
+**Tool call: `Bash`**
+
+_Fix listing regex and rerun topology job_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+import re
+p='vs.py'
+s=open(p).read()
+s=s.replace(r"m = re.match(r'^\d*\s*(n\S*\.n(sg13_\w+))", r"m = re.match(r'^\d+\s*:\s*(n\S*\.n(sg13_\w+))")
+open(p,'w').write(s)
+EOF
+grep -n "re.match(r'" vs.py; export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1 && python3 -I vs.py _work topo:tt:27:3.3 2>&1 | tail -3; head -3 _work/topo.csv; cut -d, -f2 _work/topo.csv | sort | uniq -c; ls _work/dev _work/nodes
+```
+
+## Tool results / harness — 2026-11-25 14:12:29 UTC
+
+**Tool result:**
+
+```
+206:        m = re.match(r'^\d+\s*:\s*(n\S*\.n(sg13_\w+))\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s*(.*)$', s, re.I)
+topo: 499 MOS instances -> /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/_work/topo.csv
+topo_tt_27_3.3 ok 
+inst,dev,model,d,g,s,b,w,l,nf,mult
+n.xs.xc.xle.xn1.nsg13_hv_nmos,sg13_hv_nmos,xs.xc.xle.xn1:sg13g2_hv_nmos_psp,xs.xc.xle.x,enable,0,0,1.000000000000000e-06,4.500000000000000e-07,1.000000000000000e+00,1.000000000000000e+00
+n.xs.xc.xle.xpl10.nsg13_hv_pmos,sg13_hv_pmos,xs.xc.xle.xpl10:sg13g2_hv_pmos_psp,xs.xc.xle.l9,enable,vdd_3v3,vdd_3v3,3.000000000000000e-07,2.000000000000000e-05,1.000000000000000e+00,1.000000000000000e+00
+      1 dev
+    200 sg13_hv_nmos
+    299 sg13_hv_pmos
+_work/dev:
+topo_tt_27_3.3.csv.gz
+
+_work/nodes:
+topo_tt_27_3.3.csv.gz
+```
+
+## Assistant — 2026-11-25 14:12:38 UTC
+
+**Tool call: `Bash`**
+
+_Check per-device output and block counts_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/_work && zcat dev/topo_tt_27_3.3.csv.gz | head -5; zcat dev/topo_tt_27_3.3.csv.gz | sort -t, -k2 -g | tail -3; zcat nodes/topo_tt_27_3.3.csv.gz | wc -l; zcat nodes/topo_tt_27_3.3.csv.gz | head -5; python3 -c "
+import csv,collections
+r=list(csv.DictReader(open('topo.csv')))
+c=collections.Counter()
+for x in r:
+  p=x['inst'].split('.')
+  blk=p[1] if p[1]!='xs' else 'xs.'+p[2]
+  c[(blk,x['dev'],round(float(x['l'])*1e6,3))]+=1
+for k,v in sorted(c.items()): print(k,v)
+"
+```
+
+## Tool results / harness — 2026-11-25 14:12:38 UTC
+
+**Tool result:**
+
+```
+# topo_tt_27_3.3: kind topo, aid none, 71 points; per value: signed value at max |.|, sweep value [V] or time [s] there
+inst,vgs,x_vgs,vgd,x_vgd,vds,x_vds,vgb,x_vgb,vsb,x_vsb,vdb,x_vdb
+n.xs.xc.xle.xn1.nsg13_hv_nmos,1.2,-0.2,1.1998,-0.2,0.00022871,3.2,1.2,-0.2,0,-0.2,0.00022871,3.2
+n.xs.xc.xle.xpl10.nsg13_hv_pmos,-2.1,-0.2,-2.0488,0.75,0.051193,1.45,-2.1,-0.2,0,-0.2,-0.051193,1.45
+n.xs.xc.xle.xpl9.nsg13_hv_pmos,-2.0488,0.75,-1.9946,0.75,0.054251,2.85,-2.1,-0.2,-0.051193,1.45,-0.10544,2.85
+n.xs.xd.xlay.x$7.x$1.nsg13_hv_nmos,3.3,0.85,3.3,0.45,1.0601e-08,0.85,3.3,0.85,1.0601e-08,2.45,2.1202e-08,0.85
+n.xs.xd.xlay.x$7.x$2.nsg13_hv_nmos,3.3,-0.2,3.3,-0.2,1.0601e-08,2.45,3.3,-0.2,0,-0.2,1.0601e-08,2.45
+n.xs.xd.xlay.x$8.x$3.nsg13_hv_nmos,3.3,-0.2,3.3,-0.2,5.3003e-09,1.1,3.3,-0.2,0,-0.2,5.3003e-09,1.1
+4125
+# topo_tt_27_3.3
+node,vmax,x_vmax,vmin,x_vmin
+v(v-sweep),3.3,3.3,-0.2,-0.2
+v(b0),0.0070335,1.7,0.0069658,-0.2
+v(b1),0.0070148,-0.2,0.0069599,1.7
+('x2d', 'sg13_hv_nmos', 0.45) 4
+('x2d', 'sg13_hv_nmos', 1.0) 6
+('x2d', 'sg13_hv_nmos', 3.0) 3
+('x2d', 'sg13_hv_nmos', 6.0) 9
+('x2d', 'sg13_hv_nmos', 8.0) 1
+('x2d', 'sg13_hv_pmos', 0.45) 3
+('x2d', 'sg13_hv_pmos', 0.6) 7
+('x2d', 'sg13_hv_pmos', 1.0) 9
+('x2d', 'sg13_hv_pmos', 3.0) 2
+('x2d', 'sg13_hv_pmos', 4.0) 5
+('x2d', 'sg13_hv_pmos', 6.0) 13
+('x2d', 'sg13_hv_pmos', 32.16) 2
+('x2s', 'sg13_hv_nmos', 0.45) 4
+('x2s', 'sg13_hv_nmos', 0.6) 1
+('x2s', 'sg13_hv_nmos', 3.0) 5
+('x2s', 'sg13_hv_nmos', 6.0) 10
+('x2s', 'sg13_hv_nmos', 8.0) 1
+('x2s', 'sg13
+… [1195 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:12:47 UTC
+
+**Tool call: `Bash`**
+
+_Inspect bandgap device parameters_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/_work && grep "xs.xbg" topo.csv | head -30; grep -n "xbg.xpb.nsg13\|xbg.xpb " /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/topo.out | head
+```
+
+## Tool results / harness — 2026-11-25 14:12:47 UTC
+
+**Tool result:**
+
+```
+n.xs.xbg.xms2.nsg13_hv_nmos,sg13_hv_nmos,xs.xbg.xms2:sg13g2_hv_nmos_psp,xs.xbg.ks,xs.xbg.g,0,0,9.999999999999999e-06,1.000000000000000e-06,1.000000000000000e+00,1.000000000000000e+00
+n.xs.xbg.xms3.nsg13_hv_nmos,sg13_hv_nmos,xs.xbg.xms3:sg13g2_hv_nmos_psp,xs.xbg.vpc,xs.xbg.ks,0,0,5.000000000000000e-07,2.000000000000000e-06,1.000000000000000e+00,1.000000000000000e+00
+n.xs.xbg.xpb.nsg13_hv_pmos,sg13_hv_pmos,xs.xbg.xpb:sg13g2_hv_pmos_psp,xs.xbg.vpg,xs.xbg.vpg,vdd_3v3,vdd_3v3,4.000000000000000e-05,1.000000000000000e-06,4.000000000000000e+00,1.000000000000000e+00
+n.xs.xbg.xpbc.nsg13_hv_pmos,sg13_hv_pmos,xs.xbg.xpbc:sg13g2_hv_pmos_psp,xs.xbg.vpc,xs.xbg.vpc,xs.xbg.vpg,vdd_3v3,4.000000000000000e-05,1.000000000000000e-06,4.000000000000000e+00,1.000000000000000e+00
+n.xs.xbg.xnb.nsg13_hv_nmos,sg13_hv_nmos,xs.xbg.xnb:sg13g2_hv_nmos_psp,xs.xbg.vpc,xs.xbg.g,xs.xbg.eb,0,2.000000000000000e-05,4.000000000000000e-06,2.000000000000000e+00,1.000000000000000e+00
+n.xs.xbg.xpa.nsg13_hv_pmos,sg13_hv_pmos,xs.xbg.xpa:sg13g2_hv_pmos_psp,xs.xbg.ca,xs.xbg.vpg,vdd_3v3,vdd_3v3,4.000000000000000e-05,1.000000000000000e-06,4.000000000000000e+00,1.000000000000000e+00
+n.xs.xbg.xpac.nsg13_hv_pmos,sg13_hv_pmos,xs.xbg.xpac:sg13g2_hv_pmos_psp,xs.xbg.g,xs.xbg.vpc,xs.xbg.ca,vdd_3v3,4.000000000000000e-05,1.000000000000000e-06,4.000000000000000e+00,1.000000000000000e+00
+n.xs.xbg.xna.nsg13_hv_nmos,sg13_hv_nmos,xs.xbg.xna:sg13g2_hv_nmos_psp,xs.xbg.g,xs.xbg.g,xs.xbg.ea,0,2.000000000000000e-05,4.000000000000000e-06,2
+… [3516 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:13:00 UTC
+
+**Tool call: `Bash`**
+
+_Run test DC jobs at tt 27 C 3.6 V_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1 && for j in dc:tt:27:3.6:open dc:tt:27:3.6:1k dc:tt:27:3.6:1kgnd dcoff:tt:27:3.6 fs:tt:27:3.6 fs0:tt:27:3.6; do /usr/bin/time -f "%e s" python3 -I vs.py _work $j 2>&1 | tail -2; done
+```
+
+## Tool results / harness — 2026-11-25 14:13:00 UTC
+
+**Tool result:**
+
+```
+/bin/bash: line 1: /usr/bin/time: No such file or directory
+/bin/bash: line 1: /usr/bin/time: No such file or directory
+/bin/bash: line 1: /usr/bin/time: No such file or directory
+/bin/bash: line 1: /usr/bin/time: No such file or directory
+/bin/bash: line 1: /usr/bin/time: No such file or directory
+/bin/bash: line 1: /usr/bin/time: No such file or directory
+```
+
+## Assistant — 2026-11-25 14:13:10 UTC
+
+**Tool call: `Bash`**
+
+_Run test DC jobs at tt 27 C 3.6 V_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1 && for j in dc:tt:27:3.6:open dc:tt:27:3.6:1k dc:tt:27:3.6:1kgnd dcoff:tt:27:3.6 fs:tt:27:3.6 fs0:tt:27:3.6; do s=$(date +%s); python3 -I vs.py _work $j 2>&1 | tail -2; echo "$(( $(date +%s)-s )) s"; done
+```
+
+## Tool results / harness — 2026-11-25 14:23:11 UTC
+
+**Tool result:**
+
+```
+dc_tt_27_3.6_open ok 
+14 s
+dc_tt_27_3.6_1k ok 
+5 s
+dc_tt_27_3.6_1kgnd ok 
+4 s
+Command did not complete within its 600s timeout and was moved to the background (ID: bo1epd2hu). Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bo1epd2hu.output. You will be notified when it completes. If it is still running after 30m in the background, it will be stopped and you will be notified. It is running now: do not start a second copy while it runs. If it is no longer needed, stop it with TaskStop. To check interim output, use Read on that file path.
+Session cwd remains /home/user/sg13cmos5l_cm_slot7; directory changes made by the backgrounded command do not apply to subsequent commands.
+```
+
+## Assistant — 2026-11-25 14:23:16 UTC
+
+**Tool call: `ToolSearch`**
+
+```json
+{
+ "query": "select:TaskStop,Monitor"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:23:16 UTC
+
+**Tool result:**
+
+```
+[tool_reference]
+[tool_reference]
+```
+
+## Assistant — 2026-11-25 14:23:19 UTC
+
+**Tool call: `TaskStop`**
+
+```json
+{
+ "task_id": "bo1epd2hu"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:23:19 UTC
+
+**Tool result:**
+
+```
+{"message":"Successfully stopped task: bo1epd2hu (cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1 && for j in dc:tt:27:3.6:open dc:tt:27:3.6:1k dc:tt:27:3.6:1kgnd dcoff:tt:27:3.6 fs:tt:27:3.6 fs0:tt:27:3.6; do s=$(date +%s); python3 -I vs.py _work $j 2>&1 | tail -2; echo \"$(( $(date +%s)-s )) s\"; done)","task_id":"bo1epd2hu","task_type":"local_bash","command":"cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1 && for j in dc:tt:27:3.6:open dc:tt:27:3.6:1k dc:tt:27:3.6:1kgnd dcoff:tt:27:3.6 fs:tt:27:3.6 fs0:tt:27:3.6; do s=$(date +%s); python3 -I vs.py _work $j 2>&1 | tail -2; echo \"$(( $(date +%s)-s )) s\"; done"}
+```
+
+## Assistant — 2026-11-25 14:23:21 UTC
+
+**Tool call: `Bash`**
+
+_Kill leftover ngspice process_
+
+```bash
+pkill -f "ngspice -b dcoff" ; sleep 1; pgrep -a ngspice; echo done
+```
+
+## Tool results / harness — 2026-11-25 14:23:24 UTC
+
+**Tool result:**
+
+```
+8203 ngspice -b c_tt_27_3.3_dc.spice
+8258 ngspice -b hbm_esdproxy_s2d_gnd_vss_p500.spice
+done
+```
+
+## Assistant — 2026-11-25 14:23:33 UTC
+
+**Tool call: `Bash`**
+
+_Add ngspice timeouts to vs.py_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+p='vs.py'
+s=open(p).read()
+old="""        pr = subprocess.run(['ngspice', '-b', f.name], cwd=rdir, capture_output=True, text=True)
+        out = pr.stdout + '\\n--- stderr ---\\n' + pr.stderr"""
+new="""        tmo = TMO_TRAN if kind in ('pu', 'en', 'step', 'mode') else TMO_DC
+        try:
+            pr = subprocess.run(['ngspice', '-b', f.name], cwd=rdir, capture_output=True, text=True, timeout=tmo)
+        except subprocess.TimeoutExpired as e:
+            so = e.stdout.decode(errors='replace') if isinstance(e.stdout, bytes) else (e.stdout or '')
+            pr = subprocess.CompletedProcess(e.cmd, -9, so, f'TIMEOUT after {tmo} s (killed)')
+        out = pr.stdout + '\\n--- stderr ---\\n' + pr.stderr"""
+assert old in s
+s=s.replace(old,new)
+s=s.replace("MODESEQ = [", "TMO_DC = int(os.environ.get('VS_TMO_DC', '240'))      # s per ngspice run (a stalled DC sweep is killed)\nTMO_TRAN = int(os.environ.get('VS_TMO_TRAN', '1800'))\nMODESEQ = [",1)
+open(p,'w').write(s)
+EOF
+grep -n "TMO" vs.py | head
+```
+
+## Tool results / harness — 2026-11-25 14:23:33 UTC
+
+**Tool result:**
+
+```
+61:TMO_DC = int(os.environ.get('VS_TMO_DC', '240'))      # s per ngspice run (a stalled DC sweep is killed)
+62:TMO_TRAN = int(os.environ.get('VS_TMO_TRAN', '1800'))
+293:        tmo = TMO_TRAN if kind in ('pu', 'en', 'step', 'mode') else TMO_DC
+```
+
+## Assistant — 2026-11-25 14:23:39 UTC
+
+**Tool call: `Bash`**
+
+_Test disabled and fail-safe DC jobs_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+p='vs.py'
+s=open(p).read()
+old="""    tries = [''] + (['rshunt'] if kind in ('dc', 'dcoff', 'fs', 'fs0', 'topo') else ['step2n'])"""
+new="""    # disabled / unpowered states have nodes held only by leakage: their DC sweep goes straight to the solver aid
+    if kind in ('dcoff', 'fs', 'fs0'):
+        tries = ['rshunt']
+    else:
+        tries = [''] + (['rshunt'] if kind in ('dc', 'topo') else ['step2n'])"""
+assert old in s
+s=s.replace(old,new); open(p,'w').write(s)
+EOF
+export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1 && for j in dcoff:tt:27:3.6 fs:tt:27:3.6 fs0:tt:27:3.6; do s=$(date +%s); timeout 900 python3 -I vs.py _work $j 2>&1 | tail -2; echo "$(( $(date +%s)-s )) s"; done
+```
+
+## Tool results / harness — 2026-11-25 14:25:50 UTC
+
+**Tool result:**
+
+```
+dcoff_tt_27_3.6 FAILED 
+121 s
+fs_tt_27_3.6 ok (aid rshunt)
+8 s
+fs0_tt_27_3.6 ok (aid rshunt)
+1 s
+```
+
+## Assistant — 2026-11-25 14:25:53 UTC
+
+**Tool call: `Bash`**
+
+_Inspect dcoff failure log_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/_work && grep -v "^ Reference\|^$" log/dcoff_tt_27_3.6.log | tail -30
+```
+
+## Tool results / harness — 2026-11-25 14:25:53 UTC
+
+**Tool result:**
+
+```
+=== aid: rshunt ===
+Note: No compatibility mode selected!
+Circuit: * slot-7 voltage stress: dcoff , pads klayout-extracted (diodes fixed), tt 27 c, 3.6 v
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+Using SPARSE 1.3 as Direct Linear Solver
+VSDONE
+--- stderr ---
+Note: Starting dynamic gmin stepping
+Warning: Dynamic gmin stepping failed
+Note: Starting true gmin stepping
+Warning: True gmin stepping failed
+Note: Starting source stepping
+Warning: source stepping failed
+Note: Transient op started
+Error: Transient op failed, timestep too small
+Error: The operating point could not be simulated successfully.
+    Any of the following steps may fail.!
+doAnalyses: DC:  Timestep too small;  vin = -0.2: trouble with dparea-instance d.x2s.xlay.x$63.d1
+dc simulation(s) aborted
+Warning from checkvalid: vector b0 is not available or has zero length.
+Error during 'write': no writable vector found.
+Error: incomplete or empty netlist
+       or no ".plot", ".print", or ".fourier" lines in batch mode;
+no simulations run!
+```
+
+## Assistant — 2026-11-25 14:26:12 UTC
+
+**Tool call: `Bash`**
+
+_Add disabled-state transient and test it with power-up_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+p='vs.py'
+s=open(p).read()
+rep=[("    tran = kind in ('pu', 'en', 'step', 'mode')\n","    tran = kind in TRAN\n"),
+("""    if kind == 'dcoff':
+        src['ven'] = '0'
+""","""    if kind == 'off':
+        src['ven'] = pwl([(0, 1.2), (1e-6, 1.2), (1.01e-6, 0)])
+        src['vin'] = pwl([(0, 0.5), (20e-6, 0.5), (30e-6, -0.2), (60e-6, vmax), (70e-6, 0.5)])
+"""),
+("    if kind in ('dc', 'dcoff', 'topo'):","    if kind in ('dc', 'topo'):"),
+("""    elif kind == 'en':
+        ana = f'tran 10n 42u 0 {tmax}'""","""    elif kind == 'en':
+        ana = f'tran 10n 42u 0 {tmax}'
+    elif kind == 'off':
+        ana = f'tran 10n 70u 0 {tmax}'"""),
+("        tmo = TMO_TRAN if kind in ('pu', 'en', 'step', 'mode') else TMO_DC","        tmo = TMO_TRAN if kind in TRAN else TMO_DC"),
+("    if kind in ('dcoff', 'fs', 'fs0'):","    if kind in ('fs', 'fs0'):"),
+("TMO_DC = int(","TRAN = ('pu', 'en', 'step', 'mode', 'off')\nTMO_DC = int("),
+("""         dcoff disabled: enable 0, otherwise as dc open
+""","""         off   disabled state, quasi-static (transient, as run_tier1.py's disabled point): from the enabled operating
+               point (pad 0.5 V), enable 1.2 -> 0 V at 1 us; then the S2D pad source ramps 0.5 -> -0.2 V (20 ... 30 us),
+               -0.2 V -> max(3.3, vdd) (30 ... 60 us), back to 0.5 V (70 us); D2S pad 1 Gohm. (A DC sweep of the
+               disabled state does not converge: gmin / source stepping and the transient op fail at pad -0.2 V.)
+"""),
+]
+for a,b in rep:
+    assert a in s, a
+    s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+grep -n "dcoff" vs.py; export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1; for j in off:tt:27:3.6 pu:tt:27:3.6; do s=$(date +%s); python3 -I vs.py _work $j 2>&1 | tail -2; echo "$(( $(date +%s)-s )) s"; done
+```
+
+## Tool results / harness — 2026-11-25 14:31:32 UTC
+
+**Tool result:**
+
+```
+Command was moved to the background (ID: bvfsyiioe) so that a message that arrived while it was running can reach you; it was not interrupted. Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bvfsyiioe.output. You will be notified when it completes. If it is still running after 30m in the background (plus the timeout it was started with, up to the background maximum), it will be stopped and you will be notified. It is running now: do not start a second copy while it runs. If it is no longer needed, stop it with TaskStop. To check interim output, use Read on that file path.
+Session cwd remains /home/user/sg13cmos5l_cm_slot7; directory changes made by the backgrounded command do not apply to subsequent commands.
+```
+

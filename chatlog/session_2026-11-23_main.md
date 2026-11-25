@@ -18156,3 +18156,379 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin sudel_buecher && git log --oneline -1
 ```
 
+## Tool results / harness — 2026-11-25 14:09:29 UTC
+
+**Tool result:**
+
+```
+12007fc RUNLOG: user decisions, proposal, honest specification, antenna DRC, agents started; chatlog regenerated
+```
+
+## Assistant — 2026-11-25 14:09:43 UTC
+
+Here's where each point stands. The source edits are pushed; the PDFs will be rebuilt once, after the simulation results are in.
+
+1. **Front page:** the row now reads "data sheet in eight pages", with links to the two-page summary and the three-page data sheet.
+2. **Proposal:** found it on the design repository's `sudel_buecher` branch (`s2d_d2s_pinbuffers.md`, dated 10 August 2026). Copied unchanged to `docs/chipalooza2_as_taped_out/PROPOSAL_chipalooza2.md`, with a header naming its source. It's Appendix I of the data book and has a row in "Where to find what". Rules-table item 4 is now "met".
+3. **Specification:** the wording now says so everywhere: the description page, the limitations list, achieved vs limits, the test plan, the glue logic, all four data sheets (and their generator script), HOW_IT_WORKS §7, the cover and the rules table. It reads: an ad hoc specification, the CACE working limits written during the AI-assisted design, not quite met.
+   - One of 30 D2S Monte Carlo samples has a gain of 0.48877 against a 0.49 limit.
+   - At the slot's own references, the S2D input range ends at 0.980 V against 1.0 V.
+   - The proposal's tentative targets were superseded during the design.
+4. **Licence:** unchanged.
+5. **Reviews:** item 20 is removed from the rules table, and the header no longer lists 20.1–20.4.
+6. **CSV files:** kept. Item 13 is now "met".
+
+**Simulations:**
+- **Antenna DRC:** done. `run_signoff.sh` has a new `antenna` step. `slot_7` and both pads show 0 violations in 23 antenna rule categories each (`fbe8916`). This is a check per cell; antenna effects through the chip-level routing are the harness's.
+- **Still running in the background:** three agents, each writing only to its own new folder.
+  - `voltage_stress/`: the actual terminal voltages of every MOS at 3.3 and 3.6 V, against the PDK's 3.3 V limit.
+  - `pad_esd_latchup/`: HBM discharge, latch-up current injection and overvoltage, with the limits of the models stated.
+  - `slot_pex/`: extraction of the whole slot, LVS, RC extraction if feasible, and slot simulations compared with the earlier views.
+
+  I'll check and commit their results, update the documents, and rebuild both PDFs when they finish.
+
+**The 55 mV range-end shift.** It shows only in the "KLayout-extracted" rows. At fs 125 °C 3.6 V the 1 mV input range ends at 1.385 V instead of 1.440 V; at ss −40 °C the low end is −0.210 V instead of −0.243 V.
+- Table of all three pad views: https://github.com/tatzelbrumm/sg13cmos5l_cm_slot7/blob/fbe8916bfdc5d6f127648df3f32adf48e72f9c54/verification/c2_gaps/dc_curves/tables/rt.md
+- The statement and its update: https://github.com/tatzelbrumm/sg13cmos5l_cm_slot7/blob/fbe8916bfdc5d6f127648df3f32adf48e72f9c54/verification/c2_gaps/dc_curves/results.md?plain=1#L199-L204
+- Data: https://github.com/tatzelbrumm/sg13cmos5l_cm_slot7/blob/fbe8916bfdc5d6f127648df3f32adf48e72f9c54/verification/c2_gaps/dc_curves/csv/rt_summary.csv
+- Follow-up, showing it's an S2D output common mode 33 mV low and not the diodes: https://github.com/tatzelbrumm/sg13cmos5l_cm_slot7/blob/fbe8916bfdc5d6f127648df3f32adf48e72f9c54/verification/c2_gaps/klayout_pad_diodes/README.md?plain=1#L119-L128 and https://github.com/tatzelbrumm/sg13cmos5l_cm_slot7/blob/fbe8916bfdc5d6f127648df3f32adf48e72f9c54/verification/c2_gaps/klayout_pad_diodes/csv/rt_range.csv
+
+The "55.20" in the D2S rows of that results file is an unrelated nonlinearity value.
+
+The chatlog and RUNLOG are updated (`12007fc`).
+
+## User (or harness) — 2026-11-25 14:30:29 UTC
+
+[image attached by the user]
+
+These tables don't get markdown parsed correctly. Here, presentation matters more than the not-so-fantastic figures.
+
+## User (or harness) — 2026-11-25 14:30:29 UTC
+
+[Image: source: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/images/2.webp]
+
+## Assistant — 2026-11-25 14:30:36 UTC
+
+GitHub falls back to plain text because the header contains "max |err|". Its unescaped pipes add extra columns, so the header no longer matches the separator row and the whole block stops being a table. The same bug can be in other generated tables, so I'm checking every Markdown table in the repository for mismatched column counts:
+
+## Assistant — 2026-11-25 14:30:43 UTC
+
+**Tool call: `Bash`**
+
+_Check all Markdown tables for column-count mismatches_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && cat > /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tablecheck.py <<'EOF'
+import re,sys,subprocess
+def cells(line):
+    # split on unescaped pipes outside backticks
+    out=[];cur='';tick=False;i=0;l=line.strip()
+    if l.startswith('|'): l=l[1:]
+    if l.endswith('|') and not l.endswith('\\|'): l=l[:-1]
+    while i<len(l):
+        c=l[i]
+        if c=='`': tick=not tick
+        if c=='\\' and i+1<len(l) and l[i+1]=='|': cur+='\\|'; i+=2; continue
+        if c=='|' and not tick: out.append(cur); cur=''
+        else: cur+=c
+        i+=1
+    out.append(cur); return out
+files=subprocess.run(['git','ls-files','*.md'],capture_output=True,text=True).stdout.split()
+bad={}
+for f in files:
+    L=open(f,encoding='utf-8').read().split('\n'); fence=False
+    for k in range(1,len(L)):
+        if L[k-1].lstrip().startswith('ʼʼʼ'): fence=not fence
+        if fence: continue
+        if re.match(r'^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$',L[k]) and '|' in L[k-1]:
+            n=len(cells(L[k])); h=len(cells(L[k-1]))
+            probs=[]
+            if h!=n: probs.append(f'header {h} vs {n}')
+            j=k+1
+            while j<len(L) and L[j].strip().startswith('|'):
+                if len(cells(L[j]))!=n: probs.append(f'L{j+1}:{len(cells(L[j]))}')
+                j+=1
+            if probs: bad.setdefault(f,[]).append((k,probs[:4],len(probs)))
+for f,v in bad.items():
+    for k,p,n in v: print(f, 'table at line',k, n, 'problem(s)', p)
+print(len(bad),'files with problems')
+EOF
+python3 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tablecheck.py
+```
+
+## Tool results / harness — 2026-11-25 14:30:44 UTC
+
+**Tool result:**
+
+```
+docs/chipalooza2_as_taped_out/PROPOSAL_chipalooza2.md table at line 140 1 problem(s) ['L145:3']
+docs/chipalooza2_as_taped_out/test_platforms.md table at line 167 1 problem(s) ['header 11 vs 5']
+docs/chipalooza2_as_taped_out/test_platforms.md table at line 187 1 problem(s) ['header 11 vs 5']
+verification/c2_gaps/ac_tran/tables/rt_consistency.md table at line 4 1 problem(s) ['header 9 vs 7']
+verification/c2_gaps/dc_curves/tables/rt.md table at line 9 1 problem(s) ['header 14 vs 12']
+4 files with problems
+```
+
+## Assistant — 2026-11-25 14:30:51 UTC
+
+**Tool call: `Bash`**
+
+_Inspect broken tables and their generators_
+
+```bash
+sed -n 166,169p docs/chipalooza2_as_taped_out/test_platforms.md | cut -c1-250; sed -n 186,189p docs/chipalooza2_as_taped_out/test_platforms.md | cut -c1-250; sed -n 3,6p verification/c2_gaps/ac_tran/tables/rt_consistency.md | cut -c1-250; grep -rln "rt_consistency\|tables/rt.md\|max |err|" verification/c2_gaps/ac_tran/*.py verification/c2_gaps/dc_curves/*.py; grep -n "max |err|" verification/c2_gaps/ac_tran/*.py verification/c2_gaps/dc_curves/*.py | cut -c1-200
+```
+
+## Tool results / harness — 2026-11-25 14:30:52 UTC
+
+**Tool result:**
+
+```
+| case | max V(bus2) into 1 Gohm | max |I(bus0)| | max |I(bus1)| | max |I(bus3)| |
+|---|---|---|---|---|
+| vdd1v2_off | 200.9 mV | 6.32e-11 A | 1.57e-10 A | 2.9e-11 A |
+
+| case | max V(bus2) into 1 Gohm | max |I(bus0)| | max |I(bus1)| | max |I(bus3)| |
+|---|---|---|---|---|
+| vdd1v2_off | 161.8 mV | 5.7e-11 A | 1.47e-10 A | 2.2e-11 A |
+<!-- generated by rt.py -->
+| pads | PVT | DC slope (../dc_curves) | |gain| at 10 Hz (AC, unloaded) | step gain (0.5 V step, unloaded) | vref_s2d / vcm DC sweep [V] | vref_s2d / vcm here (op) [V] |
+|---|---|---|---|---|---|---|
+| schematic | tt 27 °C 3.3 V | 0.99875 | 0.99876 | 0.99872 | 0.4923 / 1.2566 | 0.4923 / 1.2566 |
+verification/c2_gaps/ac_tran/rt.py
+verification/c2_gaps/dc_curves/rt.py
+verification/c2_gaps/dc_curves/rt.py:120:          'max |err| pad in 0 ... 1 V [mV]', 'pad in range 1 mV [V]', 'pad out range 1 mV [V]', 'pad in range 10 mV [V]']
+verification/c2_gaps/dc_curves/rt.py:139:           '\n\noffset = pad out - vcm at pad in = vref (replica values); max |err| over pad in 0 ... 1 V against '
+```
+
+## Assistant — 2026-11-25 14:31:00 UTC
+
+**Tool call: `Bash`**
+
+_Escape pipes in generators and tables; recheck_
+
+```bash
+grep -n "|gain| at 10 Hz" verification/c2_gaps/ac_tran/rt.py | cut -c1-200; python3 - <<'EOF'
+import re
+# 1. generators: escape pipes inside header strings
+for p,a,b in [('verification/c2_gaps/dc_curves/rt.py',"'max |err| pad in 0 ... 1 V [mV]'","'max \\\\|err\\\\| pad in 0 ... 1 V [mV]'"),
+              ('verification/c2_gaps/ac_tran/rt.py',"|gain| at 10 Hz","\\\\|gain\\\\| at 10 Hz")]:
+    s=open(p,encoding='utf-8').read(); assert s.count(a)==1,(p,s.count(a)); open(p,'w',encoding='utf-8').write(s.replace(a,b))
+# 2. the committed tables (generated output) and test_platforms.md: escape the |x| pipes in header lines
+fix=[('verification/c2_gaps/dc_curves/tables/rt.md','max |err| pad in 0 ... 1 V [mV]','max \\|err\\| pad in 0 ... 1 V [mV]',1),
+     ('verification/c2_gaps/ac_tran/tables/rt_consistency.md','|gain| at 10 Hz','\\|gain\\| at 10 Hz',1),
+     ('docs/chipalooza2_as_taped_out/test_platforms.md','| max |I(bus0)| | max |I(bus1)| | max |I(bus3)| |','| max \\|I(bus0)\\| | max \\|I(bus1)\\| | max \\|I(bus3)\\| |',2)]
+for p,a,b,n in fix:
+    s=open(p,encoding='utf-8').read(); assert s.count(a)==n,(p,s.count(a)); open(p,'w',encoding='utf-8').write(s.replace(a,b))
+EOF
+grep -n "err\\\\|\|gain\\\\|" verification/c2_gaps/dc_curves/rt.py verification/c2_gaps/ac_tran/rt.py | cut -c1-160; python3 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/tablecheck.py
+```
+
+## Tool results / harness — 2026-11-25 14:31:00 UTC
+
+**Tool result:**
+
+```
+339:            ['pads', 'PVT', 'DC slope (../dc_curves)', '|gain| at 10 Hz (AC, unloaded)', 'step gain (0.5 V step, unloaded)',
+docs/chipalooza2_as_taped_out/PROPOSAL_chipalooza2.md table at line 140 1 problem(s) ['L145:3']
+1 files with problems
+```
+
+## Assistant — 2026-11-25 14:31:05 UTC
+
+**Tool call: `Bash`**
+
+_Verify generator strings produce escaped pipes_
+
+```bash
+sed -n 120p verification/c2_gaps/dc_curves/rt.py; sed -n 339p verification/c2_gaps/ac_tran/rt.py; python3 -c "print('max \\\\|err\\\\| pad')"; python3 - <<'EOF'
+import ast
+for p,ln in [('verification/c2_gaps/dc_curves/rt.py',120),('verification/c2_gaps/ac_tran/rt.py',339)]:
+    line=open(p).read().split('\n')[ln-1]
+    import re
+    m=re.findall(r"'([^']*\\\\\|[^']*)'",line)
+    print(p, [ast.literal_eval("'"+x+"'") for x in m])
+EOF
+python3 -m py_compile verification/c2_gaps/dc_curves/rt.py verification/c2_gaps/ac_tran/rt.py && echo compiled
+```
+
+## Tool results / harness — 2026-11-25 14:31:05 UTC
+
+**Tool result:**
+
+```
+'max \\|err\\| pad in 0 ... 1 V [mV]', 'pad in range 1 mV [V]', 'pad out range 1 mV [V]', 'pad in range 10 mV [V]']
+            ['pads', 'PVT', 'DC slope (../dc_curves)', '\\|gain\\| at 10 Hz (AC, unloaded)', 'step gain (0.5 V step, unloaded)',
+max \|err\| pad
+verification/c2_gaps/dc_curves/rt.py ['max \\|err\\| pad in 0 ... 1 V [mV]']
+verification/c2_gaps/ac_tran/rt.py ['\\|gain\\| at 10 Hz (AC, unloaded)']
+compiled
+```
+
+## Assistant — 2026-11-25 14:31:09 UTC
+
+Both strings now produce `\|` in the Markdown. One more check: the header list in `dc_curves/rt.py` must not also feed a CSV, which would then get backslashes:
+
+## Assistant — 2026-11-25 14:31:10 UTC
+
+**Tool call: `Bash`**
+
+_Check where the header strings are used_
+
+```bash
+sed -n 112,142p verification/c2_gaps/dc_curves/rt.py | cut -c1-150; sed -n 333,345p verification/c2_gaps/ac_tran/rt.py | cut -c1-150
+```
+
+## Tool results / harness — 2026-11-25 14:31:10 UTC
+
+**Tool result:**
+
+```
+ax.legend(handles=h, loc='lower left', ncol=2)
+    ax.set_title('Round trip: error vs expected (replica vcm / vref as simulated), pad out unloaded\n%s\n'
+                 'corner extremes of the designer\'s tier-1 points; symlog axis, linear inside ±1 mV' % RTLABEL,
+                 fontsize=8.5)
+    fig.tight_layout()
+    save(fig, str(dest / 'plots' / 'rt_error_corners'))
+    # table + CSV
+    hd = ['pads', 'corner', 'T [°C]', 'V', 'replica vref / vcm [V]', 'D2S vref [V]', 'gain', 'offset [mV]',
+          'max \\|err\\| pad in 0 ... 1 V [mV]', 'pad in range 1 mV [V]', 'pad out range 1 mV [V]', 'pad in range 10 mV [V]']
+    rr, cr = [], []
+    for p in PTS:
+        for v in VIEWS:
+            k = (v,) + p
+            if k not in ms:
+                rr.append([VIEWNAME[v], *p, 'not run / failed', '', '', '', '', '', '', ''])
+                continue
+            m = ms[k]
+            part = '' if m['x'][-1] > 3.29 else ' (sweep aborted at pad in %.3f V)' % m['x'][-1]
+            rr.append([VIEWNAME[v] + part, *p, '%.4f / %.4f' % (m['vref'], m['vcm']), '%.4f' % m['vrefd'], '%.5f' % m['G'],
+                       '%.2f' % (m['off'] * 1e3), '%.2f' % (m['emax01'] * 1e3),
+                       '%s%.3f ... %.3f' % ('<=' if m['loc1'] else '', m['lo1'], m['hi1']),
+                       '%.3f ... %.3f' % (m['olo1'], m['ohi1']),
+                       '%s%.3f ... %.3f' % ('<=' if m['loc10'] else '', m['lo10'], m['hi10'])])
+            cr.append([v, *p, m['vref'], m['vcm'], m['vrefd'],
+… [1620 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:31:14 UTC
+
+The header list feeds only the Markdown table; the CSV has its own. Confirming that a GitHub-flavored renderer now produces real tables, then committing:
+
+## Assistant — 2026-11-25 14:31:19 UTC
+
+**Tool call: `Bash`**
+
+_Verify rendering; commit table fixes; push_
+
+```bash
+for f in verification/c2_gaps/dc_curves/tables/rt.md verification/c2_gaps/ac_tran/tables/rt_consistency.md docs/chipalooza2_as_taped_out/test_platforms.md; do echo "$f tables=$(pandoc -f gfm -t html $f | grep -c '<table')  rows=$(pandoc -f gfm -t html $f | grep -c '<tr')"; done; git add verification/c2_gaps/dc_curves/rt.py verification/c2_gaps/dc_curves/tables/rt.md verification/c2_gaps/ac_tran/rt.py verification/c2_gaps/ac_tran/tables/rt_consistency.md docs/chipalooza2_as_taped_out/test_platforms.md && git commit -q -m "docs: Markdown tables that GitHub showed as plain text: escape the pipes of |err|, |gain|, |I(bus)| in header cells (dc_curves rt table, ac_tran rt_consistency, test_platforms; generators fixed too)
+
+All Markdown tables in the repository checked for column-count mismatches; the only one left is
+one short row in the verbatim proposal, which renders.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin chipalooza2-documentation && git log --oneline -1 && git rev-parse HEAD
+```
+
+## Tool results / harness — 2026-11-25 14:31:23 UTC
+
+**Tool result:**
+
+```
+verification/c2_gaps/dc_curves/tables/rt.md tables=1  rows=16
+verification/c2_gaps/ac_tran/tables/rt_consistency.md tables=1  rows=16
+docs/chipalooza2_as_taped_out/test_platforms.md tables=11  rows=89
+8c58c8c docs: Markdown tables that GitHub showed as plain text: escape the pipes of |err|, |gain|, |I(bus)| in header cells (dc_curves rt table, ac_tran rt_consistency, test_platforms; generators fixed too)
+8c58c8c84718c51052f4a2735adf9ae794bdae30
+```
+
+## Assistant — 2026-11-25 14:31:26 UTC
+
+The fix is pushed (`8c58c8c`). The three running agents will write tables with "|VGS|"-style headers, so I'm telling each of them about this pitfall now:
+
+## Assistant — 2026-11-25 14:31:28 UTC
+
+**Tool call: `SendMessage`**
+
+```json
+{
+ "to": "ac1c7ffb4f24efa5f",
+ "summary": "Escape pipes in Markdown tables",
+ "message": "Formatting rule for all Markdown you write: inside table cells, escape every literal pipe as \\| (e.g. \"max \\|VGS\\|\", \"\\|err\\|\"), also in tables generated by your scripts, and keep the header, separator and row column counts equal. Otherwise GitHub shows the table as plain text. Check your .md files for this before you report.",
+ "type": "message",
+ "recipient": "ac1c7ffb4f24efa5f",
+ "recipient_kind": "agent",
+ "content": "Formatting rule for all Markdown you write: insid…"
+}
+```
+
+## Assistant — 2026-11-25 14:31:30 UTC
+
+**Tool call: `SendMessage`**
+
+```json
+{
+ "to": "ada7afe514c13161e",
+ "summary": "Escape pipes in Markdown tables",
+ "message": "Formatting rule for all Markdown you write: inside table cells, escape every literal pipe as \\| (e.g. \"\\|I\\|\", \"max \\|V\\|\"), also in tables generated by your scripts, and keep the header, separator and row column counts equal. Otherwise GitHub shows the table as plain text. Check your .md files for this before you report.",
+ "type": "message",
+ "recipient": "ada7afe514c13161e",
+ "recipient_kind": "agent",
+ "content": "Formatting rule for all Markdown you write: insid…"
+}
+```
+
+## Assistant — 2026-11-25 14:31:31 UTC
+
+**Tool call: `SendMessage`**
+
+```json
+{
+ "to": "a7c0fe31fe640748a",
+ "summary": "Escape pipes in Markdown tables",
+ "message": "Formatting rule for all Markdown you write: inside table cells, escape every literal pipe as \\| (e.g. \"max \\|err\\|\"), also in tables generated by your scripts, and keep the header, separator and row column counts equal. Otherwise GitHub shows the table as plain text. Check your .md files for this before you report.",
+ "type": "message",
+ "recipient": "a7c0fe31fe640748a",
+ "recipient_kind": "agent",
+ "content": "Formatting rule for all Markdown you write: insid…"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:31:31 UTC
+
+**Tool result:**
+
+```
+{"success":true,"message":"Message queued for delivery to ac1c7ffb4f24efa5f at its next tool round. Moved 1 running tool call to the background without stopping it, so that round no longer waits for it. If it finishes first, it is resumed with the message and notifies again, so wait for that notification before resending.","pin":{"id":"ac1c7ffb4f24efa5f","name":"ac1c7ffb4f24efa5f","ref":"769ae0"}}
+```
+
+## Tool results / harness — 2026-11-25 14:31:31 UTC
+
+**Tool result:**
+
+```
+{"success":true,"message":"Message queued for delivery to ada7afe514c13161e at its next tool round. Moved 1 running tool call to the background without stopping it, so that round no longer waits for it. If it finishes first, it is resumed with the message and notifies again, so wait for that notification before resending.","pin":{"id":"ada7afe514c13161e","name":"ada7afe514c13161e","ref":"af19de"}}
+```
+
+## Tool results / harness — 2026-11-25 14:31:31 UTC
+
+**Tool result:**
+
+```
+{"success":true,"message":"Message queued for delivery to a7c0fe31fe640748a at its next tool round. Sending this moved nothing it is running to the background just now, so the message waits for that round unless something moves sooner. If it finishes first, it is resumed with the message and notifies again, so wait for that notification before resending.","pin":{"id":"a7c0fe31fe640748a","name":"a7c0fe31fe640748a","ref":"4db965"}}
+```
+
+## Assistant — 2026-11-25 14:31:37 UTC
+
+**Tool call: `Bash`**
+
+_Log table fix; push chatlog_
+
+```bash
+cd /home/user/sky130_cm_ip__single2diff2single_sudelbuecher && echo "- User: tables/rt.md shows as plain text on GitHub. Cause: unescaped pipes in header cells (max |err|) make the header's column count differ from the separator row. Checked every Markdown table in [S7] with a script; fixed rt.md (dc_curves), rt_consistency.md (ac_tran), test_platforms.md (two tables), and the two generators (dc_curves/rt.py, ac_tran/rt.py) ([S7] 8c58c8c); the verbatim proposal keeps one short row (renders). The three running agents were told to escape pipes in their tables." >> RUNLOG.md && bash chatlog/tools/export_all.sh >/dev/null 2>&1; git add -A && git commit -q -m "RUNLOG: Markdown table fix; chatlog regenerated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin sudel_buecher && git log --oneline -1
+```
+

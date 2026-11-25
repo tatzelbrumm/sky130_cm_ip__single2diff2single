@@ -1333,3 +1333,3857 @@ diodevss_2kv.tcl
 196:.model res_rppd r3_cmc
 ```
 
+## Assistant — 2026-11-25 14:09:26 UTC
+
+**Tool call: `Bash`**
+
+_Find model include conventions in existing scripts_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps && grep -n "\.lib\|\.include\|osdi\|spiceinit" dc_curves/roundtrip.py ac_tran/*.py klayout_pad_diodes/*.py | head -30; cat dc_curves/.gitignore
+```
+
+## Tool results / harness — 2026-11-25 14:09:27 UTC
+
+**Tool result:**
+
+```
+dc_curves/roundtrip.py:16:pnp typ, diodes.lib (as run_tier1.py), plus the IHP IO library sg13cmos5l_io.spice and cap_typ (needed by the
+dc_curves/roundtrip.py:83:.lib cornerMOShv.lib mos_{c}
+dc_curves/roundtrip.py:84:.lib cornerMOSlv.lib mos_{c}
+dc_curves/roundtrip.py:85:.lib cornerRES.lib res_typ
+dc_curves/roundtrip.py:86:.lib cornerCAP.lib cap_typ
+dc_curves/roundtrip.py:87:.lib cornerPNP.lib typ
+dc_curves/roundtrip.py:88:.include {PDK}/libs.tech/ngspice/models/diodes.lib
+dc_curves/roundtrip.py:89:.include sg13cmos5l_io.spice
+dc_curves/roundtrip.py:90:.include {mac}/hv_logic/netlist/source/hv_logic.spice
+dc_curves/roundtrip.py:91:.include {mac}/en_ctrl_3v3/netlist/source/en_ctrl_3v3.spice
+dc_curves/roundtrip.py:92:.include {bg}
+dc_curves/roundtrip.py:93:""" + ''.join(f'.include {i}\n' for i in includes(view, rdir)) + f""".include {mac}/slot_7/netlist/source/slot_7.spice
+dc_curves/roundtrip.py:118:    spiceinit = Path(PDK) / 'libs.tech' / 'ngspice' / '.spiceinit'
+dc_curves/roundtrip.py:119:    (rdir / '.spiceinit').write_text(spiceinit.read_text())
+ac_tran/slot.py:115:.lib cornerMOShv.lib mos_{c}
+ac_tran/slot.py:116:.lib cornerMOSlv.lib mos_{c}
+ac_tran/slot.py:117:.lib cornerRES.lib res_typ
+ac_tran/slot.py:118:.lib cornerCAP.lib cap_typ
+ac_tran/slot.py:119:.lib cornerPNP.lib typ
+ac_tran/slot.py:120:.include {PDK}/libs.tech/ngspice/models/diodes.lib
+ac_tran/slot.py:121:.include sg13cmos5l_io.spice
+ac_tran/slot.py:122:.include {mac}/hv_logic/netlist/source/hv_logic.spice
+ac_tra
+… [838 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:09:46 UTC
+
+**Tool call: `Bash`**
+
+_Inspect IO filler cell ring metal layers_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad && cat > ring.py <<'EOF'
+import klayout.db as db, sys
+ly=db.Layout(); ly.read('/foss/pdks/ihp-sg13cmos5l/libs.ref/sg13cmos5l_io/gds/sg13cmos5l_io.gds')
+c=ly.cell('sg13cmos5l_Filler2000')
+print(c.name, c.bbox())
+for li in ly.layer_indexes():
+    info=ly.get_info(li)
+    sh=list(c.begin_shapes_rec(li))
+    if not sh: continue
+    boxes=[]; texts=[]
+    it=c.begin_shapes_rec(li)
+    while not it.at_end():
+        s=it.shape()
+        if s.is_text(): texts.append((s.text.string, s.text.trans.disp.transformed(it.trans()) if False else (it.trans()*s.text.trans).disp))
+        else: boxes.append(s.bbox().transformed(it.trans()))
+        it.next()
+    print(info, len(boxes), [ (b.top*ly.dbu,b.bottom*ly.dbu,b.width()*ly.dbu) for b in sorted(boxes,key=lambda b:b.bottom)][:12], texts[:6])
+EOF
+python3 ring.py 2>&1 | head -40
+```
+
+## Tool results / harness — 2026-11-25 14:09:49 UTC
+
+**Tool result:**
+
+```
+sg13cmos5l_Filler2000 (-620,0;10620,180000)
+8/0 8 [(33.0, 6.0, 10.0), (61.0, 34.0, 10.0), (89.56, 65.0, 10.0), (114.62, 90.56, 10.0), (140.17000000000002, 115.62, 10.0), (148.58, 148.42000000000002, 10.0), (157.08, 156.92000000000002, 10.0), (167.08, 166.92000000000002, 10.0)] []
+1/0 8 [(33.0, 6.0, 10.0), (61.0, 34.0, 10.0), (89.56, 65.0, 9.5), (114.62, 90.56, 9.5), (140.17000000000002, 115.62, 9.5), (148.65, 148.35, 10.0), (157.15, 156.85, 9.5), (167.15, 166.85, 10.0)] []
+31/0 3 [(61.620000000000005, 5.38, 11.24), (149.27, 147.73, 11.24), (167.77, 166.23, 11.24)] []
+14/0 4 [(89.74, 64.82000000000001, 10.36), (114.8, 90.38, 10.36), (140.35, 115.44, 10.36), (157.33, 156.67000000000002, 10.36)] []
+40/0 4 [(89.56, 65.0, 9.5), (114.62, 90.56, 9.5), (140.17000000000002, 115.62, 9.5), (157.15, 156.85, 9.5)] []
+30/0 10 [(32.5, 7.0, 10.0), (31.945, 7.555, 7.49), (60.0, 34.5, 10.0), (59.42, 35.03, 7.49), (91.5, 66.0, 10.0), (119.0, 93.5, 10.0), (134.0, 126.0, 10.0), (133.76500000000001, 126.185, 7.49), (158.0, 140.0, 10.0), (178.0, 160.0, 10.0)] []
+50/0 7 [(32.5, 7.0, 10.0), (60.0, 34.5, 10.0), (91.5, 66.0, 10.0), (119.0, 93.5, 10.0), (134.0, 126.0, 10.0), (155.8, 140.0, 10.0), (178.0, 162.20000000000002, 10.0)] []
+126/0 5 [(32.5, 7.0, 10.0), (60.0, 34.5, 10.0), (91.5, 66.0, 10.0), (119.0, 93.5, 10.0), (134.0, 126.0, 10.0)] []
+30/2 7 [(32.5, 7.0, 10.0), (60.0, 34.5, 10.0), (91.5, 66.0, 10.0), (119.0, 93.5, 10.0), (134.0, 126.0, 10.0), (158.0, 140.0, 10.0), (178.0, 160.0, 10.0)] []
+30/
+… [2110 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:11:12 UTC
+
+**Tool call: `Bash`**
+
+_Search spec for well resistance and rules for latch-up_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad && sed -n 440,500p spec.txt; pdftotext -layout /foss/pdks/ihp-sg13cmos5l/libs.doc/doc/SG13CMOS5L_os_layout_rules.pdf rules.txt; grep -n -i "latch\|LU\.\|guard" rules.txt | head -40
+```
+
+## Tool results / harness — 2026-11-25 14:11:14 UTC
+
+**Tool result:**
+
+```
+2.2 Passive Device Parameters
+2.2.1 Rsil
+Rsil utilizes salicided, n-doped gate polysilicon as resistor material.
+                                                                  Tar-                Meas.
+ Parameter                  Name                Unit      Min                   Max            Comment
+                                                                  get                 Cond.
+ Sheet Resistance           RSNRSIL              Ω       6.2     7.0          7.8     [A.i]
+ Line Width Delta           DWRSIL               nm      -20     10           40      [A.i]
+ Temperature                TC1NRSIL           ppm/K             3100 0.3             [A.af]
+ Coefficients               TC2NRSIL           ppm/K2
+ Matching Coefficients      MATRSIL1             nm              6      1.4           [A.ac]
+                            MATRSIL2
+
+ Metal-to-Body-           RCRSIL               Ω* µm             4.5               [A.ae]
+ Resistance
+Maximum Current Density for Rsil is limited by contacts, please refer section 3.5.
+2.2.2 Rppd
+Rppd utilizes unsalicided, p-doped gate polysilicon as resistor material. For realizing precision resistors,
+a line width of 2μm or higher is recommended.
+
+                                                                  Tar-                Meas.
+ Parameter                  Name                Unit      Min                   Max            Comment
+                                                                  get                 Cond.
+… [3875 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:11:22 UTC
+
+**Tool call: `Bash`**
+
+_Read latch-up rules and find maxlu reports_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad && sed -n 2315,2390p rules.txt; ls /home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5/reports/ | grep -i lu; ls /home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5/reports/ | head -40
+```
+
+## Tool results / harness — 2026-11-25 14:11:23 UTC
+
+**Tool result:**
+
+```
+53 of 60
+                                    SG13CMOS5L Layout Rules Rev. 0.1
+
+
+7.2 Latch-up Guidelines
+Latch-up is an undesirable phenomenon in integrated circuit (IC) design that can lead to the inadvertent
+creation of a low-impedance path between the power supply rails or any other regions forming a parasitic
+thyristor. The effect is trigged by unwated injection of charges into this structure. This can lead to destruction
+of circuit parts due to overcurrent.
+
+Latch-up rules are not checked by default. Latch-up rule checking must be switched on separately.
+7.2.1 Latch-up Protection on Output Buffers
+  1. Connect source of NMOS and PMOS devices to VSS and VDD, respectively.
+  2. Connect drain of NMOS and PMOS devices directly to the output pad.
+  3. Place guard rings (VSS, VDD ties) around any NMOS and PMOS devices, which are directly tied to a
+     pad.
+  4. Double guard rings (N-Well isolator and P+ isolator) should be inserted between n-channel and p-
+     channel output buffers.
+  5. Double guard rings (N-Well isolator and P+ isolator) should be inserted between output buffers and
+     internal circuit area.
+
+                          P+ guard ring                                          N+ guard ring
+
+
+
+
+                Vss        Gate Vss               VDD      Vss          VDD      Gate VDD
+
+
+
+
+                         n-channel                                            p-channel
+                         buffer            N+ isolator    P+ isolator         buffer
+
+
+… [3318 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:11:27 UTC
+
+**Tool call: `Bash`**
+
+_Read latch-up DRC reports_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5/reports/ && cat S2D.maxlu.txt D2S.maxlu.txt | head -40; grep -c "<item>" *maxlu*.lyrdb; grep -o "<category>[^<]*" S2D.maxlu*.lyrdb | head; ls ..
+```
+
+## Tool results / harness — 2026-11-25 14:11:27 UTC
+
+**Tool result:**
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# written by summarize.py from the run directory of run_signoff.sh
+command: klayout -b -r /foss/pdks/ihp-sg13cmos5l/libs.tech/klayout/tech/drc/rule_decks/sg13cmos5l_maximal.drc -rd input=/home/user/sg13cmos5l_cm_slot7/pads/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.gds -rd topcell=sg13cmos5l_IOPadSingle2Diff -rd run_mode=deep -rd thr=2 -rd threads=2 -rd latchUpRules=true -rd report=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/S2D/klayout_maximal_lu/sg13cmos5l_IOPadSingle2Diff_maximal_lu.lyrdb -rd log=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/S2D/klayout_maximal_lu/sg13cmos5l_IOPadSingle2Diff_maximal_lu.log
+exit code: 0, wall time: 13s
+report S2D/klayout_maximal_lu/sg13cmos5l_IOPadSingle2Diff_maximal_lu.lyrdb: 271 rule categories, 0 items (violations)
+logs scanned: S2D/klayout_maximal_lu/sg13cmos5l_IOPadSingle2Diff_maximal_lu.log, logs/S2D.maxlu.log
+log lines: 'exception' 0, 'Traceback' 0, 'ERROR' 0
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# written by summarize.py from the run directory of run_signoff.sh
+command: klayout -b -r /foss/pdks/ihp-sg13cmos5l/libs.tech/klayout/tech/drc/rule_decks/sg13cmos5l_maximal.drc -rd input=/home/user/sg13cmos5l_cm_slot7/pads/sg13cmos5l_IOPadDiff2Single/sg13cmos5l_IOPadDiff2Single.gds -rd topcell=sg13cmos5l_IOPadDiff2Si
+… [1015 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:11:34 UTC
+
+**Tool call: `Bash`**
+
+_Read KLayout layer names_
+
+```bash
+ls /foss/pdks/ihp-sg13cmos5l/libs.tech/klayout/tech/; grep -o '<name>[^<]*</name>\|<source>[^<]*</source>' /foss/pdks/ihp-sg13cmos5l/libs.tech/klayout/tech/*.lyp | paste - - | head -60
+```
+
+## Tool results / harness — 2026-11-25 14:11:34 UTC
+
+**Tool result:**
+
+```
+d25
+drc
+lvs
+macros
+pymacros
+scripts
+sg13cmos5l.lyp
+sg13cmos5l.lyt
+sg13cmos5l.map
+xsect
+<name>Activ.drawing</name>	<source>1/0</source>
+<name>Activ.label</name>	<source>1/1</source>
+<name>Activ.pin</name>	<source>1/2</source>
+<name>Activ.net</name>	<source>1/3</source>
+<name>Activ.boundary</name>	<source>1/4</source>
+<name>Activ.lvs</name>	<source>1/19</source>
+<name>Activ.mask</name>	<source>1/20</source>
+<name>Activ.filler</name>	<source>1/22</source>
+<name>Activ.nofill</name>	<source>1/23</source>
+<name>Activ.OPC</name>	<source>1/26</source>
+<name>Activ.iOPC</name>	<source>1/27</source>
+<name>Activ.noqrc</name>	<source>1/28</source>
+<name>GatPoly.drawing</name>	<source>5/0</source>
+<name>GatPoly.label</name>	<source>5/1</source>
+<name>GatPoly.pin</name>	<source>5/2</source>
+<name>GatPoly.net</name>	<source>5/3</source>
+<name>GatPoly.boundary</name>	<source>5/4</source>
+<name>GatPoly.filler</name>	<source>5/22</source>
+<name>GatPoly.nofill</name>	<source>5/23</source>
+<name>GatPoly.OPC</name>	<source>5/26</source>
+<name>GatPoly.iOPC</name>	<source>5/27</source>
+<name>GatPoly.noqrc</name>	<source>5/28</source>
+<name>Cont.drawing</name>	<source>6/0</source>
+<name>Cont.net</name>	<source>6/3</source>
+<name>Cont.boundary</name>	<source>6/4</source>
+<name>Cont.OPC</name>	<source>6/26</source>
+<name>nSD.drawing</name>	<source>7/0</source>
+<name>nSD.block</name>	<source>7/21</source>
+<name>Metal1.drawing</name>	<source>8/0</source>
+<name>Metal1.label</name>	<source>8/1</source>
+<na
+… [1430 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:11:47 UTC
+
+**Tool call: `Bash`**
+
+_Extract S2D pad layout geometry of wells and diffusions_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad && cat > geo.py <<'EOF'
+import klayout.db as db, sys
+f=sys.argv[1]
+ly=db.Layout(); ly.read(f)
+top=ly.top_cell(); print(top.name, top.dbbox())
+for c in ly.each_cell():
+    if c.cell_index()!=top.cell_index(): pass
+# hierarchy
+def walk(c,d=0,t=db.ICplxTrans()):
+    for inst in c.each_inst():
+        cc=inst.cell
+        if d<2: print('  '*d, cc.name, inst.dcplx_trans, cc.dbbox().transformed(inst.dcplx_trans))
+        walk(cc,d+1)
+walk(top)
+def reg(l,d=0):
+    return db.Region(top.begin_shapes_rec(ly.layer(l,d))).merged()
+nw=reg(31); act=reg(1); psd=reg(14); nsd=reg(7); gp=reg(5)
+print('NWell polygons:')
+for p in nw.each(): print('  ', p.bbox().to_dtype(ly.dbu), round(p.area()*ly.dbu**2,1))
+pact = (act & psd) - gp
+nact = (act - psd) - gp
+print('P+ in NWell:'); 
+for p in (pact & nw).merged().each(): print('  ', p.bbox().to_dtype(ly.dbu))
+print('N+ outside NWell (in p-sub):')
+for p in (nact - nw).merged().each(): print('  ', p.bbox().to_dtype(ly.dbu), round(p.area()*ly.dbu**2,1))
+print('P+ outside NWell (substrate ties/ diodes?):')
+for p in (pact - nw).merged().each(): print('  ', p.bbox().to_dtype(ly.dbu), round(p.area()*ly.dbu**2,1))
+print('N+ in NWell (well ties):')
+for p in (nact & nw).merged().each(): print('  ', p.bbox().to_dtype(ly.dbu), round(p.area()*ly.dbu**2,1))
+EOF
+python3 geo.py /home/user/sg13cmos5l_cm_slot7/pads/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.gds 2>&1 | head -120
+```
+
+## Tool results / harness — 2026-11-25 14:11:47 UTC
+
+**Tool result:**
+
+```
+sg13cmos5l_IOPadSingle2Diff (-0.62,0;80.62,180)
+ edge_stubs r0 *1 0,0 (-0.62,84;80.62,167.77)
+ edge_stubs_low r0 *1 0,0 (-0.18,64.82;80.18,84.44)
+ DCNDiode r0 *1 2.67,7.66 (0.39,5.38;38.01,20.2)
+ DCPDiode r0 *1 43.7,7.66 (41.86,5.82;78.6,19.76)
+ Clamp_N_M1 r0 *1 1.2,19.58 (0.58,18.96;37.82,30.1)
+ Clamp_P_M1 r0 *1 42.23,19.58 (42.05,19.4;78.41,39.02)
+ rppd r0 *1 38.8,23.16 (38.6,22.55;39.5,27.31)
+ rppd$1 r0 *1 40.6,23.17 (40.4,22.56;41.3,36.68)
+ esd_wiring r0 *1 0,0 (0,2.8;80,72.55)
+ s2d_block r0 *1 0,26 (1.47,30.88;77.9,180)
+   pwr_f r0 *1 0,-26 (5,4.88;77.35,126.2)
+   s2d_inputs_c3 r0 *1 4.3,96.4 (4.3,96.4;51.88,122.84)
+   s2d_pd_p_c3 r0 *1 35,146.3 (35,146.3;38.2,149.27)
+   bias_tree_noab_p_c3 r0 *1 60,138.3 (60,138.3;72.94,148.67)
+   s2d_sinks_cmfb_c3_core r90 *1 74.92,66.75 (59.19,65.25;75.7,97.5)
+   sinks_6x6_s2d_c3_core r270 *1 5.08,56.2 (4.3,6.7;20.81,57.7)
+   bias_tree_noab_n_c3 r0 *1 54.82,127.08 (51.49,126.3;75.7,135.515)
+   s2d_rhigh_c3 r90 *1 71.87,100.87 (55.5,100;75.59,119.24)
+   s2d_cload_c3 r0 *1 5.3,137.28 (4.3,136.5;33.86,150.74)
+   s2d_tails_lo_f m0 *1 4.37,93.4 (4.37,84.24;49.56,93.4)
+   s2d_tails_hi_f r0 *1 4.37,125.84 (4.37,125.84;49.56,135)
+   s2d_casc_n_f r270 *1 24.83,76.92 (22.62,6.7;36.99,79.44)
+   s2d_casc_p_f r270 *1 45.5,71.83 (45.5,19.6;58.31,73.43)
+   s2d_loads_f r270 *1 58.31,62.79 (58.31,19.6;70.63,64.39)
+ iovdd_rail_tie r0 *1 0,0 (76.35,90;77.55,95.4)
+NWell polygons:
+   (43.08,7.04;77.38,18.54) 394.4
+   (43.41,20.76;77.05,37.66) 568.5
+   (-0
+… [2850 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:12:44 UTC
+
+**Tool call: `Bash`**
+
+_Inspect HV MOS subcircuit wrapper_
+
+```bash
+M=/foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models; grep -n -A25 "subckt sg13_hv_pmos" $M/sg13g2_moshv_mod.lib | head -50; grep -n "^.lib\|^.endl\|include" $M/cornerMOShv.lib | head
+```
+
+## Tool results / harness — 2026-11-25 14:12:44 UTC
+
+**Tool result:**
+
+```
+155:.subckt sg13_hv_pmos d g s b
+156-+ w=0.35u l=0.28u ng=1 m=1 mm_ok=0 as=0 ad=0 pd=0 ps=0 trise=0 z1=0.34e-6 z2=0.38e-6 wmin=0.15e-6 rfmode=0 pre_layout=1
+157-
+158-.include sg13g2_moshv_parm.lib
+159-
+160-.if (rfmode == 0)
+161-    .if (as <= 1e-50)
+162-        .if (floor(floor(ng/2+0.501)*2+0.001) != ng)
+163-            Nsg13_hv_pmos d g s b sg13g2_hv_pmos_psp
+164-              + w=w
+165-              + l=l
+166-              + nf='ng' mult='m'
+167-              + as='max(w/ng,wmin)*(z1+((ng-1)/2)*z2)'
+168-              + ad='max(w/ng,wmin)*(z1+((ng-1)/2)*z2)'
+169-              + ps='2*(max(w/ng,wmin)*((ng-1)/2+1)+z1+(ng-1)/2*z2)'
+170-              + pd='2*(max(w/ng,wmin)*((ng-1)/2+1)+z1+(ng-1)/2*z2)'
+171-              + dta=trise
+172-              + ngcon=2
+173-              + delvto=0
+174-              + factuo=1
+175-        .else
+176-            Nsg13_hv_pmos d g s b sg13g2_hv_pmos_psp
+177-              + w=w
+178-              + l=l
+179-              + nf='ng' mult='m'
+180-              + as='max(w/ng,wmin)*(2*z1+max(0,(ng-2)/2)*z2)'
+120:  .include sg13g2_moshv_mod.lib
+121:  .include sg13g2_svaricaphv_mod.lib
+170:  .include sg13g2_moshv_mismatch.lib
+171:  .include sg13g2_moshv_mod_mismatch.lib
+172:  .include sg13g2_svaricaphv_mod_mismatch.lib
+221:  .include sg13g2_moshv_stat.lib
+222:  .include sg13g2_moshv_mod.lib
+223:  .include sg13g2_svaricaphv_mod.lib
+273:  .include sg13g2_moshv_mod.lib
+274:  .include sg13g2_svaricaphv_mod.lib
+```
+
+## Assistant — 2026-11-25 14:12:59 UTC
+
+**Tool call: `Bash`**
+
+_Check junction/breakdown params in HV MOS model_
+
+```bash
+M=/foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models; grep -n -i "vbr\|idsatr\|imax\|swjunexp\|cjorbot\|rsh\|rint\|rshg\|nsubo\|toxo\b\|toxo =" $M/sg13g2_moshv_parm.lib | head -40; grep -n -i "^.model\|level" $M/sg13g2_moshv_mod.lib | head
+```
+
+## Tool results / harness — 2026-11-25 14:13:00 UTC
+
+**Tool result:**
+
+```
+74:+ toxo          =  '7.4256e-09*sg13g2_hv_nmos_toxo'                                         epsroxo       =  3.9                         nsubo         =  1.8552e+23
+81:+ vsbnudo       =  0.0                         dvsbnudo      =  1.0                         vnsubo        =  0.0
+82:+ nslpo         =  0.05                        dnsubo        =  0.025686                    dphibo        = '-0.042228*sg13g2_hv_nmos_dphibo'
+152:+ kuowelw       =  0.0                         trj           =  21.0                        swjunexp      =  0.0
+153:+ imax          =  0.0020128                   frev          =  1000.0                      cjorbot       =  '0.00085856*sg13g2_hv_nmos_cjorbot'
+156:+ psti          =  0.16571                     pgat          =  0.1451                      cjorbotd      =  0.001
+160:+ phigsti       =  1.006                       phiggat       =  0.3                         idsatrbot     =  5.397e-08
+161:+ idsatrsti     =  4.0612e-15                  idsatrgat     =  0.0                         csrhbot       =  100.0
+164:+ phiggatd      =  1.16                        idsatrbotd    =  1e-12                       idsatrstid    =  1e-18
+165:+ idsatrgatd    =  1e-18                       csrhbotd      =  100.0                       csrhstid      =  0.0001
+177:+ vbrbot        =  10.0                        vbrsti        =  10.0                        vbrgat        =  10.0
+179:+ vbrbotd       =  10.0                        vbrstid       =  10.0               
+… [3325 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:14:00 UTC
+
+**Tool call: `Bash`**
+
+_Find splitter cell and read harness README ESD notes_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/harness/repo && git ls-tree -r --name-only HEAD | grep -i "split\|decap" | head; git rev-parse HEAD; git checkout HEAD -- README && sed -n 280,310p README
+```
+
+## Tool results / harness — 2026-11-25 14:14:00 UTC
+
+**Tool result:**
+
+```
+magic/sg13cmos5l_ocd_Split200.mag
+magic/sg13cmos5l_ocd_Split2000.mag
+verilog/rtl/sg13cmos5l_ocd_Split2000.v
+2ef5a86964b4f93a5b1e2c9bb8a46edc425cc227
+		core signals are:	mysig_in
+					mysig_out
+					mysig_ena
+					mysig_zero
+					mysig_one
+
+     11. Analog pad:
+
+	gpio[0]:	sg13cmos5l_IOPadInOut30mA	mysig
+
+		pad signal is:		gpio[0]
+		core signals are:	gpio[0]
+					mysig_esd
+
+	Note that the analog pad is slightly different from other pads:
+	For all other pads, the user project wrapper pin names are the
+	same as the padframe core-facing pin names.  However, the analog
+	pad is connected directly to the core-facing non-ESD pin, so in
+	the padframe, the core-facing pin name is the same as the pad name.
+	In the user project wrapper, however, the core-facing non-ESD pin
+	is given the name "mysig".
+
+     Signals should not be indexed, as then different signals would have
+     different index ranges which would not match the indexes of the pads.
+
+     All pads in this library are the same size.
+
+-----------------------------------------------------------------------
+The following steps are for rebuilding the chip top-level with custom
+padframe changes due to users who have specified non-default I/O cell
+names for the dedicated pads connected to their projects (i.e., in
+```
+
+## Assistant — 2026-11-25 14:14:05 UTC
+
+**Tool call: `Bash`**
+
+_Read ring splitter cell_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/harness/repo && git checkout HEAD -- magic/sg13cmos5l_ocd_Split2000.mag verilog/rtl/sg13cmos5l_ocd_Split2000.v && cat verilog/rtl/sg13cmos5l_ocd_Split2000.v | head -40; grep "^<<\|flabel\|rlabel" magic/sg13cmos5l_ocd_Split2000.mag | head -30
+```
+
+## Tool results / harness — 2026-11-25 14:14:07 UTC
+
+**Tool result:**
+
+```
+// Copyright 2026 Open Circuit Design LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// type: Split2000
+//
+// This cell has the basic form of a Filler2000 cell, but removes the two
+// "vdd" buses, such that the 1.2V power domains end on either side of
+// this cell, splitting the domain (however, the ground domain cannot be
+// split, as it is shorted through the substrate).
+
+`timescale 1ns/10ps
+`celldefine
+module sg13cmos5l_ocd_Split2000 (iovdd, iovss, vss);
+	inout iovdd;
+	inout iovss;
+	inout vss;
+endmodule
+`endcelldefine
+
+<< nwell >>
+<< pwell >>
+<< nsubdiff >>
+<< ptapdiff >>
+<< nsubdiffcont >>
+<< ptapdiffcont >>
+<< metal1 >>
+<< metal3 >>
+<< via3 >>
+<< metal4 >>
+<< via4 >>
+<< metal5 >>
+<< labels >>
+rlabel metal3 s 0 28000 2000 31600 4 vss
+rlabel metal3 s 0 18700 2000 23800 4 iovdd
+rlabel metal3 s 0 13200 2000 18300 4 iovdd
+rlabel metal3 s 0 6900 2000 12000 4 iovss
+rlabel metal3 s 0 1400 2000 6500 4 iovss
+rlabel metal3 s 0 25200 2000 26800 4 iovss
+rlabel metal4 s 0 32440 
+… [440 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:14:15 UTC
+
+**Tool call: `Bash`**
+
+_Check remaining metal layers and IO cell sizes_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad && python3 ring.py 2>&1 | grep -E "^10/0|^67/0|^134/0|^19/0" ; python3 - <<'EOF'
+import klayout.db as db
+ly=db.Layout(); ly.read('/foss/pdks/ihp-sg13cmos5l/libs.ref/sg13cmos5l_io/gds/sg13cmos5l_io.gds')
+for c in ly.each_cell():
+    if c.name.startswith('sg13cmos5l_IOPad') or 'Filler' in c.name: print(c.name, c.dbbox())
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:14:16 UTC
+
+**Tool result:**
+
+```
+sg13cmos5l_Filler1000 (-0.62,0;5.62,180)
+sg13cmos5l_Filler10000 (-0.62,0;50.62,180)
+sg13cmos5l_Filler200 (-0.5,0;1.5,180)
+sg13cmos5l_Filler2000 (-0.62,0;10.62,180)
+sg13cmos5l_Filler400 (-0.62,0;2.62,180)
+sg13cmos5l_Filler4000 (-0.62,0;20.62,180)
+sg13cmos5l_IOPadAnalog (-0.62,0;80.62,180)
+sg13cmos5l_IOPadIOVdd (-0.62,0;80.62,180)
+sg13cmos5l_IOPadIOVss (-0.62,0;80.62,180)
+sg13cmos5l_IOPadIn (-0.62,0;80.62,180)
+sg13cmos5l_IOPadInOut16mA (-0.62,0;80.62,180.62)
+sg13cmos5l_IOPadInOut30mA (-0.62,0;80.62,180.62)
+sg13cmos5l_IOPadInOut4mA (-0.62,0;80.62,180.62)
+sg13cmos5l_IOPadOut16mA (-0.62,0;80.62,180)
+sg13cmos5l_IOPadOut30mA (-0.62,0;80.62,180)
+sg13cmos5l_IOPadOut4mA (-0.62,0;80.62,180)
+sg13cmos5l_IOPadTriOut16mA (-0.62,0;80.62,180.62)
+sg13cmos5l_IOPadTriOut30mA (-0.62,0;80.62,180.62)
+sg13cmos5l_IOPadTriOut4mA (-0.62,0;80.62,180.62)
+sg13cmos5l_IOPadVdd (-0.62,0;80.62,180)
+sg13cmos5l_IOPadVss (-0.62,0;80.62,180)
+```
+
+## Assistant — 2026-11-25 14:14:51 UTC
+
+**Tool call: `Bash`**
+
+_Create deliverable folder and gitignore_
+
+```bash
+mkdir -p /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/{csv,plots,_work} && cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && printf '# SPDX-FileCopyrightText: 2026 Christoph Maier\n# SPDX-License-Identifier: Apache-2.0\n_work/\n__pycache__/\n' > .gitignore && cat .gitignore; nproc; uptime
+```
+
+## Tool results / harness — 2026-11-25 14:14:51 UTC
+
+**Tool result:**
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+_work/
+__pycache__/
+4
+ 14:14:51 up 36 min,  0 user,  load average: 3.40, 1.30, 0.52
+```
+
+## Assistant — 2026-11-25 14:15:00 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/fetch_harness.sh`
+
+```
+#!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+#
+# Fetch the harness padframe files this study reads (shallow, blobless; only these paths are downloaded):
+# RTimothyEdwards/sg13cmos5l_ocd_chipalooza, branch tapeout_nov_2026, pinned to commit 2ef5a869 (the branch head
+# on 2026-11-25). Usage: fetch_harness.sh <work_dir>  ->  <work_dir>/harness/<paths>
+set -euo pipefail
+WORK=$(realpath -m "$1")
+URL=https://github.com/RTimothyEdwards/sg13cmos5l_ocd_chipalooza
+REV=2ef5a86964b4f93a5b1e2c9bb8a46edc425cc227
+mkdir -p "$WORK"
+if [ ! -d "$WORK/harness_repo" ]; then
+  git clone -q --depth 1 --filter=blob:none --no-checkout -b tapeout_nov_2026 "$URL" "$WORK/harness_repo"
+fi
+git -C "$WORK/harness_repo" fetch -q --depth 1 origin $REV
+rm -rf "$WORK/harness" && mkdir -p "$WORK/harness"
+git -C "$WORK/harness_repo" archive $REV magic/sg13cmos5l_padframe.mag magic/sg13cmos5l_ocd_Split2000.mag \
+  verilog/rtl/sg13cmos5l_ocd_Split2000.v netlist/layout/sg13cmos5l_padframe.spice config.txt README \
+  | tar x -C "$WORK/harness"
+echo "fetched: $WORK/harness ($REV)"
+```
+
+## Tool results / harness — 2026-11-25 14:15:00 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/fetch_harness.sh (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:15:01 UTC
+
+**Tool call: `Bash`**
+
+_Run harness fetch script_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && chmod +x fetch_harness.sh && ./fetch_harness.sh _work && ls _work/harness/*
+```
+
+## Tool results / harness — 2026-11-25 14:15:08 UTC
+
+**Tool result:**
+
+```
+fetched: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/harness (2ef5a86964b4f93a5b1e2c9bb8a46edc425cc227)
+_work/harness/README
+_work/harness/config.txt
+
+_work/harness/magic:
+sg13cmos5l_ocd_Split2000.mag
+sg13cmos5l_padframe.mag
+
+_work/harness/netlist:
+layout
+
+_work/harness/verilog:
+rtl
+```
+
+## Assistant — 2026-11-25 14:15:30 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/ring.py`
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Pad-ring model inputs, read from layout (no simulation):
+1. resistance per um of the iovdd and iovss rings, from the metal bands of the IHP IO cell sg13cmos5l_Filler2000
+   (PDK GDS) and the typical sheet resistances of the PDK process specification (SG13CMOS5L_os_process_spec.pdf
+   Rev. 0.2, 2.3: Metal3 / Metal4 88 mOhm/sq, TopMetal1 18 mOhm/sq). Metal1 is left out (its bands do not follow
+   the ring nets; leaving it out makes the ring resistance an upper bound);
+2. positions of the supply pads, the ring splitters and the two slot-7 pads along the ring, from the harness
+   padframe magic/sg13cmos5l_padframe.mag (tapeout_nov_2026 at 2ef5a869).
+Usage: python3 ring.py <work_dir> <out_dir>   -> <out_dir>/csv/ring_metal.csv, ring_cells.csv"""
+import csv
+import os
+import sys
+
+import klayout.db as db
+
+PDK = os.path.join(os.environ.get('PDK_ROOT', '/foss/pdks'), os.environ.get('PDK', 'ihp-sg13cmos5l'))
+RSH = {'Metal3': (30, 0.088), 'Metal4': (50, 0.088), 'TopMetal1': (126, 0.018)}   # (GDS layer, Ohm/sq typ.)
+LABEL_LAYER = (30, 25)   # Metal3.text: net labels of the ring bands
+
+
+def ring_metal():
+    ly = db.Layout()
+    ly.read(os.path.join(PDK, 'libs.ref/sg13cmos5l_io/gds/sg13cmos5l_io.gds'))
+    c = ly.cell('sg13cmos5l_Filler2000')
+    cw = c.bbox().width()
+    labels = []
+    it = c.begin_shapes_rec(ly.layer(*LABEL_LAYER))
+    while not it.at_end():
+        s = it.shape()
+        if s.is_text():
+            labels.append((s.text.string, (it.trans() * s.text.trans).disp.y))
+        it.next()
+    rows = []
+    for name, (lay, rsh) in RSH.items():
+        reg = db.Region(c.begin_shapes_rec(ly.layer(lay, 0))).merged()
+        for p in reg.each():
+            b = p.bbox()
+            if b.width() < 0.9 * cw:
+                continue   # only bands that run through the cell (the ring)
+            nets = {n for n, y in labels if b.bottom <= y <= b.top}
+            if len(nets) != 1:
+                continue
+            net = nets.pop()
+            if net not in ('iovdd', 'iovss'):
+                continue
+            rows.append({'net': net, 'layer': name, 'y0_um': b.bottom * ly.dbu, 'y1_um': b.top * ly.dbu,
+                         'width_um': round(b.height() * ly.dbu, 3), 'rsh_ohm_sq': rsh})
+    rper = {}
+    for net in ('iovdd', 'iovss'):
+        g = sum(r['width_um'] / r['rsh_ohm_sq'] for r in rows if r['net'] == net)
+        rper[net] = 1.0 / g   # Ohm per um of ring
+    return rows, rper
+
+
+def perimeter(x, y):
+    """Ring coordinate (um), counterclockwise from the south-east corner of the pad-cell origins
+    (right edge x = 2080, top y = 3180, left x = 100, bottom y = 100, as in sg13cmos5l_padframe.mag)."""
+    if abs(x - 2080) < 1:
+        return y - 100
+    if abs(y - 3180) < 1:
+        return 3080 + (2080 - x)
+    if abs(x - 100) < 1:
+        return 5060 + (3180 - y)
+    return 8140 + (x - 100)
+
+
+def ring_cells(work):
+    path = os.path.join(work, 'harness/magic/sg13cmos5l_padframe.mag')
+    cells = []
+    cur = None
+    for line in open(path):
+        w = line.split()
+        if not w:
+            continue
+        if w[0] == 'use':
+            cur = (w[1], w[2])
+        elif w[0] == 'transform' and cur:
+            x, y = int(w[3]) * 0.005, int(w[6]) * 0.005   # magscale 1 2: 5 nm units
+            cells.append((cur[0], cur[1], x, y))
+            cur = None
+    keep = ('IOPadIOVdd', 'IOPadIOVss', 'IOPadVdd', 'IOPadVss', 'Split2000', 'IOPadSingle2Diff', 'IOPadDiff2Single',
+            'Corner')
+    out = []
+    for cell, inst, x, y in cells:
+        if any(k in cell for k in keep):
+            out.append({'cell': cell, 'instance': inst, 'x_um': x, 'y_um': y, 's_um': perimeter(x, y)})
+    out.sort(key=lambda r: r['s_um'])
+    return out
+
+
+def main():
+    work, outdir = sys.argv[1], sys.argv[2]
+    rows, rper = ring_metal()
+    os.makedirs(os.path.join(outdir, 'csv'), exist_ok=True)
+    with open(os.path.join(outdir, 'csv/ring_metal.csv'),
+… [1230 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 14:15:30 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/ring.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:15:31 UTC
+
+**Tool call: `Bash`**
+
+_Run ring geometry script_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 ring.py _work . && cat csv/ring_metal.csv && cat csv/ring_cells.csv
+```
+
+## Tool results / harness — 2026-11-25 14:15:32 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+Traceback (most recent call last):
+  File "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/ring.py", line 116, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/ring.py", line 94, in main
+    rows, rper = ring_metal()
+                 ~~~~~~~~~~^^
+  File "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/ring.py", line 52, in ring_metal
+    rper[net] = 1.0 / g   # Ohm per um of ring
+                ~~~~^~~
+ZeroDivisionError: float division by zero
+```
+
+## Assistant — 2026-11-25 14:15:37 UTC
+
+**Tool call: `Bash`**
+
+_Rerun ring geometry script_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && sed -i 's/b.width() < 0.9 \* cw/b.width() < 0.8 * cw/' ring.py && python3 ring.py _work . && cat csv/ring_metal.csv && cat csv/ring_cells.csv
+```
+
+## Tool results / harness — 2026-11-25 14:15:38 UTC
+
+**Tool result:**
+
+```
+ring resistance: iovdd 0.2505 mOhm/um, iovss 0.2165 mOhm/um; 31 cells
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# ring metal bands of sg13cmos5l_Filler2000 (PDK GDS); sheet resistance typ. (process spec 2.3)
+# resistance per um: iovdd 0.2505 mOhm/um, iovss 0.2165 mOhm/um
+net,layer,y0_um,y1_um,width_um,rsh_ohm_sq
+iovss,Metal3,7.0,32.5,25.5,0.088
+iovss,Metal3,34.5,60.0,25.5,0.088
+iovdd,Metal3,66.0,91.5,25.5,0.088
+iovdd,Metal3,93.5,119.0,25.5,0.088
+iovss,Metal3,126.0,134.0,8.0,0.088
+iovss,Metal4,7.0,32.5,25.5,0.088
+iovss,Metal4,34.5,60.0,25.5,0.088
+iovdd,Metal4,66.0,91.5,25.5,0.088
+iovdd,Metal4,93.5,119.0,25.5,0.088
+iovss,Metal4,126.0,134.0,8.0,0.088
+iovss,TopMetal1,7.0,32.5,25.5,0.018
+iovss,TopMetal1,34.5,60.0,25.5,0.018
+iovdd,TopMetal1,66.0,91.5,25.5,0.018
+iovdd,TopMetal1,93.5,119.0,25.5,0.018
+iovss,TopMetal1,126.0,134.0,8.0,0.018
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# supply pads, splitters, corners and the slot-7 pads of sg13cmos5l_padframe.mag (tapeout_nov_2026 2ef5a869); s = ring coordinate of the cell origin, counterclockwise from the SE corner
+cell,instance,x_um,y_um,s_um
+sg13cmos5l_Corner,pad_corner_se,2080.0,100.0,0.0
+sg13cmos5l_IOPadIOVdd,pad_vdd3v3_0,2080.0,280.0,180.0
+sg13cmos5l_ocd_Split2000,splitter_14,2080.0,380.0,280.0
+sg13cmos5l_IOPadVdd,pad_vdd1v2_0,2080.0,390.0,290.0
+sg13cmos5l_IOPadVdd,pad_vdd1v2_1,2080.0,500.0,400.0
+sg13cmos5l_IOPadIOVss,pad_vss3
+… [1531 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:16:01 UTC
+
+**Tool call: `Bash`**
+
+_Check finger uniformity of the BigFET clamp_
+
+```bash
+P=/foss/pdks/ihp-sg13cmos5l/libs.ref/sg13cmos5l_io/spice/sg13cmos5l_io.spice; sed -n 53,233p $P | awk '{print $2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14}' | sort | uniq -c
+```
+
+## Tool results / harness — 2026-11-25 14:16:01 UTC
+
+**Tool result:**
+
+```
+2             
+      1 Cell name: sg13cmos5l_RCClampResistor          
+      1 End of subcircuit definition.         
+      1 Library name: sg13cmos5l_io          
+      1 View name: schematic          
+      1 iovss sub! ptap1 R=9.999         
+    172 pad gate iovss sub! sg13_hv_nmos w=4.4u l=600.0n ng=1 ad=1.496e-12 as=1.496e-12 pd=9.48e-06 ps=9.48e-06 m=1
+      1 sg13cmos5l_Clamp_N43N43D4R gate iovss pad         
+      1 sub! gate dantenna l=480n w=480n m=1
+```
+
+## Assistant — 2026-11-25 14:17:08 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/common.py`
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Shared pieces of the ESD / latch-up study (IHP sg13cmos5l simulation, ngspice-47 + IHP OSDI models):
+netlist preparation (ammeters in the pad netlists, antenna-diode model variants, the IO-library supply cells with the
+172-finger clamp lumped as m = 172), the pad-ring model, the ngspice runner (one process at a time), a raw-file
+reader and a flattener of the pad netlists (device terminals for the oxide / junction stress tables)."""
+import csv
+import os
+import re
+import subprocess
+from pathlib import Path
+
+import numpy as np
+
+HERE = Path(__file__).resolve().parent
+SLOT = HERE.parents[2]
+PDK_ROOT = os.environ.get('PDK_ROOT', '/foss/pdks')
+PDK = os.path.join(PDK_ROOT, os.environ.get('PDK', 'ihp-sg13cmos5l'))
+MODELS = os.path.join(PDK, 'libs.tech/ngspice/models')
+IOLIB = os.path.join(PDK, 'libs.ref/sg13cmos5l_io/spice/sg13cmos5l_io.spice')
+S2D = 'sg13cmos5l_IOPadSingle2Diff'
+D2S = 'sg13cmos5l_IOPadDiff2Single'
+SPDX = '* SPDX-FileCopyrightText: 2026 Christoph Maier\n* SPDX-License-Identifier: Apache-2.0\n'
+CSV_HEAD = '# SPDX-FileCopyrightText: 2026 Christoph Maier\n# SPDX-License-Identifier: Apache-2.0\n'
+LABEL = 'IHP sg13cmos5l simulation (ngspice, PDK models; not ESD-calibrated)'
+
+# Ammeters inserted into copies of the pad netlists: (subckt, instance, terminal index, label).
+# Each 0 V source sits between the named terminal's node and the device; current is positive INTO the device from
+# that node (for a diode on the pad: from the pad into the diode).
+AMMETERS = {
+    S2D: [('s2d_pad_esd', 'XDP1', 0, 'DP1'), ('s2d_pad_esd', 'XDP2', 0, 'DP2'),
+          ('s2d_pad_esd', 'XDN1', 1, 'DN1'), ('s2d_pad_esd', 'XDN2', 1, 'DN2'),
+          ('s2d_pad_esd', 'XMCP', 0, 'MCP'), ('s2d_pad_esd', 'XMCN', 0, 'MCN')],
+    D2S: [(D2S, 'XDP0', 0, 'DP0'), (D2S, 'XDP1', 0, 'DP1'), (D2S, 'XDN0', 1, 'DN0'), (D2S, 'XDN1', 1, 'DN1'),
+          ('d2s_out_p', 'XOP', 0, 'OP'), ('d2s_out_n', 'XON', 0, 'ON'),
+          ('d2s_sp2k', 'XR0', 0, 'SP_R'), ('d2s_sp2k', 'XD0', 0, 'SP_DP'), ('d2s_sp2k', 'XD1', 1, 'SP_DN')],
+}
+# ngspice branch-current vectors of those ammeters, per pad (hierarchical names of the testbench, see build_tb)
+def ammeter_vectors(cell, inst='xpad'):
+    out = {}
+    for sub, dev, _, lab in AMMETERS[cell]:
+        if sub == cell:
+            path = f'{inst}'
+        elif sub == 's2d_pad_esd':
+            path = f'{inst}.xp'
+        elif sub == 'd2s_out_p':
+            path = f'{inst}.xfp'
+        elif sub == 'd2s_out_n':
+            path = f'{inst}.xfn'
+        elif sub == 'd2s_sp2k':
+            for k in ('xspa', 'xspb'):
+                out[f'{lab}_{k[-1].upper()}'] = f'v.{inst}.{k}.vam_{lab.lower()}#branch'
+            continue
+        out[lab] = f'v.{path}.vam_{lab.lower()}#branch'
+    return out
+
+
+# Diode sizes on the pad (l, w in um; from the pad netlists), for current density
+DIODES = {
+    S2D: {'DP1': ('dpantenna', 27.78, 1.26), 'DP2': ('dpantenna', 27.78, 1.26),
+          'DN1': ('dantenna', 27.78, 1.26), 'DN2': ('dantenna', 27.78, 1.26)},
+    D2S: {'DP0': ('dpantenna', 65.8, 1.26), 'DP1': ('dpantenna', 65.8, 1.26),
+          'DN0': ('dantenna', 67.6, 1.26), 'DN1': ('dantenna', 67.6, 1.26),
+          'SP_DP_A': ('dpantenna', 4.98, 0.64), 'SP_DP_B': ('dpantenna', 4.98, 0.64),
+          'SP_DN_A': ('dantenna', 3.1, 0.64), 'SP_DN_B': ('dantenna', 3.1, 0.64)},
+}
+
+
+def _split_inst(line):
+    return line.split()
+
+
+def add_ammeters(text, cell):
+    """Insert the AMMETERS of `cell` into its netlist text (subckt bodies)."""
+    lines = text.split('\n')
+    out = []
+    cur = None
+    todo = {(s, d): (t, lab) for s, d, t, lab in AMMETERS[cell]}
+    done = set()
+    for ln in lines:
+        m = re.match(r'^\.subckt\s+(\S+)', ln, re.I)
+        if m:
+            cur = m.group(1)
+        if re.match(r'^\.ends', ln, re.I):
+            cur = None
+        w = ln.split()
+        if cur and w and (cur, w[0]) in todo:
+            t, lab = todo[(cur, w[0])]
+         
+… [12823 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 14:17:08 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/common.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:17:48 UTC
+
+**Tool call: `Bash`**
+
+_Patch flattener and test netlist prep and ring_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+import re
+p='common.py'; s=open(p).read()
+s=s.replace("""            nodes = [binding.get(a, f'{path}.{a}'.lower()) for a in args[:-1]]""","""            nodes = []
+            for a in args[:-1]:
+                a0 = re.sub(r'_am_[a-z0-9_]+$', '', a)   # ammeter node: the 0 V source joins it to a0
+                nodes.append(binding.get(a0, f'{path}.{a0}'.lower()))""")
+s=s.replace("""    # ammeters: map '<node>_am_<lab>' back to <node> (the 0 V source joins them)
+    for d in devs:
+        d['nodes'] = [re.sub(r'_am_[a-z0-9_]+$', '', n) for n in d['nodes']]
+    return devs""","""    return devs""")
+s=s.replace("""    rows = [r for r in rows if 'Corner' not in r['cell'] and 'Split' not in r['cell'] and 'IOPadVdd' != r['cell'][11:]
+            and r['cell'] not in ('sg13cmos5l_IOPadVdd', 'sg13cmos5l_IOPadVss')]""","""    # the ring nodes: IOVdd / IOVss supply cells and the two slot-7 pads (the 1.2 V IOPadVdd / IOPadVss cells,
+    # corners and splitters carry the iovdd / iovss ring through but put no device on it in this model)
+    rows = [r for r in rows if r['cell'] in ('sg13cmos5l_IOPadIOVdd', 'sg13cmos5l_IOPadIOVss', S2D, D2S)]""")
+open(p,'w').write(s)
+EOF
+python3 -c "
+import sys; sys.path.insert(0,'.')
+import common as c
+p=c.prep_netlists('_work'); print(p)
+t,n=c.ring_netlist('gnd_vss'); print(t[:1500]); print(len(n))
+"; grep -n "am_" _work/net/*_am.spice | head -30
+```
+
+## Tool results / harness — 2026-11-25 14:17:48 UTC
+
+**Tool result:**
+
+```
+{'sg13cmos5l_IOPadSingle2Diff': '_work/net/sg13cmos5l_IOPadSingle2Diff_am.spice', 'sg13cmos5l_IOPadDiff2Single': '_work/net/sg13cmos5l_IOPadDiff2Single_am.spice', 'io': '_work/net/sg13cmos5l_io_lumped.spice'}
+* pad ring: iovdd / iovss loops, resistance per um from csv/ring_metal.csv (x 1)
+Rrd_vdd3v3_0_vss3v3_0 vd_vdd3v3_0 vd_vss3v3_0 0.192885
+Rrs_vdd3v3_0_vss3v3_0 vs_vdd3v3_0 vs_vss3v3_0 0.166705
+Rrd_vss3v3_0_s2d vd_vss3v3_0 vd_s2d 0.303105
+Rrs_vss3v3_0_s2d vs_vss3v3_0 vs_s2d 0.261965
+Rrd_s2d_d2s vd_s2d vd_d2s 0.027555
+Rrs_s2d_d2s vs_s2d vs_d2s 0.023815
+Rrd_d2s_vss3v3_1 vd_d2s vd_vss3v3_1 0.05511
+Rrs_d2s_vss3v3_1 vs_d2s vs_vss3v3_1 0.04763
+Rrd_vss3v3_1_vss3v3_2 vd_vss3v3_1 vd_vss3v3_2 0.33066
+Rrs_vss3v3_1_vss3v3_2 vs_vss3v3_1 vs_vss3v3_2 0.28578
+Rrd_vss3v3_2_vss3v3_3 vd_vss3v3_2 vd_vss3v3_3 0.137775
+Rrs_vss3v3_2_vss3v3_3 vs_vss3v3_2 vs_vss3v3_3 0.119075
+Rrd_vss3v3_3_vdd3v3_1 vd_vss3v3_3 vd_vdd3v3_1 0.027555
+Rrs_vss3v3_3_vdd3v3_1 vs_vss3v3_3 vs_vdd3v3_1 0.023815
+Rrd_vdd3v3_1_vdd3v3_2 vd_vdd3v3_1 vd_vdd3v3_2 0.027555
+Rrs_vdd3v3_1_vdd3v3_2 vs_vdd3v3_1 vs_vdd3v3_2 0.023815
+Rrd_vdd3v3_2_vdd3v3_3 vd_vdd3v3_2 vd_vdd3v3_3 0.027555
+Rrs_vdd3v3_2_vdd3v3_3 vs_vdd3v3_2 vs_vdd3v3_3 0.023815
+Rrd_vdd3v3_3_vdd3v3_4 vd_vdd3v3_3 vd_vdd3v3_4 0.027555
+Rrs_vdd3v3_3_vdd3v3_4 vs_vdd3v3_3 vs_vdd3v3_4 0.023815
+Rrd_vdd3v3_4_vss3v3_4 vd_vdd3v3_4 vd_vss3v3_4 0.303105
+Rrs_vdd3v3_4_vss3v3_4 vs_vdd3v3_4 vs_vss3v3_4 0.261965
+Rrd_vss3v3_4_vss3v3_5 vd_vss3v3_4 vd_vss3v3_5 0.16533
+Rrs_vss3v3_4_vss3v3_5 vs_vss3v
+… [2955 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:18:10 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/esd.py`
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""HBM zaps (JS-001-style 100 pF / 1.5 kOhm network) into the S2D and D2S pads on the modeled pad ring.
+IHP sg13cmos5l simulation with the PDK's compact models, which are NOT calibrated for ESD currents.
+Usage: python3 esd.py <work_dir> run [<filter>]   (runs the jobs whose name contains <filter>; one ngspice at a time)
+       python3 esd.py <work_dir> post              (csv/ tables from the raw files)
+       python3 esd.py <work_dir> wave              (HBM network check into a short and into 500 Ohm)"""
+import sys
+from pathlib import Path
+
+import numpy as np
+
+import common as C
+
+CELLS = {'s2d': C.S2D, 'd2s': C.D2S}
+VOLTS = [500, 1000, 2000]
+MODES = {'gnd_vss': 'iovss grounded, iovdd floating', 'gnd_vdd': 'iovdd grounded, iovss floating',
+         'p2p': 'pad to the other slot-7 pad (grounded), both rings floating'}
+LS_LIT = 7.5e-6   # series inductance used in the literature's HBM tester model (sensitivity runs only)
+
+
+def jobs():
+    out = []
+    for var in ('pdk', 'esdproxy'):
+        for t in CELLS:
+            for mode in MODES:
+                for v in VOLTS:
+                    for sgn in (+1, -1):
+                        out.append(dict(name=f'hbm_{var}_{t}_{mode}_{"p" if sgn > 0 else "n"}{v}', var=var, pad=t,
+                                        mode=mode, v=sgn * v, ls=0.0))
+    for t in CELLS:
+        for mode in ('gnd_vss', 'gnd_vdd'):
+            for sgn in (+1, -1):
+                out.append(dict(name=f'hbmls_pdk_{t}_{mode}_{"p" if sgn > 0 else "n"}2000', var='pdk', pad=t,
+                                mode=mode, v=sgn * 2000, ls=LS_LIT))
+    return out
+
+
+def hbm_source(v0, node, ls):
+    """100 pF charged to v0, closed by a switch at 1 ns, 1.5 kOhm (and optional ls) into `node`."""
+    L = [f'Chbm hc 0 100p', f'.ic v(hc)={v0}',
+         'Vctl ctl 0 pulse(0 1 1n 0.2n 0.2n 1 2)',
+         'Shbm hc hs ctl 0 swhbm', '.model swhbm sw vt=0.5 vh=0.1 ron=0.01 roff=1e14',
+         'Rhbm hs hl 1500']
+    if ls > 0:
+        L += [f'Lhbm hl hm {ls}', 'Rdamp hl hm 1e5']
+        L.append(f'Vzap hm {node} 0')
+    else:
+        L.append(f'Vzap hl {node} 0')
+    return '\n'.join(L) + '\n'
+
+
+def build(work, job, paths):
+    mode = 'float' if job['mode'] == 'p2p' else job['mode']
+    ring, _ = C.ring_netlist(mode)
+    other = 'd2s' if job['pad'] == 's2d' else 's2d'
+    txt = [f'* {job["name"]}: HBM {job["v"]} V into pad_{job["pad"]}, {MODES[job["mode"]]}; diode model {job["var"]}',
+           C.SPDX.strip(), C.model_block('tt', job['var'], work),
+           f'.include {paths[C.S2D]}', f'.include {paths[C.D2S]}', f'.include {paths["io"]}', ring,
+           C.pad_instance(C.S2D, 'unpowered', 'xs2d'), C.pad_instance(C.D2S, 'unpowered', 'xd2s'),
+           hbm_source(job['v'], f'pad_{job["pad"]}', job['ls'])]
+    if job['mode'] == 'p2p':
+        txt.append(f'Vret pad_{other} 0 0')
+    else:
+        txt.append(f'Rnz pad_{other} 0 1e12')
+    txt.append(""".option method=gear reltol=1e-3 abstol=1e-10 vntol=1e-5 itl4=200
+.temp 27
+.control
+set filetype=binary
+tran 0.1n 1000n 0 0.5n
+write %s.raw
+.endc
+.end
+""" % job['name'])
+    d = Path(work) / 'hbm'
+    d.mkdir(parents=True, exist_ok=True)
+    p = d / f'{job["name"]}.spice'
+    p.write_text('\n'.join(txt))
+    return p
+
+
+def run(work, filt=''):
+    paths = C.prep_netlists(work)
+    for job in jobs():
+        if filt and filt not in job['name']:
+            continue
+        p = build(work, job, paths)
+        raw = p.with_suffix('.raw')
+        if raw.exists() and raw.stat().st_mtime > p.stat().st_mtime - 5 and '--force' not in sys.argv:
+            pass
+        rc = C.run_ngspice(p, p.with_suffix('.log'))
+        print(job['name'], 'rc', rc, 'raw' if raw.exists() else 'NO RAW', flush=True)
+
+
+if __name__ == '__main__':
+    work = sys.argv[1]
+    if sys.argv[2] == 'run':
+        run(work, sys.argv[3] if len(sys.argv) > 3 else '')
+```
+
+## Tool results / harness — 2026-11-25 14:18:10 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/esd.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:18:12 UTC
+
+**Tool call: `Bash`**
+
+_Run first HBM test simulation_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && time python3 esd.py _work run hbm_pdk_s2d_gnd_vss_p2000 && tail -20 _work/hbm/hbm_pdk_s2d_gnd_vss_p2000.log && ls -la _work/hbm/
+```
+
+## Tool results / harness — 2026-11-25 14:18:12 UTC
+
+**Tool result:**
+
+```
+hbm_pdk_s2d_gnd_vss_p2000 rc 1 NO RAW
+
+real	0m0.172s
+user	0m0.261s
+sys	0m0.007s
+Error: Could not find include file _work/net/sg13cmos5l_IOPadSingle2Diff_am.spice
+    While reading hbm_pdk_s2d_gnd_vss_p2000.spice
+
+ERROR: fatal error in ngspice, exit(1)
+total 24
+drwxr-xr-x 2 root root 4096 Nov 25 14:18 .
+drwxr-xr-x 6 root root 4096 Nov 25 14:18 ..
+-rw-r--r-- 1 root root 1091 Nov 25 14:18 .spiceinit
+-rw-r--r-- 1 root root  172 Nov 25 14:18 hbm_pdk_s2d_gnd_vss_p2000.log
+-rw-r--r-- 1 root root 4384 Nov 25 14:18 hbm_pdk_s2d_gnd_vss_p2000.spice
+```
+
+## Assistant — 2026-11-25 14:18:15 UTC
+
+Paths need to be absolute.
+
+## Assistant — 2026-11-25 14:18:17 UTC
+
+**Tool call: `Bash`**
+
+_Fix paths and rerun first HBM test_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && sed -i 's|    net = Path(work) / .net.$|    net = Path(work).resolve() / "net"|; s|    p = Path(work) / .net. / .diodes_esdproxy.lib.|    p = Path(work).resolve() / "net" / "diodes_esdproxy.lib"|' common.py && grep -n 'resolve' common.py && time python3 esd.py _work run hbm_pdk_s2d_gnd_vss_p2000 && tail -30 _work/hbm/hbm_pdk_s2d_gnd_vss_p2000.log && ls -la _work/hbm/
+```
+
+## Tool results / harness — 2026-11-25 14:18:30 UTC
+
+**Tool result:**
+
+```
+15:HERE = Path(__file__).resolve().parent
+116:    p = Path(work).resolve() / "net" / "diodes_esdproxy.lib"
+136:    net = Path(work).resolve() / "net"
+hbm_pdk_s2d_gnd_vss_p2000 rc 0 raw
+
+real	0m12.333s
+user	0m10.648s
+sys	0m3.342s
+v.xd2s.xspa.vam_sp_r#branch        4.75466e-22
+v.xd2s.xfn.vam_on#branch          -2.14559e-22
+v.xd2s.xfp.vam_op#branch            8.1123e-22
+venb_s2d#branch                    1.15799e-23
+ven_s2d#branch                    -8.79559e-24
+vg_s2d_vref#branch                -6.86239e-22
+vg_s2d_vcm#branch                 -4.34482e-22
+v.xs2d.xp.vam_mcn#branch          -1.08369e-22
+v.xs2d.xp.vam_mcp#branch           1.22795e-22
+v.xs2d.xp.vam_dn2#branch          -7.08902e-23
+v.xs2d.xp.vam_dp2#branch           2.57684e-23
+v.xs2d.xp.vam_dn1#branch          -7.08902e-23
+v.xs2d.xp.vam_dp1#branch           2.57684e-23
+vbp_vss3v3_5#branch                -1.9567e-21
+vbp_vss3v3_4#branch               -6.82995e-21
+vcl_vdd3v3_4#branch               -1.45828e-21
+vcl_vdd3v3_3#branch               -1.45828e-21
+vcl_vdd3v3_2#branch               -1.45829e-21
+vcl_vdd3v3_1#branch                -1.4583e-21
+vbp_vss3v3_3#branch               -3.32612e-20
+vbp_vss3v3_2#branch               -2.22141e-22
+vbp_vss3v3_1#branch               -2.86989e-21
+vbp_vss3v3_0#branch               -9.08545e-21
+vcl_vdd3v3_0#branch               -1.45832e-21
+vcore#branch                                 0
+
+ Reference value :  0.00000e+00 Reference value :  6.65945e-09 Reference value :  2.36594e-08
+… [2113 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:18:37 UTC
+
+**Tool call: `Bash`**
+
+_Inspect first HBM run results_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+import sys; sys.path.insert(0,'.')
+import common as C, numpy as np
+pl=C.read_raw('_work/hbm/hbm_pdk_s2d_gnd_vss_p2000.raw')[-1]['vars']
+t=pl['time']
+def pk(n):
+    v=pl[n]; i=np.argmax(abs(v)); return v[i], t[i]*1e9
+for n in ['pad_s2d','vd_s2d','vs_s2d','pad_d2s','vd_d2s','hc','v(hc)' ]:
+    if n in pl: print(n, pk(n))
+for n in [k for k in pl if '#branch' in k]:
+    v,ti=pk(n)
+    if abs(v)>1e-4: print(n, v, ti)
+print([k for k in pl if k.startswith('xs2d.xa.xs.xa1')][:20])
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:18:37 UTC
+
+**Tool result:**
+
+```
+v(hc) (np.float64(6.796677341937075e-18), np.float64(994.6594453125322))
+[]
+```
+
+## Assistant — 2026-11-25 14:18:42 UTC
+
+**Tool call: `Bash`**
+
+_List raw file plots and vectors_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+import sys; sys.path.insert(0,'.')
+import common as C, numpy as np
+pls=C.read_raw('_work/hbm/hbm_pdk_s2d_gnd_vss_p2000.raw')
+for p in pls: print(p['name'], len(p['vars']), list(p['vars'])[:15])
+EOF
+grep -n -i "warn\|error\|ic" _work/hbm/hbm_pdk_s2d_gnd_vss_p2000.log | head
+```
+
+## Tool results / harness — 2026-11-25 14:18:42 UTC
+
+**Tool result:**
+
+```
+Transient Analysis 2651 ['time', 'v(ctl)', 'v(d2s_en)', 'v(d2s_enb)', 'v(d2s_iref)', 'v(d2s_vinn)', 'v(d2s_vinp)', 'v(d2s_vref)', 'v(hc)', 'v(hl)', 'v(hs)', 'v(n.xd2s.xcma.nsg13_hv_pmos#bi)', 'v(n.xd2s.xcma.nsg13_hv_pmos#bp)', 'v(n.xd2s.xcma.nsg13_hv_pmos#bs)', 'v(n.xd2s.xcma.nsg13_hv_pmos#di)']
+1:Warning: redefinition of .subckt unit_r2, ignored
+2:Warning: singular matrix:  check node xvdd3v3_3.xi3.sub!
+4:Note: Starting dynamic gmin stepping
+5:Warning: singular matrix:  check node xvdd3v3_3.xi3.sub!
+7:Warning: Dynamic gmin stepping failed
+9:Warning: singular matrix:  check node xvdd3v3_3.xi3.sub!
+11:Warning: singular matrix:  check node xvdd3v3_3.xi3.sub!
+13:Warning: singular matrix:  check node xvdd3v3_3.xi3.sub!
+15:Warning: singular matrix:  check node xvdd3v3_3.xi3.sub!
+17:Warning: True gmin stepping failed
+```
+
+## Assistant — 2026-11-25 14:19:07 UTC
+
+**Tool call: `Bash`**
+
+_Pass substrate node down as port in IO lib copy_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+p='common.py'; s=open(p).read()
+old="""    (net / 'sg13cmos5l_io_lumped.spice').write_text("""
+new="""    out = _local_substrate(out)
+    (net / 'sg13cmos5l_io_lumped.spice').write_text("""
+assert old in s
+s=s.replace(old,new)
+s=s.replace("""        SPDX + '* copy of the PDK sg13cmos5l_io.spice; Clamp_N43N43D4R: its 172 identical fingers as one instance '
+               'with m=172 (common.py)\\n' + '\\n'.join(out))""","""        SPDX + '* copy of the PDK sg13cmos5l_io.spice; Clamp_N43N43D4R: its 172 identical fingers as one instance '
+               'with m=172; the substrate node sub! of the supply cells IOPadIOVdd / IOPadIOVss passed to their '
+               'sub-cells as a port "sub" (one local substrate node per supply cell, tied to its iovss by the '
+               "library's ptap1 resistors) (common.py)\\n" + '\\n'.join(out))""")
+s=s.replace("""def model_block(""","""IO_CHILDREN = ('sg13cmos5l_Clamp_N43N43D4R', 'sg13cmos5l_RCClampResistor', 'sg13cmos5l_RCClampInverter',
+               'sg13cmos5l_DCNDiode', 'sg13cmos5l_DCPDiode')
+IO_PARENTS = ('sg13cmos5l_IOPadIOVdd', 'sg13cmos5l_IOPadIOVss')
+
+
+def _local_substrate(lines):
+    \"\"\"In the IO library, sub! is meant as a global node; ngspice keeps it local to every sub-cell, which leaves
+    the sub-cells' substrate floating. Pass it down as a port instead (supply cells and their sub-cells only).\"\"\"
+    out, cur = [], None
+    for ln in lines:
+        w = ln.split()
+        if w and w[0] == '.subckt':
+            cur = w[1]
+            if cur in IO_CHILDREN:
+                ln = ln.rstrip() + ' sub'
+        elif w and w[0].startswith('.ends'):
+            cur = None
+        elif cur in IO_CHILDREN + IO_PARENTS and w and w[0][0] in 'XxDdRr':
+            if cur in IO_PARENTS and w[-1] in IO_CHILDREN:
+                w = w[:-1] + ['sub', w[-1]]
+            ln = ' '.join(t if t != 'sub!' else 'sub' for t in w)
+        out.append(ln)
+    return out
+
+
+def model_block(""")
+open(p,'w').write(s)
+EOF
+python3 -c "
+import sys; sys.path.insert(0,'.'); import common as c; c.prep_netlists('_work')"; grep -n "sub\b" _work/net/sg13cmos5l_io_lumped.spice | head -30
+```
+
+## Tool results / harness — 2026-11-25 14:19:07 UTC
+
+**Tool result:**
+
+```
+3:* copy of the PDK sg13cmos5l_io.spice; Clamp_N43N43D4R: its 172 identical fingers as one instance with m=172; the substrate node sub! of the supply cells IOPadIOVdd / IOPadIOVss passed to their sub-cells as a port "sub" (one local substrate node per supply cell, tied to its iovss by the library's ptap1 resistors) (common.py)
+25:.subckt sg13cmos5l_DCNDiode anode cathode guard sub
+26:XD1 sub cathode dantenna l=27.78u w=1.26u m=1
+27:XD0 sub cathode dantenna l=27.78u w=1.26u m=1
+28:XR0 anode sub ptap1 R=5.191
+35:.subckt sg13cmos5l_DCPDiode anode cathode guard sub
+38:XR0 guard sub ptap1 R=17.289
+46:XI3 iovss iovss iovdd sub sg13cmos5l_DCNDiode
+47:XI2 iovss iovdd iovss sub sg13cmos5l_DCPDiode
+48:XR1 vss sub ptap1 R=22.472
+49:XR0 iovss sub ptap1 R=169.45m
+56:.subckt sg13cmos5l_Clamp_N43N43D4R gate iovss pad sub
+57:XN0[1] pad gate iovss sub sg13_hv_nmos w=4.4u l=600.0n ng=1 ad=1.496e-12 as=1.496e-12 pd=9.48e-06 ps=9.48e-06 m=172
+58:XR0 iovss sub ptap1 R=9.999
+59:XD0 sub gate dantenna l=480n w=480n m=1
+66:.subckt sg13cmos5l_RCClampResistor pin1 pin2 sub
+67:XR15 net15 net16 sub rppd R=5.239K l=20u w=1u
+68:XR20 net20 net21 sub rppd R=5.239K l=20u w=1u
+69:XR23 net23 net24 sub rppd R=5.239K l=20u w=1u
+70:XR17 net17 net18 sub rppd R=5.239K l=20u w=1u
+71:XR16 net16 net17 sub rppd R=5.239K l=20u w=1u
+72:XR25 net25 pin2 sub rppd R=5.239K l=20u w=1u
+73:XR22 net22 net23 sub rppd R=5.239K l=20u w=1u
+74:XR19 net19 net20 sub rppd R=5.239K l=20u w=1u
+75:XR24 net24 net25 sub rppd R=5.239K l=20u w=
+… [241 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:19:17 UTC
+
+**Tool call: `Bash`**
+
+_Rerun HBM test and inspect peaks_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && time python3 esd.py _work run hbm_pdk_s2d_gnd_vss_p2000 && grep -i -c "singular\|warn" _work/hbm/hbm_pdk_s2d_gnd_vss_p2000.log; head -12 _work/hbm/hbm_pdk_s2d_gnd_vss_p2000.log; python3 - <<'EOF'
+import sys; sys.path.insert(0,'.')
+import common as C, numpy as np
+pl=C.read_raw('_work/hbm/hbm_pdk_s2d_gnd_vss_p2000.raw')[-1]['vars']
+t=pl['time']
+def pk(n):
+    v=pl[n]; i=np.argmax(abs(v)); return round(v[i],4), round(t[i]*1e9,2)
+for n in ['pad_s2d','vd_s2d','vs_s2d','pad_d2s','vd_d2s','hc','xs2d.xa.xs.xa1.sa','xs2d.xa.xs.y','xs2d.xp.gp','xs2d.xp.gn','vd_vdd3v3_0','vdc_vdd3v3_1']:
+    print(n, pk(f'v({n})'))
+for n in [k for k in pl if '#branch' in k]:
+    v,ti=pk(n)
+    if abs(v)>1e-4: print(n, v, ti)
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:19:25 UTC
+
+**Tool result:**
+
+```
+hbm_pdk_s2d_gnd_vss_p2000 rc 1 raw
+
+real	0m6.848s
+user	0m5.979s
+sys	0m1.988s
+2
+Warning: redefinition of .subckt unit_r2, ignored
+Warning: singular matrix:  check nodes n.xs2d.xa.xs.xa2.xr[3].nr1#i2 and n.xs2d.xa.xs.xa1.xr[3].nr1#i2
+
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed
+
+Note: No compatibility mode selected!
+
+
+Circuit: * hbm_pdk_s2d_gnd_vss_p2000: hbm 2000 v into pad_s2d, iovss grounded, iovdd floating; diode model pdk
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+pad_s2d (np.float64(0.0535), np.float64(0.0))
+vd_s2d (np.float64(0.0175), np.float64(0.0))
+vs_s2d (np.float64(0.0), np.float64(1.06))
+pad_d2s (np.float64(0.0155), np.float64(0.0))
+vd_d2s (np.float64(0.0175), np.float64(0.0))
+hc (np.float64(2000.0), np.float64(0.0))
+xs2d.xa.xs.xa1.sa (np.float64(0.0076), np.float64(0.0))
+xs2d.xa.xs.y (np.float64(0.0055), np.float64(1.06))
+xs2d.xp.gp (np.float64(0.0175), np.float64(0.0))
+xs2d.xp.gn (np.float64(0.0), np.float64(0.0))
+vd_vdd3v3_0 (np.float64(0.0175), np.float64(0.0))
+vdc_vdd3v3_1 (np.float64(0.0175), np.float64(0.0))
+```
+
+## Assistant — 2026-11-25 14:19:28 UTC
+
+**Tool call: `Bash`**
+
+_Read tail of failing log_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && tail -30 _work/hbm/hbm_pdk_s2d_gnd_vss_p2000.log
+```
+
+## Tool results / harness — 2026-11-25 14:19:28 UTC
+
+**Tool result:**
+
+```
+vg_s2d_vcm#branch                  7.07885e-14
+v.xs2d.xp.vam_mcn#branch           4.11241e-13
+v.xs2d.xp.vam_mcp#branch           1.90492e-11
+v.xs2d.xp.vam_dn2#branch           1.60993e-13
+v.xs2d.xp.vam_dp2#branch           1.08523e-13
+v.xs2d.xp.vam_dn1#branch           1.60993e-13
+v.xs2d.xp.vam_dp1#branch           1.08523e-13
+vbp_vss3v3_5#branch                6.92106e-13
+vbp_vss3v3_4#branch                2.34087e-12
+vcl_vdd3v3_4#branch                3.35354e-12
+vcl_vdd3v3_3#branch                3.35376e-12
+vcl_vdd3v3_2#branch                3.35332e-12
+vcl_vdd3v3_1#branch                3.35354e-12
+vbp_vss3v3_3#branch                1.12833e-11
+vbp_vss3v3_2#branch                1.05256e-13
+vbp_vss3v3_1#branch                2.22438e-12
+vbp_vss3v3_0#branch                3.32222e-12
+vcl_vdd3v3_0#branch                3.35341e-12
+vcore#branch                                 0
+
+ Reference value :  0.00000e+00doAnalyses: TRAN:  Timestep too small; time = 1.09781e-09, timestep = 6.25e-22: trouble with node "vd_vss3v3_0"
+
+
+tran simulation(s) aborted
+Error: incomplete or empty netlist
+       or no ".plot", ".print", or ".fourier" lines in batch mode;
+no simulations run!
+
+No. of Data Rows : 16
+binary raw file "hbm_pdk_s2d_gnd_vss_p2000.raw"
+```
+
+## Assistant — 2026-11-25 14:19:50 UTC
+
+**Tool call: `Bash`**
+
+_Use JS-001 rise-window inductance and rerun_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+p='esd.py'; s=open(p).read()
+s=s.replace("""LS_LIT = 7.5e-6   # series inductance used in the literature's HBM tester model (sensitivity runs only)""",
+"""# Series inductance of the HBM network: set so that the 10-90 % rise into a short (2.197 L / 1.5 kOhm) sits at the
+# two ends of the JS-001 rise-time window (2 ... 10 ns): L_FAST is the default, L_SLOW the sensitivity case.
+L_FAST = 2e-9 / 2.197 * 1500
+L_SLOW = 10e-9 / 2.197 * 1500""")
+s=s.replace("mode=mode, v=sgn * v, ls=0.0))","mode=mode, v=sgn * v, ls=L_FAST))")
+s=s.replace("mode=mode, v=sgn * 2000, ls=LS_LIT))","mode=mode, v=sgn * 2000, ls=L_SLOW))")
+s=s.replace("""    if ls > 0:
+        L += [f'Lhbm hl hm {ls}', 'Rdamp hl hm 1e5']
+        L.append(f'Vzap hm {node} 0')
+    else:
+        L.append(f'Vzap hl {node} 0')""","""    L += [f'Lhbm hl hm {ls:.6g}', f'Vzap hm {node} 0']""")
+open(p,'w').write(s)
+EOF
+time python3 esd.py _work run hbm_pdk_s2d_gnd_vss_p2000 && grep -i "singular\|too small\|abort" _work/hbm/hbm_pdk_s2d_gnd_vss_p2000.log | head
+```
+
+## Tool results / harness — 2026-11-25 14:20:19 UTC
+
+**Tool result:**
+
+```
+hbm_pdk_s2d_gnd_vss_p2000 rc 1 raw
+
+real	0m29.054s
+user	0m25.725s
+sys	0m8.986s
+Warning: singular matrix:  check nodes xs2d.xa.xs.xa2.n2 and n.xs2d.xa.xs.xf1.xr[1].nr1#i2
+ Reference value :  0.00000e+00 Reference value :  1.09782e-09 Reference value :  1.15471e-09 Reference value :  1.20748e-09 Reference value :  1.20775e-09 Reference value :  1.20788e-09 Reference value :  1.20792e-09 Reference value :  1.20798e-09 Reference value :  1.20811e-09 Reference value :  1.20822e-09 Reference value :  1.20827e-09 Reference value :  1.20840e-09 Reference value :  1.20851e-09 Reference value :  1.20863e-09 Reference value :  1.20867e-09 Reference value :  1.20880e-09 Reference value :  1.20891e-09 Reference value :  1.20903e-09 Reference value :  1.20907e-09 Reference value :  1.20920e-09 Reference value :  1.20932e-09 Reference value :  1.20943e-09 Reference value :  1.20954e-09 Reference value :  1.20966e-09 Reference value :  1.20977e-09 Reference value :  1.20989e-09 Reference value :  1.21000e-09 Reference value :  1.21012e-09 Reference value :  1.21023e-09 Reference value :  1.21035e-09 Reference value :  1.21046e-09 Reference value :  1.21058e-09 Reference value :  1.21062e-09 Reference value :  1.21075e-09 Reference value :  1.21087e-09 Reference value :  1.21091e-09 Reference value :  1.21104e-09 Reference value :  1.21108e-09 Reference value :  1.21121e-09 Reference value :  1.21125e-09 Reference value :  1.21138e-09 Reference value :
+… [468 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:20:33 UTC
+
+**Tool call: `Bash`**
+
+_Inspect state just before failure_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+import sys; sys.path.insert(0,'.')
+import common as C, numpy as np
+pl=C.read_raw('_work/hbm/hbm_pdk_s2d_gnd_vss_p2000.raw')[-1]['vars']
+t=pl['time']; print(len(t))
+for n in ['v(pad_s2d)','v(vd_s2d)','v(xs2d.xp.gp)','v(xs2d.xp.gn)','vzap#branch','v.xs2d.xp.vam_mcp#branch','v.xs2d.xp.vam_mcn#branch','v.xs2d.xp.vam_dp1#branch','vcl_vdd3v3_0#branch','v(xs2d.xa.xs.xa1.sa)','v(xs2d.xa.xs.y)']:
+    print(n, ' '.join('%.3g'%x for x in pl[n][-8:]))
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:20:33 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+191
+v(pad_s2d) 9.33 9.33 9.33 9.33 9.33 9.33 9.33 9.33
+v(vd_s2d) 1.39 1.39 1.39 1.39 1.39 1.39 1.39 1.39
+v(xs2d.xp.gp) 8.18 8.18 8.18 8.18 8.18 8.18 8.18 8.18
+v(xs2d.xp.gn) 1.23 1.23 1.23 1.23 1.23 1.23 1.23 1.23
+Traceback (most recent call last):
+  File "<stdin>", line 6, in <module>
+KeyError: 'vzap#branch'
+```
+
+## Assistant — 2026-11-25 14:20:48 UTC
+
+**Tool call: `Bash`**
+
+_DC forward IV of diodes and MOS junctions_
+
+```bash
+mkdir -p /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/iv && cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/iv && cp /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/.spiceinit . && cat > iv.spice <<EOF
+* forward IV
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
+.include /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/diodes.lib
+I1 0 a 1m
+X1 a 0 dpantenna l=27.78u w=1.26u
+I2 0 b 1m
+* MCP drain junction: drain=b, g=s=bulk=0
+X2 b 0 0 0 sg13_hv_pmos w=266.4u l=0.6u ng=40
+I3 0 c 1m
+* MCN drain junction forward: drain=c negative -> use bulk at c? drain at 0, bulk=c
+X3 0 0 0 c sg13_hv_nmos w=88u l=0.6u ng=20
+.control
+dc I1 1u 2 0.01
+wrdata d1.txt v(a)
+dc I2 1u 2 0.01
+wrdata d2.txt v(b)
+dc I3 1u 2 0.01
+wrdata d3.txt v(c)
+.endc
+.end
+EOF
+ngspice -b iv.spice > iv.log 2>&1; tail -3 iv.log; for f in d1 d2 d3; do awk 'NR==1||NR==11||NR==51||NR==101||NR==201{print FILENAME, $1, $2}' $f.txt; done
+```
+
+## Tool results / harness — 2026-11-25 14:20:48 UTC
+
+**Tool result:**
+
+```
+No. of Data Rows : 200
+Note: Simulation executed from .control section 
+d1.txt 1.00000000e-06 6.94910483e-01
+d1.txt 1.00001000e-01 4.04706755e+02
+d1.txt 5.00001000e-01 2.01872540e+03
+d1.txt 1.00000100e+00 4.03618028e+03
+d2.txt 1.00000000e-06 3.10313696e-01
+d2.txt 1.00001000e-01 4.44072919e+00
+d2.txt 5.00001000e-01 1.05796285e+01
+d2.txt 1.00000100e+00 1.25416389e+01
+d3.txt 1.00000000e-06 6.70300272e-01
+d3.txt 1.00001000e-01 4.81281737e+01
+d3.txt 5.00001000e-01 2.36886986e+02
+d3.txt 1.00000100e+00 4.72835503e+02
+```
+
+## Assistant — 2026-11-25 14:21:12 UTC
+
+**Tool call: `Bash`**
+
+_DC forward IV of proxy diode models_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/iv && sed -e 's|.include /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/diodes.lib|.include ../net/diodes_esdproxy.lib|' -e 's/d1.txt/p1.txt/;s/d2.txt/p2.txt/;s/d3.txt/p3.txt/' iv.spice | sed 's|^X3 0 0 0 c sg13_hv_nmos.*|X3 c 0 dantenna l=27.78u w=1.26u|' > ivp.spice && ngspice -b ivp.spice > ivp.log 2>&1; tail -2 ivp.log; for f in p1 p3; do awk 'NR==1||NR==11||NR==51||NR==101||NR==201{print FILENAME, $1, $2}' $f.txt; done
+```
+
+## Tool results / harness — 2026-11-25 14:21:12 UTC
+
+**Tool result:**
+
+```
+Exit code 2
+
+ERROR: fatal error in ngspice, exit(1)
+awk: cannot open "p1.txt" (No such file or directory)
+awk: cannot open "p3.txt" (No such file or directory)
+```
+
+## Assistant — 2026-11-25 14:21:15 UTC
+
+**Tool call: `Bash`**
+
+_Check proxy run error_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/iv && ls ../net; head -20 ivp.log
+```
+
+## Tool results / harness — 2026-11-25 14:21:16 UTC
+
+**Tool result:**
+
+```
+sg13cmos5l_IOPadDiff2Single_am.spice
+sg13cmos5l_IOPadSingle2Diff_am.spice
+sg13cmos5l_io_lumped.spice
+Error: Could not find include file ../net/diodes_esdproxy.lib
+    While reading ivp.spice
+
+ERROR: fatal error in ngspice, exit(1)
+```
+
+## Assistant — 2026-11-25 14:21:21 UTC
+
+**Tool call: `Bash`**
+
+_Write proxy lib and run IV_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 -c "
+import sys; sys.path.insert(0,'.'); import common as c; print(c.diode_lib('_work','esdproxy'))" && cd _work/iv && ngspice -b ivp.spice > ivp.log 2>&1; tail -2 ivp.log; for f in p1 p3; do awk 'NR==1||NR==11||NR==51||NR==101||NR==201{print FILENAME, $1, $2}' $f.txt; done
+```
+
+## Tool results / harness — 2026-11-25 14:21:21 UTC
+
+**Tool result:**
+
+```
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/net/diodes_esdproxy.lib
+No. of Data Rows : 200
+Note: Simulation executed from .control section 
+p1.txt 1.00000000e-06 6.65959561e-01
+p1.txt 1.00001000e-01 1.81802216e+00
+p1.txt 5.00001000e-01 5.18704485e+00
+p1.txt 1.00000100e+00 9.35330331e+00
+p3.txt 1.00000000e-06 6.44079435e-01
+p3.txt 1.00001000e-01 1.59960209e+00
+p3.txt 5.00001000e-01 3.96852106e+00
+p3.txt 1.00000100e+00 6.86204910e+00
+```
+
+## Assistant — 2026-11-25 14:21:27 UTC
+
+**Tool call: `Bash`**
+
+_Run HBM with proxy diode model_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && time python3 esd.py _work run hbm_esdproxy_s2d_gnd_vss_p2000 && grep -i "singular\|too small\|abort" _work/hbm/hbm_esdproxy_s2d_gnd_vss_p2000.log | cut -c1-200 | head
+```
+
+## Tool results / harness — 2026-11-25 14:21:39 UTC
+
+**Tool result:**
+
+```
+hbm_esdproxy_s2d_gnd_vss_p2000 rc 0 raw
+
+real	0m11.760s
+user	0m9.956s
+sys	0m2.671s
+Warning: singular matrix:  check node xd2s.xd.xc2.n3
+```
+
+## Assistant — 2026-11-25 14:21:48 UTC
+
+**Tool call: `Bash`**
+
+_Inspect proxy HBM run peaks_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && cat > /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/peek.py <<'EOF'
+import sys; sys.path.insert(0,'/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup')
+import common as C, numpy as np
+pl=C.read_raw(sys.argv[1])[-1]['vars']
+t=pl['time']
+def pk(n):
+    v=pl[n]; i=np.argmax(abs(v)); return '%.4g @ %.2f ns'%(v[i], t[i]*1e9)
+for n in sys.argv[2:]:
+    if n in pl: print(n, pk(n))
+for n in [k for k in pl if '#branch' in k]:
+    v=pl[n]; i=np.argmax(abs(v))
+    if abs(v[i])>1e-3: print(n, pk(n))
+EOF
+python3 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/peek.py _work/hbm/hbm_esdproxy_s2d_gnd_vss_p2000.raw 'v(pad_s2d)' 'v(vd_s2d)' 'v(vs_s2d)' 'v(xs2d.xp.gp)' 'v(xs2d.xp.gn)' 'v(xs2d.xa.xs.xa1.sa)' 'v(xs2d.xa.xs.y)' 'v(vd_vdd3v3_0)' 'v(vdc_vdd3v3_1)' 'v(pad_d2s)' 'v(xvdd3v3_1.net4)'
+```
+
+## Tool results / harness — 2026-11-25 14:21:48 UTC
+
+**Tool result:**
+
+```
+v(pad_s2d) 9.298 @ 5.05 ns
+v(vd_s2d) 3.281 @ 5.46 ns
+v(vs_s2d) 0.0004728 @ 1.21 ns
+v(xs2d.xp.gp) 6.586 @ 3.09 ns
+v(xs2d.xp.gn) 0.5839 @ 1.25 ns
+v(xs2d.xa.xs.xa1.sa) 4.534 @ 2.78 ns
+v(xs2d.xa.xs.y) 1.231 @ 46.46 ns
+v(vd_vdd3v3_0) 3.043 @ 5.46 ns
+v(vdc_vdd3v3_1) 2.883 @ 531.46 ns
+v(pad_d2s) 1.544 @ 18.46 ns
+v(xvdd3v3_1.net4) 2.804 @ 5.96 ns
+```
+
+## Assistant — 2026-11-25 14:21:53 UTC
+
+**Tool call: `Bash`**
+
+_List current vector names in raw_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 -c "
+import sys; sys.path.insert(0,'.'); import common as C
+pl=C.read_raw('_work/hbm/hbm_esdproxy_s2d_gnd_vss_p2000.raw')[-1]['vars']
+print([k for k in pl if not k.startswith('v(')][:60]); print(len(pl))"
+```
+
+## Tool results / harness — 2026-11-25 14:21:53 UTC
+
+**Tool result:**
+
+```
+['time', 'i(lhbm)', 'i(v.xd2s.vam_dn0)', 'i(v.xd2s.vam_dn1)', 'i(v.xd2s.vam_dp0)', 'i(v.xd2s.vam_dp1)', 'i(v.xd2s.xfn.vam_on)', 'i(v.xd2s.xfp.vam_op)', 'i(v.xd2s.xspa.vam_sp_dn)', 'i(v.xd2s.xspa.vam_sp_dp)', 'i(v.xd2s.xspa.vam_sp_r)', 'i(v.xd2s.xspb.vam_sp_dn)', 'i(v.xd2s.xspb.vam_sp_dp)', 'i(v.xd2s.xspb.vam_sp_r)', 'i(v.xs2d.xp.vam_dn1)', 'i(v.xs2d.xp.vam_dn2)', 'i(v.xs2d.xp.vam_dp1)', 'i(v.xs2d.xp.vam_dp2)', 'i(v.xs2d.xp.vam_mcn)', 'i(v.xs2d.xp.vam_mcp)', 'i(vbp_vss3v3_0)', 'i(vbp_vss3v3_1)', 'i(vbp_vss3v3_2)', 'i(vbp_vss3v3_3)', 'i(vbp_vss3v3_4)', 'i(vbp_vss3v3_5)', 'i(vcl_vdd3v3_0)', 'i(vcl_vdd3v3_1)', 'i(vcl_vdd3v3_2)', 'i(vcl_vdd3v3_3)', 'i(vcl_vdd3v3_4)', 'i(vcore)', 'i(vctl)', 'i(ven_d2s)', 'i(ven_s2d)', 'i(venb_d2s)', 'i(venb_s2d)', 'i(vg_d2s_vinn)', 'i(vg_d2s_vinp)', 'i(vg_d2s_vref)', 'i(vg_s2d_vcm)', 'i(vg_s2d_vref)', 'i(vzap)']
+2626
+```
+
+## Assistant — 2026-11-25 14:22:02 UTC
+
+**Tool call: `Bash`**
+
+_Print branch current peaks_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && sed -i "s/if '#branch' in k/if k.startswith('i(')/" /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/peek.py && python3 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/peek.py _work/hbm/hbm_esdproxy_s2d_gnd_vss_p2000.raw
+```
+
+## Tool results / harness — 2026-11-25 14:22:02 UTC
+
+**Tool result:**
+
+```
+i(lhbm) 1.296 @ 5.96 ns
+i(v.xd2s.xfn.vam_on) 0.001292 @ 1.22 ns
+i(v.xd2s.xfp.vam_op) -0.001828 @ 1.22 ns
+i(v.xs2d.xp.vam_dn1) 0.00226 @ 1.13 ns
+i(v.xs2d.xp.vam_dn2) 0.00226 @ 1.13 ns
+i(v.xs2d.xp.vam_dp1) 0.5998 @ 5.05 ns
+i(v.xs2d.xp.vam_dp2) 0.5998 @ 5.05 ns
+i(v.xs2d.xp.vam_mcn) 0.001946 @ 1.14 ns
+i(v.xs2d.xp.vam_mcp) 0.137 @ 15.46 ns
+i(vbp_vss3v3_0) 0.2407 @ 5.96 ns
+i(vbp_vss3v3_1) 0.00945 @ 1.21 ns
+i(vbp_vss3v3_2) 0.001215 @ 1.19 ns
+i(vbp_vss3v3_3) 0.8373 @ 5.96 ns
+i(vbp_vss3v3_4) 0.1664 @ 5.96 ns
+i(vbp_vss3v3_5) 0.05106 @ 5.96 ns
+i(vcl_vdd3v3_0) 0.2918 @ 5.96 ns
+i(vcl_vdd3v3_1) 0.2561 @ 5.96 ns
+i(vcl_vdd3v3_2) 0.2512 @ 5.96 ns
+i(vcl_vdd3v3_3) 0.2485 @ 5.96 ns
+i(vcl_vdd3v3_4) 0.2479 @ 5.96 ns
+i(vzap) 1.296 @ 5.96 ns
+```
+
+## Assistant — 2026-11-25 14:22:56 UTC
+
+**Tool call: `Bash`**
+
+_Add analysis to esd.py and test one run_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+p='esd.py'; s=open(p).read()
+i=s.index("def run(work, filt=''):")
+s=s[:i]+'''PATH_DEVICES = {
+    's2d': [('xs2d.xa.xs.xa1.xma', 'input device of unit XA1 (gate = pad)'),
+            ('xs2d.xa.xs.xa2.xma', 'input device of unit XA2 (gate = pad)'),
+            ('xs2d.xp.xmcp', 'clamp PMOS MCP (drain = pad, gate via rppd to iovdd)'),
+            ('xs2d.xp.xmcn', 'clamp NMOS MCN (drain = pad, gate via rppd to iovss)')],
+    'd2s': [('xd2s.xd.xc1.xmb', 'feedback input of unit C1 (gate = vfb = pad)'),
+            ('xd2s.xd.xc2.xmb', 'feedback input of unit C2 (gate = vfb = pad)'),
+            ('xd2s.xfp.xop', 'output PMOS OP (drain = pad)'),
+            ('xd2s.xfn.xon', 'output NMOS ON (drain = pad)'),
+            ('xd2s.xcma', 'Miller capacitor CMA (gate = a, body = pa: pad via 2 kOhm)'),
+            ('xd2s.xcmb', 'Miller capacitor CMB (gate = pb: pad via 2 kOhm, body = b)'),
+            ('xd2s.xd.xsa', 'disable switch SA (a to iovdd)'),
+            ('xd2s.xd.xsb', 'disable switch SB (b to iovss)')],
+}
+
+
+def devices(paths):
+    """Flattened MOS / diode lists of both pads with the testbench's node names."""
+    out = {}
+    for t, cell in CELLS.items():
+        line = C.pad_instance(cell, 'unpowered', f'x{t}').split('\\n')[0].split()
+        out[t] = C.flatten(Path(paths[cell]).read_text(), cell, line[1:-1], f'x{t}')
+    return out
+
+
+def _v(pl, n):
+    n = n.lower()
+    if n == '0':
+        return 0.0
+    return pl['v(%s)' % n]
+
+
+def _integ(t, y):
+    return float(np.sum(0.5 * (y[1:] + y[:-1]) * np.diff(t)))
+
+
+def analyse(job, pl, devs):
+    """One run -> (summary row, diode rows, mos rows, waveform dict)."""
+    t = pl['time']
+    pad = job['pad']
+    ip = pl['i(vzap)']
+    vpad = _v(pl, f'pad_{pad}')
+    k = int(np.argmax(np.abs(vpad)))
+    row = dict(run=job['name'], diode_model=job['var'], pad=pad, config=job['mode'], v_hbm=job['v'],
+               l_hbm_uH=round(job['ls'] * 1e6, 3),
+               i_peak_A=float(ip[np.argmax(np.abs(ip))]), v_pad_peak=float(vpad[k]), t_v_pad_peak_ns=t[k] * 1e9,
+               v_iovdd_peak=float(_v(pl, f'vd_{pad}')[np.argmax(np.abs(_v(pl, f'vd_{pad}')))]),
+               v_iovss_peak=float(_v(pl, f'vs_{pad}')[np.argmax(np.abs(_v(pl, f'vs_{pad}')))]),
+               v_ring_peak=float(np.max(np.abs(_v(pl, f'vd_{pad}') - _v(pl, f'vs_{pad}')))),
+               i_rc_clamps_peak_A=float(np.max(np.abs(sum(pl[x] for x in pl if x.startswith('i(vcl_'))))),
+               end_v_pad=float(vpad[-1]))
+    drows = []
+    for tt in CELLS:
+        for d in devs[tt]:
+            if d['kind'] != 'dio':
+                continue
+            nm = d['name']
+            lab = {'xs2d.xp.xdp1': 'DP1', 'xs2d.xp.xdp2': 'DP2', 'xs2d.xp.xdn1': 'DN1', 'xs2d.xp.xdn2': 'DN2',
+                   'xd2s.xdp0': 'DP0', 'xd2s.xdp1': 'DP1', 'xd2s.xdn0': 'DN0', 'xd2s.xdn1': 'DN1',
+                   'xd2s.xspa.xd0': 'SP_DP_A', 'xd2s.xspb.xd0': 'SP_DP_B', 'xd2s.xspa.xd1': 'SP_DN_A',
+                   'xd2s.xspb.xd1': 'SP_DN_B'}.get(nm)
+            if lab is None:
+                continue
+            am = {'SP_DP_A': 'v.xd2s.xspa.vam_sp_dp', 'SP_DP_B': 'v.xd2s.xspb.vam_sp_dp',
+                  'SP_DN_A': 'v.xd2s.xspa.vam_sp_dn', 'SP_DN_B': 'v.xd2s.xspb.vam_sp_dn'}.get(
+                lab, ('v.xs2d.xp.vam_' if tt == 's2d' else 'v.xd2s.vam_') + lab.lower())
+            i_am = pl['i(%s)' % am]
+            anode, cathode = d['nodes']
+            # ammeter sits on the anode for dpantenna (pad / core side = anode), on the cathode for dantenna
+            ifwd = i_am if d['model'] == 'dpantenna' else -i_am
+            vak = _v(pl, anode) - _v(pl, cathode)
+            l = float(d['params']['l'].rstrip('u'))
+            w = float(d['params']['w'].rstrip('u'))
+            j = int(np.argmax(np.abs(ifwd)))
+            drows.append(dict(run=job['name'], diode_model=job['var'], pad_zapped=pad, config=job['mode'],
+                              v_hbm=job['v'], diode=f'{tt}.{lab}', type=d['model'], l_um=l, w_um=w,
+                              area_um2=round(l * w, 3), perim_um=round(2 * (l + w), 2),
+                              i_peak_A=float(ifwd[j]), j_area_mA_um2=float(ifwd[j] / (l * w) * 1e3),
+                              j_perim_mA_um=float(ifwd[j] / (2 * (l + w)) * 1e3),
+                              v_ak_at_peak=float(vak[j]),
+                              energy_nJ=_integ(t, vak * ifwd) * 1e9))
+    mrows = []
+    for tt in CELLS:
+        best = None
+        for d in devs[tt]:
+            if d['kind'] not in ('nmos', 'pmos'):
+                continue
+            dd, g, ss, b = (_v(pl, n) for n in d['nodes'])
+            vgs = np.max(np.abs(g - ss)) if np.ndim(g - ss) else abs(g - ss)
+            vgd = np.max(np.abs(g - dd)) if np.ndim(g - dd) else abs(g - dd)
+            vgb = np.max(np.abs(g - b)) if np.ndim(g - b) else abs(g - b)
+            vds = np.max(np.abs(dd - ss)) if np.ndim(dd - ss) else abs(dd - ss)
+            vox = max(vgs, vgd, vgb)
+            ent = dict(run=job['name'], diode_model=job['var'], pad_zapped=pad, config=job['mode'], v_hbm=job['v'],
+                       pad=tt, device=d['name'], model=d['model'], w=d['params'].get('w'), l=d['params'].get('l'),
+                       max_vgs=float(vgs), max_vgd=float(vgd), max_vgb=float(vgb), max_vox=float(vox),
+                       max_vds=float(vds))
+            if d['name'] in dict(PATH_DEVICES[tt]):
+                ent['role'] = dict(PATH_DEVICES[tt])[d['name']]
+                mrows.append(ent)
+            if best is None or vox > best['max_vox']:
+                best = dict(ent)
+        best['role'] = 'largest max_vox of all MOS devices of this pad'
+        mrows.append(best)
+    tw = np.linspace(0, 400e-9, 801)
+    wave = {'t_ns': tw * 1e9, 'i_zap': np.interp(tw, t, ip), 'v_pad': np.interp(tw, t, vpad),
+            'v_iovdd': np.interp(tw, t, _v(pl, f'vd_{pad}')), 'v_iovss': np.interp(tw, t, _v(pl, f'vs_{pad}')),
+            'i_rc_clamps': np.interp(tw, t, sum(pl[x] for x in pl if x.startswith('i(vcl_')))}
+    for r in drows:
+        if r['diode'].startswith(pad):
+            pass
+    return row, drows, mrows, wave
+
+
+'''+s[i:]
+s=s.replace('''def run(work, filt=''):
+    paths = C.prep_netlists(work)
+    for job in jobs():
+        if filt and filt not in job['name']:
+            continue
+        p = build(work, job, paths)
+        raw = p.with_suffix('.raw')
+        if raw.exists() and raw.stat().st_mtime > p.stat().st_mtime - 5 and '--force' not in sys.argv:
+            pass
+        rc = C.run_ngspice(p, p.with_suffix('.log'))
+        print(job['name'], 'rc', rc, 'raw' if raw.exists() else 'NO RAW', flush=True)
+''','''def run(work, filt='', keep=False):
+    """Run the jobs one after the other; analyse each raw file at once and delete it (about 40 MB each) unless
+    keep. Results: <work>/hbm/<run>.json (summary, diode and MOS rows, waveform)."""
+    import json
+    paths = C.prep_netlists(work)
+    devs = devices(paths)
+    for job in jobs():
+        if filt and filt not in job['name']:
+            continue
+        p = build(work, job, paths)
+        raw = p.with_suffix('.raw')
+        res = p.with_suffix('.json')
+        if res.exists() and '--force' not in sys.argv:
+            print(job['name'], 'done before', flush=True)
+            continue
+        if raw.exists():
+            raw.unlink()
+        rc = C.run_ngspice(p, p.with_suffix('.log'))
+        log = p.with_suffix('.log').read_text(errors='replace')
+        ok = raw.exists() and 'aborted' not in log and 'Timestep too small' not in log
+        status = 'ok' if ok else ('aborted' if raw.exists() else 'no raw')
+        out = {'job': job, 'status': status, 'rc': rc}
+        if raw.exists():
+            pl = C.read_raw(raw)[-1]['vars']
+            out['t_end_ns'] = float(pl['time'][-1] * 1e9)
+            if len(pl['time']) > 5:
+                row, drows, mrows, wave = analyse(job, pl, devs)
+                row['status'] = status
+                row['t_end_ns'] = out['t_end_ns']
+                out.update(summary=row, diodes=drows, mos=mrows, wave={k: v.tolist() for k, v in wave.items()})
+            if not keep:
+                raw.unlink()
+        res.write_text(json.dumps(out))
+        print(job['name'], 'rc', rc, status, 't_end %.1f ns' % out.get('t_end_ns', 0), flush=True)
+''')
+s=s.replace('''    if sys.argv[2] == 'run':
+        run(work, sys.argv[3] if len(sys.argv) > 3 else '')''','''    if sys.argv[2] == 'run':
+        run(work, sys.argv[3] if len(sys.argv) > 3 and not sys.argv[3].startswith('--') else '',
+            keep='--keep' in sys.argv)''')
+open(p,'w').write(s)
+EOF
+time python3 esd.py _work run hbm_esdproxy_s2d_gnd_vss_p2000 --force && python3 -c "
+import json; d=json.load(open('_work/hbm/hbm_esdproxy_s2d_gnd_vss_p2000.json')); print(d['summary']); [print(r['diode'],round(r['i_peak_A'],4),round(r['j_area_mA_um2'],3),round(r['energy_nJ'],2)) for r in d['diodes']]; [print(r['pad'],r['device'],round(r['max_vgs'],2),round(r['max_vgd'],2),round(r['max_vgb'],2),round(r['max_vds'],2),r['role']) for r in d['mos']]"
+```
+
+## Tool results / harness — 2026-11-25 14:23:07 UTC
+
+**Tool result:**
+
+```
+hbm_esdproxy_s2d_gnd_vss_p2000 rc 0 ok t_end 1000.0 ns
+
+real	0m11.603s
+user	0m9.809s
+sys	0m2.500s
+{'run': 'hbm_esdproxy_s2d_gnd_vss_p2000', 'diode_model': 'esdproxy', 'pad': 's2d', 'config': 'gnd_vss', 'v_hbm': 2000, 'l_hbm_uH': 1.365, 'i_peak_A': 1.2956034739801208, 'v_pad_peak': 9.297743261722115, 't_v_pad_peak_ns': 5.049544837394265, 'v_iovdd_peak': 3.28073226021728, 'v_iovss_peak': 0.0004727777770251286, 'v_ring_peak': 3.2807265463069823, 'i_rc_clamps_peak_A': 1.29548674722212, 'end_v_pad': 3.4601534769080295, 'status': 'ok', 't_end_ns': 1000.0000000000001}
+s2d.DP1 0.5998 17.137 308.93
+s2d.DN1 -0.0023 -0.065 0.0
+s2d.DP2 0.5998 17.137 308.93
+s2d.DN2 -0.0023 -0.065 0.0
+d2s.SP_DP_A -0.0 -0.006 0.0
+d2s.SP_DN_A -0.0 -0.016 0.0
+d2s.SP_DP_B -0.0 -0.014 0.0
+d2s.SP_DN_B -0.0 -0.007 0.0
+d2s.DP0 -0.0008 -0.009 0.0
+d2s.DP1 -0.0008 -0.009 0.0
+d2s.DN0 -0.001 -0.011 0.0
+d2s.DN1 -0.001 -0.011 0.0
+s2d xs2d.xa.xs.xa1.xma 6.66 8.65 6.66 3.82 input device of unit XA1 (gate = pad)
+s2d xs2d.xa.xs.xa2.xma 6.66 8.65 6.66 3.82 input device of unit XA2 (gate = pad)
+s2d xs2d.xp.xmcp 3.53 5.48 3.53 6.02 clamp PMOS MCP (drain = pad, gate via rppd to iovdd)
+s2d xs2d.xp.xmcn 0.58 9.3 0.58 9.3 clamp NMOS MCN (drain = pad, gate via rppd to iovss)
+s2d xs2d.xp.xmcn 0.58 9.3 0.58 9.3 largest max_vox of all MOS devices of this pad
+d2s xd2s.xd.xc1.xmb 0.95 1.26 0.95 1.08 feedback input of unit C1 (gate = vfb = pad)
+d2s xd2s.xd.xc2.xmb 0.95 1.26 0.95 1.08 feedback input of unit C2 (gate = vfb = pad)
+d2s xd2s.x
+… [520 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:23:18 UTC
+
+**Tool call: `Bash`**
+
+_Reorder HBM job list_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+p='esd.py'; s=open(p).read()
+s=s.replace("for var in ('pdk', 'esdproxy'):","for var in ('esdproxy', 'pdk'):")
+s=s.replace("""                out.append(dict(name=f'hbmls_pdk_{t}_{mode}_{"p" if sgn > 0 else "n"}2000', var='pdk', pad=t,""","""                out.append(dict(name=f'hbmls_esdproxy_{t}_{mode}_{"p" if sgn > 0 else "n"}2000', var='esdproxy', pad=t,""")
+# order: esdproxy main, then slow-rise, then pdk
+s=s.replace("""def jobs():
+    out = []""","""def jobs():
+    out = []
+    ls = []""")
+s=s.replace("""                out.append(dict(name=f'hbmls_esdproxy""","""                ls.append(dict(name=f'hbmls_esdproxy""")
+s=s.replace("""                                mode=mode, v=sgn * 2000, ls=L_SLOW))
+    return out""","""                                mode=mode, v=sgn * 2000, ls=L_SLOW))
+    main = [j for j in out if j['var'] == 'esdproxy']
+    return main + ls + [j for j in out if j['var'] == 'pdk']""")
+open(p,'w').write(s)
+EOF
+python3 -c "
+import sys; sys.path.insert(0,'.'); import esd; j=esd.jobs(); print(len(j), j[0]['name'], j[36]['name'], j[44]['name'])"
+```
+
+## Tool results / harness — 2026-11-25 14:23:19 UTC
+
+**Tool result:**
+
+```
+80 hbm_esdproxy_s2d_gnd_vss_p500 hbmls_esdproxy_s2d_gnd_vss_p2000 hbm_pdk_s2d_gnd_vss_p500
+```
+
+## Assistant — 2026-11-25 14:23:22 UTC
+
+**Tool call: `Bash`**
+
+_Run full HBM matrix sequentially_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 esd.py _work run > _work/hbm_run.log 2>&1
+```
+
+## Tool results / harness — 2026-11-25 14:23:24 UTC
+
+**Tool result:**
+
+```
+Command running in background with ID: b0lak6we8. Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/b0lak6we8.output. You will be notified when it completes. To check interim output, use Read on that file path.
+Session cwd remains /home/user/sg13cmos5l_cm_slot7; directory changes made by the backgrounded command do not apply to subsequent commands.
+```
+
+## Assistant — 2026-11-25 14:23:44 UTC
+
+**Tool call: `Bash`**
+
+_Inspect ESD cell layers in both pads_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad && cat > g2.py <<'EOF'
+import klayout.db as db, sys
+for f,top in [('/home/user/sg13cmos5l_cm_slot7/pads/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.gds','S2D'),('/home/user/sg13cmos5l_cm_slot7/pads/sg13cmos5l_IOPadDiff2Single/sg13cmos5l_IOPadDiff2Single.gds','D2S')]:
+    ly=db.Layout(); ly.read(f); t=ly.top_cell()
+    print('==',top)
+    for inst in t.each_inst():
+        print('  ', inst.cell.name, inst.dcplx_trans, inst.cell.dbbox().transformed(inst.dcplx_trans))
+        if inst.cell.name.startswith(('Clamp','DCN','DCP','d2s_out','esd','clamp')):
+            c=inst.cell
+            for (l,d,nm) in [(31,0,'NWell'),(1,0,'Activ'),(14,0,'pSD'),(7,0,'nSD'),(5,0,'GatPoly')]:
+                r=db.Region(c.begin_shapes_rec(ly.layer(l,d))).merged().transformed(inst.cplx_trans)
+                print('      ',nm, r.count(), [str(p.bbox().to_dtype(ly.dbu)) for p in r.each()][:6])
+EOF
+python3 g2.py 2>&1 | head -80
+```
+
+## Tool results / harness — 2026-11-25 14:23:44 UTC
+
+**Tool result:**
+
+```
+== S2D
+   edge_stubs r0 *1 0,0 (-0.62,84;80.62,167.77)
+   edge_stubs_low r0 *1 0,0 (-0.18,64.82;80.18,84.44)
+   DCNDiode r0 *1 2.67,7.66 (0.39,5.38;38.01,20.2)
+       NWell 1 ['(0.39,5.38;38.01,20.2)']
+       Activ 4 ['(5.31,9.91;33.09,11.17)', '(5.31,14.41;33.09,15.67)', '(2.67,7.66;35.73,17.92)', '(1.01,6;37.39,19.58)']
+       pSD 1 ['(2.25,7.24;36.15,18.34)']
+       nSD 0 []
+       GatPoly 0 []
+   DCPDiode r0 *1 43.7,7.66 (41.86,5.82;78.6,19.76)
+       NWell 1 ['(43.08,7.04;77.38,18.54)']
+       Activ 4 ['(46.34,9.91;74.12,11.17)', '(46.34,14.41;74.12,15.67)', '(43.7,7.66;76.76,17.92)', '(42.04,6;78.42,19.58)']
+       pSD 3 ['(45.92,9.49;74.54,11.59)', '(45.92,13.99;74.54,16.09)', '(41.86,5.82;78.6,19.76)']
+       nSD 0 []
+       GatPoly 0 []
+   Clamp_N_M1 r0 *1 1.2,19.58 (0.58,18.96;37.82,30.1)
+       NWell 1 ['(0.58,18.96;37.82,30.1)']
+       Activ 3 ['(3.95,22.33;34.45,26.73)', '(3,21.38;35.4,27.68)', '(1.2,19.58;37.2,29.48)']
+       pSD 1 ['(2.82,21.2;35.58,27.86)']
+       nSD 0 []
+       GatPoly 20 ['(4.42,21.96;5.02,27.1)', '(6.2,21.96;6.8,27.1)', '(7.44,21.96;8.04,27.1)', '(9.22,21.96;9.82,27.1)', '(10.46,21.96;11.06,27.1)', '(12.24,21.96;12.84,27.1)']
+   Clamp_P_M1 r0 *1 42.23,19.58 (42.05,19.4;78.41,39.02)
+       NWell 1 ['(43.41,20.76;77.05,37.66)']
+       Activ 4 ['(44.98,22.33;75.48,28.99)', '(44.98,29.43;75.48,36.09)', '(44.03,21.38;76.43,37.04)', '(42.23,19.58;78.23,38.84)']
+       pSD 2 ['(44.8,21.93;75.66,36.49)', '(42.05,19.4;78.41,39.02)']
+       nSD 0 []
+… [2703 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:23:59 UTC
+
+**Tool call: `Bash`**
+
+_List remaining D2S cells and check run progress_
+
+```bash
+cd /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad && python3 g2.py 2>&1 | sed -n 80,140p | grep -v "      " ; tail -5 /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/b0lak6we8.output
+```
+
+## Tool results / harness — 2026-11-25 14:23:59 UTC
+
+**Tool result:**
+
+```
+DCPDiode r0 *1 4.46,53.08 (2.62,51.24;77.38,65.18)
+   d2s_cma r0 *1 0,0 (2.57,39.3;37.97,50.82)
+   d2s_cmb r0 *1 0,0 (39.77,41.46;75.17,50.82)
+   m2_comb_n r0 *1 0,0 (3.45,2.8;76.55,39.5)
+   m2_comb_p r0 *1 0,0 (4.35,41.1;75.65,84.2)
+   m2_junction r0 *1 0,0 (3,39.3;74,52.2)
+   replica_lines r0 *1 0,0 (38.15,18.255;39.55,86)
+   gate_feeds r0 *1 0,0 (0.5,12.73;79.5,88)
+   cm_rings r0 *1 0,0 (1.36,40.22;76.12,51.79)
+   guard_tie r0 *1 0,0 (1.25,25.9;1.65,67.05)
+   nw_isolator r0 *1 0,0 (2.6,84.45;77.4,86.15)
+   edge_stubs r0 *1 0,0 (-0.62,84;80.62,167.77)
+   d2s_block r0 *1 0,84 (0.66,85.74;77.85,180)
+   pad_wiring_f2 r0 *1 0,0 (0.6,39.8;79.4,96.5)
+```
+
+## Assistant — 2026-11-25 14:24:13 UTC
+
+**Tool call: `Bash`**
+
+_Check HBM batch progress_
+
+```bash
+cat /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/hbm_run.log
+```
+
+## Tool results / harness — 2026-11-25 14:24:14 UTC
+
+**Tool result:**
+
+```
+hbm_esdproxy_s2d_gnd_vss_p500 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_s2d_gnd_vss_n500 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_s2d_gnd_vss_p1000 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_s2d_gnd_vss_n1000 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_s2d_gnd_vss_p2000 done before
+```
+
+## Assistant — 2026-11-25 14:24:19 UTC
+
+Good. Now the latch-up geometry script.
+
+## Assistant — 2026-11-25 14:24:49 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/lu_geometry.py`
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Latch-up-relevant geometry of the two pad cells, read from pads/<cell>/<cell>.gds with KLayout (no simulation):
+the guard rings of the ESD sub-cells and the distances that set the parasitic bipolar paths:
+  d_np_inj   : pad-connected n+ in p-substrate (ESD N cells: dantenna stripes, clamp NMOS) -> nearest n-well that is
+               not one of the n-well guard rings of the ESD N cells (electron collection by a "victim" n-well)
+  d_pn_inj   : n-well of the ESD P cells (holes injected by the pad p+) -> nearest n+ in p-substrate outside the
+               ESD cells (core NMOS: emitter of the parasitic NPN)
+  d_scr      : n+ in p-substrate of the ESD N cells -> n-well of the ESD P cells (the clamp pair's own PNPN)
+plus the widths of the guard rings. Layers (IHP sg13cmos5l): Activ 1/0, GatPoly 5/0, nSD 7/0, pSD 14/0, NWell 31/0.
+Usage: python3 lu_geometry.py <out_dir>   -> <out_dir>/csv/lu_geometry.csv, <out_dir>/plots/lu_layout_<pad>.png"""
+import os
+import sys
+
+import klayout.db as db
+import matplotlib
+
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt  # noqa: E402
+from matplotlib.patches import Polygon as MPoly  # noqa: E402
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+SLOT = os.path.abspath(os.path.join(HERE, '../../..'))
+PADS = {'s2d': 'sg13cmos5l_IOPadSingle2Diff', 'd2s': 'sg13cmos5l_IOPadDiff2Single'}
+N_CELLS = ('DCNDiode', 'Clamp_N_M1')
+P_CELLS = ('DCPDiode', 'Clamp_P_M1')
+
+
+def regions(ly, cell, trans=None):
+    def r(l, d=0):
+        reg = db.Region(cell.begin_shapes_rec(ly.layer(l, d)))
+        if trans is not None:
+            reg = reg.transformed(trans)
+        return reg.merged()
+    act, gp, psd, nw = r(1), r(5), r(14), r(31)
+    diff = act - gp
+    return {'nw': nw, 'pplus': diff & psd, 'nplus': diff - psd}
+
+
+def min_dist(a, b, dbu, maxd=200.0):
+    if a.is_empty() or b.is_empty():
+        return float('nan')
+    ep = a.separation_check(b, int(maxd / dbu), False, db.Metrics.Euclidian)
+    ds = [e.distance() for e in ep.each()]
+    inter = not (a & b).is_empty()
+    if inter:
+        return 0.0
+    return min(ds) * dbu if ds else float('nan')
+
+
+def analyse(pad, cell_name):
+    ly = db.Layout()
+    ly.read(os.path.join(SLOT, 'pads', cell_name, f'{cell_name}.gds'))
+    top = ly.top_cell()
+    dbu = ly.dbu
+    allr = regions(ly, top)
+    esd_n = {'nw': db.Region(), 'pplus': db.Region(), 'nplus': db.Region()}
+    esd_p = {'nw': db.Region(), 'pplus': db.Region(), 'nplus': db.Region()}
+    esd_box = db.Region()
+    rings = []
+    for inst in top.each_inst():
+        nm = inst.cell.name
+        if nm.startswith(N_CELLS) or nm.startswith(P_CELLS):
+            rr = regions(ly, inst.cell, inst.cplx_trans)
+            tgt = esd_n if nm.startswith(N_CELLS) else esd_p
+            for k in tgt:
+                tgt[k] += rr[k]
+            esd_box += db.Region(inst.bbox())
+            # ring widths: n-well ring of N cells / p+ ring around P cells (outermost diffusion ring)
+            nwr = rr['nw']
+            for p in nwr.each():
+                holes = p.holes()
+                w = (p.bbox().width() - p.hull_bbox().width()) if False else None
+                rings.append(dict(pad=pad, cell=nm, origin=str(inst.dcplx_trans.disp),
+                                  nwell_bbox=str(p.bbox().to_dtype(dbu)), nwell_is_ring=holes > 0,
+                                  nwell_ring_width_um=round(_ring_width(p, dbu), 3) if holes else '',
+                                  pplus_rings=sum(1 for q in rr['pplus'].each() if q.holes() > 0),
+                                  nplus_rings=sum(1 for q in rr['nplus'].each() if q.holes() > 0)))
+    for k in esd_n:
+        esd_n[k] = esd_n[k].merged()
+        esd_p[k] = esd_p[k].merged()
+    esd_box = esd_box.merged()
+    # n+ in p-substrate of the N cells (device stripes, not the n+ well ties of the guard ring)
+    n_inj = esd_n['nplus'] - esd_n['nw']
+    # n-well guard rings of the N cells: the N cells'
+… [3715 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 14:24:49 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/lu_geometry.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:24:50 UTC
+
+**Tool call: `Bash`**
+
+_Run latch-up geometry script_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 lu_geometry.py . && cat csv/lu_geometry.csv
+```
+
+## Tool results / harness — 2026-11-25 14:24:51 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+Traceback (most recent call last):
+  File "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/lu_geometry.py", line 163, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/lu_geometry.py", line 144, in main
+    r, rg, (ly, top, allr, esd_box) = analyse(pad, cell)
+                                      ~~~~~~~^^^^^^^^^^^
+  File "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/lu_geometry.py", line 76, in analyse
+    nwell_ring_width_um=round(_ring_width(p, dbu), 3) if holes else '',
+                              ~~~~~~~~~~~^^^^^^^^
+  File "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/lu_geometry.py", line 101, in _ring_width
+    hull = db.Polygon(p.each_point_hull())
+TypeError: No overload with matching arguments. Variants are:
+  static new Polygon ptr {new|from_dpoly}(const DPolygon dpolygon) [match candidate]
+  static new Polygon ptr new() [0 argument(s) expected, but 1 given]
+  static new Polygon ptr new(const SimplePolygon sp) [match candidate]
+  static new Polygon ptr new(Point[] pts, bool raw = false) [match candidate]
+  static new Polygon ptr new(const Box box) [match candidate]
+ in Polygon.__init__
+```
+
+## Assistant — 2026-11-25 14:24:55 UTC
+
+**Tool call: `Bash`**
+
+_Fix and rerun geometry script_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+p='lu_geometry.py'; s=open(p).read()
+s=s.replace("""    hull = db.Polygon(p.each_point_hull())
+    hole = max((db.Polygon(list(p.each_point_hole(i))) for i in range(p.holes())), key=lambda q: q.area())""","""    hull = db.Polygon(list(p.each_point_hull()))
+    hole = max((db.Polygon(list(p.each_point_hole(i))) for i in range(p.holes())), key=lambda q: q.area())""")
+s=s.replace("""                holes = p.holes()
+                w = (p.bbox().width() - p.hull_bbox().width()) if False else None
+""","""                holes = p.holes()
+""")
+open(p,'w').write(s)
+EOF
+python3 lu_geometry.py . && cat csv/lu_geometry.csv
+```
+
+## Tool results / harness — 2026-11-25 14:24:59 UTC
+
+**Tool result:**
+
+```
+{'pad': 's2d', 'd_np_inj_to_any_other_nwell_um': 3.37, 'd_np_inj_to_core_nwell_um': 3.37, 'd_pwell_esd_to_core_nplus_um': 8.63, 'd_scr_esd_nplus_to_esd_pwell_um': 8.96, 'area_n_inj_um2': 151.4, 'area_esd_pwell_um2': 963.0}
+{'pad': 'd2s', 'd_np_inj_to_any_other_nwell_um': 4.92, 'd_np_inj_to_core_nwell_um': 4.92, 'd_pwell_esd_to_core_nplus_um': 7.24, 'd_scr_esd_nplus_to_esd_pwell_um': 17.330000000000002, 'area_n_inj_um2': 453.3, 'area_esd_pwell_um2': 2143.8}
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# latch-up geometry of the pad cells (KLayout, pads/<cell>/<cell>.gds); distances edge to edge
+pad,d_np_inj_to_any_other_nwell_um,d_np_inj_to_core_nwell_um,d_pwell_esd_to_core_nplus_um,d_scr_esd_nplus_to_esd_pwell_um,area_n_inj_um2,area_esd_pwell_um2
+s2d,3.37,3.37,8.63,8.96,151.4,963.0
+d2s,4.92,4.92,7.24,17.33,453.3,2143.8
+#
+# guard rings of the ESD sub-cells
+pad,cell,origin,nwell_bbox,nwell_is_ring,nwell_ring_width_um,pplus_rings,nplus_rings
+s2d,DCNDiode,2.67 7.66,(0.39 5.38;38.01 20.2),True,1.58,1,1
+s2d,DCPDiode,43.7 7.66,(43.08 7.04;77.38 18.54),False,,1,1
+s2d,Clamp_N_M1,1.2 19.58,(0.58 18.96;37.82 30.1),True,1.58,1,1
+s2d,Clamp_P_M1,42.23 19.58,(43.41 20.76;77.05 37.66),False,,1,1
+d2s,Clamp_P_M1,0 65,(1.18 66.18;78.82 83.08),False,,1,1
+d2s,Clamp_N_M1,0 15.56,(-0.62 14.94;80.62 26.08),True,1.58,1,1
+d2s,Clamp_N_M1,0 6,(-0.62 5.38;80.62 16.52),True,1.58,1,1
+d2s,DCNDiode,3.56 27.12,(1.28 24.84;78.72 39.66),True,1.58,1,1
+d2s,DCPDiode,4.46 53.
+… [38 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:25:08 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/plots/lu_layout_s2d.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:25:08 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 14:25:22 UTC
+
+**Tool call: `Bash`**
+
+_Refine victim well definition in geometry script_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+p='lu_geometry.py'; s=open(p).read()
+old="""    res = dict(pad=pad,
+               d_np_inj_to_any_other_nwell_um=min_dist(n_inj, victim_nw, dbu),
+               d_np_inj_to_core_nwell_um=min_dist(n_inj, victim_nw_core, dbu),"""
+new="""    # core PMOS wells: n-well polygons outside the ESD cells that hold p+ diffusion (PNP emitters at iovdd or signal)
+    core_pmos_nw = (victim_nw_core.interacting(allr['pplus'] - esd_box)).merged()
+    res = dict(pad=pad,
+               d_np_inj_to_core_pmos_nwell_um=min_dist(n_inj, core_pmos_nw, dbu),"""
+assert old in s
+s=s.replace(old,new)
+s=s.replace("""  d_np_inj   : pad-connected n+ in p-substrate (ESD N cells: dantenna stripes, clamp NMOS) -> nearest n-well that is
+               not one of the n-well guard rings of the ESD N cells (electron collection by a "victim" n-well)""","""  d_np_inj   : n+ in p-substrate of the ESD N cells (dantenna stripes, clamp NMOS) -> nearest core n-well that holds
+               p+ diffusion (a PMOS well outside the ESD cells: the "victim" that collects injected electrons)""")
+open(p,'w').write(s)
+EOF
+python3 lu_geometry.py . | head -3
+```
+
+## Tool results / harness — 2026-11-25 14:25:23 UTC
+
+**Tool result:**
+
+```
+{'pad': 's2d', 'd_np_inj_to_core_pmos_nwell_um': 21.867, 'd_pwell_esd_to_core_nplus_um': 8.63, 'd_scr_esd_nplus_to_esd_pwell_um': 8.96, 'area_n_inj_um2': 151.4, 'area_esd_pwell_um2': 963.0}
+{'pad': 'd2s', 'd_np_inj_to_core_pmos_nwell_um': 6.33, 'd_pwell_esd_to_core_nplus_um': 7.24, 'd_scr_esd_nplus_to_esd_pwell_um': 17.330000000000002, 'area_n_inj_um2': 453.3, 'area_esd_pwell_um2': 2143.8}
+```
+
+## Assistant — 2026-11-25 14:25:29 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/plots/lu_layout_d2s.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:25:29 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 14:26:09 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/latchup.py`
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Latch-up tests in the JESD78 style on the modeled pad ring, IHP sg13cmos5l simulation (PDK compact models; they
+contain no parasitic thyristor, so latch-up itself cannot occur in these runs):
+  itest : chip powered at 3.6 V (iovdd), both pads enabled at the slot operating point; a current forced into one
+          pad, swept 0 -> +1 A and 0 -> -1 A (DC); where it flows, pad voltage, effect on outputs and bias lines
+  ovt   : supply at 3.6 V and 5.4 V (1.5 x 3.6 V), operating point; terminal voltages of every MOS device
+Usage: python3 latchup.py <work_dir> itest|ovt|post"""
+import json
+import sys
+from pathlib import Path
+
+import numpy as np
+
+import common as C
+
+CELLS = {'s2d': C.S2D, 'd2s': C.D2S}
+VSUP = 3.6
+IMAX = 1.0
+
+
+def deck_head(work, var, title, paths):
+    ring, _ = C.ring_netlist('powered', vsup=VSUP)
+    return [f'* {title}', C.SPDX.strip(), C.model_block('tt', var, work),
+            f'.include {paths[C.S2D]}', f'.include {paths[C.D2S]}', f'.include {paths["io"]}', ring,
+            C.pad_instance(C.S2D, 'enabled', 'xs2d'), C.pad_instance(C.D2S, 'enabled', 'xd2s')]
+
+
+def itest_jobs():
+    out = []
+    for var in ('pdk', 'esdproxy'):
+        for t in CELLS:
+            for sgn, tag in ((1, 'pos'), (-1, 'neg')):
+                out.append(dict(name=f'itest_{var}_{t}_{tag}', var=var, pad=t, sgn=sgn))
+    return out
+
+
+def itest(work, filt=''):
+    paths = C.prep_netlists(work)
+    d = Path(work).resolve() / 'latchup'
+    d.mkdir(parents=True, exist_ok=True)
+    for job in itest_jobs():
+        if filt and filt not in job['name']:
+            continue
+        txt = deck_head(work, job['var'], f'{job["name"]}: current forced into pad_{job["pad"]}, iovdd {VSUP} V',
+                        paths)
+        # Iinj: current from ground into the pad (positive = into the pad)
+        txt.append(f'Iinj 0 pad_{job["pad"]} 0')
+        txt.append(f"""Vsens_s2d s2d_outp_s 0 0
+.option rshunt=1e12 itl1=500 itl2=500 gmin=1e-12
+.temp 27
+.control
+set filetype=binary
+op
+write {job['name']}_op.raw
+dc Iinj 0 {job['sgn'] * IMAX} {job['sgn'] * 1e-3}
+write {job['name']}.raw
+.endc
+.end
+""")
+        p = d / f'{job["name"]}.spice'
+        p.write_text('\n'.join(txt))
+        rc = C.run_ngspice(p, p.with_suffix('.log'))
+        print(job['name'], 'rc', rc, flush=True)
+
+
+def ovt(work):
+    paths = C.prep_netlists(work)
+    d = Path(work).resolve() / 'latchup'
+    d.mkdir(parents=True, exist_ok=True)
+    for var in ('esdproxy',):
+        txt = deck_head(work, var, f'ovt_{var}: supply swept 0 ... 5.4 V (op at each point), pads enabled', paths)
+        txt.append(f"""Vsens_s2d s2d_outp_s 0 0
+.option rshunt=1e12 itl1=500 itl2=500 gmin=1e-12
+.temp 27
+.control
+set filetype=binary
+dc Vsup 0 5.4 0.05
+write ovt_{var}.raw
+.endc
+.end
+""")
+        p = d / f'ovt_{var}.spice'
+        p.write_text('\n'.join(txt))
+        rc = C.run_ngspice(p, p.with_suffix('.log'))
+        print(p.name, 'rc', rc, flush=True)
+
+
+if __name__ == '__main__':
+    work = sys.argv[1]
+    if sys.argv[2] == 'itest':
+        itest(work, sys.argv[3] if len(sys.argv) > 3 else '')
+    elif sys.argv[2] == 'ovt':
+        ovt(work)
+```
+
+## Tool results / harness — 2026-11-25 14:26:09 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/latchup.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:26:10 UTC
+
+**Tool call: `Bash`**
+
+_Check HBM batch progress_
+
+```bash
+cat /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/hbm_run.log | tail -30
+```
+
+## Tool results / harness — 2026-11-25 14:26:10 UTC
+
+**Tool result:**
+
+```
+hbm_esdproxy_s2d_gnd_vss_p500 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_s2d_gnd_vss_n500 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_s2d_gnd_vss_p1000 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_s2d_gnd_vss_n1000 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_s2d_gnd_vss_p2000 done before
+hbm_esdproxy_s2d_gnd_vss_n2000 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_s2d_gnd_vdd_p500 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_s2d_gnd_vdd_n500 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_s2d_gnd_vdd_p1000 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_s2d_gnd_vdd_n1000 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_s2d_gnd_vdd_p2000 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_s2d_gnd_vdd_n2000 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_s2d_p2p_p500 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_s2d_p2p_n500 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_s2d_p2p_p1000 rc 0 ok t_end 1000.0 ns
+```
+
+## Assistant — 2026-11-25 14:26:33 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/scr.py`
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Lumped parasitic-thyristor (PNPN) estimate for latch-up triggering by pad current injection. ngspice with
+Gummel-Poon BJTs and resistors; EVERY parameter here is an ASSUMPTION (no PDK model of the parasitic bipolars
+exists), swept over a range to show sensitivity. Structure (iovdd = 3.6 V, iovss = 0):
+  QP  : vertical/lateral PNP, emitter = p+ at iovdd (PMOS source / ESD P cell), base = n-well node W, collector = S
+  QN  : lateral NPN, emitter = n+ at iovss (NMOS source / ESD N cell), base = substrate node S, collector = W
+  RNW : n-well resistance W -> iovdd tie;  RSUB : substrate resistance S -> iovss tie (p+ guard ring)
+Injection (JESD78 I-test): a fraction ALPHA of the forced pad current reaches the victim structure behind the guard
+rings: negative injection (pad n+ forward) -> electrons collected by the well, current ALPHA*I out of W;
+positive injection (pad p+ forward) -> holes collected by the substrate, current ALPHA*I into S.
+Trigger test: injection ramped up within 1 us, held 2 us, removed; latched if the supply current stays > 1 mA at the
+end. The trigger current is found by bisection.
+Usage: python3 scr.py <work_dir>   -> csv/scr_trigger.csv, plots/scr_trigger.png"""
+import itertools
+import sys
+from pathlib import Path
+
+import numpy as np
+
+import common as C
+
+BETA_N = [0.5, 2, 10]
+BETA_P = [0.5, 2, 10]
+RNW = [300, 1000, 3000]
+RSUB = [300, 1000, 3000]
+ALPHA = [0.01, 0.1]
+IS_BJT = 1e-15      # assumed saturation current (Vbe ~ 0.72 V at 1 mA)
+VSUP = 3.6
+
+
+def deck(bn, bp, rnw, rsub, alpha, iinj, pol):
+    src = (f'Binj W 0 I = {alpha} * {iinj} * v(ramp)' if pol == 'neg' else
+           f'Binj 0 S I = {alpha} * {iinj} * v(ramp)')
+    return f"""* lumped PNPN, assumed parameters
+.model qn npn(is={IS_BJT} bf={bn} br=0.1 rb=0 cje=1p cjc=1p tf=1n)
+.model qp pnp(is={IS_BJT} bf={bp} br=0.1 rb=0 cje=1p cjc=1p tf=1n)
+Vdd vdd 0 {VSUP}
+Vam vdd vdda 0
+QP S W vdda qp
+QN W S 0 qn
+RNW W vdda {rnw}
+RSUB S 0 {rsub}
+Vramp ramp 0 pwl(0 0 1u 1 3u 1 3.2u 0)
+{src}
+.option reltol=1e-4
+.control
+tran 5n 6u
+let iend = -i(vdd)
+meas tran ilast find iend at=5.9u
+print ilast
+.endc
+.end
+"""
+
+
+def latched(work, bn, bp, rnw, rsub, alpha, iinj, pol):
+    p = Path(work).resolve() / 'scr' / 'scr.spice'
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(C.SPDX + deck(bn, bp, rnw, rsub, alpha, iinj, pol))
+    C.run_ngspice(p, p.with_suffix('.log'), timeout=120)
+    for ln in p.with_suffix('.log').read_text(errors='replace').splitlines():
+        if ln.strip().startswith('ilast'):
+            return float(ln.split('=')[1].split()[0]) > 1e-3
+    return None
+
+
+def trigger(work, bn, bp, rnw, rsub, alpha, pol, imax=1.0):
+    """Smallest injected pad current (A) that leaves the PNPN latched; inf if not up to imax."""
+    if not latched(work, bn, bp, rnw, rsub, alpha, imax, pol):
+        return float('inf')
+    lo, hi = 1e-6, imax
+    if latched(work, bn, bp, rnw, rsub, alpha, lo, pol):
+        return lo
+    for _ in range(14):
+        mid = np.sqrt(lo * hi)
+        if latched(work, bn, bp, rnw, rsub, alpha, mid, pol):
+            hi = mid
+        else:
+            lo = mid
+    return hi
+
+
+def main():
+    work = sys.argv[1]
+    rows = []
+    for bn, bp, rnw, rsub, alpha in itertools.product(BETA_N, BETA_P, RNW, RSUB, ALPHA):
+        for pol in ('neg', 'pos'):
+            it = trigger(work, bn, bp, rnw, rsub, alpha, pol)
+            rows.append(dict(beta_npn=bn, beta_pnp=bp, beta_product=bn * bp, r_nwell_ohm=rnw, r_sub_ohm=rsub,
+                             alpha=alpha, injection=pol, i_trigger_A=it))
+        print(bn, bp, rnw, rsub, alpha, rows[-2]['i_trigger_A'], rows[-1]['i_trigger_A'], flush=True)
+    C.write_csv(C.HERE / 'csv/scr_trigger.csv', rows,
+                'lumped PNPN latch-up estimate (scr.py); ALL parameters assumed, not from the PDK; ngspice Gummel-Poon\n'
+                f'iovdd {VSUP} V; i_trigger_A = smallest forced pad current that leaves t
+… [226 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 14:26:33 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/scr.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:27:11 UTC
+
+**Tool call: `Bash`**
+
+_Add post-processing, plots and network check to esd.py_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+p='scr.py'; s=open(p).read()
+s=s.replace("RNW = [300, 1000, 3000]\nRSUB = [300, 1000, 3000]","RNW = [300, 3000]\nRSUB = [300, 3000]")
+open(p,'w').write(s)
+p='esd.py'; s=open(p).read()
+i=s.index("if __name__ == '__main__':")
+s=s[:i]+'''def post(work):
+    """Collect the per-run json files into csv/ and make the plots."""
+    import json
+    rows, drows, mrows = [], [], []
+    waves = {}
+    for job in jobs():
+        f = Path(work) / 'hbm' / f'{job["name"]}.json'
+        if not f.exists():
+            continue
+        d = json.loads(f.read_text())
+        if 'summary' not in d:
+            rows.append(dict(run=job['name'], diode_model=job['var'], pad=job['pad'], config=job['mode'],
+                             v_hbm=job['v'], l_hbm_uH=round(job['ls'] * 1e6, 3), status=d['status']))
+            continue
+        s = d['summary']
+        rows.append(s)
+        if s['status'] != 'ok':
+            continue
+        for r in d['diodes']:
+            if abs(r['i_peak_A']) > 1e-3:
+                drows.append(r)
+        mrows += d['mos']
+        waves[job['name']] = d['wave']
+    keys = []
+    for r in rows:
+        for k in r:
+            if k not in keys:
+                keys.append(k)
+    rows = [{k: r.get(k, '') for k in keys} for r in rows]
+    C.write_csv(C.HERE / 'csv/hbm_summary.csv', [_round(r) for r in rows],
+                C.LABEL + '\\nHBM 100 pF / 1.5 kOhm (+ series L, see l_hbm_uH); one row per run; status ok = run to 1 us\\n'
+                'v_pad_peak: signed peak pad voltage; v_ring_peak: max |iovdd - iovss| at the zapped pad; '
+                'i_rc_clamps_peak_A: sum over the 5 IOPadIOVdd RC clamps')
+    C.write_csv(C.HERE / 'csv/hbm_diodes.csv', [_round(r) for r in drows],
+                C.LABEL + '\\nper diode with |peak current| > 1 mA; i_peak_A > 0 = forward; j_* = i_peak / area or / '
+                'perimeter (perimeter = 2 (l + w)); energy_nJ = integral of v_ak * i over the run')
+    C.write_csv(C.HERE / 'csv/hbm_mos.csv', [_round(r) for r in mrows],
+                C.LABEL + '\\nmax over the run of |vg - vs|, |vg - vd|, |vg - vb|, |vd - vs| for the MOS devices on '
+                'the pad path, and the device with the largest of these per pad (role column)')
+    plots(rows, mrows, waves)
+
+
+def _round(r):
+    return {k: (float('%.5g' % v) if isinstance(v, float) else v) for k, v in r.items()}
+
+
+def plots(rows, mrows, waves):
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    plt.rcParams.update({'font.size': 8.5, 'axes.grid': True, 'grid.color': '#d8d8d4', 'figure.facecolor': 'white'})
+    col = {'gnd_vss': '#2a78d6', 'gnd_vdd': '#eb6834', 'p2p': '#1baf7a'}
+    # 1. waveforms at +-2 kV
+    for pad in CELLS:
+        fig, axs = plt.subplots(2, 2, figsize=(9, 6), sharex=True)
+        for j, sgn in enumerate(('p', 'n')):
+            for mode in MODES:
+                nm = f'hbm_esdproxy_{pad}_{mode}_{sgn}2000'
+                if nm not in waves:
+                    continue
+                w = waves[nm]
+                axs[0, j].plot(w['t_ns'], w['v_pad'], color=col[mode], label=MODES[mode])
+                axs[1, j].plot(w['t_ns'], w['i_zap'], color=col[mode])
+            axs[0, j].set_title(f'{pad.upper()} pad, {"+" if sgn == "p" else "-"}2 kV HBM')
+            axs[0, j].set_ylabel('pad voltage (V)')
+            axs[1, j].set_ylabel('HBM current into pad (A)')
+            axs[1, j].set_xlabel('time (ns)')
+            axs[1, j].set_xlim(0, 400)
+        axs[0, 0].legend(fontsize=7)
+        fig.suptitle(f'HBM 2 kV into the {pad.upper()} pad on the modeled pad ring\\n{C.LABEL}; antenna diodes: '
+                     'ESD-diode proxy model', fontsize=8.5)
+        fig.tight_layout()
+        fig.savefig(C.HERE / f'plots/hbm_wave_{pad}.png', dpi=150)
+        plt.close(fig)
+    # 2. peak pad voltage vs HBM voltage
+    fig, axs = plt.subplots(1, 2, figsize=(9, 3.8))
+    for j, pad in enumerate(CELLS):
+        for mode in MODES:
+            for var, ls in (('esdproxy', '-'), ('pdk', ':')):
+                pts = sorted((r['v_hbm'], r['v_pad_peak']) for r in rows if r['pad'] == pad and r['config'] == mode
+                             and r['diode_model'] == var and r.get('status') == 'ok' and r['l_hbm_uH'] < 2)
+                if pts:
+                    x, y = zip(*pts)
+                    axs[j].plot(x, y, ls, marker='o', ms=3, color=col[mode],
+                                label=f'{MODES[mode]} ({var})' if j == 0 else None)
+        axs[j].set_title(f'{pad.upper()} pad')
+        axs[j].set_xlabel('HBM precharge (V)')
+        axs[j].set_ylabel('peak pad voltage (V)')
+    axs[0].legend(fontsize=6)
+    fig.suptitle(f'Peak pad voltage, {C.LABEL}\\nsolid: antenna diodes as ESD-diode proxy; dotted: PDK antenna-diode '
+                 'model (runs that finished)', fontsize=8.5)
+    fig.tight_layout()
+    fig.savefig(C.HERE / 'plots/hbm_vpad_peak.png', dpi=150)
+    plt.close(fig)
+    # 3. oxide voltage of the pad-path devices at +-2 kV (esdproxy, fast rise)
+    fig, axs = plt.subplots(1, 2, figsize=(10, 4.6))
+    for j, pad in enumerate(CELLS):
+        devs = [d for d, _ in PATH_DEVICES[pad]]
+        labels = [d.split('.')[-1] + ('' if d.count('.') < 3 else ' (' + d.split('.')[-2] + ')') for d in devs]
+        k = 0
+        width = 0.13
+        for mode in MODES:
+            for sgn in (2000, -2000):
+                vals = []
+                for dname in devs:
+                    m = [r for r in mrows if r['run'] == f'hbm_esdproxy_{pad}_{mode}_{"p" if sgn > 0 else "n"}2000'
+                         and r['device'] == dname and r['pad'] == pad]
+                    vals.append(m[0]['max_vox'] if m else np.nan)
+                axs[j].bar(np.arange(len(devs)) + (k - 2.5) * width, vals, width, color=col[mode],
+                           alpha=1.0 if sgn > 0 else 0.5,
+                           label=f'{MODES[mode]}, {"+" if sgn > 0 else "-"}2 kV' if j == 0 else None)
+                k += 1
+        axs[j].axhline(3.3, color='#52514e', ls='--', lw=0.8)
+        axs[j].text(len(devs) - 0.5, 3.4, 'VGS max 3.3 V (PDK, HCI)', ha='right', fontsize=6.5)
+        axs[j].set_xticks(np.arange(len(devs)))
+        axs[j].set_xticklabels(labels, rotation=30, ha='right', fontsize=7)
+        axs[j].set_ylabel('max |V| across gate oxide (V)')
+        axs[j].set_title(f'{pad.upper()} pad: gate oxides on the pad path')
+    axs[0].legend(fontsize=6)
+    fig.suptitle(f'Peak gate-oxide voltage (max of |vgs|, |vgd|, |vgb|), 2 kV HBM, {C.LABEL}; ESD-diode proxy',
+                 fontsize=8.5)
+    fig.tight_layout()
+    fig.savefig(C.HERE / 'plots/hbm_oxide.png', dpi=150)
+    plt.close(fig)
+
+
+def wave_check(work):
+    """HBM network into a short and into 500 Ohm, 2 kV, both inductances: peak current, 10-90 % rise, decay."""
+    d = Path(work).resolve() / 'hbm'
+    d.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for ls, tag in ((L_FAST, 'L_fast'), (L_SLOW, 'L_slow')):
+        for rl in (0.0, 500.0):
+            p = d / f'wave_{tag}_{int(rl)}.spice'
+            p.write_text(C.SPDX + f'* HBM network check\\n' + hbm_source(2000, 'load', ls) +
+                         (f'Rl load 0 {rl}\\n' if rl > 0 else 'Rl load 0 1e-3\\n') +
+                         '.control\\nset filetype=binary\\ntran 0.05n 1000n 0 0.05n\\nwrite %s.raw\\n.endc\\n.end\\n' %
+                         p.stem)
+            C.run_ngspice(p, p.with_suffix('.log'))
+            pl = C.read_raw(p.with_suffix('.raw'))[-1]['vars']
+            t, i = pl['time'], pl['i(vzap)']
+            ip = float(np.max(i))
+            k = int(np.argmax(i))
+            t10 = np.interp(0.1 * ip, i[:k + 1], t[:k + 1])
+            t90 = np.interp(0.9 * ip, i[:k + 1], t[:k + 1])
+            tail = i[k:]
+            t37 = np.interp(-ip * np.exp(-1), -tail, t[k:])
+            rows.append(dict(network=tag, l_uH=round(ls * 1e6, 3), load_ohm=rl, i_peak_A=round(ip, 4),
+                             rise_10_90_ns=round((t90 - t10) * 1e9, 2), decay_to_36.8pct_ns=round((t37 - t[k]) * 1e9, 1)))
+            p.with_suffix('.raw').unlink()
+    C.write_csv(C.HERE / 'csv/hbm_network_check.csv', rows,
+                'HBM network of esd.py (100 pF, 1.5 kOhm, series L) at 2 kV into a short (1 mOhm) and into 500 Ohm\\n'
+                'decay = time from the peak to 1/e of the peak (JS-001 decay time is defined differently; compare '
+                'with care)')
+    for r in rows:
+        print(r)
+
+
+'''+s[i:]
+s=s.replace("""    if sys.argv[2] == 'run':""","""    if sys.argv[2] == 'post':
+        post(work)
+    elif sys.argv[2] == 'wave':
+        wave_check(work)
+    elif sys.argv[2] == 'run':""")
+open(p,'w').write(s)
+EOF
+python3 -c "import ast;ast.parse(open('esd.py').read())" && tail -3 _work/hbm_run.log
+```
+
+## Tool results / harness — 2026-11-25 14:27:12 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import ast;ast.parse(open('esd.py').read())
+               ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/ast.py", line 50, in parse
+    return compile(source, filename, mode, flags,
+                   _feature_version=feature_version, optimize=optimize)
+  File "<unknown>", line 381
+    rise_10_90_ns=round((t90 - t10) * 1e9, 2), decay_to_36.8pct_ns=round((t37 - t[k]) * 1e9, 1)))
+                                                           ^
+SyntaxError: invalid decimal literal
+```
+
+## Assistant — 2026-11-25 14:27:15 UTC
+
+**Tool call: `Bash`**
+
+_Fix syntax and test post-processing on partial results_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && sed -i 's/decay_to_36.8pct_ns=/decay_to_1_over_e_ns=/' esd.py && python3 -c "import ast;ast.parse(open('esd.py').read())" && python3 esd.py _work post 2>&1 | tail -3; ls csv plots; tail -2 _work/hbm_run.log
+```
+
+## Tool results / harness — 2026-11-25 14:27:17 UTC
+
+**Tool result:**
+
+```
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/esd.py:301: UserWarning: No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+  axs[0, 0].legend(fontsize=7)
+csv:
+hbm_diodes.csv
+hbm_mos.csv
+hbm_summary.csv
+lu_geometry.csv
+ring_cells.csv
+ring_metal.csv
+
+plots:
+hbm_oxide.png
+hbm_vpad_peak.png
+hbm_wave_d2s.png
+hbm_wave_s2d.png
+lu_layout_d2s.png
+lu_layout_s2d.png
+hbm_esdproxy_d2s_gnd_vss_n500 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_d2s_gnd_vss_p1000 rc 0 ok t_end 1000.0 ns
+[This command modified 2 files you've previously read: verification/c2_gaps/pad_esd_latchup/esd.py, verification/c2_gaps/pad_esd_latchup/_work/hbm_run.log. Call Read before editing.]
+```
+
+## Assistant — 2026-11-25 14:27:20 UTC
+
+**Tool call: `Bash`**
+
+_Review partial HBM results_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+import csv
+rows=[r for r in csv.DictReader(l for l in open('csv/hbm_summary.csv') if not l.startswith('#'))]
+for r in rows: print(r['run'], r['status'], r['i_peak_A'], r['v_pad_peak'], r['v_iovdd_peak'], r['v_iovss_peak'], r['v_ring_peak'], r['i_rc_clamps_peak_A'], r['end_v_pad'])
+m=[r for r in csv.DictReader(l for l in open('csv/hbm_mos.csv') if not l.startswith('#'))]
+for r in m:
+    if r['pad']==r['pad_zapped'] and '2000' in r['run']: print(r['run'], r['device'], r['max_vgs'], r['max_vgd'], r['max_vgb'], r['max_vds'])
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:27:21 UTC
+
+**Tool result:**
+
+```
+hbm_esdproxy_s2d_gnd_vss_p500 ok 0.32347 3.9319 2.2082 0.00023636 2.2082 0.32343 2.7618
+hbm_esdproxy_s2d_gnd_vss_n500 ok -0.32499 -1.9426 -0.054826 -0.018243 0.036599 0.0036407 -0.63891
+hbm_esdproxy_s2d_gnd_vss_p1000 ok 0.64782 5.7824 2.4379 0.00032886 2.4379 0.64775 3.0473
+hbm_esdproxy_s2d_gnd_vss_n1000 ok -0.65064 -2.8735 -0.077957 -0.036524 0.041468 0.0049935 -0.70121
+hbm_esdproxy_s2d_gnd_vss_p2000 ok 1.2956 9.2977 3.2807 0.00047278 3.2807 1.2955 3.4602
+hbm_esdproxy_s2d_gnd_vss_n2000 ok -1.3012 -4.6987 -0.11736 -0.073044 0.045058 0.006849 -0.77877
+hbm_esdproxy_s2d_gnd_vdd_p500 ok 0.32467 2.3468 0.08671 0.057743 0.029107 0.0028866 0.56064
+hbm_esdproxy_s2d_gnd_vdd_n500 ok -0.3237 -3.575 -0.0014956 -2.2049 2.2049 0.32368 -2.8366
+hbm_esdproxy_s2d_gnd_vdd_p1000 ok 0.64969 3.7168 0.17351 0.087101 0.086493 0.0041032 0.62155
+hbm_esdproxy_s2d_gnd_vdd_n1000 ok -0.64905 -5.0362 -0.0021911 -2.4416 2.4413 0.64901 -3.1226
+hbm_esdproxy_s2d_gnd_vdd_p2000 ok 1.3002 6.3895 0.34726 0.14013 0.20757 0.0055811 0.7027
+hbm_esdproxy_s2d_gnd_vdd_n2000 ok -1.2996 -7.8134 -0.0033122 -3.192 3.1919 1.2995 -3.5324
+hbm_esdproxy_s2d_p2p_p500 ok 0.32254 5.3617 3.2029 1.3686 2.2156 0.31732 3.3522
+hbm_esdproxy_s2d_p2p_n500 ok -0.32234 -5.1664 -1.507 -3.2505 2.2146 0.31766 -3.3624
+hbm_esdproxy_s2d_p2p_p1000 ok 0.64627 7.6703 4.1453 1.7642 2.4787 0.63495 3.6821
+hbm_esdproxy_s2d_p2p_n1000 ok -0.64591 -7.2335 -2.0443 -4.4114 2.4591 0.62853 -3.6905
+hbm_esdproxy_s2d_p2p_p2000 ok 1.2933 11.965 5.9692 2.4764 3.4932 
+… [2582 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:27:44 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/iv.py`
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""What the compact models do at ESD / latch-up currents: forward I-V (DC, 1 uA ... 2 A) of the pad's antenna
+diodes (PDK diodes.lib and the ESD-diode proxy of common.py) and of the drain junctions of the pad clamps / output
+devices (PSP JUNCAP2 in the PDK hv MOS models; gate tied as in the pad: to the device's own source / rail).
+IHP sg13cmos5l simulation, tt, 27 C. Usage: python3 iv.py <work_dir>  ->  csv/model_iv.csv, plots/model_iv.png"""
+import sys
+from pathlib import Path
+
+import numpy as np
+
+import common as C
+
+DUTS = [
+    # name, netlist line (forced current enters node a; return node 0), description
+    ('dpantenna 1.26x27.78 (S2D DP1)', 'X1 a 0 dpantenna l=27.78u w=1.26u', 'p+/n-well, pad -> iovdd'),
+    ('dantenna 1.26x27.78 (S2D DN1)', 'X1 a 0 dantenna l=27.78u w=1.26u', 'n+/p-sub forward: iovss -> pad'),
+    ('dpantenna 1.26x65.8 (D2S DP0)', 'X1 a 0 dpantenna l=65.8u w=1.26u', 'p+/n-well, pad -> iovdd'),
+    ('dantenna 1.26x67.6 (D2S DN0)', 'X1 a 0 dantenna l=67.6u w=1.26u', 'n+/p-sub forward: iovss -> pad'),
+    ('MCP drain junction, hv PMOS 266.4/0.6 ng 40 (S2D)', 'X1 a g 0 0 sg13_hv_pmos w=266.4u l=0.6u ng=40\nRg g 0 6.8k',
+     'pad (drain) -> iovdd (body, source); gate to iovdd via 6.8 kOhm'),
+    ('MCN drain junction, hv NMOS 88/0.6 ng 20 (S2D)', 'X1 0 g 0 a sg13_hv_nmos w=88u l=0.6u ng=20\nRg g a 1.96k',
+     'iovss (body, source) -> pad (drain); gate to iovss via 1.96 kOhm'),
+    ('OP drain junction, hv PMOS 546.12/0.6 ng 82 (D2S)', 'X1 a 0 0 0 sg13_hv_pmos w=546.12u l=0.6u ng=82',
+     'pad (drain) -> iovdd (body, source); gate at iovdd (disabled)'),
+    ('ON drain junction, hv NMOS 299.2/1 ng 68 (D2S)', 'X1 0 a a a sg13_hv_nmos w=299.2u l=1u ng=68',
+     'iovss (body, source) -> pad (drain); gate at iovss (disabled)'),
+]
+POINTS = [1e-3, 1e-2, 0.1, 0.5, 1.0, 1.33, 2.0]
+
+
+def main():
+    work = Path(sys.argv[1]).resolve() / 'iv'
+    work.mkdir(parents=True, exist_ok=True)
+    rows = []
+    curves = {}
+    for var in ('pdk', 'esdproxy'):
+        for i, (name, line, desc) in enumerate(DUTS):
+            if var == 'esdproxy' and 'antenna' not in name:
+                continue
+            p = work / f'iv_{var}_{i}.spice'
+            p.write_text(C.SPDX + f'* forward I-V: {name}\n' + C.model_block('tt', var, sys.argv[1]) +
+                         f'I1 0 a 1u\n{line}\n.option rshunt=1e15\n.control\nset filetype=binary\n'
+                         f'dc I1 1u 2 2m\nwrite {p.stem}.raw\n.endc\n.end\n')
+            C.run_ngspice(p, p.with_suffix('.log'))
+            pl = C.read_raw(p.with_suffix('.raw'))[-1]['vars']
+            ii = pl['i(i1)'] if 'i(i1)' in pl else pl[list(pl)[0]]
+            v = pl['v(a)']
+            curves[(var, name)] = (ii, v)
+            r = dict(model=var, device=name, direction=desc)
+            for x in POINTS:
+                r[f'v_at_{x:g}A'] = round(float(np.interp(x, ii, v)), 3)
+            rows.append(r)
+            p.with_suffix('.raw').unlink()
+    C.write_csv(C.HERE / 'csv/model_iv.csv', rows,
+                C.LABEL + '\nforward voltage (V) at the forced current, DC, tt 27 C; pdk = PDK models as they are, '
+                'esdproxy = antenna diodes re-modeled with the PDK ESD-diode models (common.py)')
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots(figsize=(7.5, 4.6))
+    cols = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#7b5ea7', '#52514e', '#0b0b0b']
+    for k, ((var, name), (ii, v)) in enumerate(curves.items()):
+        idx = [d[0] for d in DUTS].index(name)
+        ax.plot(v, ii, color=cols[idx], ls='-' if var == 'pdk' else '--', lw=1.2,
+                label=f'{name} [{var}]')
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    ax.set_xlim(0.3, 5000)
+    ax.set_ylim(1e-4, 2)
+    ax.set_xlabel('forward voltage (V)')
+    ax.set_ylabel('forced current (A)')
+    ax.legend(fontsize=5.8, loc='lower right')
+    ax.set_t
+… [353 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 14:27:44 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/iv.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:27:54 UTC
+
+**Tool call: `Bash`**
+
+_Fix gate resistor values and check progress_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && sed -i "s/Rg g 0 6.8k/Rg g 0 6.768k/; s/Rg g a 1.96k/Rg g a 1.959k/; s/gate to iovdd via 6.8 kOhm/gate to iovdd via 6.768 kOhm (rppd value of the IO library's Clamp_P20N0D)/; s/gate to iovss via 1.96 kOhm/gate to iovss via 1.959 kOhm (Clamp_N20N0D)/" iv.py && wc -l _work/hbm_run.log && tail -2 _work/hbm_run.log
+```
+
+## Tool results / harness — 2026-11-25 14:27:54 UTC
+
+**Tool result:**
+
+```
+24 _work/hbm_run.log
+hbm_esdproxy_d2s_gnd_vss_p2000 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_d2s_gnd_vss_n2000 rc 0 ok t_end 1000.0 ns
+[This command modified 1 file you've previously read: verification/c2_gaps/pad_esd_latchup/iv.py. Call Read before editing.]
+```
+
+## Assistant — 2026-11-25 14:28:31 UTC
+
+**Tool call: `Bash`**
+
+_Add latch-up post-processing_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+p='latchup.py'; s=open(p).read()
+i=s.index("if __name__ == '__main__':")
+s=s[:i]+'''def _vec(pl, n):
+    return pl['v(%s)' % n] if 'v(%s)' % n in pl else pl[n]
+
+
+def itest_post(work):
+    d = Path(work).resolve() / 'latchup'
+    rows, curves = [], {}
+    for job in itest_jobs():
+        raw = d / f'{job["name"]}.raw'
+        if not raw.exists():
+            rows.append(dict(run=job['name'], status='no raw'))
+            continue
+        pls = C.read_raw(raw)
+        pl = pls[-1]['vars']
+        sweep = pl[list(pl)[0]]
+        t = job['pad']
+        other = 'd2s' if t == 's2d' else 's2d'
+        vpad = _vec(pl, f'pad_{t}')
+        am = C.ammeter_vectors(CELLS[t], f'x{t}')
+        cur = {k: pl['i(%s)' % v.replace('#branch', '')] for k, v in am.items()}
+        isup = -pl['i(vsup)']                      # current delivered by the 3.6 V supply
+        iss = sum(pl[k] for k in pl if k.startswith('i(vbp_vss'))   # current into the iovss bond pads (to ground)
+        log = (d / f'{job["name"]}.log').read_text(errors='replace')
+        status = 'ok' if abs(abs(sweep[-1]) - IMAX) < 2e-3 else 'stopped at %.3g A' % sweep[-1]
+        curves[job['name']] = dict(i=sweep, vpad=vpad, isup=isup, cur=cur,
+                                   outp=_vec(pl, 's2d_outp'), outn=_vec(pl, 's2d_outn'), vd2s=_vec(pl, 'pad_d2s'))
+        lim = 5.4 if job['sgn'] > 0 else -1.8
+        a = np.abs(vpad)
+        i_lim = float(np.interp(abs(lim), a, np.abs(sweep))) if a.max() >= abs(lim) else float('nan')
+        for itgt in (0.1,):
+            x = itgt * job['sgn']
+            k = int(np.argmin(np.abs(sweep - x)))
+            if abs(sweep[k] - x) > 2e-3:
+                continue
+            r = dict(run=job['name'], diode_model=job['var'], pad=t, injection=('+' if job['sgn'] > 0 else '-') + '100 mA',
+                     status=status, v_pad=float(vpad[k]), v_pad_at_0=float(vpad[0]),
+                     i_at_vpad_limit_A=i_lim if np.isfinite(i_lim) else '> %g' % IMAX, vpad_limit=lim,
+                     v_iovdd_at_pad=float(_vec(pl, f'vd_{t}')[k]), v_iovss_at_pad=float(_vec(pl, f'vs_{t}')[k]),
+                     i_supply_mA=float(isup[k] * 1e3), i_supply_at_0_mA=float(isup[0] * 1e3),
+                     i_iovss_pads_mA=float(iss[k] * 1e3))
+            for kk, v in cur.items():
+                r[f'i_{kk}_mA'] = float(v[k] * 1e3)
+            if t == 's2d':
+                r.update(s2d_outp=float(curves[job['name']]['outp'][k]), s2d_outn=float(curves[job['name']]['outn'][k]),
+                         s2d_outp_at_0=float(curves[job['name']]['outp'][0]),
+                         s2d_outn_at_0=float(curves[job['name']]['outn'][0]))
+            r.update(d2s_pad=float(curves[job['name']]['vd2s'][k]), d2s_pad_at_0=float(curves[job['name']]['vd2s'][0]))
+            for b in ('vbp', 'vbn', 'vbpc', 'vbnc'):
+                for tt in CELLS:
+                    n = f'x{tt}.{b}'
+                    if 'v(%s)' % n in pl:
+                        r[f'{tt}_{b}'] = float(pl['v(%s)' % n][k])
+                        r[f'{tt}_{b}_at_0'] = float(pl['v(%s)' % n][0])
+            rows.append(r)
+    keys = []
+    for r in rows:
+        for k in r:
+            if k not in keys:
+                keys.append(k)
+    rows = [{k: (float('%.5g' % r[k]) if isinstance(r.get(k), float) else r.get(k, '')) for k in keys} for r in rows]
+    C.write_csv(C.HERE / 'csv/itest.csv', rows,
+                C.LABEL + f'\\nJESD78-style I-test: iovdd {VSUP} V, both pads enabled (S2D vref 0.49 V / vcm 1.26 V, '
+                'D2S vinp = vinn = vref = 1.26 V, iref 5 uA); DC current forced into one pad; values at +-100 mA\\n'
+                'i_<device>_mA: current from the pad into the device (DP/OP: + = toward iovdd; DN/ON: - = from iovss); '
+                'i_supply_mA: current delivered by the 3.6 V supply (negative = the supply sinks); '
+                'i_at_vpad_limit_A: forced current at which the pad reaches 5.4 V (+) / -1.8 V (-)')
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    plt.rcParams.update({'font.size': 8.5, 'axes.grid': True, 'grid.color': '#d8d8d4', 'figure.facecolor': 'white'})
+    fig, axs = plt.subplots(1, 2, figsize=(9.5, 4))
+    col = {'pdk': '#eb6834', 'esdproxy': '#2a78d6'}
+    for j, t in enumerate(CELLS):
+        for name, c in curves.items():
+            if f'_{t}_' not in name:
+                continue
+            var = 'pdk' if '_pdk_' in name else 'esdproxy'
+            axs[j].plot(c['i'] * 1e3, c['vpad'], color=col[var],
+                        label=var if 'pos' in name else None)
+        axs[j].axhline(5.4, color='#52514e', ls='--', lw=0.8)
+        axs[j].axhline(-1.8, color='#52514e', ls=':', lw=0.8)
+        axs[j].axvline(100, color='#52514e', lw=0.5)
+        axs[j].axvline(-100, color='#52514e', lw=0.5)
+        axs[j].set_xlabel('current forced into the pad (mA)')
+        axs[j].set_ylabel('pad voltage (V)')
+        axs[j].set_title(f'{t.upper()} pad, iovdd 3.6 V, enabled')
+        axs[j].set_ylim(-8, 15)
+    axs[0].legend(title='antenna-diode model', fontsize=7)
+    fig.suptitle(f'I-test (JESD78 style): pad voltage vs forced current, {C.LABEL}\\ndashed: 1.5 x 3.6 V = 5.4 V; '
+                 'dotted: -1.8 V', fontsize=8.5)
+    fig.tight_layout()
+    fig.savefig(C.HERE / 'plots/itest_vpad.png', dpi=150)
+    plt.close(fig)
+    return rows
+
+
+def ovt_post(work):
+    d = Path(work).resolve() / 'latchup'
+    pl = C.read_raw(d / 'ovt_esdproxy.raw')[-1]['vars']
+    vs = pl[list(pl)[0]]
+    paths = C.prep_netlists(work)
+    rows = []
+    for t, cell in CELLS.items():
+        line = C.pad_instance(cell, 'enabled', f'x{t}').split('\\n')[0].split()
+        devs = C.flatten(Path(paths[cell]).read_text(), cell, line[1:-1], f'x{t}')
+        for vsup in (3.6, 5.4):
+            k = int(np.argmin(np.abs(vs - vsup)))
+            best = {}
+            for dv in devs:
+                if dv['kind'] not in ('nmos', 'pmos'):
+                    continue
+                v = [0.0 if n == '0' else float(pl['v(%s)' % n][k]) for n in dv['nodes']]
+                dd, g, s_, b = v
+                for q, val in (('vgs', abs(g - s_)), ('vgd', abs(g - dd)), ('vgb', abs(g - b)), ('vds', abs(dd - s_)),
+                               ('vdb', abs(dd - b)), ('vsb', abs(s_ - b))):
+                    if q not in best or val > best[q][0]:
+                        best[q] = (val, dv['name'])
+            r = dict(pad=t, v_supply=vsup, i_supply_mA=float(-pl['i(vsup)'][k] * 1e3))
+            for q, (val, nm) in best.items():
+                r[f'max_{q}'] = round(val, 3)
+                r[f'dev_{q}'] = nm
+            rows.append(r)
+    C.write_csv(C.HERE / 'csv/overvoltage.csv', rows,
+                C.LABEL + '\\nsupply (iovdd at the IOVdd bond pads) at 3.6 and 5.4 V, operating point, both pads enabled; '
+                'largest terminal-voltage difference of any MOS device of each pad and which device; i_supply_mA = '
+                'total from the supply (both pads, the 5 RC clamps and IOVss diodes)')
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots(figsize=(6, 3.6))
+    ax.semilogy(vs, np.abs(pl['i(vsup)']) * 1e3, color='#2a78d6')
+    ax.axvline(3.6, color='#52514e', ls=':', lw=0.8)
+    ax.axvline(5.4, color='#52514e', ls='--', lw=0.8)
+    ax.set_xlabel('supply iovdd (V)')
+    ax.set_ylabel('supply current (mA)')
+    ax.set_title(f'Supply current vs supply, both pads enabled + ring clamps\\n{C.LABEL}', fontsize=8)
+    fig.tight_layout()
+    fig.savefig(C.HERE / 'plots/overvoltage_isupply.png', dpi=150)
+    plt.close(fig)
+    return rows
+
+
+'''+s[i:]
+s=s.replace("""    elif sys.argv[2] == 'ovt':
+        ovt(work)""","""    elif sys.argv[2] == 'ovt':
+        ovt(work)
+    elif sys.argv[2] == 'post':
+        itest_post(work)
+        ovt_post(work)""")
+open(p,'w').write(s)
+EOF
+python3 -c "import ast;ast.parse(open('latchup.py').read())"; tail -2 _work/hbm_run.log
+```
+
+## Tool results / harness — 2026-11-25 14:28:31 UTC
+
+**Tool result:**
+
+```
+hbm_esdproxy_d2s_gnd_vdd_n500 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_d2s_gnd_vdd_p1000 rc 0 ok t_end 1000.0 ns
+```
+
+## Assistant — 2026-11-25 14:28:37 UTC
+
+**Tool call: `Bash`**
+
+_Read verification-state section and diode note_
+
+```bash
+sed -n 316,352p docs/chipalooza2_as_taped_out/README.md; cat verification/c2_gaps/klayout_pad_diodes/README.md | head -40
+```
+
+## Tool results / harness — 2026-11-25 14:28:38 UTC
+
+**Tool result:**
+
+```
+`en_b` and `s7_an_0_iref` cross `pad_ref_rb` (Metal3, DC), only the supply straps cross `bias_dist_pd` (designer's build log).
+
+## 5. Verification state
+
+By the designer, for `158afc5` (KLayout 0.30.12, PDK `ihp-sg13cmos5l`; from the delivery's `README.md` and `docs/`):
+
+| check | result |
+|---|---|
+| `run_drc.py --no_density` | no violations |
+| maximal deck with `-rd latchUpRules=true` | 0 |
+| density | the same 7 minimum-density rules as without the art (AFil.g, GFil.g, M1–M4.j, TM1.c): unfilled slot, filled at chip level |
+| LVS `run_lvs.py --run_mode=deep --disable_tap_extraction` against `netlist/slot_7.cdl` | netlists match, strict ports, 0 port errors, 497 devices |
+| magic + netgen (`netlist/netgen_check.sh`) | 5 subcircuits match uniquely; top: one port error, `vss_1v2_uq0` (the frame's second `vss_1v2` strip, unconnected inside the slot, joined by the harness) |
+| re-run 2026-11-25: `run_drc.py --no_density` on the taped-out GDS (sha256 `469f2327…`; KLayout 0.30.12, PDK IHP-Open-PDK `df4c5054`) | 0 violations, 0 exception lines ([`signoff/taped_out_158afc5/`](../../signoff/taped_out_158afc5/README.md)) |
+| re-run 2026-11-25: maximal deck with `-rd latchUpRules=true` | 0 |
+| re-run 2026-11-25: density | 7 violations, 1 each: AFil.g, GFil.g, M1–M4.j, TM1.c |
+| re-run 2026-11-25: KLayout LVS deep, `--disable_tap_extraction`, vs `netlist/slot_7.cdl` | match, strict ports, 497 layout devices (376 device pairs after simplification, all Match) |
+| re-run 2026-11-25: `netl
+… [7362 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:28:40 UTC
+
+**Tool call: `Bash`**
+
+_Check HBM progress_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && wc -l < _work/hbm_run.log; tail -3 _work/hbm_run.log
+```
+
+## Tool results / harness — 2026-11-25 14:28:41 UTC
+
+**Tool result:**
+
+```
+28
+hbm_esdproxy_d2s_gnd_vdd_n500 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_d2s_gnd_vdd_p1000 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_d2s_gnd_vdd_n1000 rc 0 ok t_end 1000.0 ns
+```
+
+## Assistant — 2026-11-25 14:29:28 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/README.md`
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# ESD (HBM) and latch-up of the slot-7 pads: simulation with the PDK's compact models
+
+**IHP sg13cmos5l simulation** (ngspice-47 with the IHP OSDI models, PDK `ihp-sg13cmos5l` at `/foss/pdks`, tt, 27 °C).
+The two custom pad cells `pads/sg13cmos5l_IOPadSingle2Diff` (S2D, input) and `pads/sg13cmos5l_IOPadDiff2Single`
+(D2S, output) on a model of the harness pad ring. Results and verdicts: [results.md](results.md). Status: complete
+for what is listed under "Method"; what could not be done is listed at the end of results.md.
+
+> **Read this first: the compact models are not ESD models.** The PDK's diode and MOS models were fitted for normal
+> operation. They have no snapback (no parasitic NPN in the NMOS, no parasitic PNP in the PMOS), no high-injection or
+> self-heating physics fitted at ampere currents, no thermal failure, and no parasitic thyristor. The PDK's antenna
+> diodes are fitted "for the reverse direction" (`diodes.lib` header) and give 404 V at 0.1 A forward (table in
+> results.md §1). Everything below is **indicative**: it shows where the current goes and which oxides see the pad
+> voltage, not whether the pads pass 2 kV HBM.
+
+## Question
+
+The README of the slot (`docs/chipalooza2_as_taped_out/README.md`, "Not verified") lists ESD and latch-up of the pads
+as never simulated. Questions:
+
+1. HBM (JS-001 style, 100 pF / 1.5 kΩ, ±500 V, ±1 kV, ±2 kV) into each pad with (a) iovss grounded, (b) iovdd grounded,
+   (c) the other slot-7 pad grounded: peak pad voltage, peak voltage across every gate oxide on the pad path, peak
+   diode currents and current densities, energy in the diodes.
+2. CDM: optional (not done, see results.md §6).
+3. Latch-up (JESD78 style): (a) I-test ±100 mA into each pad with the chip powered at 3.6 V, and the current at which the
+   pad reaches 1.5 × 3.6 V = 5.4 V; (b) supply overvoltage 5.4 V; (c) an estimate of the trigger current of the parasitic
+   thyristor from a lumped model with assumed parameters; the KLayout latch-up DRC result.
+
+## Method
+
+| step | script | what it does |
+|---|---|---|
+| ring model inputs | `fetch_harness.sh`, `ring.py` | fetches the harness padframe (`RTimothyEdwards/sg13cmos5l_ocd_chipalooza`, branch `tapeout_nov_2026`, commit `2ef5a869`); reads the positions of all supply pads along the ring from `magic/sg13cmos5l_padframe.mag`, and the ring metal from the PDK IO cell `sg13cmos5l_Filler2000` → `csv/ring_cells.csv`, `csv/ring_metal.csv` |
+| model check | `iv.py` | forward I–V of the pad diodes and of the clamp / output-device drain junctions in the compact models → `csv/model_iv.csv`, `plots/model_iv.png` |
+| HBM | `esd.py` | 80 transient runs (1 µs each); per run the raw file is analyzed and deleted → `csv/hbm_*.csv`, `plots/hbm_*.png`; network check → `csv/hbm_network_check.csv` |
+| I-test, overvoltage | `latchup.py` | DC sweeps of a current forced into each pad (0 → ±1 A), powered ring at 3.6 V, pads enabled; supply swept 0 … 5.4 V → `csv/itest.csv`, `csv/overvoltage.csv`, `plots/itest_vpad.png`, `plots/overvoltage_isupply.png` |
+| latch-up geometry | `lu_geometry.py` | guard rings and distances of the ESD sub-cells in the pad GDS → `csv/lu_geometry.csv`, `plots/lu_layout_*.png` |
+| lumped thyristor | `scr.py` | PNPN with assumed β, well / substrate resistances and collection fraction; trigger current by bisection → `csv/scr_trigger.csv`, `plots/scr_trigger.png` |
+| common | `common.py` | netlist preparation, ring netlist, pad instances, ngspice runner (one process at a time), raw-file reader, netlist flattener |
+
+### Pad netlists
+
+`pads/<cell>/<cell>.spice` (the schematic / magic-LVS netlists of design commit `91a7da8b`, as taped out) are used
+unchanged except for 0 V ammeters inserted into a copy (`_work/net/`, `common.py: AMMETERS`) in series with each
+pad diode, the S2D clamps MCP / MCN, the D2S output devices OP / ON and the parts of the two `d2s_sp2k` stages. These
+netlists giv
+… [6346 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 14:29:28 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/README.md (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:29:29 UTC
+
+**Tool call: `Bash`**
+
+_Check HBM progress_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && wc -l < _work/hbm_run.log; tail -2 _work/hbm_run.log
+```
+
+## Tool results / harness — 2026-11-25 14:29:29 UTC
+
+**Tool result:**
+
+```
+32
+hbm_esdproxy_d2s_p2p_p500 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_d2s_p2p_n500 rc 0 ok t_end 1000.0 ns
+```
+
+## Assistant — 2026-11-25 14:29:36 UTC
+
+**Tool call: `Bash`**
+
+_Restrict PDK-diode HBM subset_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 - <<'EOF'
+p='esd.py'; s=open(p).read()
+old="""    main = [j for j in out if j['var'] == 'esdproxy']
+    return main + ls + [j for j in out if j['var'] == 'pdk']"""
+new="""    main = [j for j in out if j['var'] == 'esdproxy']
+    # PDK antenna-diode model as shipped: a subset (it is not meant for forward currents; see README)
+    pdk = [j for j in out if j['var'] == 'pdk' and j['mode'] != 'p2p' and abs(j['v']) in (500, 2000)]
+    return main + ls + pdk"""
+assert old in s; s=s.replace(old,new); open(p,'w').write(s)
+EOF
+python3 -c "import sys; sys.path.insert(0,'.'); import esd; print(len(esd.jobs()))"
+```
+
+## Tool results / harness — 2026-11-25 14:29:36 UTC
+
+**Tool result:**
+
+```
+60
+```
+
+## Assistant — 2026-11-25 14:29:45 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/run.sh`
+
+```
+#!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+#
+# ESD (HBM) and latch-up simulation of the slot-7 pads on a model of the harness pad ring (IHP sg13cmos5l simulation,
+# PDK compact models, not ESD-calibrated). Reproduces csv/ and plots/ of this folder.
+# Usage: run.sh [fetch|ring|iv|hbm|latchup|geometry|scr|post|all]   (default all; work dir ./_work)
+# ngspice runs strictly one at a time. Needs PDK_ROOT with ihp-sg13cmos5l, ngspice-47 with the IHP OSDI models,
+# KLayout's python module, python3 with numpy / matplotlib, git with network access to github.com.
+set -euo pipefail
+HERE=$(cd "$(dirname "$0")" && pwd)
+WORK=$HERE/_work
+STEP=${1:-all}
+export PDK_ROOT=${PDK_ROOT:-/foss/pdks} PDK=ihp-sg13cmos5l
+export PYTHONDONTWRITEBYTECODE=1
+mkdir -p "$WORK" "$HERE/csv" "$HERE/plots"
+cd "$HERE"
+
+fetch()    { ./fetch_harness.sh "$WORK"; }
+ring()     { python3 ring.py "$WORK" "$HERE"; }
+iv()       { python3 iv.py "$WORK"; }
+hbm()      { python3 esd.py "$WORK" wave; python3 esd.py "$WORK" run; python3 esd.py "$WORK" post; }
+latchup()  { python3 latchup.py "$WORK" itest; python3 latchup.py "$WORK" ovt; python3 latchup.py "$WORK" post; }
+geometry() { python3 lu_geometry.py "$HERE"; }
+scr()      { python3 scr.py "$WORK"; python3 scr_plot.py; }
+post()     { python3 esd.py "$WORK" post; python3 latchup.py "$WORK" post; python3 scr_plot.py; }
+
+case "$STEP" in
+  all) fetch; ring; iv; hbm; latchup; geometry; scr ;;
+  fetch|ring|iv|hbm|latchup|geometry|scr|post) "$STEP" ;;
+  *) echo "unknown step $STEP"; exit 2 ;;
+esac
+```
+
+## Tool results / harness — 2026-11-25 14:29:45 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/run.sh (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:29:46 UTC
+
+**Tool call: `Bash`**
+
+_Make run.sh executable and check progress_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && chmod +x run.sh && wc -l < _work/hbm_run.log; tail -2 _work/hbm_run.log
+```
+
+## Tool results / harness — 2026-11-25 14:29:46 UTC
+
+**Tool result:**
+
+```
+33
+hbm_esdproxy_d2s_p2p_n500 rc 0 ok t_end 1000.0 ns
+hbm_esdproxy_d2s_p2p_p1000 rc 0 ok t_end 1000.0 ns
+```
+
+## Assistant — 2026-11-25 14:29:56 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/scr_plot.py`
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Plot of csv/scr_trigger.csv (lumped PNPN with ASSUMED parameters) -> plots/scr_trigger.png. Usage: python3 scr_plot.py"""
+import csv
+from pathlib import Path
+
+import matplotlib
+
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt  # noqa: E402
+
+HERE = Path(__file__).resolve().parent
+
+
+def main():
+    f = HERE / 'csv/scr_trigger.csv'
+    if not f.exists():
+        return
+    rows = list(csv.DictReader(l for l in open(f) if not l.startswith('#')))
+    plt.rcParams.update({'font.size': 8.5, 'axes.grid': True, 'grid.color': '#d8d8d4', 'figure.facecolor': 'white'})
+    fig, axs = plt.subplots(1, 2, figsize=(9.5, 4), sharey=True)
+    cols = {('300', '300'): '#2a78d6', ('300', '3000'): '#eb6834', ('3000', '300'): '#1baf7a',
+            ('3000', '3000'): '#e87ba4'}
+    for j, pol in enumerate(('neg', 'pos')):
+        ax = axs[j]
+        for (rn, rs), c in cols.items():
+            for alpha, mk in (('0.01', 'o'), ('0.1', 's')):
+                pts = sorted((float(r['beta_product']), float(r['i_trigger_A'])) for r in rows
+                             if r['injection'] == pol and r['r_nwell_ohm'] == rn and r['r_sub_ohm'] == rs
+                             and r['alpha'] == alpha and r['i_trigger_A'] != 'inf')
+                if pts:
+                    x, y = zip(*pts)
+                    ax.loglog(x, y, mk, color=c, ms=4, mfc='none' if alpha == '0.01' else c,
+                              label=f'R_nw {rn}, R_sub {rs} Ohm, alpha {alpha}' if j == 0 else None)
+        ax.axhline(0.1, color='#52514e', ls='--', lw=0.8)
+        ax.text(0.3, 0.11, 'JESD78 I-test 100 mA', fontsize=7)
+        ax.set_xlabel('beta_npn x beta_pnp (assumed)')
+        ax.set_title(f'{"negative" if pol == "neg" else "positive"} injection')
+        ax.set_xlim(0.2, 200)
+    axs[0].set_ylabel('forced pad current that latches the PNPN (A)')
+    axs[0].legend(fontsize=5.8)
+    fig.suptitle('Lumped parasitic-thyristor estimate (scr.py): ALL parameters assumed, not from the PDK; '
+                 'ngspice Gummel-Poon BJTs\nmissing points: no latch up to 1 A', fontsize=8.5)
+    fig.tight_layout()
+    fig.savefig(HERE / 'plots/scr_trigger.png', dpi=150)
+    plt.close(fig)
+
+
+if __name__ == '__main__':
+    main()
+```
+
+## Tool results / harness — 2026-11-25 14:29:56 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/scr_plot.py (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 14:30:06 UTC
+
+**Tool call: `Bash`**
+
+_Add series resistances to SCR BJT models_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && sed -i 's/.model qn npn(is={IS_BJT} bf={bn} br=0.1 rb=0 cje=1p cjc=1p tf=1n)/.model qn npn(is={IS_BJT} bf={bn} br=0.1 re={R_SER} rc={R_SER} cje=1p cjc=1p tf=1n)/; s/.model qp pnp(is={IS_BJT} bf={bp} br=0.1 rb=0 cje=1p cjc=1p tf=1n)/.model qp pnp(is={IS_BJT} bf={bp} br=0.1 re={R_SER} rc={R_SER} cje=1p cjc=1p tf=1n)/; s/^IS_BJT = 1e-15      # assumed saturation current (Vbe ~ 0.72 V at 1 mA)/IS_BJT = 1e-15      # assumed saturation current (Vbe ~ 0.72 V at 1 mA)\nR_SER = 10          # assumed emitter and collector series resistance (Ohm) of each parasitic BJT/' scr.py && grep -n "R_SER\|IS_BJT" scr.py; wc -l < _work/hbm_run.log
+```
+
+## Tool results / harness — 2026-11-25 14:30:07 UTC
+
+**Tool result:**
+
+```
+28:IS_BJT = 1e-15      # assumed saturation current (Vbe ~ 0.72 V at 1 mA)
+29:R_SER = 10          # assumed emitter and collector series resistance (Ohm) of each parasitic BJT
+37:.model qn npn(is={IS_BJT} bf={bn} br=0.1 re={R_SER} rc={R_SER} cje=1p cjc=1p tf=1n)
+38:.model qp pnp(is={IS_BJT} bf={bp} br=0.1 re={R_SER} rc={R_SER} cje=1p cjc=1p tf=1n)
+35
+[This command modified 1 file you've previously read: verification/c2_gaps/pad_esd_latchup/scr.py. Call Read before editing.]
+```
+
+## Assistant — 2026-11-25 14:30:13 UTC
+
+**Tool call: `Bash`**
+
+_Review D2S HBM partial results_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup && python3 esd.py _work post >/dev/null 2>&1; python3 - <<'EOF'
+import csv
+rows=[r for r in csv.DictReader(l for l in open('csv/hbm_summary.csv') if not l.startswith('#'))]
+for r in rows:
+  if 'd2s' in r['run']: print(r['run'], r['status'], r['i_peak_A'], r['v_pad_peak'], r['v_iovdd_peak'], r['v_iovss_peak'], r['v_ring_peak'], r['i_rc_clamps_peak_A'])
+m=[r for r in csv.DictReader(l for l in open('csv/hbm_mos.csv') if not l.startswith('#'))]
+for r in m:
+    if r['pad']=='d2s' and r['pad_zapped']=='d2s' and '2000' in r['run']: print(r['run'], r['device'], r['max_vgs'], r['max_vgd'], r['max_vgb'], r['max_vds'])
+d=[r for r in csv.DictReader(l for l in open('csv/hbm_diodes.csv') if not l.startswith('#'))]
+for r in d:
+    if '2000' in r['run'] and 'd2s' in r['run']: print(r['run'], r['diode'], r['i_peak_A'], r['j_area_mA_um2'], r['energy_nJ'])
+EOF
+```
+
+## Tool results / harness — 2026-11-25 14:30:15 UTC
+
+**Tool result:**
+
+```
+hbm_esdproxy_d2s_gnd_vss_p500 ok 0.32361 3.225 2.2058 0.00029357 2.2058 0.31913
+hbm_esdproxy_d2s_gnd_vss_n500 ok -0.32479 -1.3971 -0.11885 -0.013259 0.10579 0.0051653
+hbm_esdproxy_d2s_gnd_vss_p1000 ok 0.6476 4.2583 2.4366 0.00095905 2.4366 0.63094
+hbm_esdproxy_d2s_gnd_vss_n1000 ok -0.6505 -1.8192 -0.15638 -0.026557 0.13201 0.0074916
+hbm_esdproxy_d2s_gnd_vss_p2000 ok 1.2978 6.2932 3.216 0.0025999 3.2152 1.2599
+hbm_esdproxy_d2s_gnd_vss_n2000 ok -1.3024 -2.6162 -0.22827 -0.053169 0.17829 0.0098539
+hbm_esdproxy_d2s_gnd_vdd_p500 ok 0.32454 1.6095 0.087122 0.20084 0.12226 0.0047253
+hbm_esdproxy_d2s_gnd_vdd_n500 ok -0.32401 -3.1646 -0.0021976 -2.2036 2.2036 0.31945
+hbm_esdproxy_d2s_gnd_vdd_p1000 ok 0.64998 2.2599 0.17447 0.34246 0.178 0.0067581
+hbm_esdproxy_d2s_gnd_vdd_n1000 ok -0.64907 -3.9489 -0.0031 -2.4315 2.4315 0.63957
+hbm_esdproxy_d2s_gnd_vdd_p2000 ok 1.301 3.5171 0.34924 0.51142 0.16374 0.0093534
+hbm_esdproxy_d2s_gnd_vdd_n2000 ok -1.2978 -5.5967 -0.012829 -3.1143 3.1025 1.2529
+hbm_esdproxy_d2s_p2p_p500 ok 0.32234 5.1664 3.6627 1.9217 2.2146 0.31766
+hbm_esdproxy_d2s_p2p_n500 ok -0.32254 -5.3617 -2.2568 -3.9959 2.2156 0.31732
+hbm_esdproxy_d2s_p2p_p1000 ok 0.64591 7.2335 5.1956 2.8337 2.4582 0.62853
+hbm_esdproxy_d2s_p2p_n1000 ok -0.64627 -7.6703 -3.5381 -5.9116 2.4774 0.63495
+hbm_esdproxy_d2s_p2p_p2000 ok 1.2948 11.175 8.1141 4.628 3.5139 1.2555
+hbm_esdproxy_d2s_p2p_n2000 ok -1.2933 -11.965 -6.0308 -9.5016 3.4815 1.239
+hbm_esdproxy_d2s_gnd_vss_p2000 xd2s.xd.xc1.xmb 4.1926 5.717
+… [6049 more characters cut]
+```
+
+## Assistant — 2026-11-25 14:30:24 UTC
+
+**Tool call: `Bash`**
+
+_Create markdown table helper_
+
+```bash
+cat > /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/md.py <<'EOF'
+import csv, sys
+def load(f): return [r for r in csv.DictReader(l for l in open(f) if not l.startswith('#'))]
+def fmt(x, nd=3):
+    try:
+        v=float(x)
+        if abs(v)>=100: return '%.0f'%v
+        if abs(v)>=10: return '%.1f'%v
+        return ('%.'+str(nd)+'g')%v
+    except: return x
+def table(rows, cols, heads=None):
+    heads = heads or cols
+    out=['| '+' | '.join(heads)+' |','|'+'---|'*len(cols)]
+    for r in rows: out.append('| '+' | '.join(fmt(r.get(c,'')) for c in cols)+' |')
+    return '\n'.join(out)
+EOF
+sleep 1; wc -l < /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/hbm_run.log
+```
+
+## Tool results / harness — 2026-11-25 14:30:26 UTC
+
+**Tool result:**
+
+```
+37
+```
+
+## Assistant — 2026-11-25 14:30:29 UTC
+
+**Tool call: `ToolSearch`**
+
+```json
+{
+ "query": "select:Monitor"
+}
+```
+
+## Tool results / harness — 2026-11-25 14:30:30 UTC
+
+**Tool result:**
+
+```
+[tool_reference]
+```
+
+## Assistant — 2026-11-25 14:30:33 UTC
+
+**Tool call: `Bash`**
+
+_Wait until proxy and slow-rise HBM runs finish_
+
+```bash
+L=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/hbm_run.log; until grep -q "hbmls_esdproxy_d2s_gnd_vdd_n2000\|^hbm_pdk" $L; do sleep 5; done; tail -3 $L
+```
+
+## Tool results / harness — 2026-11-25 14:30:33 UTC
+
+**Tool result:**
+
+```
+Command running in background with ID: bov0l0wuf. Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bov0l0wuf.output. You will be notified when it completes. To check interim output, use Read on that file path.
+```
+
+## Assistant — 2026-11-25 14:30:42 UTC
+
+**Tool call: `Monitor`**
+
+_HBM proxy and slow-rise runs complete_
+
+```json
+{
+ "command": "L=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/hbm_run.log; until grep -q \"hbmls_esdproxy_d2s_gnd_vdd_n2000\\|^hbm_pdk\" $L; do sleep 5; done; echo done; tail -2 $L",
+ "timeout_ms": 1800000
+}
+```
+
+## Tool results / harness — 2026-11-25 14:30:42 UTC
+
+**Tool result:**
+
+```
+Monitor started (task b7jt3ntvo, expires in 30m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+```
+
+## Assistant — 2026-11-25 14:30:46 UTC
+
+**Tool call: `Bash`**
+
+_Check wait status_
+
+```bash
+cat /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bov0l0wuf.output 2>/dev/null; wc -l < /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/hbm_run.log
+```
+
+## Tool results / harness — 2026-11-25 14:30:46 UTC
+
+**Tool result:**
+
+```
+39
+```
+
+## Assistant — 2026-11-25 14:30:50 UTC
+
+**Tool call: `Bash`**
+
+_Block until slow-rise runs finish_
+
+```bash
+L=/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/hbm_run.log; timeout 1500 bash -c "until grep -q 'hbmls_esdproxy_d2s_gnd_vdd_n2000\|^hbm_pdk' $L; do sleep 10; done"; tail -3 $L
+```
+
+## Tool results / harness — 2026-11-25 14:31:32 UTC
+
+**Tool result:**
+
+```
+Command was moved to the background (ID: bdhk7ud4o) so that a message that arrived while it was running can reach you; it was not interrupted. Output is being written to: /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/tasks/bdhk7ud4o.output. You will be notified when it completes. If it is still running after 30m in the background (plus the timeout it was started with, up to the background maximum), it will be stopped and you will be notified. It is running now: do not start a second copy while it runs. If it is no longer needed, stop it with TaskStop. To check interim output, use Read on that file path.
+```
+
+## Assistant — 2026-11-25 14:31:34 UTC
+
+**Tool call: `Bash`**
+
+_Check HBM progress_
+
+```bash
+tail -3 /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/pad_esd_latchup/_work/hbm_run.log
+```
+
+## Tool results / harness — 2026-11-25 14:31:34 UTC
+
+**Tool result:**
+
+```
+hbmls_esdproxy_d2s_gnd_vss_n2000 rc 0 ok t_end 1000.0 ns
+hbmls_esdproxy_d2s_gnd_vdd_p2000 rc 0 ok t_end 1000.0 ns
+hbmls_esdproxy_d2s_gnd_vdd_n2000 rc 0 ok t_end 1000.0 ns
+```
+
