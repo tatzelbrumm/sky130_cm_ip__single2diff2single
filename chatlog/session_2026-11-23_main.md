@@ -20567,3 +20567,346 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin sudel_buecher 2>&1|tail -2; git log --oneline -1
 ```
 
+## Tool results / harness — 2026-11-25 19:23:41 UTC
+
+**Tool result:**
+
+```
+7e60edc RUNLOG: Özdemir ministry corrected; chatlog regenerated
+```
+
+## Assistant — 2026-11-25 19:23:50 UTC
+
+You were right: Özdemir was Federal Minister of Education and Research. I corrected the tughra story in both places it appears, the description page §7.2 and `art/README.md` (`3c75b81`, pushed).
+
+**What the sources say:**
+- When the coalition broke up in November 2024, Bettina Stark-Watzinger was dismissed on 7 November. Özdemir took over her ministry while keeping food and agriculture, and held it until the new government in May 2025.
+- Reports at first described the move as temporary. Forschung & Lehre reports his formal appointment certificate as head of the ministry on 25 November 2024.
+- He has been Minister-President of Baden-Württemberg since 13 May 2026.
+
+**Text change:** "a former federal minister of education" now reads "a former Federal Minister of Education and Research".
+
+I also changed one sentence of my own in that paragraph: "he took the matter elsewhere" is now "the designer took the matter elsewhere". You hadn't told me your pronouns, so I shouldn't have used one.
+
+There are no other mentions of him or of the ministry in either repository. The digest still has nothing on the tughra. The data-book PDF will pick up the change at the next rebuild, together with the voltage-stress results, which have started arriving. RUNLOG and chatlog are pushed (`7e60edc`).
+
+Sources:
+- [zdfheute: Wissing übernimmt Justizministerium, Özdemir Bildung](https://www.zdfheute.de/politik/deutschland/wissing-justiz-oezdemir-bildung-100.html)
+- [news4teachers: Bundespräsident ernennt Özdemir zum Bildungsminister](https://www.news4teachers.de/2024/11/kommt-jetzt-der-digitalpakt-2-0-bundespraesident-ernennt-oezdemir-zum-bildungsminister/)
+- [Forschung & Lehre: Özdemir holt Ertner und Huthmacher ins BMBF](https://www.forschung-und-lehre.de/politik/oezdemir-holt-ertner-und-huthmacher-ins-bmbf-6784)
+- [topagrar: Özdemir bleibt Agrarminister, führt aber vorerst auch das Forschungsressort](https://www.topagrar.com/management-und-politik/news/ozdemir-bleibt-agrarminister-fuhrt-aber-vorerst-auch-das-forschungsressort-20008582.html)
+- [Baden-Württemberg: Cem Özdemir ist neuer Ministerpräsident](https://www.baden-wuerttemberg.de/de/service/alle-meldungen/meldung/pid/cem-oezdemir-ist-neuer-ministerpraesident)
+
+## User (or harness) — 2026-11-25 19:23:54 UTC
+
+also correct the pdfs as necessary.
+
+## Assistant — 2026-11-25 19:23:59 UTC
+
+Rebuilding both PDFs from the current commit: the data book for the tughra fix and today's doc updates, the digest for its updated rows.
+
+## Assistant — 2026-11-25 19:24:00 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && git status --short | head -5; time (timeout 1200 python3 docs/chipalooza2_as_taped_out/book/build_book.py 2>&1 | tail -8)
+```
+
+## Tool results / harness — 2026-11-25 19:24:54 UTC
+
+**Tool result:**
+
+```
+?? verification/c2_gaps/voltage_stress/
+warning: uncommitted documentation changes; the pinned links point to 3c75b81:
+?? verification/c2_gaps/voltage_stress/
+
+0 problem(s); see docs/chipalooza2_as_taped_out/book/build_report.txt
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+
+real	0m53.352s
+user	0m48.835s
+sys	0m2.839s
+```
+
+## Assistant — 2026-11-25 19:24:58 UTC
+
+Built with 0 link problems. Checking page counts, the corrected sentence, and the digest layout.
+
+## Assistant — 2026-11-25 19:25:00 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pdf && for f in slot7_databook.pdf slot7_digest.pdf; do pdfinfo $f | grep Pages; done; pdftotext slot7_databook.pdf - | grep -n -A1 "former Federal" ; pdftotext slot7_databook.pdf - | grep -c "federal minister of$"; pdftotext slot7_digest.pdf - | grep -n -i "tughra\|minister\|1.262\|1.04\b\|antenna rules\|I-test\|5.4 V" | head; pdftotext -layout slot7_digest.pdf - | awk '/\f/{p++} {print p+1": "$0}' | grep -i "Physical verification\|Silicon bring-up"
+```
+
+## Tool results / harness — 2026-11-25 19:25:03 UTC
+
+**Tool result:**
+
+```
+Pages:           281
+Pages:           8
+2023:hazretleri) to Cem Özdemir, born in Bad Urach, Minister-President of Baden-Württemberg and a former Federal Minister
+2024-of Education and Research. The choice is deliberate. During the challenge the designer tried to establish, by analogy,
+0
+380:[DM] load dummies as drawn (s2d_loads_f, C3 2026-11-04):
+1424:1.04
+1591:1.262
+1933:KLayout antenna rules
+1990:latch-up I-test, ±100 mA into
+1999:pad-ring supply at 5.4 V
+2014:6. Close bus switches 2 and 3: vcm 1.120 … 1.379 V and vref 0.446 … 0.578 V (27 °C typical 1.262 / 0.494 V).
+7: Physical verification
+8: Silicon bring-up
+```
+
+## Assistant — 2026-11-25 19:25:14 UTC
+
+**Tool call: `Bash`**
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad && pdftoppm -r 60 -png -f 7 -l 8 slot7_digest.pdf $S/dg && p=$(python3 -c "
+import subprocess
+t=subprocess.run(['pdftotext','slot7_databook.pdf','-'],capture_output=True,text=True).stdout.split('\f')
+print([i+1 for i,x in enumerate(t) if 'former Federal Minister' in x][0])"); echo tughra page $p; pdftoppm -r 50 -png -f $((p-1)) -l $((p+1)) slot7_databook.pdf $S/db; ls $S/dg* $S/db*
+```
+
+## Tool results / harness — 2026-11-25 19:25:16 UTC
+
+**Tool result:**
+
+```
+tughra page 20
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/db-019.png
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/db-020.png
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/db-021.png
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dg-7.png
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dg-8.png
+```
+
+## Assistant — 2026-11-25 19:25:20 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dg-7.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 19:25:20 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 19:25:20 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/db-020.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 19:25:20 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 19:25:24 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dg-8.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 19:25:24 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 19:25:28 UTC
+
+The tughra page is correct. In the digest, the physical-verification table now runs over into page 8 (header repeated). I'll try to keep it on one page by shrinking the pad-cell pictures above it.
+
+## Assistant — 2026-11-25 19:25:29 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && grep -n -B2 -A8 "^## Layout" DIGEST.md | cut -c1-250; grep -n "max-height\|figs" book/build_book.py | head -20
+```
+
+## Tool results / harness — 2026-11-25 19:25:29 UTC
+
+**Tool result:**
+
+```
+194-| ext | `dig_in[5]` | vcm, vref driven from `analog_bus2`, `analog_bus3` |
+195-
+196:## Layout
+197-
+198-![slot_7 layout, 537.15 × 273 µm, from the taped-out GDS](pix/layout/slot_7.png)
+199-
+200-| | |
+201-|---|---|
+202-| ![S2D pad layout](pix/layout/IOPadSingle2Diff.png) | ![D2S pad layout](pix/layout/IOPadDiff2Single.png) |
+203-| S2D pad cell, 80 × 180 µm. | D2S pad cell, 80 × 180 µm. |
+204-
+328:img { max-width: 100%; max-height: 225mm; }
+337:figure.gal img { max-height: 200mm; }
+349:.summary img { max-height: 72mm; }
+506:p > img:only-child { display: block; margin: 3pt auto; max-height: 60mm; }
+513:table.figs { table-layout: fixed; }
+514:table.figs td { border: none; width: 50%; font-size: 7.6pt; padding: 0 3pt; text-align: left; }
+515:table.figs td img { max-width: 80%; max-height: 85mm; }
+516:table.figs th { display: none; }
+529:    h = re.sub(r'<table>(?=(?:(?!</table>).)*?<img)', '<table class="figs">', h, flags=re.S)
+```
+
+## Assistant — 2026-11-25 19:25:33 UTC
+
+**Tool call: `Bash`**
+
+```bash
+sed -n 500,520p book/build_book.py
+```
+
+## Tool results / harness — 2026-11-25 19:25:34 UTC
+
+**Tool result:**
+
+```
+li { margin: 1.2pt 0; }
+code { font-family: "DejaVu Sans Mono", monospace; font-size: 8pt; }
+table { border-collapse: collapse; width: 100%; margin: 4pt 0; font-size: 8.3pt; }
+th, td { border: 0.4pt solid #aaa; padding: 1.6pt 4pt; vertical-align: top; }
+th { background: #e9eef4; text-align: left; }
+img { max-width: 100%; }
+p > img:only-child { display: block; margin: 3pt auto; max-height: 60mm; }
+p > img[src$=".svg"]:only-child { width: 100%; }
+p > em:only-child { font-size: 7.6pt; }
+tr { break-inside: avoid; }
+h2 + table, h2 + p { break-before: avoid; }
+blockquote { margin: 5pt 0; padding: 4pt 7pt; border: 0.6pt solid #9bb; background: #f1f7f7; }
+blockquote p { margin: 0; }
+table.figs { table-layout: fixed; }
+table.figs td { border: none; width: 50%; font-size: 7.6pt; padding: 0 3pt; text-align: left; }
+table.figs td img { max-width: 80%; max-height: 85mm; }
+table.figs th { display: none; }
+'''
+
+
+def build_digest(sha):
+```
+
+## Assistant — 2026-11-25 19:25:38 UTC
+
+**Tool call: `Bash`**
+
+```bash
+python3 - <<'PYEOF'
+p='book/build_book.py'; s=open(p).read()
+old="table.figs th { display: none; }\n'''"
+assert s.count(old)==1
+s=s.replace(old,"table.figs th { display: none; }\ntable.figs td img[alt$=\"pad layout\"] { max-height: 52mm; }\n'''")
+open(p,'w').write(s)
+PYEOF
+cd /home/user/sg13cmos5l_cm_slot7 && timeout 600 python3 docs/chipalooza2_as_taped_out/book/build_book.py --digest-only 2>&1 | tail -2; cd docs/chipalooza2_as_taped_out/pdf && pdfinfo slot7_digest.pdf | grep Pages; pdftoppm -r 60 -png -f 7 -l 8 slot7_digest.pdf /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dg2
+```
+
+## Tool results / harness — 2026-11-25 19:25:41 UTC
+
+**Tool result:**
+
+```
+wrote docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+Pages:           8
+```
+
+## Assistant — 2026-11-25 19:25:44 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/dg2-7.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 19:25:44 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 19:25:47 UTC
+
+The table fits on page 7 now, and the digest is still 8 pages. Committing.
+
+## Assistant — 2026-11-25 19:25:51 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && git add docs/chipalooza2_as_taped_out/book/build_book.py docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf docs/chipalooza2_as_taped_out/book/build_report.txt 2>/dev/null; git status --short | head; git commit -q -F - <<'EOF'
+Rebuild data book and digest PDFs
+
+Data book (281 pages): tughra §7.2 with the corrected ministry, the ESD /
+latch-up and whole-slot extraction updates, and both new folders in
+Appendix A. Digest (8 pages): updated references, bandwidth / settling and
+physical-verification rows; the pad-cell pictures are capped at 52 mm so
+the physical-verification table stays on one page. Link check: 0 problems.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs
+EOF
+git push -q origin chipalooza2-documentation 2>&1|tail -2; git log --oneline -1
+```
+
+## Tool results / harness — 2026-11-25 19:25:58 UTC
+
+**Tool result:**
+
+```
+M  docs/chipalooza2_as_taped_out/book/build_book.py
+M  docs/chipalooza2_as_taped_out/book/build_report.txt
+M  docs/chipalooza2_as_taped_out/pdf/slot7_databook.pdf
+M  docs/chipalooza2_as_taped_out/pdf/slot7_digest.pdf
+?? verification/c2_gaps/voltage_stress/
+6c89e5a Rebuild data book and digest PDFs
+```
+
+## Assistant — 2026-11-25 19:26:04 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sky130_cm_ip__single2diff2single_sudelbuecher && cat >> RUNLOG.md <<'EOF'
+- User: correct the PDFs as necessary. Rebuilt both ([S7] 6c89e5a, pinned to 3c75b81, link check 0 problems): data book 281 pages (tughra §7.2 on page 20 reads "former Federal Minister of Education and Research"; ESD / slot-extraction updates; pad_esd_latchup and slot_pex in Appendix A); digest 8 pages, no tughra (guard passed). The digest's physical-verification table had split over pages 7/8; capped the pad-cell pictures at 52 mm (digest CSS only), table now whole on page 7. The short reference digests are unchanged.
+EOF
+bash chatlog/tools/export_all.sh >/dev/null 2>&1; git add -A && git commit -q -m "RUNLOG: PDFs rebuilt; chatlog regenerated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01XU3KH8MC4er7X9Fx14LZcs" && git push -q origin sudel_buecher 2>&1|tail -2; git log --oneline -1
+```
+

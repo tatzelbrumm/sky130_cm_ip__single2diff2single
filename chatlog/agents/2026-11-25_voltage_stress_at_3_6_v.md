@@ -7173,3 +7173,611 @@ en_tt_27_3.6_chk_nqs points 367 last t 2.162e-06
   xs.xc.xle.l1 max 2.702 min 1.858 (2.00-2.16 us)
 ```
 
+## Assistant — 2026-11-25 19:23:42 UTC
+
+**Tool call: `Bash`**
+
+_Try NQS on the bandgap only_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+p='vs.py'
+s=open(p).read()
+a="""        if aid != 'nqs' or path.name not in ('bg_core_pd_magic.spice', 'en_ctrl_3v3.spice'):"""
+b="""        if aid not in ('nqs', 'nqsbg') or path.name not in (('bg_core_pd_magic.spice',) if aid == 'nqsbg' else
+                                                          ('bg_core_pd_magic.spice', 'en_ctrl_3v3.spice')):"""
+assert a in s; s=s.replace(a,b)
+s=s.replace("""         chk_nqs = rfmode=1, the PDK's non-quasi-static model card, on bg_core_pd and ls_up_fs)""","""         chk_nqs = rfmode=1, the PDK's non-quasi-static model card, on bg_core_pd and ls_up_fs; chk_nqsbg = the same
+         on bg_core_pd only)""")
+open(p,'w').write(s)
+p='edges.py'
+s=open(p).read()
+s=s.replace("""       'nqs': 'NQS model (rfmode=1) on bg_core_pd and ls_up_fs'}""","""       'nqs': 'NQS model (rfmode=1) on bg_core_pd and ls_up_fs', 'nqsbg': 'NQS model (rfmode=1) on bg_core_pd'}""")
+open(p,'w').write(s)
+EOF
+python3 -m py_compile vs.py edges.py && export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1 KEEP_RAW=1 VS_TMO_TRAN=500 && timeout 560 python3 -I vs.py _work en:tt:27:3.6:chk_nqsbg 2>&1 | tail -1; grep -i "abort\|too small" _work/log/en_tt_27_3.6_chk_nqsbg.log | head -2
+```
+
+## Tool results / harness — 2026-11-25 19:23:55 UTC
+
+**Tool result:**
+
+```
+en_tt_27_3.6_chk_nqsbg FAILED 
+doAnalyses: TRAN:  Timestep too small; time = 2.12905e-06, timestep = 1.25e-20: trouble with node "xs.xc.xle.x"
+tran simulation(s) aborted
+```
+
+## Assistant — 2026-11-25 19:24:01 UTC
+
+**Tool call: `Bash`**
+
+_Rerun check summary including NQS variants_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && sed -i "s/en:tt:27:3.6 '' step2n step05n trap nqs$/en:tt:27:3.6 '' step2n step05n trap nqs nqsbg/; s|           # trapezoidal integration, NQS model (rfmode=1)|           # trapezoidal integration, NQS model (rfmode=1) on bg_core_pd + ls_up_fs and on bg_core_pd only|" run.sh && sed -n 37,41p run.sh && export PDK_ROOT=/foss/pdks PDK=ihp-sg13cmos5l PYTHONDONTWRITEBYTECODE=1 VS_TMO_TRAN=500 && timeout 580 python3 -I edges.py _work . en:tt:27:3.6 '' step2n step05n trap nqs nqsbg 2>&1 | grep "^\[" ; cat csv/solver_check_en_tt_27_3.6.csv
+```
+
+## Tool results / harness — 2026-11-25 19:24:30 UTC
+
+**Tool result:**
+
+```
+done
+}
+
+check() {  # solver / model check of the enable-edge transient (tt 27 C 3.6 V): stress-run setting, 2 / 0.5 ns step,
+           # trapezoidal integration, NQS model (rfmode=1) on bg_core_pd + ls_up_fs and on bg_core_pd only
+['default', 'gear, cshunt 1 fF, max step 10 ns (stress runs)', 4345, '5.308', '-6.586', '4.156', '4.156 n.xs.xd.xlay.x_8.x_7.nsg13_hv_nmos', '10.186 n.xs.xbg.xms1_0.nsg13_hv_pmos']
+['step2n', 'max step 2 ns', 21073, '5.316', '-6.838', '4.155', '4.155 n.xs.xd.xlay.x_8.x_7.nsg13_hv_nmos', '10.438 n.xs.xbg.xms1_0.nsg13_hv_pmos']
+['step05n', 'max step 0.5 ns', 84047, '5.314', '-6.917', '4.155', '4.155 n.xs.xd.xlay.x_8.x_7.nsg13_hv_nmos', '10.517 n.xs.xbg.xms1_0.nsg13_hv_pmos']
+['trap', 'trapezoidal', 4250, '4.912', '-4.241', '4.163', '4.142 n.xs.xd.xlay.x_8.x_7.nsg13_hv_nmos', '7.841 n.xs.xbg.xms1_0.nsg13_hv_pmos']
+['nqs', 'NQS model (rfmode=1) on bg_core_pd and ls_up_fs', 'FAILED', '', '', '', '', '']
+['nqsbg', 'NQS model (rfmode=1) on bg_core_pd', 'FAILED', '', '', '', '', '']
+setting,what,time_points,net1_max_V,net1_min_V,isp_max_V,max_abs_vgs_V_device,max_abs_vds_V_device
+default,"gear, cshunt 1 fF, max step 10 ns (stress runs)",4345,5.308,-6.586,4.156,4.156 n.xs.xd.xlay.x_8.x_7.nsg13_hv_nmos,10.186 n.xs.xbg.xms1_0.nsg13_hv_pmos
+step2n,max step 2 ns,21073,5.316,-6.838,4.155,4.155 n.xs.xd.xlay.x_8.x_7.nsg13_hv_nmos,10.438 n.xs.xbg.xms1_0.nsg13_hv_pmos
+step05n,max step 0.5 ns,84047,5.314,-6.917,4.155,4.155 n.xs.xd.xlay.x_8.x_7.nsg13_hv_nmos,10.517
+… [393 more characters cut]
+```
+
+## Assistant — 2026-11-25 19:24:41 UTC
+
+**Tool call: `Bash`**
+
+_Fill solver check section in results_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+p='results.md'
+s=open(p).read()
+tab="""| setting | time points | `xs.xbg.net1` max / min [V] | `xs.isp` max [V] | largest \\|VGS\\| [V] (device) | largest \\|VDS\\| [V] (device) |
+|---|---|---|---|---|---|
+| gear, cshunt 1 fF, max step 10 ns (the stress runs) | 4345 | 5.308 / −6.586 | 4.156 | 4.156 (`bias_dist_pd` `x_8.x_7`) | 10.186 (`bg_core_pd` `xms1_0`) |
+| max step 2 ns | 21073 | 5.316 / −6.838 | 4.155 | 4.155 (same) | 10.438 (same) |
+| max step 0.5 ns | 84047 | 5.314 / −6.917 | 4.155 | 4.155 (same) | 10.517 (same) |
+| trapezoidal integration | 4250 | 4.912 / −4.241 | 4.163 | 4.142 (same) | 7.841 (same) |
+| NQS model (`rfmode=1`) on `bg_core_pd` and `ls_up_fs` | aborted at 2.162 µs, before the disable edge reached `en_b` | | | | |
+| NQS model on `bg_core_pd` only | aborted at 2.129 µs, before the disable edge reached `en_b` | | | | |"""
+s=s.replace('SOLVER_CHECK_TABLE',tab)
+nqs="""**The NQS check did not decide it.** Both runs with the PDK's NQS model card abort just before the disable edge reaches
+  `en_b`. One aborts in the D2S pad diode, the other at the `ls_up_fs` node `xs.xc.xle.x`. So this study cannot say how far
+  `net1` really goes. The trapezoidal run is no help either: it gives smaller spikes (−4.2 V instead of −6.6 V), but
+  trapezoidal integration is known to ring at such nodes. Nor is it a reference: the one stress run that converged only
+  with it (`mode` ff −40 °C 3.6 V) showed 7.5 V on a NAND2 internal node, and that result was discarded.
+- **How to use these numbers:** the stack spikes (`bg_core_pd` `xms1_*`, `ls_up_fs` `xpl*`) are reported in the tables
+  as computed, but they are not taken as real stress here. The held values of the same devices are gate stress ≤ 3.6 V
+  and \\|VDS\\| ≤ 4.28 V at 3.6 V. All other peaks in this file stay within a few hundred mV of the rails."""
+s=s.replace('NQS_SENTENCE',nqs)
+s=s.replace("""- They are larger than capacitive coupling can explain.""","""- They are larger than capacitive coupling can explain.""")
+s=s.replace("""  channel.
+- **The NQS check""","""  channel.
+- **The NQS check""")
+open(p,'w').write(s)
+EOF
+grep -n "SOLVER\|NQS_\|TOP20" results.md; sed -n '/^## 4/,/^## 5/p' results.md
+```
+
+## Tool results / harness — 2026-11-25 19:24:41 UTC
+
+**Tool result:**
+
+```
+## 4. Solver and model check of the edge spikes (`edges.py`, enable edges at tt 27 °C 3.6 V)
+
+| setting | time points | `xs.xbg.net1` max / min [V] | `xs.isp` max [V] | largest \|VGS\| [V] (device) | largest \|VDS\| [V] (device) |
+|---|---|---|---|---|---|
+| gear, cshunt 1 fF, max step 10 ns (the stress runs) | 4345 | 5.308 / −6.586 | 4.156 | 4.156 (`bias_dist_pd` `x_8.x_7`) | 10.186 (`bg_core_pd` `xms1_0`) |
+| max step 2 ns | 21073 | 5.316 / −6.838 | 4.155 | 4.155 (same) | 10.438 (same) |
+| max step 0.5 ns | 84047 | 5.314 / −6.917 | 4.155 | 4.155 (same) | 10.517 (same) |
+| trapezoidal integration | 4250 | 4.912 / −4.241 | 4.163 | 4.142 (same) | 7.841 (same) |
+| NQS model (`rfmode=1`) on `bg_core_pd` and `ls_up_fs` | aborted at 2.162 µs, before the disable edge reached `en_b` | | | | |
+| NQS model on `bg_core_pd` only | aborted at 2.129 µs, before the disable edge reached `en_b` | | | | |
+
+Plot: `plots/solver_check_en_tt_27_3.6.png`.
+
+- The spikes are the same with maximum time steps of 10, 2 and 0.5 ns, so they are not a time-step artifact.
+- They are larger than capacitive coupling can explain. `net1` falls by about 10 V (from +3.88 V to −6.6 V) while the
+  gate `en_b` falls by 3.6 V. A capacitive divider cannot move a node by more than the gate swing.
+- A likely cause is the quasi-static charge partition of the PSP model. When a 0.5 × 12.5 µm channel turns on, the
+  model takes part of its inversion charge from the floating drain node at once. That node has only junction c
+… [1084 more characters cut]
+```
+
+## Assistant — 2026-11-25 19:24:52 UTC
+
+**Tool call: `Bash`**
+
+_Soften NQS claims and complete failure notes_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+p='results.md'
+s=open(p).read()
+rep=[("""for nanoseconds: up to 10.745 V on `bg_core_pd` `xms1_0`. Section 4 shows these come from the quasi-static model.""",
+"""for nanoseconds: up to 10.745 V on `bg_core_pd` `xms1_0`. Section 4: these are not a time-step artifact and are larger than capacitive coupling allows, most likely the quasi-static charge partition of the model; the NQS check aborted before the edge."""),
+("""   - Section 4: these spikes are not physical voltages.""","""   - Section 4: these spikes are not a time-step artifact, but they are larger than capacitive coupling allows; they
+     are not taken as real stress here."""),
+("""All other peaks in this file stay within a few hundred mV of the rails.""","""Apart from these stacks, no node in any run goes more than 0.6 V beyond the rails (`xs.isp` 4.156 V at 3.6 V)."""),
+("""| `mode` ff −40 °C (3.3, 3.6 V), sf −40 °C 3.6 V | time limit |""","""| `mode` ff −40 °C (3.3, 3.6 V), sf −40 °C 3.6 V | time limit (ff −40 °C 3.6 V converged only with trapezoidal integration in the first pass: 7.5 V on a NAND2 internal node, result discarded) |"""),
+]
+for a,b in rep:
+    assert a in s, a[:50]
+    s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+echo ok
+```
+
+## Tool results / harness — 2026-11-25 19:24:52 UTC
+
+**Tool result:**
+
+```
+ok
+```
+
+## Assistant — 2026-11-25 19:25:00 UTC
+
+**Tool call: `Bash`**
+
+_Verify node excursions outside the stacks_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/_work && python3 -c "
+import gzip,glob,re,csv
+hi=(-9,);lo=(9,)
+for f in glob.glob('nodes/*.csv.gz'):
+    t=f.split('/')[-1][:-7]
+    if 'chk' in t or t.startswith('topo'): continue
+    v=float(re.search(r'_([\d.]+)(?:_[a-z0-9]+)?$',t).group(1))
+    if t.startswith('fs0'): v=0.0
+    fh=gzip.open(f,'rt'); fh.readline()
+    for r in csv.DictReader(fh):
+        n=r['node']
+        if re.search(r'xbg\.net\d|\.xl[e0-9]\.l\d|v\(padin|v-sweep|time',n): continue
+        a=float(r['vmax'])-max(v,3.3 if t.startswith(('dc','off','step')) else v)
+        b=float(r['vmin'])-(-0.2 if t.startswith(('dc','off','step')) else 0)
+        if a>hi[0]: hi=(a,n,t)
+        if b<lo[0]: lo=(b,n,t)
+print('max above supply (or pad source max)',hi); print('min below 0 (or -0.2 pad)',lo)
+"
+```
+
+## Tool results / harness — 2026-11-25 19:25:01 UTC
+
+**Tool result:**
+
+```
+max above supply (or pad source max) (0.73479, 'v(padout)', 'fs0_ss_-40_3.6')
+min below 0 (or -0.2 pad) (-0.63447, 'v(xs.xr.xlay.n_25)', 'en_tt_27_3.6')
+```
+
+## Assistant — 2026-11-25 19:25:06 UTC
+
+**Tool call: `Bash`**
+
+_Rank node excursions beyond rails_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/_work && python3 -c "
+import gzip,glob,re,csv
+res=[]
+for f in glob.glob('nodes/*.csv.gz'):
+    t=f.split('/')[-1][:-7]
+    if 'chk' in t or t.startswith(('topo','fs0')): continue
+    v=float(re.search(r'_([\d.]+)(?:_[a-z0-9]+)?$',t).group(1))
+    fh=gzip.open(f,'rt'); fh.readline()
+    for r in csv.DictReader(fh):
+        n=r['node']
+        if re.search(r'xbg\.net\d|\.xl[e0-9]\.l\d|v\(padin|v-sweep|time',n): continue
+        top=max(v,3.3) if t.startswith(('dc','off','step')) else v
+        res.append((float(r['vmax'])-top,n,t,'above')); res.append((-float(r['vmin']),n,t,'below0'))
+res.sort(reverse=True)
+seen=set()
+for x in res:
+    if (x[1],x[3]) in seen: continue
+    seen.add((x[1],x[3])); print('%.3f'%x[0],x[1:]); 
+    if len(seen)>10: break
+"
+```
+
+## Tool results / harness — 2026-11-25 19:25:06 UTC
+
+**Tool result:**
+
+```
+0.634 ('v(xs.xr.xlay.n_25)', 'en_tt_27_3.6', 'below0')
+0.582 ('v(xs.xd.xlay.n_30)', 'en_ff_-40_3.6', 'above')
+0.582 ('v(xs.isp)', 'en_ff_-40_3.6', 'above')
+0.516 ('v(vinp)', 'pu_tt_27_3.6_late', 'below0')
+0.513 ('v(xs.vref)', 'pu_tt_27_3.6_late', 'below0')
+0.513 ('v(vref_s2d)', 'pu_tt_27_3.6_late', 'below0')
+0.485 ('v(xs.xd.xlay.n_29)', 'off_ss_-40_3.6', 'above')
+0.485 ('v(xs.xd.xlay.n_27)', 'off_ss_-40_3.6', 'above')
+0.485 ('v(xs.xd.xlay.n_26)', 'off_ss_-40_3.6', 'above')
+0.478 ('v(b0)', 'pu_tt_27_3.6_late', 'below0')
+0.473 ('v(vinn)', 'pu_tt_27_3.6_late', 'below0')
+```
+
+## Assistant — 2026-11-25 19:25:25 UTC
+
+**Tool call: `Bash`**
+
+_Update results extremes and README details_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+p='results.md'
+s=open(p).read()
+a="""Apart from these stacks, no node in any run goes more than 0.6 V beyond the rails (`xs.isp` 4.156 V at 3.6 V)."""
+b="""Apart from these stacks, no node in any powered run goes more than 0.64 V beyond the rails (the extremes: `pad_ref_rb` node `xs.xr.xlay.n_25` at −0.634 V and `xs.isp` 0.582 V above the supply, both at the enable edges at 3.6 V)."""
+assert a in s; s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+python3 - <<'EOF'
+p='/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress/README.md'
+s=open(p).read()
+rep=[("""- **Solver check** (`edges.py`): the enable-edge transient at tt 27 °C 3.6 V again with a 2 ns and 0.5 ns maximum step
+  and with trapezoidal integration, waveforms of the nodes with the largest excursions.""",
+"""- **Solver and model check** (`edges.py`): the enable-edge transient at tt 27 °C 3.6 V again with a 2 ns and 0.5 ns
+  maximum step, with trapezoidal integration, and with the PDK's non-quasi-static model card (`rfmode=1`, PSP NQS with
+  `swnqs = 5`) on the devices of `bg_core_pd` and `ls_up_fs` (the two netlists with long-channel series stacks), and on
+  `bg_core_pd` only; waveforms of the nodes with the largest excursions. Both NQS runs abort before the disable edge
+  (results.md section 4); with `rfmode=1` on every MOS of the deck the transient does not start at all."""),
+("""whose result exists (`FORCE=1` reruns them). Environment: `VS_TMO_DC` / `VS_TMO_TRAN` = ngspice time limit per try
+in s (default 240 / 1800; the runs here used `VS_TMO_TRAN=600`). Wall clock in this session (4 shared CPUs): DC sweep
+5 … 15 s, fail-safe sweep 1 … 10 s, transient 20 … 60 s per try (failed transients up to three tries).""",
+"""whose result exists (`FORCE=1` reruns them) and jobs that failed before (`RETRY=1` retries them). Environment:
+`VS_TMO_DC` / `VS_TMO_TRAN` / `VS_TMO_PU` = ngspice time limit per try in s (defaults 240 / 1800 / 150; the 10 µs
+power-up ramps use the smaller of `VS_TMO_TRAN` and `VS_TMO_PU`). The runs here: first pass with `VS_TMO_TRAN=600`,
+the later passes with `VS_TMO_TRAN=240 VS_TMO_DC=120`, `check` with `VS_TMO_TRAN=1500` (the NQS variants with 500).
+Wall clock in this session (4 shared CPUs, other jobs running): DC sweep 5 … 15 s (cold fail-safe sweeps up to the
+time limit), transient 20 … 60 s per try, the 0.5 ns-step check run about 15 min; all passes together about 4 h."""),
+("""| `csv/top20_*_3v6.csv` | top-20 devices by gate stress, \\|VGS\\|, \\|VDS\\|, \\|VGB\\| over the 3.6 V runs |""",
+"""| `csv/top20_*_3v6.csv`, `csv/top20_*_3v3.csv` | top-20 devices over the 3.6 V runs (held and peak gate stress, held and peak \\|VDS\\|, peak \\|VGS\\|, \\|VGB\\|) and over the 3.3 V runs (held gate stress and \\|VDS\\|) |
+| `csv/gate_stress_bins.csv` | number of devices per bin of their gate stress, per run class, gate-length class, peak / held |"""),
+("""| `csv/solver_check_*.csv` | `edges.py` results |""","""| `csv/solver_check_*.csv` | `edges.py` results (per setting: node extremes, largest \\|VGS\\| and \\|VDS\\|) |"""),
+("""| `fs0:<pvt>` | fail-safe: all supplies 0 V, both pads driven 0 … the supply level through 1 kΩ |""",
+"""| `fs0:<pvt>` | fail-safe: all supplies 0 V, both pads driven 0 … the supply level through 1 kΩ |
+| `fst:<pvt>` | `fs` as a slow transient, for the −40 °C points where the `fs` DC sweep aborts in the S2D pad diode: from all nodes at 0 V, `iovdd` 0 → supply in 1 µs, pad source 0 V until 2 µs, then 0 → supply at 52 µs |"""),
+("""PVT points: DC jobs at the 5 MOS corners (tt, ss, ff, sf, fs) × −40 / 27 / 125 °C at 3.3 V and at 3.6 V, plus the
+designer's two 3.0 V tier-1 points (ss / sf −40 °C); fail-safe jobs at the 30 points of 3.3 and 3.6 V; transients at
+tt 27 °C (3.3 and 3.6 V) and at ff / ss / sf / fs extremes (list in `jobs.txt`; which ones completed: `csv/runs.csv`).""",
+"""PVT points: DC jobs at the 5 MOS corners (tt, ss, ff, sf, fs) × −40 / 27 / 125 °C at 3.3 V and at 3.6 V, plus the
+designer's two 3.0 V tier-1 points (ss / sf −40 °C); fail-safe jobs at the 30 points of 3.3 and 3.6 V (`fst` at the
+ten −40 °C points); transients at tt 27 °C (3.3 and 3.6 V), at ff −40, ss 125, ff 125, ss −40, sf −40, fs 125 °C
+(3.6 V) and at ff −40, ss 125 °C (3.3 V); `pu late` at tt 27 °C only. Which runs completed: `csv/runs.csv`."""),
+("""- Quasi-static MOS models: excursions of floating nodes at fast gate edges (results.md section 4) come from the
+  quasi-static channel-charge partition; whether the real node goes that far is not shown (the NQS model was not used).""",
+"""- Quasi-static MOS models: the multi-volt excursions of the internal nodes of the long-channel series stacks at fast
+  gate edges (results.md section 4) exceed what capacitive coupling allows and are most likely the quasi-static
+  channel-charge partition; the NQS runs that would show it aborted, so how far these nodes really go is not shown.
+- Floating nodes of the disabled slot are held beyond the rails until the end of each run (tens of µs); how long they
+  stay there in silicon (junction leakage over ms … s) is not simulated."""),
+]
+for a,b in rep:
+    assert a in s, a[:60]
+    s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+echo ok
+```
+
+## Tool results / harness — 2026-11-25 19:25:25 UTC
+
+**Tool result:**
+
+```
+ok
+```
+
+## Assistant — 2026-11-25 19:25:31 UTC
+
+**Tool call: `Bash`**
+
+_Final analysis run and size check_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && cp csv/top20_vgx_held_3v6.csv /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/t20.csv && python3 -I analyze.py _work . | tail -1 && cmp csv/top20_vgx_held_3v6.csv /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/t20.csv && echo same; du -sh _work csv plots; ls csv plots; du -sh csv/* plots/* | sort -h | tail -4
+```
+
+## Tool results / harness — 2026-11-25 19:25:34 UTC
+
+**Tool result:**
+
+```
+analyze: runs 222 failed 16
+same
+329M	_work
+540K	csv
+408K	plots
+csv:
+device_max.csv
+flags_over_3v3.csv
+gate_stress_bins.csv
+node_extremes.csv
+runs.csv
+solver_check_en_tt_27_3.6.csv
+top20_vds_3v6.csv
+top20_vds_held_3v3.csv
+top20_vds_held_3v6.csv
+top20_vgb_3v6.csv
+top20_vgs_3v6.csv
+top20_vgx_3v6.csv
+top20_vgx_held_3v3.csv
+top20_vgx_held_3v6.csv
+type_length_max.csv
+
+plots:
+hist_vgs_vds_3v6.png
+ranked_vgs_vds_3v6.png
+solver_check_en_tt_27_3.6.png
+144K	plots/solver_check_en_tt_27_3.6.png
+164K	plots/ranked_vgs_vds_3v6.png
+220K	csv/device_max.csv
+252K	csv/flags_over_3v3.csv
+```
+
+## Assistant — 2026-11-25 19:25:38 UTC
+
+**Tool call: `Bash`**
+
+_See how other folders license CSV files_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps && head -3 dc_curves/csv/*.csv | head -12; head -3 klayout_pad_diodes/csv/diode_params.csv; ls dc_curves/csv/*.license 2>/dev/null; cat ../../REUSE.toml 2>/dev/null | head; ls ../../.reuse 2>/dev/null
+```
+
+## Tool results / harness — 2026-11-25 19:25:39 UTC
+
+**Tool result:**
+
+```
+Exit code 2
+==> dc_curves/csv/d2s_grid_summary.csv <==
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# D2S pad, d2s_grid: IHP sg13cmos5l simulation (schematic | magic PEX); d2s.py; criteria in README.md
+
+==> dc_curves/csv/d2s_noload_summary.csv <==
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# D2S pad, d2s_noload: IHP sg13cmos5l simulation (schematic | magic PEX); d2s.py; criteria in README.md
+
+==> dc_curves/csv/d2s_slot_summary.csv <==
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# IHP sg13cmos5l simulation (ngspice, PDK diodes.lib): area factor each component diode of dpantenna gets (listing expand); ngspice message about a= / p=: none
+```
+
+## Assistant — 2026-11-25 19:25:42 UTC
+
+**Tool call: `Bash`**
+
+_Check PNG licensing convention_
+
+```bash
+find verification/c2_gaps -name "*.license" | head; ls verification/c2_gaps/klayout_pad_diodes/plots; python3 -c "
+from PIL import Image; im=Image.open('verification/c2_gaps/klayout_pad_diodes/plots/sine_tt27_fixed.png'); print(im.info)" 2>&1 | head -3
+```
+
+## Tool results / harness — 2026-11-25 19:25:42 UTC
+
+**Tool result:**
+
+```
+verification/c2_gaps/pad_esd_latchup/plots/lu_layout_s2d.png.license
+verification/c2_gaps/pad_esd_latchup/plots/scr_trigger.png.license
+verification/c2_gaps/pad_esd_latchup/plots/model_iv.png.license
+verification/c2_gaps/pad_esd_latchup/plots/itest_vpad.png.license
+verification/c2_gaps/pad_esd_latchup/plots/hbm_vpad_peak.png.license
+verification/c2_gaps/pad_esd_latchup/plots/hbm_oxide.png.license
+verification/c2_gaps/pad_esd_latchup/plots/lu_layout_d2s.png.license
+verification/c2_gaps/pad_esd_latchup/plots/overvoltage_isupply.png.license
+verification/c2_gaps/pad_esd_latchup/plots/hbm_wave_d2s.png.license
+verification/c2_gaps/pad_esd_latchup/plots/hbm_wave_s2d.png.license
+diode_step_27C.png
+diode_step_27C.svg
+sine_tt27_fixed.png
+{'Copyright': '2026 Christoph Maier, Apache-2.0'}
+```
+
+## Assistant — 2026-11-25 19:25:45 UTC
+
+**Tool call: `Bash`**
+
+_Show sidecar license format_
+
+```bash
+cat verification/c2_gaps/pad_esd_latchup/plots/model_iv.png.license
+```
+
+## Tool results / harness — 2026-11-25 19:25:45 UTC
+
+**Tool result:**
+
+```
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+```
+
+## Assistant — 2026-11-25 19:25:47 UTC
+
+Now I'll add SPDX headers to the CSVs, PNG metadata and sidecar `.license` files, and trim the flags CSV.
+
+## Assistant — 2026-11-25 19:25:57 UTC
+
+**Tool call: `Bash`**
+
+_Add SPDX headers to CSVs and PNG license sidecars_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+import re
+for p in ['analyze.py','edges.py']:
+    s=open(p).read()
+    # every csv.writer: write SPDX lines first
+    s=s.replace("w = csv.writer(f)\n", "f.write(SPDX)\n        w = csv.writer(f)\n") if p=='analyze.py' else s
+    open(p,'w').write(s)
+s=open('analyze.py').read()
+s=s.replace("VLIM = 3.3\n","SPDX = '# SPDX-FileCopyrightText: 2026 Christoph Maier\\n# SPDX-License-Identifier: Apache-2.0\\n'\nPNGMETA = {'Copyright': '2026 Christoph Maier, Apache-2.0'}\nVLIM = 3.3\n",1)
+s=s.replace("fig.savefig(OUT / 'plots' / 'ranked_vgs_vds_3v6.png', dpi=150)","save_png(fig, OUT / 'plots' / 'ranked_vgs_vds_3v6.png')")
+s=s.replace("fig.savefig(OUT / 'plots' / 'hist_vgs_vds_3v6.png', dpi=150)","save_png(fig, OUT / 'plots' / 'hist_vgs_vds_3v6.png')")
+s=s.replace("""def esc(s):""","""def save_png(fig, path):
+    \"\"\"PNG with the copyright in its metadata and an SPDX sidecar <file>.license (REUSE convention).\"\"\"
+    fig.savefig(path, dpi=150, metadata=PNGMETA)
+    Path(str(path) + '.license').write_text(SPDX.replace('# ', ''))
+
+
+def esc(s):""")
+# trim flags csv to the four main classes
+a="""            for r in over:
+                v1, t1, x1 = M[k][r['inst']]['vgs']"""
+b="""            for r in (over if k in ('3.3', '3.6', '3.3_dc', '3.6_dc') else []):   # csv: the main classes only
+                v1, t1, x1 = M[k][r['inst']]['vgs']"""
+assert a in s; s=s.replace(a,b)
+open('analyze.py','w').write(s)
+s=open('edges.py').read()
+s=s.replace("""    with open(OUT / 'csv' / f'solver_check_{base}.csv', 'w', newline='') as f:
+        wr = csv.writer(f)""","""    with open(OUT / 'csv' / f'solver_check_{base}.csv', 'w', newline='') as f:
+        f.write(SPDX)
+        wr = csv.writer(f)""")
+s=s.replace("""    fig.savefig(OUT / 'plots' / f'solver_check_{base}.png', dpi=130)""","""    fig.savefig(OUT / 'plots' / f'solver_check_{base}.png', dpi=130,
+                metadata={'Copyright': '2026 Christoph Maier, Apache-2.0'})
+    Path(str(OUT / 'plots' / f'solver_check_{base}.png') + '.license').write_text(SPDX.replace('# ', ''))""")
+s=s.replace("""WORK, OUT = Path(sys.argv[1]).resolve(), Path(sys.argv[2]).resolve()""","""SPDX = '# SPDX-FileCopyrightText: 2026 Christoph Maier\\n# SPDX-License-Identifier: Apache-2.0\\n'
+WORK, OUT = Path(sys.argv[1]).resolve(), Path(sys.argv[2]).resolve()""")
+open('edges.py','w').write(s)
+EOF
+grep -n "f.write(SPDX)" analyze.py | head; python3 -m py_compile analyze.py edges.py && echo ok
+```
+
+## Tool results / harness — 2026-11-25 19:25:57 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+204:        f.write(SPDX)
+243:        f.write(SPDX)
+290:        f.write(SPDX)
+325:        f.write(SPDX)
+350:        f.write(SPDX)
+415:            f.write(SPDX)
+474:        f.write(SPDX)
+Sorry: IndentationError: unexpected indent (analyze.py, line 417)
+```
+
+## Assistant — 2026-11-25 19:25:59 UTC
+
+**Tool call: `Bash`**
+
+_Show indentation problem_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && sed -n 410,420p analyze.py
+```
+
+## Tool results / harness — 2026-11-25 19:25:59 UTC
+
+**Tool result:**
+
+```
+f"{abs(M[sup + '_27C'][r['inst']][q][0]):.3f}", f"{abs(M[oth][r['inst']][q][0]):.3f}"])
+        lines.append(md_table(['#', 'device', 'block', 'type', 'W/L [um]', 'L meets spec LG', f'{lab} [V]',
+                               'where', 'held >= 100 ns [V]', 'DC enabled only [V]', '27 C runs only [V]',
+                               f'all {oth} V runs [V]'], rows))
+        with open(OUT / 'csv' / f'top20_{q}_{sup.replace(".", "v")}.csv', 'w', newline='') as f:
+            f.write(SPDX)
+        w = csv.writer(f)
+            w.writerow(['rank', 'inst', 'block', 'type', 'W_um', 'L_um', 'meets_spec_LG', f'abs_{q}_V', 'where',
+                        'held_100ns_V', 'dc_enabled_V', 'runs_27C_V', f'runs_{oth.replace(".", "v")}_V'])
+            for row in rows:
+                w.writerow(row[:4] + row[4].split('/') + row[5:])
+```
+
+## Assistant — 2026-11-25 19:26:02 UTC
+
+**Tool call: `Bash`**
+
+_Fix indentation in analyze.py_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && python3 - <<'EOF'
+s=open('analyze.py').read()
+s=s.replace("""            f.write(SPDX)
+        w = csv.writer(f)
+            w.writerow(['rank',""","""            f.write(SPDX)
+            w = csv.writer(f)
+            w.writerow(['rank',""")
+open('analyze.py','w').write(s)
+EOF
+python3 -m py_compile analyze.py edges.py && echo ok; grep -n "csv.writer" analyze.py edges.py
+```
+
+## Tool results / harness — 2026-11-25 19:26:02 UTC
+
+**Tool result:**
+
+```
+ok
+analyze.py:205:        w = csv.writer(f)
+analyze.py:244:        w = csv.writer(f)
+analyze.py:291:        w = csv.writer(f)
+analyze.py:326:        w = csv.writer(f)
+analyze.py:351:        w = csv.writer(f)
+analyze.py:416:            w = csv.writer(f)
+analyze.py:475:        w = csv.writer(f)
+edges.py:76:        wr = csv.writer(f)
+```
+
+## Assistant — 2026-11-25 19:26:05 UTC
+
+**Tool call: `Bash`**
+
+_Show device_max header writing_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/voltage_stress && sed -n 202,212p analyze.py
+```
+
+## Tool results / harness — 2026-11-25 19:26:05 UTC
+
+**Tool result:**
+
+```
+# --- per-device CSV (all devices, 3.3 V and 3.6 V classes)
+    with open(OUT / 'csv' / 'device_max.csv', 'w', newline='') as f:
+        f.write(SPDX)
+        w = csv.writer(f)
+        w.writerow(['# per MOS instance: max |V| over all runs of a supply class (3.3 / 3.6 V): signed value at the '
+                    'max, run tag, sweep value [V] or time [s]; vgx = the larger of |VGS| and |VGD|; *_held = largest '
+                    '|value| held for at least 100 ns (transients; DC points count as held); electrical source = lower '
+                    '(NMOS) / higher (PMOS) of the two diffusion terminals'])
+        hdr = ['inst', 'block', 'type', 'W_um', 'L_um', 'nf', 'meets_spec_LG', 'drain_eq_source', 'd', 'g', 's', 'b']
+        for k in ('3.3', '3.6'):
+            for q in ('vgs', 'vgd', 'vds', 'vgb'):
+```
+
