@@ -2516,3 +2516,598 @@ File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gap
 W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; until grep -q 'dc_params done' $W/sim_rest.log || ! pgrep -f cace_run.sh >/dev/null; do sleep 5; done; cat $W/sim_rest.log
 ```
 
+## Tool results / harness — 2026-11-25 03:55:19 UTC
+
+**Tool result:**
+
+```
+=== ac_mm_params start 2026-11-25T03:50:55Z jobs=2
+ac_mm_params: 30 of 30 runs -> /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/out/ac_mm_params.csv (0 data files with a wrong value count)
+=== ac_mm_params done 2026-11-25T03:51:58Z rows=30
+=== mc_params start 2026-11-25T03:51:58Z jobs=2
+mc_params: 30 of 30 runs -> /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/out/mc_params.csv (0 data files with a wrong value count)
+=== mc_params done 2026-11-25T03:52:32Z rows=30
+=== dc_params start 2026-11-25T03:52:32Z jobs=2
+dc_params: 135 of 135 runs -> /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/out/dc_params.csv (0 data files with a wrong value count)
+=== dc_params done 2026-11-25T03:55:17Z rows=135
+=== mm_params_pex start 2026-11-25T03:55:19Z jobs=2
+```
+
+## Assistant — 2026-11-25 03:55:23 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; cat $W/out/pex_for_sim.log; cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch && ./run.sh $W csv && ./run.sh $W analyze && sed -n 6,100p tables/stats.md; sed -n 5,100p tables/compare_committed.md; head -5 csv/ac_mm_params.csv csv/mc_params.csv
+```
+
+## Tool results / harness — 2026-11-25 03:55:24 UTC
+
+**Tool result:**
+
+```
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/design/macros/sg13cmos5l_IOPadSingle2Diff/netlist/pex/sg13cmos5l_IOPadSingle2Diff_magic_pex_2.spice -> netlist_pex/pex/sg13cmos5l_IOPadSingle2Diff.spice: mm_ok=1 on 221 devices; 28 capacitor-only nodes tied to iovss through 1e12 Ohm
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/figures/s2d_mm_hist.png: 69 kB
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/figures/s2d_ac_mm_hist.png: 103 kB
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/figures/s2d_mc_hist.png: 72 kB
+| group | view | quantity | unit | n (runs with data / runs) | mean | sigma | min | median | max | mean - 3 sigma | mean + 3 sigma | working limits | min / max inside |
+|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|
+| mm_params | schematic | Input offset - Mismatch | mV | 100 / 100 | -0.403 | 5.251 | -10.22 | -0.7581 | 15.97 | -16.16 | 15.35 | -20 … 20 | yes |
+| mm_params | schematic | Gain - Mismatch |  | 100 / 100 | 1.999 | 0.01668 | 1.958 | 2 | 2.05 | 1.949 | 2.049 | 1.93 … 2.07 | yes |
+| mm_params | schematic | Output common-mode error - Mismatch | mV | 100 / 100 | 7.943 | 10.97 | -27.29 | 7.498 | 47.04 | -24.96 | 40.85 | -60 … 60 | yes |
+| ac_mm_params | schematic | PSRR iovdd at 1 kHz (input-referred), mismatch | dB | 30 / 30 | 95.37 | 9.752 | 83.83 | 92.91 | 131.6 | 66.11 | 124.6 | 60 … any | yes |
+| ac_mm_params | schematic | PSRR iovdd at 100 kHz (input-re
+… [5370 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:55:34 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch && python3 - <<'EOF'
+p='analyze.py'; s=open(p).read()
+s=s.replace("""            txt = []
+""","""            txt = []
+            un = re.search(r'\\[(.*)\\]', lab)
+            un = ' ' + un.group(1) if un else ''
+""")
+s=s.replace("""txt.append('sch: mean %s, σ %s' % (fmt(st.mean(xs) * k, 3), fmt(st.stdev(xs) * k, 3)))""",
+"""txt.append('sch: mean %s%s, σ %s%s' % (fmt(st.mean(xs) * k, 4), un, fmt(st.stdev(xs) * k, 3), un))""")
+s=s.replace("""txt.append('PEX: mean %s, σ %s' % (fmt(st.mean(xp) * k, 3), fmt(st.stdev(xp) * k, 3)))""",
+"""txt.append('PEX: mean %s%s, σ %s%s' % (fmt(st.mean(xp) * k, 4), un, fmt(st.stdev(xp) * k, 3), un))""")
+s=s.replace("""        c += ['', '### dc_params (check of the committed non-Monte-Carlo schematic results, 2026-11-05)', '',
+              'committed `dc_params.csv` (%d runs) vs this run (%d runs), matched by conditions; largest difference '
+              'over all matched runs, absolute and relative to the committed value.' % (len(olddc), len(newdc)), '',""",
+"""        c += ['', '### dc_params (check of the committed non-Monte-Carlo schematic results, 2026-11-05)', '',
+              'committed `dc_params.csv` (%d runs) vs this run (%d runs), matched by conditions; largest difference '
+              'over all matched runs, absolute and relative to the committed value. Values as in the CSVs: SI (V, A), '
+              'whatever the [unit] label says.' % (len(olddc), len(newdc)), '',""")
+open(p,'w').write(s)
+EOF
+grep -n "un = \|sch: mean" analyze.py
+```
+
+## Tool results / harness — 2026-11-25 03:55:34 UTC
+
+**Tool result:**
+
+```
+165:            un = re.search(r'\[(.*)\]', lab)
+166:            un = ' ' + un.group(1) if un else ''
+169:                txt.append('sch: mean %s%s, σ %s%s' % (fmt(st.mean(xs) * k, 4), un, fmt(st.stdev(xs) * k, 3), un))
+```
+
+## Assistant — 2026-11-25 03:55:37 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; until grep -q 'mm_params_pex done' $W/sim_rest.log || ! pgrep -f cace_run.sh >/dev/null; do sleep 5; done; cat $W/sim_rest.log | tail -3; grep -c 'Skipping extraction\|Up to date' $W/out/log_mm_params_pex.txt; grep -o 'Skipping[^│]*' $W/out/log_mm_params_pex.txt | head -2
+```
+
+## Tool results / harness — 2026-11-25 03:58:22 UTC
+
+**Tool result:**
+
+```
+=== mm_params_pex start 2026-11-25T03:55:19Z jobs=2
+mm_params: 100 of 100 runs -> /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/out/mm_params_pex.csv (0 data files with a wrong value count)
+=== mm_params_pex done 2026-11-25T03:58:20Z rows=100
+2
+Skipping extraction of pex netlist.   cace_regenerate.py:408
+```
+
+## Assistant — 2026-11-25 03:58:27 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; f=$(ls $W/runs/mm_params_pex/parameters/mm_params/run_0/run_3/*.spice); grep -n '\.include\|SEED' $f | head; grep -c mm_ok=1 $W/sg13cmos5l_IOPadSingle2Diff_pex_mm.spice; f2=$(ls $W/runs/mm_params/parameters/mm_params/run_0/run_3/*.spice); grep -n '\.include\|SEED' $f2|head -4; cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch && ./run.sh $W csv && ./run.sh $W analyze && grep -E 'magic|PEX|pex' tables/stats.md tables/compare_committed.md
+```
+
+## Tool results / harness — 2026-11-25 03:58:28 UTC
+
+**Tool result:**
+
+```
+14:.include sg13cmos5l_io.spice
+45:.include /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/netlist_pex/pex/sg13cmos5l_IOPadSingle2Diff.spice
+47:.options savecurrents method=gear reltol=1e-4 abstol=1e-15 gmin=1e-15 SEED=12349.0
+222
+14:.include sg13cmos5l_io.spice
+45:.include /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm/design/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/netlist/schematic/sg13cmos5l_IOPadSingle2Diff.spice
+47:.options savecurrents method=gear reltol=1e-4 abstol=1e-15 gmin=1e-15 SEED=12349.0
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/figures/s2d_mm_hist.png: 97 kB
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/figures/s2d_ac_mm_hist.png: 108 kB
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/figures/s2d_mc_hist.png: 75 kB
+tables/stats.md:| mm_params | magic PEX (C-coupled) | Input offset - Mismatch | mV | 100 / 100 | -1.352 | 6.149 | -13.17 | -1.738 | 19.63 | -19.8 | 17.1 | -20 … 20 | yes |
+tables/stats.md:| mm_params | magic PEX (C-coupled) | Gain - Mismatch |  | 100 / 100 | 1.999 | 0.01638 | 1.959 | 1.999 | 2.034 | 1.95 | 2.048 | 1.93 … 2.07 | yes |
+tables/stats.md:| mm_params | magic PEX (C-coupled) | Output common-mode error - Mismatch | mV | 100 / 100 | 9.348 | 12.7 | -17.87 | 10.46 | 41.95 | -28.75 | 47.45 | -60 … 60 | yes |
+tables/compare_committed.md:| mm_params | p
+… [570 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:58:36 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/figures/s2d_mm_hist.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 03:58:36 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 03:58:36 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/figures/s2d_ac_mm_hist.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 03:58:36 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 03:58:40 UTC
+
+**Tool call: `Bash`**
+
+```bash
+python3 -c "import scipy; print(scipy.__version__)"
+```
+
+## Tool results / harness — 2026-11-25 03:58:40 UTC
+
+**Tool result:**
+
+```
+Exit code 1
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import scipy; print(scipy.__version__)
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'scipy'
+```
+
+## Assistant — 2026-11-25 03:58:44 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/analyze.py",
+ "offset": 60,
+ "limit": 50
+}
+```
+
+## Tool results / harness — 2026-11-25 03:58:44 UTC
+
+**Tool result:**
+
+```
+60	def fmt(x, k=4):
+61	    return '%.*g' % (k, x)
+62	
+63	
+64	def main(ycell, oldres, csvdir, out):
+65	    y = yaml.safe_load(open(ycell))['parameters']
+66	    os.makedirs(os.path.join(out, 'tables'), exist_ok=True)
+67	    os.makedirs(os.path.join(out, 'figures'), exist_ok=True)
+68	    md, rows_csv, data = [], [], {}
+69	    md.append('<!--\nSPDX-FileCopyrightText: 2026 Christoph Maier\nSPDX-License-Identifier: Apache-2.0\n'
+70	              'generated by analyze.py from csv/*.csv and the CACE summaries; IHP sg13cmos5l simulation\n-->')
+71	    md.append('| group | view | quantity | unit | n (runs with data / runs) | mean | sigma | min | median | max | '
+72	              'mean - 3 sigma | mean + 3 sigma | working limits | min / max inside |')
+73	    md.append('|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|')
+74	    cmp_ = []
+75	    for g in MC_GROUPS:
+76	        spec = y[g]['spec']
+77	        n_iter = y[g]['conditions']['iterations']['maximum']
+78	        old = summary(os.path.join(oldres, 'summary_%s.md' % g))
+79	        for suf, view in VIEWS:
+80	            rows = load(os.path.join(csvdir, '%s%s.csv' % (g, suf)))
+81	            if not rows:
+82	                continue
+83	            new = summary(os.path.join(csvdir, 'summary_%s%s.md' % (g, suf)))
+84	            for var, sp in spec.items():
+85	                u = sp.get('unit', '')
+86	                k = SCALE.get(u, 1)
+87	                x = col(rows, var)
+88	                data[(g, suf, var)] = x
+89	     
+… [1706 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:58:59 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch && python3 - <<'EOF'
+p='analyze.py'; s=open(p).read()
+s=s.replace("""def fmt(x, k=4):
+    return '%.*g' % (k, x)
+""","""def fmt(x, k=4):
+    return '%.*g' % (k, x)
+
+
+def sigma_ci(s, n):
+    \"\"\"95 % confidence interval of sigma for a normal sample (chi-square quantiles by Wilson-Hilferty)\"\"\"
+    def chi2(p_z, k):
+        return k * (1 - 2 / (9 * k) + p_z * (2 / (9 * k)) ** 0.5) ** 3
+    k = n - 1
+    return s * (k / chi2(1.959964, k)) ** 0.5, s * (k / chi2(-1.959964, k)) ** 0.5
+""")
+s=s.replace("""    md.append('| group | view | quantity | unit | n (runs with data / runs) | mean | sigma | min | median | max | '
+              'mean - 3 sigma | mean + 3 sigma | working limits | min / max inside |')
+    md.append('|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|')""",
+"""    md.append('| group | view | quantity | unit | n (runs with data / runs) | mean | sigma | sigma, 95 % CI | min | median | '
+              'max | mean - 3 sigma | mean + 3 sigma | working limits | min / max inside |')
+    md.append('|---|---|---|---|---|---:|---:|---|---:|---:|---:|---:|---:|---|---|')""")
+s=s.replace("""                md.append('| %s | %s | %s | %s | %d / %d | %s | %s | %s | %s | %s | %s | %s | %s | %s |' % (
+                    g, view.split(',')[0], sp['display'], u, len(x), n_iter, *[fmt(v) for v in vals], lim,
+                    'yes' if inside else '**no**'))""",
+"""                ci = sigma_ci(s * k, len(x))
+                md.append('| %s | %s | %s | %s | %d / %d | %s | %s | %s … %s | %s | %s | %s | %s | %s | %s | %s |' % (
+                    g, view.split(',')[0], sp['display'], u, len(x), n_iter, fmt(vals[0]), fmt(vals[1]),
+                    fmt(ci[0], 3), fmt(ci[1], 3), *[fmt(v) for v in vals[2:]], lim, 'yes' if inside else '**no**'))""")
+s=s.replace("""    open(os.path.join(out, 'tables', 'stats.md'), 'w').write('\\n'.join(md) + '\\n')""",
+"""    # rejection in linear terms: input-referred coupling 10^(-dB/20) (V at the input per V on the supply / common mode)
+    acm = [(v, d) for (g, suf, v), d in data.items() if g == 'ac_mm_params' and not suf]
+    if acm:
+        md += ['', 'ac_mm_params, the same runs as input-referred coupling 10^(-PSRR/20) (µV at the input per V on '
+               'iovdd / iovss, or per V of common mode for CMRR): the dB values are skewed (a run near perfect '
+               'cancellation gives a very large dB value), the linear coupling is the quantity that adds up.', '',
+               '| quantity | n | mean | sigma | median | max (= min in dB) |', '|---|---|---:|---:|---:|---:|']
+        for v, d in acm:
+            lin = [10 ** (-x / 20) * 1e6 for x in d]
+            md.append('| %s | %d | %s µV/V | %s µV/V | %s µV/V | %s µV/V |' % (v, len(lin), fmt(st.mean(lin), 3),
+                      fmt(st.stdev(lin), 3), fmt(st.median(lin), 3), fmt(max(lin), 3)))
+    # schematic and PEX runs share the seeds (SEED = 12345 + iteration) but not the device list: correlation per seed
+    pairs = [v for (g, suf, v) in data if g == 'mm_params' and suf == '_pex']
+    if pairs:
+        md += ['', 'mm_params, schematic vs PEX run with the same seed: Pearson correlation over the 100 seeds (the '
+               'extraction has another device list and order, so the same seed draws other numbers per device).', '',
+               '| quantity | correlation |', '|---|---:|']
+        for v in pairs:
+            a, b = data[('mm_params', '', v)], data[('mm_params', '_pex', v)]
+            ma, mb = st.mean(a), st.mean(b)
+            r = sum((x - ma) * (y_ - mb) for x, y_ in zip(a, b)) / ((sum((x - ma) ** 2 for x in a) *
+                                                                      sum((y_ - mb) ** 2 for y_ in b)) ** 0.5)
+            md.append('| %s | %.2f |' % (v, r))
+    open(os.path.join(out, 'tables', 'stats.md'), 'w').write('\\n'.join(md) + '\\n')""")
+open(p,'w').write(s)
+EOF
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; ./run.sh $W analyze && sed -n 6,100p tables/stats.md
+```
+
+## Tool results / harness — 2026-11-25 03:59:01 UTC
+
+**Tool result:**
+
+```
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/figures/s2d_mm_hist.png: 97 kB
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/figures/s2d_ac_mm_hist.png: 108 kB
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/figures/s2d_mc_hist.png: 75 kB
+| group | view | quantity | unit | n (runs with data / runs) | mean | sigma | sigma, 95 % CI | min | median | max | mean - 3 sigma | mean + 3 sigma | working limits | min / max inside |
+|---|---|---|---|---|---:|---:|---|---:|---:|---:|---:|---:|---|---|
+| mm_params | schematic | Input offset - Mismatch | mV | 100 / 100 | -0.403 | 5.251 | 4.61 … 6.1 | -10.22 | -0.7581 | 15.97 | -16.16 | 15.35 | -20 … 20 | yes |
+| mm_params | schematic | Gain - Mismatch |  | 100 / 100 | 1.999 | 0.01668 | 0.0146 … 0.0194 | 1.958 | 2 | 2.05 | 1.949 | 2.049 | 1.93 … 2.07 | yes |
+| mm_params | schematic | Output common-mode error - Mismatch | mV | 100 / 100 | 7.943 | 10.97 | 9.63 … 12.7 | -27.29 | 7.498 | 47.04 | -24.96 | 40.85 | -60 … 60 | yes |
+| mm_params | magic PEX (C-coupled) | Input offset - Mismatch | mV | 100 / 100 | -1.352 | 6.149 | 5.4 … 7.14 | -13.17 | -1.738 | 19.63 | -19.8 | 17.1 | -20 … 20 | yes |
+| mm_params | magic PEX (C-coupled) | Gain - Mismatch |  | 100 / 100 | 1.999 | 0.01638 | 0.0144 … 0.019 | 1.959 | 1.999 | 2.034 | 1.95 | 2.048 | 1.93 … 2.07 | yes |
+| mm_params | magic PEX (C-coupled) | Output common-mode error - Mismatch | mV | 100 / 100 | 9.348 | 12.7 | 11.2 … 14.8 | -17.87 | 10.46 | 
+… [2456 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:59:05 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/figures/s2d_mc_hist.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 03:59:05 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 03:59:15 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch && python3 - <<'EOF'
+p='analyze.py'; s=open(p).read()
+old_loop="        for a, (var, lab, k) in zip(ax.flat, vars_):\n"
+assert old_loop in s
+s=s.replace(old_loop,"        for a, vk in zip(ax.flat, vars_):\n            var, lab, k = vk[:3]\n            off = vk[3] if len(vk) > 3 else 0\n")
+s=s.replace("allv = [v * k for v in (xs or []) + (xp or [])]","allv = [(v - off) * k for v in (xs or []) + (xp or [])]")
+s=s.replace("a.hist([v * k for v in xs], bins","a.hist([(v - off) * k for v in xs], bins")
+s=s.replace("a.hist([v * k for v in xp], bins","a.hist([(v - off) * k for v in xp], bins")
+s=s.replace("fmt(st.mean(xs) * k, 4), un","fmt((st.mean(xs) - off) * k, 4), un")
+s=s.replace("fmt(st.mean(xp) * k, 4), un","fmt((st.mean(xp) - off) * k, 4), un")
+old="""        hist('s2d_mc_hist.png', 'mc_params', [('Vos_in', 'input offset [mV]', 1e3), ('Gain', 'gain (outp − outn)/u', 1),
+                                              ('Vcm_err', 'output CM error [mV]', 1e3)],
+             'S2D pad, process MC (CACE mc_params), tt_stat / rhigh typ, 27 °C, 3.3 V', 3)"""
+assert old in s
+s=s.replace(old,"""        hist('s2d_mc_hist.png', 'mc_params', [('Vos_in', 'input offset [nV]', 1e9),
+                                              ('Gain', 'gain − 2 [ppm] (printed to 10 ppm)', 1e6, 2.0),
+                                              ('Vcm_err', 'output CM error [mV]', 1e3)],
+             'S2D pad, process MC (CACE mc_params), tt_stat / rhigh typ, 27 °C, 3.3 V', 3)""")
+open(p,'w').write(s)
+EOF
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; ./run.sh $W analyze
+```
+
+## Tool results / harness — 2026-11-25 03:59:16 UTC
+
+**Tool result:**
+
+```
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/figures/s2d_mm_hist.png: 97 kB
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/figures/s2d_ac_mm_hist.png: 108 kB
+/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/figures/s2d_mc_hist.png: 74 kB
+```
+
+## Assistant — 2026-11-25 03:59:18 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/figures/s2d_mc_hist.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 03:59:18 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 03:59:26 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch && python3 - <<'EOF'
+p='run.sh'; s=open(p).read()
+s=s.replace("""case "$STEP" in
+  all) fetch; history; netcheck; sim; csv; analyze ;;
+  fetch|history|netcheck|sim|csv|analyze) $STEP ;;""","""# results.md = results_head.md (hand-written text) + the generated tables
+results() {
+  { cat "$HERE/results_head.md"
+    printf '\\n## 3. Statistics per group, view and quantity (= tables/stats.md)\\n\\n'
+    sed '1,/^-->$/d' "$HERE/tables/stats.md"
+    printf '\\n## 4. Comparison with the committed results (= tables/compare_committed.md)\\n\\n'
+    sed '1,/^-->$/d' "$HERE/tables/compare_committed.md"; } > "$HERE/results.md"
+}
+
+case "$STEP" in
+  all) fetch; history; netcheck; sim; csv; analyze; results ;;
+  fetch|history|netcheck|sim|csv|analyze|results) $STEP ;;""")
+s=s.replace("# Usage: run.sh [<work_dir>] [fetch|history|netcheck|sim|csv|analyze|all]","# Usage: run.sh [<work_dir>] [fetch|history|netcheck|sim|csv|analyze|results|all]")
+open(p,'w').write(s)
+EOF
+grep -n 'results' run.sh | head; ls csv; W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; grep -v '^ \{10,\}' $W/out/log_mm_params_pex.txt | grep -i -E 'warn|fail|error' | grep -v 'parameter.py:43' | sort | uniq -c | head
+```
+
+## Tool results / harness — 2026-11-25 03:59:26 UTC
+
+**Tool result:**
+
+```
+8:# (non-Monte-Carlo) schematic results. Design repository commit 91a7da8b, yaml and templates unchanged, CACE 2.11.
+9:# Usage: run.sh [<work_dir>] [fetch|history|netcheck|sim|csv|analyze|results|all]   (default ./_work next to this script, all)
+41:# Staleness: commit dates of the committed results vs the last change of the schematic (S2D and the macros it uses),
+45:  local H="git -C $WORK/hist" R=macros/$T/verification/cace/results/$T f d
+50:    echo "## committed schematic results, per file"
+60:    echo "## commits that changed macros/$T/schematic/xschem after the mismatch results (2026-10-26)"
+128:  python3 "$HERE/analyze.py" "$M/verification/cace/$T.yaml" "$M/verification/cace/results/$T" "$HERE/csv" "$HERE"
+131:# results.md = results_head.md (hand-written text) + the generated tables
+132:results() {
+133:  { cat "$HERE/results_head.md"
+ac_mm_params.csv
+dc_params.csv
+mc_params.csv
+mm_params.csv
+mm_params_pex.csv
+pex_for_sim.log
+summary_ac_mm_params.md
+summary_dc_params.md
+summary_mc_params.md
+summary_mm_params.md
+summary_mm_params_pex.md
+      6  error                                                                          
+      1  error,                                                                         
+      1 [03:58:20] ERROR      klayout_script.py:34                         common.py:695
+      1 [03:58:20] ERROR    ERROR: RuntimeError: Unable to open file:      common.py:695
+      1 [03:58:20] ERROR    Error output generated by subprocess:          common.py:69
+… [90 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:59:29 UTC
+
+**Tool call: `Bash`**
+
+```bash
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; grep -n -B3 -A12 'klayout_script.py:34' $W/out/log_mm_params_pex.txt | cut -c1-90 | head -40; tail -30 $W/out/log_mm_params_pex.txt | cut -c1-90
+```
+
+## Tool results / harness — 2026-11-25 03:59:29 UTC
+
+**Tool result:**
+
+```
+8605-                    /foss/pdks/IHP-Open-PDK/ihp-sg13cmos5l/libs.te              
+8606-                    ch/klayout/tech//sg13g2.lyp (errno=2) in                    
+8607-                    LayoutViewBase.load_layer_props                             
+8608:[03:58:20] ERROR      klayout_script.py:34                         common.py:695
+ Misma…                                                                    ✅   
+ Output  ngspi…  Vcm_e…  -60 mV  -17.8…     any  10.462   60 mV  41.952   Pass  
+ commo…                              mV              mV              mV    ✅   
+ error                                                                          
+ -                                                                              
+ Misma…                                                                         
+ Input   ngspi…  Vos_in   -5 mV        ​     any        ​    5 mV        ​   Skip 
+ offset                                                                    🟧   
+ -                                                                              
+ Proce…                                                                         
+ MC                                                                             
+ Gain -  ngspi…  Gain      1.99        ​     any        ​    2.01        ​   Skip 
+ Proce…                                                                    🟧   
+ MC                                                                             
+ Output  ngspi…  Vcm_e
+… [1272 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:59:55 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/results_head.md`
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# S2D pad Monte Carlo groups: results
+
+IHP sg13cmos5l simulation, `sg13cmos5l_IOPadSingle2Diff` (S2D pad, `s7_an[0]`), design repository commit
+`91a7da8b`, CACE 2.11, ngspice-47, 2026-11-25. Method and provenance: [README.md](README.md). Sections 3 and 4 are
+generated (`run.sh … results`); every number in sections 1 and 2 is taken from them, from `csv/`, from
+[staleness.txt](staleness.txt) or from [netcheck.txt](netcheck.txt).
+
+## 1. Runs
+
+| group | view | conditions | runs with a result | wall clock (2 ngspice at a time) |
+|---|---|---|---|---|
+| mm_params | schematic | tt_mismatch, rhigh typ_mismatch, 27 °C, 3.3 V, vref = vcm = 1.2 V, iterations 1 … 100 | 100 / 100 | 03:48:56 … 03:50:49 UTC |
+| ac_mm_params | schematic | as mm_params, iterations 1 … 30 | 30 / 30 | 03:50:55 … 03:51:58 |
+| mc_params | schematic | tt_stat, rhigh typ, 27 °C, iterations 1 … 30 | 30 / 30 | 03:51:58 … 03:52:32 |
+| dc_params (check) | schematic | 3 supplies × 5 MOS corners × 3 rhigh corners × 3 temperatures | 135 / 135 | 03:52:32 … 03:55:17 |
+| mm_params | magic PEX (C-coupled), mm_ok=1 on 221 extracted devices | as mm_params schematic | 100 / 100 | 03:55:19 … 03:58:20 |
+
+No solver aid, no failed run. Seeds as in the templates: `SEED = 12345 + iteration` for every view. The only error in
+the logs is CACE's documentation step after the PEX group (KLayout cannot find the PDK's `sg13g2.lyp` for the layout
+picture); it runs after the results are written and does not touch them.
+
+## 2. Reading
+
+- **Staleness.** The committed `mm_params`, `ac_mm_params` and `mc_params` summaries are from commit 6229797
+  (2026-10-26), i.e. from the pre-layout design: after them the S2D schematic changed in 8 commits up to 2026-11-05
+  (bias tree `bias_tree_noab_pd` instead of `bias_sel_noab_pd` on 2026-10-28, the drawn input protection
+  `s2d_pad_esd` on 2026-11-03, the backannotation of the drawn cell on 2026-11-04). They are stale. The other
+  committed schematic groups were re-run on 2026-11-05 01:22 … 01:48, after the last schematic change (01:19, which
+  only added the `_pex` symbol): the `dc_params` check here reproduces all 135 committed runs exactly (largest
+  difference 0 in every quantity, section 4), so those results are current, unlike the D2S ones of
+  ../d2s_schematic_rerun.
+- **Offset, gain, CM error (schematic, 100 runs):** input offset mean −0.40 mV, **σ 5.25 mV** (95 % CI 4.61 … 6.10),
+  −10.2 … +16.0 mV; gain mean 1.999, **σ 0.0167** (0.83 %), 1.958 … 2.050; output CM error mean 7.9 mV,
+  **σ 11.0 mV**, −27.3 … +47.0 mV. All 100 runs inside the working limits (±20 mV, 1.93 … 2.07, ±60 mV). The
+  committed summary (stale design) had −17.25 … +18.17 mV, 1.959 … 2.038, −19.0 … +39.9 mV; the design README at
+  91a7da8b quotes, from that run's data files, σ 6.19 mV, gain σ 0.74 %, CM error mean 10.8 mV / σ 12.2 mV. With 100
+  runs the σ estimate itself has about ±14 % (95 %); the offset σ of the taped-out schematic is somewhat lower than
+  that of the pre-layout design, the gain and CM spreads are about the same.
+- **PEX (magic C-coupled, mm_ok=1 added, 100 runs):** offset σ 6.15 mV (CI 5.40 … 7.14), gain σ 0.0164, CM error
+  σ 12.7 mV; the σ confidence intervals overlap those of the schematic, so no layout effect on the mismatch spread is
+  resolved with 100 runs. The same seed gives uncorrelated results in the two views (correlation 0.01 … 0.06): the
+  extraction lists 221 devices in another order (the schematic 75 instances with m / fingers), so each seed draws other
+  numbers per device; the PDK's mismatch scales with 1/sqrt(m·w·l), so the expected spread is the same for both.
+- **PSRR / CMRR (schematic, 30 runs, input-referred):** PSRR iovdd 1 kHz median 92.9 dB, worst 83.8 dB; 100 kHz
+  median 91.7, worst 82.3 dB; PSRR iovss 1 kHz median 91.0, worst 83.4 dB; 100 kHz median 76.2, worst 66.0 dB; CMRR
+  1 kHz median 100.5, worst 90.1 dB. All inside the working limits
+… [1263 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 03:59:55 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch/results_head.md (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 04:00:11 UTC
+
+**Tool call: `Bash`**
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/s2d_mismatch && python3 - <<'EOF'
+p='results_head.md'; s=open(p).read()
+rep=[("""  (bias tree `bias_tree_noab_pd` instead of `bias_sel_noab_pd` on 2026-10-28, the drawn input protection
+  `s2d_pad_esd` on 2026-11-03, the backannotation of the drawn cell on 2026-11-04). They are stale.""",
+"""  (on 2026-10-27/28 `bias_gen_pd` + `bias_tree_noab_pd` instead of `bias_sel_pd`; on 2026-11-03/04 the input
+  protection as drawn, `s2d_pad_esd`, instead of IHP's IOPadAnalog cells with the 587 Ω secondary resistor; on
+  2026-11-04 the backannotation of the drawn cell; design README and yaml header at 91a7da8b). They are stale."""),
+("""  91a7da8b quotes, from that run's data files, σ 6.19 mV, gain σ 0.74 %, CM error mean 10.8 mV / σ 12.2 mV. With 100
+  runs the σ estimate itself has about ±14 % (95 %); the offset σ of the taped-out schematic is somewhat lower than
+  that of the pre-layout design, the gain and CM spreads are about the same.""",
+"""  91a7da8b quotes, from that run's data files, σ 6.19 mV, gain σ 0.74 %, CM error mean 10.8 mV / σ 12.2 mV. With 100
+  runs the σ estimate itself is uncertain by about −12 … +16 % (95 %): the offset σ of the taped-out schematic (5.25
+  mV) is lower than the pre-layout 6.19 mV, at about the edge of what 100 runs resolve; gain and CM spreads are about
+  the same."""),
+("the worst cases are 0.1 … 4.8 dB better","the worst cases are 0.1 … 5.0 dB better")]
+for a,b in rep:
+    assert a in s, a[:40]
+    s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+W=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/s2d_mm; ./run.sh $W results && wc -l results.md
+```
+
+## Tool results / harness — 2026-11-25 04:00:11 UTC
+
+**Tool result:**
+
+```
+140 results.md
+```
+

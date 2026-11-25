@@ -3196,3 +3196,684 @@ _Full end-to-end sign-off run_
 S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff; cd $S; t0=$(date +%s); /home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5/run_signoff.sh $S/final > $S/final.out 2>&1; echo "total $(( $(date +%s)-t0 )) s" >> $S/final.out; tail -30 $S/final.out
 ```
 
+## Tool results / harness — 2026-11-25 03:56:26 UTC
+
+**Tool result:**
+
+```
+[2026-11-25T03:56:23Z] bg_core_pd magicdrc: sh /foss/tools/sak/sak-drc.sh -m -w /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/bg_core_pd/magic_drc /home/user/sg13cmos5l_cm_slot7/macros/bg_core_pd/layout/gds/bg_core_pd.gds
+    rc=1, 0 s, log /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/logs/bg_core_pd.magicdrc.log
+[2026-11-25T03:56:23Z] slot_7 netgen: bash /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/slot_7/netgen/netgen_check.sh
+    rc=0, 1 s, log /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/logs/slot_7.netgen.log
+[2026-11-25T03:56:24Z] S2D netgen: sh /foss/tools/sak/sak-lvs.sh -m -s /home/user/sg13cmos5l_cm_slot7/pads/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.spice -l /home/user/sg13cmos5l_cm_slot7/pads/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.gds -c sg13cmos5l_IOPadSingle2Diff -w /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/S2D/magic_lvs
+    rc=1, 1 s, log /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/logs/S2D.netgen.log
+[2026-11-25T03:56:25Z] D2S netgen: sh /foss/tools/sak/sak-lvs.sh -m -s /home/user/sg13cmos5l_cm_slot7/pads/sg13cmos5l_IOPadDiff2Single/sg13cmos5l_IOPadDiff2Single.spice -l /home/user/sg13cmos5l_cm_slot7/pads/sg13cmos5l_IOPadDiff2Single/sg13cmos5l_IOPadDiff2Single.gds -c sg13cmos5l_IO
+… [1415 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:56:30 UTC
+
+**Tool call: `Bash`**
+
+_Review final summary outputs_
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final; ls -la $S/summary; cat $S/summary/files.txt; grep -A9 '^report' $S/summary/slot_7.density.txt | head -12; grep -A6 '^report' $S/summary/D2S.density.txt | head -8; cat $S/runtimes.txt | cut -f1-4
+```
+
+## Tool results / harness — 2026-11-25 03:56:31 UTC
+
+**Tool result:**
+
+```
+total 5656
+drwxr-xr-x 2 root root    4096 Nov 25 03:56 .
+drwxr-xr-x 8 root root    4096 Nov 25 03:56 ..
+-rw-r--r-- 1 root root    5248 Nov 25 03:56 D2S.density.sg13cmos5l_IOPadDiff2Single_sg13cmos5l_IOPadDiff2Single_density.lyrdb
+-rw-r--r-- 1 root root    2512 Nov 25 03:56 D2S.density.txt
+-rw-r--r-- 1 root root  103810 Nov 25 03:56 D2S.drc.sg13cmos5l_IOPadDiff2Single_sg13cmos5l_IOPadDiff2Single_full.lyrdb
+-rw-r--r-- 1 root root    1108 Nov 25 03:56 D2S.drc.txt
+-rw-r--r-- 1 root root 1216032 Nov 25 03:56 D2S.lvs.sg13cmos5l_IOPadDiff2Single.lvsdb
+-rw-r--r-- 1 root root    1481 Nov 25 03:56 D2S.lvs.txt
+-rw-r--r-- 1 root root 1202111 Nov 25 03:56 D2S.lvs_spice_as_given.sg13cmos5l_IOPadDiff2Single.lvsdb
+-rw-r--r-- 1 root root    1936 Nov 25 03:56 D2S.lvs_spice_as_given.txt
+-rw-r--r-- 1 root root    2847 Nov 25 03:56 D2S.magicdrc.sg13cmos5l_IOPadDiff2Single.magic.drc.log
+-rw-r--r-- 1 root root     121 Nov 25 03:56 D2S.magicdrc.sg13cmos5l_IOPadDiff2Single.magic.drc.rpt
+-rw-r--r-- 1 root root     532 Nov 25 03:56 D2S.magicdrc.txt
+-rw-r--r-- 1 root root   45697 Nov 25 03:56 D2S.maxlu.sg13cmos5l_IOPadDiff2Single_maximal_lu.lyrdb
+-rw-r--r-- 1 root root    1097 Nov 25 03:56 D2S.maxlu.txt
+-rw-r--r-- 1 root root    7921 Nov 25 03:56 D2S.netgen.sg13cmos5l_IOPadDiff2Single.lvs.log
+-rw-r--r-- 1 root root   23574 Nov 25 03:56 D2S.netgen.sg13cmos5l_IOPadDiff2Single.lvs.out
+-rw-r--r-- 1 root root    1240 Nov 25 03:56 D2S.netgen.txt
+-rw-r--r-- 1 root root    5248 Nov 25 03:56 S2D.density.sg13cmos
+… [10854 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:56:35 UTC
+
+**Tool call: `Bash`**
+
+_Extract density values from report_
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final; grep -o '<value>[^<]*</value>' $S/summary/slot_7.density.slot_7_slot_7_density.lyrdb | head -20; grep -iE 'density.*%|global' $S/slot_7/klayout_density/slot_7_slot_7_density.log | head -20
+```
+
+## Tool results / harness — 2026-11-25 03:56:35 UTC
+
+**Tool result:**
+
+```
+<value>polygon: (0,0;0,273;537.15,273;537.15,0)</value>
+<value>text: 'Global Density Violation'</value>
+<value>text: 'chip_bbox_um      : (0.000,0.000) - (537.150,273.000)'</value>
+<value>text: 'chip_area_um2     : 146641.950'</value>
+<value>text: 'layer_area_um2    : 5874.716'</value>
+<value>text: 'ratio_percent     : 4.006'</value>
+<value>text: 'limit_percent     : 35.000 (min)'</value>
+<value>text: 'gap_percent       : 30.994 (below limit)'</value>
+<value>text: 'area_gap_um2      : 45449.967'</value>
+<value>polygon: (0,0;0,273;537.15,273;537.15,0)</value>
+<value>text: 'Global Density Violation'</value>
+<value>text: 'chip_bbox_um      : (0.000,0.000) - (537.150,273.000)'</value>
+<value>text: 'chip_area_um2     : 146641.950'</value>
+<value>text: 'layer_area_um2    : 5340.374'</value>
+<value>text: 'ratio_percent     : 3.642'</value>
+<value>text: 'limit_percent     : 15.000 (min)'</value>
+<value>text: 'gap_percent       : 11.358 (below limit)'</value>
+<value>text: 'area_gap_um2      : 16655.918'</value>
+<value>polygon: (0,0;0,273;537.15,273;537.15,0)</value>
+<value>text: 'Global Density Violation'</value>
+2026-11-25 03:55:50 +0000: Memory Usage (438016K) : Activ      Density % =  4.01%  [Min = 35.00%,  Max = 55.00%]
+2026-11-25 03:55:50 +0000: Memory Usage (438016K) : GatPoly    Density % =  3.64%  [Min = 15.00%]
+2026-11-25 03:55:50 +0000: Memory Usage (438016K) : Metal1     Density % =  2.01%  [Min = 35.00%,  Max = 60.00%]
+2026-11-25 03:55:50 +0000: Memory Usage (438016K) : Me
+… [495 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:56:42 UTC
+
+**Tool call: `Bash`**
+
+_Add density percentages to summaries_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5 && python3 - <<'EOF'
+p='summarize.py'; s=open(p).read()
+old='''    runner = os.path.join(OUT, "logs", "%s.%s.log" % (cell, step))'''
+new='''    for p in logs:
+        if p.endswith("_density.log"):
+            for ln in open(p, errors="replace"):
+                if "Density % =" in ln:
+                    out.append("density: " + ln.split(" : ", 1)[-1].strip())
+    runner = os.path.join(OUT, "logs", "%s.%s.log" % (cell, step))'''
+assert old in s; s=s.replace(old,new,1); open(p,'w').write(s)
+EOF
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final; ./run_signoff.sh $S summary >/dev/null; grep density: $S/summary/*.density.txt | sed 's/.*summary\///'
+```
+
+## Tool results / harness — 2026-11-25 03:56:42 UTC
+
+**Tool result:**
+
+```
+D2S.density.txt:density: Activ      Density % = 43.46%  [Min = 35.00%,  Max = 55.00%]
+D2S.density.txt:density: GatPoly    Density % = 24.04%  [Min = 15.00%]
+D2S.density.txt:density: Metal1     Density % = 24.31%  [Min = 35.00%,  Max = 60.00%]
+D2S.density.txt:density: Metal2     Density % = 18.74%  [Min = 35.00%,  Max = 60.00%]
+D2S.density.txt:density: Metal3     Density % = 81.31%  [Min = 35.00%,  Max = 60.00%]
+D2S.density.txt:density: Metal4     Density % = 81.19%  [Min = 35.00%,  Max = 60.00%]
+D2S.density.txt:density: TopMetal1  Density % = 61.61%  [Min = 25.00%,  Max = 70.00%]
+D2S.density.txt:density: LBE        Density % =  0.00%  [Max = 20.00%]
+S2D.density.txt:density: Activ      Density % = 36.97%  [Min = 35.00%,  Max = 55.00%]
+S2D.density.txt:density: GatPoly    Density % = 24.71%  [Min = 15.00%]
+S2D.density.txt:density: Metal1     Density % = 17.37%  [Min = 35.00%,  Max = 60.00%]
+S2D.density.txt:density: Metal2     Density % = 15.41%  [Min = 35.00%,  Max = 60.00%]
+S2D.density.txt:density: Metal3     Density % = 81.34%  [Min = 35.00%,  Max = 60.00%]
+S2D.density.txt:density: Metal4     Density % = 81.19%  [Min = 35.00%,  Max = 60.00%]
+S2D.density.txt:density: TopMetal1  Density % = 61.61%  [Min = 25.00%,  Max = 70.00%]
+S2D.density.txt:density: LBE        Density % =  0.00%  [Max = 20.00%]
+slot_7.density.txt:density: Activ      Density % =  4.01%  [Min = 35.00%,  Max = 55.00%]
+slot_7.density.txt:density: GatPoly    Density % =  3.64%  [Min = 15.00%]
+slot_7.density.txt:de
+… [497 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:56:55 UTC
+
+**Tool call: `Bash`**
+
+_Skip copying diagnostic lvsdb files_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5 && python3 - <<'EOF'
+p='summarize.py'; s=open(p).read()
+s=s.replace('''def keep(p, name):
+    """copy a result file into summary/ if < 2 MB, always record size and sha256"""
+    size = os.path.getsize(p)
+    copied = size < LIMIT''','''def keep(p, name, copy=True):
+    """copy a result file into summary/ if < 2 MB (and copy is set), always record size and sha256"""
+    size = os.path.getsize(p)
+    copied = copy and size < LIMIT''')
+s=s.replace('''"copied as summary/" + name) if copied else "not copied (> 2 MB)"))''','''"copied as summary/" + name) if copied else ("not copied (> 2 MB)" if copy else "not copied (diagnostic run)")))''')
+s=s.replace('''    keep(dbs[0], "%s.%s.%s" % (cell, step, os.path.basename(dbs[0])))''','''    keep(dbs[0], "%s.%s.%s" % (cell, step, os.path.basename(dbs[0])), copy=(step == "lvs"))''')
+open(p,'w').write(s)
+EOF
+grep -n 'copy' summarize.py | head; S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final; rm -f $S/summary/*lvs_spice_as_given*.lvsdb; ./run_signoff.sh $S summary >/dev/null && ls $S/summary | grep -c . && grep diagnostic $S/summary/files.txt | cut -c1-80
+```
+
+## Tool results / harness — 2026-11-25 03:56:56 UTC
+
+**Tool result:**
+
+```
+45:def keep(p, name, copy=True):
+46:    """copy a result file into summary/ if < 2 MB (and copy is set), always record size and sha256"""
+48:    copied = copy and size < LIMIT
+50:        shutil.copyfile(p, os.path.join(SUM, name))
+51:    files.append("%s\t%d\t%s\t%s" % (rel(p), size, sha(p), ("copied as summary/" + name) if copied else ("not copied (> 2 MB)" if copy else "not copied (diagnostic run)")))
+175:    keep(dbs[0], "%s.%s.%s" % (cell, step, os.path.basename(dbs[0])), copy=(step == "lvs"))
+299:        shutil.copyfile(os.path.join(OUT, p), os.path.join(SUM, p))
+52
+S2D/klayout_lvs_spice_as_given/sg13cmos5l_IOPadSingle2Diff.lvsdb	835521	be8a5e27
+D2S/klayout_lvs_spice_as_given/sg13cmos5l_IOPadDiff2Single.lvsdb	1202111	6bd7e74
+```
+
+## Assistant — 2026-11-25 03:57:03 UTC
+
+**Tool call: `Bash`**
+
+_Copy derived pad CDLs into summaries_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5 && python3 - <<'EOF'
+p='summarize.py'; s=open(p).read()
+old='''for p in ("versions.txt", "runtimes.txt"):'''
+new='''for cdl in sorted(glob.glob(os.path.join(OUT, "*", "netlist", "*.cdl"))):
+    keep(cdl, "%s.netlist.%s" % (cdl.split(os.sep)[-3], os.path.basename(cdl)))
+for p in ("versions.txt", "runtimes.txt"):'''
+assert old in s; s=s.replace(old,new); open(p,'w').write(s)
+EOF
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final; ./run_signoff.sh $S summary >/dev/null && ls $S/summary/*cdl && du -sh $S/summary; cat $S/summary/slot_7.netgen.txt | head -40
+```
+
+## Tool results / harness — 2026-11-25 03:57:04 UTC
+
+**Tool result:**
+
+```
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/summary/D2S.netlist.sg13cmos5l_IOPadDiff2Single.cdl
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/summary/S2D.netlist.sg13cmos5l_IOPadSingle2Diff.cdl
+3.7M	/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/summary
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# written by summarize.py from the run directory of run_signoff.sh
+command: bash /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/slot_7/netgen/netgen_check.sh
+exit code: 0, wall time: 1s
+report slot_7/netgen/comp_slot_7.out
+      5 x  Netlists match uniquely.
+      2 x  Netlists match uniquely with port errors.
+      1 x  Final result: Top level cell failed pin matching.
+    Final result: Top level cell failed pin matching.
+pin-table lines with a mismatch: 3
+    analog_bus3                                |analog_bus3,s7_an_0_vref **Mismatch**
+    s7_an_1_en_3v3                             |s7_an_0_en_3v3,s7_an_1_en_3v3 **Mismatch**
+    vss_1v2_uq0                                |(no matching pin)
+    Number of devices: 29                      |Number of devices: 29
+    Number of nets: 21                         |Number of nets: 21
+    Number of devices: 33                      |Number of devices: 33
+    Number of nets: 16                         |Number of nets: 16
+    Number of devi
+… [679 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:57:15 UTC
+
+**Tool call: `Bash`**
+
+_Fix netgen summary counting_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5 && python3 - <<'EOF'
+p='summarize.py'; s=open(p).read()
+old='''            if key in ln:
+                res[ln.strip()] = res.get(ln.strip(), 0) + 1'''
+new='''            if key in ln:
+                res[ln.strip()] = res.get(ln.strip(), 0) + 1
+                break'''
+assert old in s; s=s.replace(old,new)
+old='''    # pin-matching table of the last (top) comparison: lines with "**Mismatch**" or "(no matching pin)"
+    mism = [ln.rstrip() for ln in txt if "Mismatch" in ln or "no matching pin" in ln]
+    out.append("pin-table lines with a mismatch: %d" % len(mism))'''
+new='''    # pin tables: rows flagged "**Mismatch**" (netgen cuts the flag at the column width, so match "**Mis")
+    # are pins matched under different names; "(no matching pin)" is a pin without a partner
+    mism = [ln.rstrip() for ln in txt if "**Mis" in ln or "no matching pin" in ln]
+    out.append("pin-table rows: %d flagged '**Mismatch**' (same net, different pin names), %d '(no matching pin)'" % (
+        sum(1 for m in mism if "**Mis" in m), sum(1 for m in mism if "no matching pin" in m)))'''
+assert old in s; s=s.replace(old,new); open(p,'w').write(s)
+EOF
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final; ./run_signoff.sh $S summary >/dev/null && sed -n 4,20p $S/summary/slot_7.netgen.txt; sed -n 4,14p $S/summary/S2D.netgen.txt
+```
+
+## Tool results / harness — 2026-11-25 03:57:16 UTC
+
+**Tool result:**
+
+```
+command: bash /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/slot_7/netgen/netgen_check.sh
+exit code: 0, wall time: 1s
+report slot_7/netgen/comp_slot_7.out
+      5 x  Netlists match uniquely.
+      1 x  Netlists match uniquely with port errors.
+      1 x  Final result: Top level cell failed pin matching.
+    Final result: Top level cell failed pin matching.
+pin-table rows: 4 flagged '**Mismatch**' (same net, different pin names), 1 '(no matching pin)'
+    s7_an_0_vcm                                |analog_bus2,s7_an_0_vcm,s7_an_1_vref **Mis
+    analog_bus3                                |analog_bus3,s7_an_0_vref **Mismatch**
+    s7_an_1_en_3v3                             |s7_an_0_en_3v3,s7_an_1_en_3v3 **Mismatch**
+    s7_an_1_en_3v3_b                           |s7_an_0_en_3v3_b,s7_an_1_en_3v3_b **Mismat
+    vss_1v2_uq0                                |(no matching pin)
+    Number of devices: 29                      |Number of devices: 29
+    Number of nets: 21                         |Number of nets: 21
+    Number of devices: 33                      |Number of devices: 33
+    Number of nets: 16                         |Number of nets: 16
+command: sh /foss/tools/sak/sak-lvs.sh -m -s /home/user/sg13cmos5l_cm_slot7/pads/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.spice -l /home/user/sg13cmos5l_cm_slot7/pads/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.gds -c sg13cmos5l_IOPadSingle2Diff -w /tmp/claude-0/-home-user/468a
+… [798 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:57:23 UTC
+
+**Tool call: `Bash`**
+
+_Copy summaries into the repository_
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final; D=/home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5/reports; mkdir -p $D; cp $S/summary/* $D/; du -sh $D; ls $D | wc -l; cat $D/slot_7.drc.txt $D/slot_7.maxlu.txt | grep -v '^#'; cat $D/versions.txt | head -12
+```
+
+## Tool results / harness — 2026-11-25 03:57:23 UTC
+
+**Tool result:**
+
+```
+3.7M	/home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5/reports
+54
+command: python3 /foss/pdks/ihp-sg13cmos5l/libs.tech/klayout/tech/drc/run_drc.py --path=/home/user/sg13cmos5l_cm_slot7/final/gds/slot_7.gds --topcell=slot_7 --run_dir=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/slot_7/klayout_drc --no_density --mp=1 --density_thr=2
+exit code: 0, wall time: 27s
+report slot_7/klayout_drc/slot_7_slot_7_full.lyrdb: 546 rule categories, 0 items (violations)
+logs scanned: slot_7/klayout_drc/drc_run_2026_11_25_03_53_44.log, slot_7/klayout_drc/slot_7_slot_7_main.log, slot_7/klayout_drc/slot_7_slot_7_sg13cmos5l_maximal.log, logs/slot_7.drc.log
+log lines: 'exception' 0, 'Traceback' 0, 'ERROR' 0
+runner says: 25-Nov-2026 03:54:11 | INFO    | KLayout DRC Check Passed: No DRC violations detected in the layout.
+command: klayout -b -r /foss/pdks/ihp-sg13cmos5l/libs.tech/klayout/tech/drc/rule_decks/sg13cmos5l_maximal.drc -rd input=/home/user/sg13cmos5l_cm_slot7/final/gds/slot_7.gds -rd topcell=slot_7 -rd run_mode=deep -rd thr=2 -rd threads=2 -rd latchUpRules=true -rd report=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/slot_7/klayout_maximal_lu/slot_7_maximal_lu.lyrdb -rd log=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/slot_7/klayout_maximal_lu/slot_7_maximal_lu.log
+exit code: 0, wall time: 21s
+report slot_7/klayout_maximal_lu/slot_7_maximal_lu.lyrdb: 271 rule ca
+… [981 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:57:43 UTC
+
+**Tool call: `Bash`**
+
+_Check off-grid and latch-up rule coverage_
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final; grep -c 'Executing rule OffGrid' $S/slot_7/klayout_drc/slot_7_slot_7_main.log; grep -c '^Rule OffGrid' $S/logs/slot_7.drc.log $S/logs/slot_7.maxlu.log; grep -c '^Rule LU' $S/logs/slot_7.drc.log $S/logs/slot_7.maxlu.log
+```
+
+## Tool results / harness — 2026-11-25 03:57:43 UTC
+
+**Tool result:**
+
+```
+0
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/logs/slot_7.drc.log:0
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/logs/slot_7.maxlu.log:56
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/logs/slot_7.drc.log:5
+/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/logs/slot_7.maxlu.log:5
+```
+
+## Assistant — 2026-11-25 03:57:50 UTC
+
+**Tool call: `Bash`**
+
+_Check main deck off-grid handling_
+
+```bash
+S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final; grep -i 'offgrid\|geometry\|table' $S/slot_7/klayout_drc/slot_7_slot_7_main.log | head -8; grep -n 'offgrid\|no_offgrid' /foss/pdks/ihp-sg13cmos5l/libs.tech/klayout/tech/drc/ihp-sg13cmos5l.drc | head
+```
+
+## Tool results / harness — 2026-11-25 03:57:50 UTC
+
+**Tool result:**
+
+```
+2026-11-25 03:53:45 +0000: Memory Usage (427992K) : tables selected: main
+2026-11-25 03:53:45 +0000: Memory Usage (427992K) : OFFGRID enabled: true
+2026-11-25 03:53:46 +0000: Memory Usage (455616K) : Starting 5.1 NWell table
+2026-11-25 03:53:46 +0000: Memory Usage (456464K) : Starting 5.3 nBuLay table
+2026-11-25 03:53:46 +0000: Memory Usage (456464K) : Starting 5.5. Activ table
+2026-11-25 03:53:46 +0000: Memory Usage (456464K) : Starting 5.6 Activ:filler table
+2026-11-25 03:53:46 +0000: Memory Usage (456464K) : Starting 5.7. ThickGateOx table
+2026-11-25 03:53:46 +0000: Memory Usage (456464K) : Starting 5.8. GatPoly table
+144:OFFGRID = !bool_check?($no_offgrid)
+492:# %include rule_decks/geometry/3_1_offgrid.drc
+```
+
+## Assistant — 2026-11-25 03:57:57 UTC
+
+**Tool call: `Bash`**
+
+_Gather pad figures for README_
+
+```bash
+D=/home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5/reports; grep -v '^#' $D/S2D.drc.txt | grep report; grep -v '^#' $D/S2D.maxlu.txt | grep report; grep report $D/D2S.drc.txt $D/D2S.maxlu.txt | sed 's/.*: report/report/'; grep -v '^#' $D/bg_core_pd.magicdrc.txt; grep 'circuit' $D/S2D.lvs_spice_as_given.txt $D/D2S.lvs_spice_as_given.txt | cut -c1-200; sha256sum $D/../spice2cdl.py
+```
+
+## Tool results / harness — 2026-11-25 03:57:58 UTC
+
+**Tool result:**
+
+```
+report S2D/klayout_drc/sg13cmos5l_IOPadSingle2Diff_sg13cmos5l_IOPadSingle2Diff_full.lyrdb: 546 rule categories, 0 items (violations)
+command: klayout -b -r /foss/pdks/ihp-sg13cmos5l/libs.tech/klayout/tech/drc/rule_decks/sg13cmos5l_maximal.drc -rd input=/home/user/sg13cmos5l_cm_slot7/pads/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.gds -rd topcell=sg13cmos5l_IOPadSingle2Diff -rd run_mode=deep -rd thr=2 -rd threads=2 -rd latchUpRules=true -rd report=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/S2D/klayout_maximal_lu/sg13cmos5l_IOPadSingle2Diff_maximal_lu.lyrdb -rd log=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff/final/S2D/klayout_maximal_lu/sg13cmos5l_IOPadSingle2Diff_maximal_lu.log
+report S2D/klayout_maximal_lu/sg13cmos5l_IOPadSingle2Diff_maximal_lu.lyrdb: 271 rule categories, 0 items (violations)
+/home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5/reports/D2S.drc.txt:report D2S/klayout_drc/sg13cmos5l_IOPadDiff2Single_sg13cmos5l_IOPadDiff2Single_full.lyrdb: 546 rule categories, 0 items (violations)
+/home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5/reports/D2S.maxlu.txt:command: klayout -b -r /foss/pdks/ihp-sg13cmos5l/libs.tech/klayout/tech/drc/rule_decks/sg13cmos5l_maximal.drc -rd input=/home/user/sg13cmos5l_cm_slot7/pads/sg13cmos5l_IOPadDiff2Single/sg13cmos5l_IOPadDiff2Single.gds -rd topcell=sg13cmos5l_IOPadDiff2Single -rd run_mode=deep -rd thr=2 -rd threads=2 -rd latchUpRule
+… [1879 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:58:55 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5/README.md`
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Sign-off re-run of the taped-out slot 7 (`158afc5`), 2026-11-25
+
+DRC and LVS of the **taped-out** `final/gds/slot_7.gds` (v3 + tughra art, top cell `slot_7`) and of the two pad cells in
+`pads/`, re-run on 2026-11-25 with the PDK decks and tools listed below. Until now the results for this GDS existed only as text
+in `../../README.md` (2026-11-08); `../slot_7/layout/klayout/slot_7_checks.txt` covers v3 **without** the art. Every number
+below was read from the tool output in `reports/`; nothing was carried over from the designer's records.
+
+Inputs (sha256, checked by `run_signoff.sh` against the provenance table of `../../README.md`: all three equal):
+
+| input | sha256 |
+|---|---|
+| `final/gds/slot_7.gds` | `469f2327c4bc22b1d6fc1785fab2fd3830b6050e51989b361dc11b26be669c05` (= README "this file") |
+| `pads/sg13cmos5l_IOPadSingle2Diff/sg13cmos5l_IOPadSingle2Diff.gds` | `f4b0e07320821248872780b344d71845d08bc250a4bfc9bcf8633a39bdef0182` |
+| `pads/sg13cmos5l_IOPadDiff2Single/sg13cmos5l_IOPadDiff2Single.gds` | `13e176ab106d0cb307a6ebc42acf647ce38b6abc52183a9f1d9ffead2f6c2b17` |
+| `netlist/slot_7.cdl` | `af1e5f027f9f90c1d44d30faa886eb630bf789e194d9210e9ad2cf5a1b9028e8` |
+| `netlist/slot_7_netgen.spice` / `netlist/netgen_check.sh` | `a1e08178…` / `6cd4e7b4…` (full values in `reports/versions.txt`) |
+
+## Results
+
+S2D = `sg13cmos5l_IOPadSingle2Diff`, D2S = `sg13cmos5l_IOPadDiff2Single`. "Expected" is the designer's record
+(`../../README.md`, `../README.md`, `../../docs/chipalooza2_as_taped_out/README.md` §5). Files are in `reports/`.
+
+| check | tool | result | expected | file |
+|---|---|---|---|---|
+| slot_7 DRC, designer's flags (`run_drc.py --no_density`: main deck + maximal deck) | KLayout 0.30.12, PDK deck | **0 violations** in 546 rule categories; 0 "exception" / "Traceback" / "ERROR" log lines | no violations, 0 exception lines | `slot_7.drc.txt`, `slot_7.drc.slot_7_slot_7_full.lyrdb` |
+| slot_7 maximal deck, `-rd latchUpRules=true` | KLayout, `sg13cmos5l_maximal.drc` | **0** in 271 categories (incl. LU.a/c/c1/d/d1 and 56 OffGrid rules); 0 exception lines | 0 | `slot_7.maxlu.txt`, `slot_7.maxlu.slot_7_maximal_lu.lyrdb` |
+| slot_7 density (`run_drc.py --density_only`) | KLayout, `density.drc` | **7 violations, 1 each**: AFil.g (Activ 4.01 % < 35), GFil.g (GatPoly 3.64 % < 15), M1.j (2.01 %), M2.j (0.94 %), M3.j (2.47 %), M4.j (0.98 %) < 35, TM1.c (TopMetal1 7.04 % < 25); no max-density rule violated | the same 7 min-density rules (unfilled slot, filled at chip level) | `slot_7.density.txt`, `slot_7.density.slot_7_slot_7_density.lyrdb` |
+| slot_7 LVS vs `netlist/slot_7.cdl`, `--run_mode=deep --disable_tap_extraction` | KLayout, `run_lvs.py` | **"Congratulations! Netlists match."**, strict port mode; runner: layout = **497** devices; cross-reference: 6 circuits Match, 376 device pairs (after simplification), 0 not matching, 35 top pin pairs, 0 not matching | match, strict ports, 0 port errors, 497 devices | `slot_7.lvs.txt`, `slot_7.lvs.slot_7.lvsdb` |
+| slot_7 magic + netgen (`netlist/netgen_check.sh`, unchanged) | magic 8.3.685, netgen 1.5.324 | **5 subcircuits "Netlists match uniquely"** (bg_core_pd 29 devices, pad_ref_rb 33, s7_ctrl 222, s7_doutpd 12, bias_dist_pd 75); top `slot_7`: "match uniquely with port errors", one pin without partner: **`vss_1v2_uq0`**; 4 pin rows flagged `**Mismatch**` are the comma-named merged ports (same net, other name); "Final result: Top level cell failed pin matching." | 5 match; top: one port error `vss_1v2_uq0` | `slot_7.netgen.txt`, `slot_7.netgen.comp_slot_7.out` |
+| slot_7 magic DRC, `drc(full)` (`sak-drc.sh -m`) | magic 8.3.685 | **COUNT 48**, all "Metal1 overlap of Via1 < 0.005um (V1.c - M2.c)", at 8 places (6 markers each) in `slot7_bg_core_pd/bg_pmir_pcas_c` (x ≈ 333.55 and 376.38 µm, y 186.9–200.0 µm) | not recorded for the slot; `bg_core_pd` committed report: COUNT 0 | `slot_7.magicdrc.txt`, `slot_7
+… [8734 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 03:58:55 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5/README.md (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 03:59:04 UTC
+
+**Tool call: `Bash`**
+
+_Fix cell name and check slot cell naming_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5 && sed -i 's#in `slot7_bg_core_pd/bg_pmir_pcas_c`#in `bg_core_pd/bg_pmir_pcas_c`#' README.md && grep -n 'bg_pmir_pcas_c' README.md | cut -c1-120; python3 -c "
+import klayout.db as db; l=db.Layout(); l.read('/home/user/sg13cmos5l_cm_slot7/final/gds/slot_7.gds'); print(sorted(c.name for c in l.each_cell())[:12])"
+```
+
+## Tool results / harness — 2026-11-25 03:59:05 UTC
+
+**Tool result:**
+
+```
+34:| slot_7 magic DRC, `drc(full)` (`sak-drc.sh -m`) | magic 8.3.685 | **COUNT 48**, all "Metal1 overlap of Via1 < 0.005
+95:   no magic DRC of the slot). They sit in `bg_pmir_pcas_c` of `bg_core_pd`, where two Via1 cuts 0.22 µm apart, each 
+98:   `bg_pmir_pcas_c` in the slot is identical to the macro's (flat XOR 0 on Metal1, Via1, Metal2). So the difference c
+['bdp_fill0', 'bdp_fill1', 'bdp_fill2', 'bdp_fill3', 'bdp_fill4', 'bdp_fill5', 'bdp_fill6', 'bdp_inv_hv', 'bdp_mirror_n', 'bdp_mirror_p', 'bdp_nand2_hv', 'bdp_nmosHV']
+[This command modified 1 file you've previously read: ../sg13cmos5l_cm_slot7/signoff/taped_out_158afc5/README.md. Call Read before editing.]
+```
+
+## Assistant — 2026-11-25 03:59:19 UTC
+
+**Tool call: `Bash`**
+
+_Update signoff/README.md with the re-run section_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/signoff && python3 - <<'EOF'
+p='README.md'; s=open(p).read()
+old_row_start='| reports for the **taped-out** `final/gds/slot_7.gds` (v3 + tughra art, sha256 `469f2327…`) | none committed anywhere read here;'
+assert old_row_start in s
+s=s.replace(old_row_start,'| reports for the **taped-out** `final/gds/slot_7.gds` (v3 + tughra art, sha256 `469f2327…`) | none committed anywhere read here (2026-11-23; **re-run on 2026-11-25, see below and [`taped_out_158afc5/`](taped_out_158afc5/README.md)**);')
+old_tail='''To complete the sign-off set of the taped-out slot, the KLayout DRC report (`.lyrdb`) and LVS database (`.lvsdb`) of
+`final/gds/slot_7.gds` against `netlist/slot_7.cdl`, and the `netgen_check.sh` output, would have to be generated and added; this was not done here.
+'''
+assert old_tail in s
+new_tail='''To complete the sign-off set of the taped-out slot, the KLayout DRC report (`.lyrdb`) and LVS database (`.lvsdb`) of
+`final/gds/slot_7.gds` against `netlist/slot_7.cdl`, and the `netgen_check.sh` output, would have to be generated and added; this was not done
+on 2026-11-23. It was done on 2026-11-25 (next section).
+
+## Re-run for the taped-out GDS (2026-11-25): [`taped_out_158afc5/`](taped_out_158afc5/README.md)
+
+Unlike the files above, these were **generated** here, on 2026-11-25, from `../final/gds/slot_7.gds` (sha256 `469f2327…`, equal to
+the provenance table of `../README.md`) and the two pad GDS files of `../pads/`, with KLayout 0.30.12, magic 8.3.685, netgen 1.5.324
+and the PDK `ihp-sg13cmos5l` at IHP-Open-PDK `df4c5054` (2026-10-14). `taped_out_158afc5/run_signoff.sh` reproduces every run;
+`taped_out_158afc5/README.md` has the commands, versions, run times and the full results table.
+
+| check (slot_7, taped-out GDS) | result |
+|---|---|
+| `run_drc.py --no_density` | 0 violations (546 rule categories), 0 exception / Traceback lines |
+| maximal deck, `-rd latchUpRules=true` | 0 (271 categories) |
+| density | 7 violations, 1 each: AFil.g, GFil.g, M1.j, M2.j, M3.j, M4.j, TM1.c (unfilled slot) |
+| KLayout LVS deep, `--disable_tap_extraction`, vs `netlist/slot_7.cdl` | netlists match, strict ports, 497 layout devices (376 device pairs after simplification, all Match) |
+| `netgen_check.sh` | 5 subcircuits match uniquely; top: one pin without partner, `vss_1v2_uq0` |
+| magic DRC `drc(full)` | **48** "Metal1 overlap of Via1" markers at 8 places in `bg_pmir_pcas_c` (`bg_core_pd`); the stand-alone `bg_core_pd` macro gives the same 48 with today's magic, although its committed report above says COUNT 0: a tool-version difference, not a layout change |
+
+Pads: KLayout DRC 0 / 0, maximal + latch-up 0 / 0; KLayout LVS match (76 / 77 device pairs) against a CDL derived from
+`../pads/*/*.spice` by `taped_out_158afc5/spice2cdl.py` (the netgen netlist as given gives no match in KLayout: its X-card devices
+are not read as devices); magic DRC and netgen reports byte-identical to the committed ones above (COUNT 0; only the `vss` /
+`iovss` merge); density as stand-alone cells: M1.j, M2.j, M3.k, M4.k.
+'''
+s=s.replace(old_tail,new_tail); open(p,'w').write(s)
+EOF
+tail -5 README.md | cut -c1-100
+```
+
+## Tool results / harness — 2026-11-25 03:59:19 UTC
+
+**Tool result:**
+
+```
+Pads: KLayout DRC 0 / 0, maximal + latch-up 0 / 0; KLayout LVS match (76 / 77 device pairs) against 
+`../pads/*/*.spice` by `taped_out_158afc5/spice2cdl.py` (the netgen netlist as given gives no match 
+are not read as devices); magic DRC and netgen reports byte-identical to the committed ones above (C
+`iovss` merge); density as stand-alone cells: M1.j, M2.j, M3.k, M4.k.
+```
+
+## Assistant — 2026-11-25 03:59:29 UTC
+
+**Tool call: `Bash`**
+
+_Add 2026-11-25 rows to section 5 table_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && python3 - <<'EOF'
+p='README.md'; s=open(p).read()
+anchor='| mode simulations | tt and ff pass all 8 modes;'
+assert anchor in s and s.count(anchor)==1
+rows='''| re-run 2026-11-25: `run_drc.py --no_density` on the taped-out GDS (sha256 `469f2327…`; KLayout 0.30.12, PDK IHP-Open-PDK `df4c5054`) | 0 violations, 0 exception lines ([`signoff/taped_out_158afc5/`](../../signoff/taped_out_158afc5/README.md)) |
+| re-run 2026-11-25: maximal deck with `-rd latchUpRules=true` | 0 |
+| re-run 2026-11-25: density | 7 violations, 1 each: AFil.g, GFil.g, M1–M4.j, TM1.c |
+| re-run 2026-11-25: KLayout LVS deep, `--disable_tap_extraction`, vs `netlist/slot_7.cdl` | match, strict ports, 497 layout devices (376 device pairs after simplification, all Match) |
+| re-run 2026-11-25: `netlist/netgen_check.sh` (magic 8.3.685, netgen 1.5.324) | 5 subcircuits match uniquely; top: one pin without partner, `vss_1v2_uq0` |
+| re-run 2026-11-25: magic DRC `drc(full)` | 48 "Metal1 overlap of Via1" markers at 8 places in `bg_core_pd` (`bg_pmir_pcas_c`); the stand-alone `bg_core_pd` macro gives the same 48 with this magic, its committed report says 0: tool version, not layout |
+| re-run 2026-11-25: both pads | KLayout DRC 0, maximal + latch-up 0, KLayout LVS match (against a CDL derived from `pads/*/*.spice`); magic DRC and netgen reports byte-identical to the committed ones (only the `vss` / `iovss` merge) |
+'''
+s=s.replace(anchor, rows+anchor); open(p,'w').write(s)
+EOF
+sed -n 302,325p README.md | cut -c1-140
+```
+
+## Tool results / harness — 2026-11-25 03:59:29 UTC
+
+**Tool result:**
+
+```
+### 4.3 Hierarchy of `slot_7` (from `final/gds/slot_7.gds` of `158afc5`, read on 2026-11-22)
+
+88 cells in all. Direct children of `slot_7`, each instantiated once; placement from `docs/slot_7.md`:
+
+| block | size (µm) | placement (µm) | function | sub-cells (instances) |
+|---|---|---|---|---|
+| `bg_core_pd` | 47.55 × 50.05 | (330, 152.7) | Banba current-mode bandgap (pnpMPA, rhigh, no op amp); sources about 5 µA; high-Z when dis
+| `bias_dist_pd` | 60.49 × 16.44 | (385, 183.1) | switchable distribution mirror: reference current in, one 1:1 sourced copy per pad bias t
+| `pad_ref_rb` | 73.8 × 76.26 | (450, 150) | replica bias: one bias tree from one 5 µA reference gives `vcm` (S2D `vcm` = D2S `vref`) and 
+| `s7_ctrl` | 71.6 × 38.04 | (452, 60) | master enable, mode decode, switch matrix, fail-safe level shifting (3.3 V only) | `efs_ls_core` �
+| `s7_doutpd` | 24.67 × 3.85 | (8, 60) | pull-downs holding `dig_out[11:0]` low | `dop_nmosHV_w0p5_l0p45` ×12 |
+| `tughra_art` | 158.05 × 90.0 | (88.5, 141.3) | decorative art: floating GatPoly and Metal1–4 with no-fill markers; no device, no pin | 
+
+Notes:
+
+- The art was added after v3 by `art/add_art.py`; see the aside at the end.
+- **The Oguey–Aebischer core `oa_core_pd` is not in the taped-out slot.** The delivery repository still carries `macros/oa_core_pd/` (and 
+  says both cores are placed in `slot_7.gds`, which was true of the test platform); the hierarchy of the taped-out `slot_7.gds` has
+  the bandgap core only. `macros/bg_core_p
+… [380 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:59:34 UTC
+
+**Tool call: `Bash`**
+
+_Verify edits and repository state_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7 && sed -n '/^## 5. Verification state/,/^Not done/p' docs/chipalooza2_as_taped_out/README.md | cut -c1-90; git status --short | head; git diff --stat; du -sh signoff/taped_out_158afc5; grep -L 'SPDX' signoff/taped_out_158afc5/*.* signoff/taped_out_158afc5/reports/*.txt
+```
+
+## Tool results / harness — 2026-11-25 03:59:34 UTC
+
+**Tool result:**
+
+```
+## 5. Verification state
+
+By the designer, for `158afc5` (KLayout 0.30.12, PDK `ihp-sg13cmos5l`; from the delivery's
+
+| check | result |
+|---|---|
+| `run_drc.py --no_density` | no violations |
+| maximal deck with `-rd latchUpRules=true` | 0 |
+| density | the same 7 minimum-density rules as without the art (AFil.g, GFil.g, M1–M4.j
+| LVS `run_lvs.py --run_mode=deep --disable_tap_extraction` against `netlist/slot_7.cdl` |
+| magic + netgen (`netlist/netgen_check.sh`) | 5 subcircuits match uniquely; top: one port
+| re-run 2026-11-25: `run_drc.py --no_density` on the taped-out GDS (sha256 `469f2327…`;
+| re-run 2026-11-25: maximal deck with `-rd latchUpRules=true` | 0 |
+| re-run 2026-11-25: density | 7 violations, 1 each: AFil.g, GFil.g, M1–M4.j, TM1.c |
+| re-run 2026-11-25: KLayout LVS deep, `--disable_tap_extraction`, vs `netlist/slot_7.cdl`
+| re-run 2026-11-25: `netlist/netgen_check.sh` (magic 8.3.685, netgen 1.5.324) | 5 subcirc
+| re-run 2026-11-25: magic DRC `drc(full)` | 48 "Metal1 overlap of Via1" markers at 8 plac
+| re-run 2026-11-25: both pads | KLayout DRC 0, maximal + latch-up 0, KLayout LVS match (a
+| mode simulations | tt and ff pass all 8 modes; at ss / −40 °C default, feed and ext p
+
+Not done, as stated by the designer: PEX of the whole slot; fill; the harness flow with th
+ M docs/chipalooza2_as_taped_out/README.md
+ M signoff/README.md
+?? signoff/taped_out_158afc5/
+?? verification/c2_gaps/s2d_mismatch/
+ docs/chipalooza2_as_taped_out/README.md |  7 +++++++
+ signoff/REA
+… [236 more characters cut]
+```
+
+## Assistant — 2026-11-25 03:59:45 UTC
+
+**Tool call: `Bash`**
+
+_Add SPDX headers to versions and runtimes_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5 && python3 - <<'EOF'
+p='run_signoff.sh'; s=open(p).read()
+old='''mkdir -p "$OUT/logs"
+RT=$OUT/runtimes.txt
+'''
+new='''mkdir -p "$OUT/logs"
+RT=$OUT/runtimes.txt
+SPDX_HDR='# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0'
+[ -f "$RT" ] || printf '%s\\n# cell\\tstep\\texit code\\twall time\\tcommand\\n' "$SPDX_HDR" > "$RT"
+'''
+assert old in s; s=s.replace(old,new)
+old='''	{
+		echo "date (UTC): $(date -u +%FT%TZ)"'''
+new='''	{
+		echo "$SPDX_HDR"
+		echo "date (UTC): $(date -u +%FT%TZ)"'''
+assert old in s; s=s.replace(old,new); open(p,'w').write(s)
+EOF
+for f in reports/versions.txt reports/runtimes.txt; do { printf '# SPDX-FileCopyrightText: 2026 Christoph Maier\n# SPDX-License-Identifier: Apache-2.0\n'; [ $f = reports/runtimes.txt ] && printf '# cell\tstep\texit code\twall time\tcommand\n'; cat $f; } > $f.new && mv $f.new $f; done; head -3 reports/runtimes.txt | cut -c1-80; bash -n run_signoff.sh && echo syntax-ok; S=/tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/signoff; ./run_signoff.sh $S/envtest env | head -3; python3 -c "
+import sys; sys.argv=['x','$S/final']" ; cut -f1-4 reports/runtimes.txt | head -5
+```
+
+## Tool results / harness — 2026-11-25 03:59:46 UTC
+
+**Tool result:**
+
+```
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# cell	step	exit code	wall time	command
+syntax-ok
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+date (UTC): 2026-11-25T03:59:46Z
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+# cell	step	exit code	wall time
+slot_7	drc	rc=0	27s
+S2D	drc	rc=0	19s
+```
+
+## Assistant — 2026-11-25 04:00:02 UTC
+
+**Tool call: `SubagentHandback`**
+
+```json
+{
+ "message": "I re-ran DRC and LVS on the taped-out `final/gds/slot_7.gds` and both pads. Everything matches the designer's records except magic DRC, which nobody had recorded for the slot: it gives 48 markers. Its sha256 `469f2327…` matches the provenance table. Tools: KLayout 0.30.12, magic 8.3.685, netgen 1.5.324, PDK IHP-Open-PDK `df4c5054` (2026-10-14; the designer recorded no PDK commit). 2 threads; the whole script runs in 163 s.\n\n**slot_7**\n- **`run_drc.py --no_density`:** 0 violations, 0 exception or Traceback lines in the logs.\n- **Maximal deck with latch-up:** 0.\n- **Density:** the expected 7 rules, 1 violation each (AFil.g 4.0 %, GFil.g 3.6 %, M1–M4.j 0.9–2.5 %, TM1.c 7.0 %).\n- **KLayout LVS deep:** match in strict port mode, 497 layout devices. After simplification that is 376 device pairs, all matching.\n- **`netgen_check.sh`:** 5 subcircuits match; at top level the only pin without a partner is `vss_1v2_uq0`.\n\n**Pads**\n- **KLayout DRC and maximal + latch-up:** 0 for both.\n- **Density:** 4 violations each (M1.j and M2.j too low; M3.k and M4.k at 81 %, above the 60 % maximum). Nothing was recorded for pad density before.\n- **KLayout LVS:** `pads/*.spice` as given gives no match, because KLayout does not read its X-card devices as devices. I wrote `spice2cdl.py` to rename those to M/R/D cards. With that netlist both pads match (76 and 77 device pairs).\n- **magic DRC and netgen:** reports byte-identical to the committed ones. Netgen shows only the documented `vss`/`iovss` merge.\n\n**Unexpected**\n1. **magic DRC on slot_7: COUNT 48** (\"Metal1 overlap of Via1\"), at 8 places in `bg_core_pd/bg_pmir_pcas_c`, away from the art. The standalone `macros/bg_core_pd` GDS also gives 48 today, though its committed report says 0, and the cell is identical in both (XOR 0). So this comes from the tool or PDK version, not the layout. KLayout passes the same rules.\n2. **PDK deck quirk:** `sg13cmos5l_maximal.drc` reads `no_offgrid` inverted, so inside `run_drc.py` its 56 OffGrid rules are skipped. The standalone maximal run includes them; 0 either way.\n\nNot run: antenna rules and chip-level checks. I ran no git commands that change state. The untracked `verification/c2_gaps/s2d_mismatch/` is not mine.\n\nThe two existing files were edited only where allowed: a new section at the end of `signoff/README.md` (plus an updated \"not collected\" row and closing paragraph), and seven dated rows in the §5 table of `docs/chipalooza2_as_taped_out/README.md`.\n\nFiles are in `/home/user/sg13cmos5l_cm_slot7/signoff/taped_out_158afc5/`:\n- `README.md` — results table, versions, commands, differences from the records\n- `run_signoff.sh` — reproduces every run\n- `summarize.py`\n- `spice2cdl.py`\n- `reports/` — 54 files, 3.7 MB, all under 2 MB\n"
+}
+```
+
+## Tool results / harness — 2026-11-25 04:00:02 UTC
+
+**Tool result:**
+
+```
+{"success":true,"message":"Report delivered to your caller."}
+```
+
