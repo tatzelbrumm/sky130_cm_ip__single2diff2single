@@ -2324,3 +2324,470 @@ wrote docs/chipalooza2_as_taped_out/pix/plots/pex_vs_schematic_s2d.png (185094 b
 wrote docs/chipalooza2_as_taped_out/pix/plots/pex_vs_schematic_d2s.png (223221 bytes)
 ```
 
+## Assistant — 2026-11-25 02:48:16 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pix/plots/pex_vs_schematic_s2d.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 02:48:16 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 02:48:17 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pix/plots/bias_dist_mismatch_hist.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 02:48:17 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 02:48:18 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pix/plots/pad_ref_rb_vcm_vref_pvt.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 02:48:18 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 02:48:26 UTC
+
+**Tool call: `Bash`**
+
+_Fix pad_ref_rb plot legends and title_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pix/plots && python3 - <<'EOF'
+p='make_plots.py'; s=open(p).read()
+s=s.replace("""    a1.legend(title='MOS corner (color)', fontsize=7, title_fontsize=7.5, loc='upper left')
+    for v in [3.0, 3.3, 3.6]:
+        a2.plot([], [], VLS[v], color='k', label='iovdd %.1f V' % v)
+    a2.legend(title='line style', fontsize=7, title_fontsize=7.5, loc='upper left')""",
+"""    h, l = a1.get_legend_handles_labels()
+    leg = a2.legend(h, l, title='MOS corner (color)', fontsize=7, title_fontsize=7.5, loc='lower right')
+    a2.add_artist(leg)
+    hs = [a2.plot([], [], VLS[v], color='k')[0] for v in [3.0, 3.3, 3.6]]
+    a2.legend(hs, ['iovdd %.1f V' % v for v in [3.0, 3.3, 3.6]], title='line style', fontsize=7, title_fontsize=7.5,
+              loc='upper left')""")
+s=s.replace("""'IHP sg13cmos5l simulation (schematic; the magic PEX gives the same values within 0.1 mV); '
+                 'data: verification/c2_gaps/replica_bias/results/cace_schematic/vcm_dc*_params.csv', fontsize=8.4)""",
+"""'IHP sg13cmos5l simulation (schematic; the magic PEX gives the same values within 0.1 mV)\\n'
+                 'data: verification/c2_gaps/replica_bias/results/cace_schematic/vcm_dc*_params.csv', fontsize=8.4)""")
+open(p,'w').write(s)
+EOF
+python3 -I make_plots.py --design-cache /tmp/claude-0/-home-user/468ace82-a4b3-592d-8838-6ea52a1be021/scratchpad/rationale/cache 2>&1 | grep 'wrote.*pad_ref'
+```
+
+## Tool results / harness — 2026-11-25 02:48:29 UTC
+
+**Tool result:**
+
+```
+wrote docs/chipalooza2_as_taped_out/pix/plots/pad_ref_rb_vcm_vref_pvt.png (212479 bytes)
+```
+
+## Assistant — 2026-11-25 02:48:31 UTC
+
+**Tool call: `Read`**
+
+```json
+{
+ "file_path": "/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pix/plots/pad_ref_rb_vcm_vref_pvt.png"
+}
+```
+
+## Tool results / harness — 2026-11-25 02:48:31 UTC
+
+**Tool result:**
+
+```
+[image]
+```
+
+## Assistant — 2026-11-25 02:48:36 UTC
+
+**Tool call: `Bash`**
+
+_Check bandgap MOS spread and resistor-corner ratios_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/verification/c2_gaps/slot_modes_bg && python3 -c "
+import csv
+r=[x for x in csv.DictReader(l for l in open('bg_core_dc.csv') if not l.startswith('#')) if x['view']=='schematic']
+from collections import defaultdict
+g=defaultdict(list)
+for x in r: g[(x['res'],x['temp'],x['vdd'])].append(float(x['i_op_uA']))
+print(max((max(v)-min(v))/min(v)*100 for v in g.values()))
+ty={(x['mos'],x['temp'],x['vdd']):float(x['i_op_uA']) for x in r if x['res']=='res_typ'}
+for res in ['res_bcs','res_wcs']:
+  rr=[float(x['i_op_uA'])/ty[(x['mos'],x['temp'],x['vdd'])]-1 for x in r if x['res']==res]
+  print(res, min(rr)*100, max(rr)*100)
+"
+```
+
+## Tool results / harness — 2026-11-25 02:48:36 UTC
+
+**Tool result:**
+
+```
+0.3015496750681299
+res_bcs 27.73543709318611 28.977899423996067
+res_wcs -21.366174996419872 -20.633187772925766
+```
+
+## Assistant — 2026-11-25 02:49:52 UTC
+
+Now writing HOW_IT_WORKS.md.
+
+## Assistant — 2026-11-25 02:52:36 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md`
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Slot 7: how it works, and why it is sized the way it is
+
+For a reviewer who knows analog design but not this project. Back to [README.md](README.md); numbers in the data sheets
+([datasheets/](datasheets/README.md)); measured-in-simulation curves in [`../../verification/c2_gaps/`](../../verification/c2_gaps/).
+No silicon exists yet: every number here is an IHP sg13cmos5l **simulation** quoted from the files named next to it.
+
+**Sources and conventions.**
+
+- **P** = design repository [`tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single`](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single)
+  at commit [`91a7da8b`](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single/tree/91a7da8b67ac56a26c605501146667a1fde28c32)
+  (the two pads, as taped out); **S** = the same repository at [`9052bd35`](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single/tree/9052bd35928c6d40344e8e686c9abbe736bfadb9)
+  (`slot_7` and the blocks it places). Paths below are relative to that repository's root. Statements of fact and of
+  design intent come from the READMEs and the comment headers of the source netlists named in each section.
+- Sizing tables are copied from the **source netlists** (`netlist/source/*.spice`); for every cell the READMEs state that
+  the xschem sheet netlists to the same devices (checked device by device by the designer). Layout dummies (D = S on a
+  rail, no current) are left out of the tables. W is the total width over all fingers (`ng`).
+- **Derivation (added here)** marks a step that is not in the sources: a short calculation from the netlist values that
+  the reader can redo. Where the sources do not give a reason for a choice, the text says so.
+- Schematic pictures: [pix/schematics/](pix/schematics/README.md) (xschem renders of the sources at P and S). Plots:
+  [pix/plots/](pix/plots/README.md) (made from committed CSVs by `make_plots.py`).
+
+Contents: [1 the common unit](#1-the-common-unit-unit_r2) · [2 S2D pad](#2-s2d-pad-sg13cmos5l_iopadsingle2diff) ·
+[3 D2S pad](#3-d2s-pad-sg13cmos5l_iopaddiff2single) · [4 replica bias](#4-replica-bias-pad_ref_rb) ·
+[5 bandgap](#5-bandgap-current-reference-bg_core_pd) · [6 distribution and fail-safe enables](#6-bias_dist_pd-and-the-fail-safe-enables) ·
+[7 what the sources do not say](#7-what-the-sources-do-not-say)
+
+## 1. The common unit `unit_r2`
+
+Both pads are built from one matched unit, defined once in `macros/sg13cmos5l_IOPadDiff2Single/netlist/source/units.spice`
+(P) and used unchanged by the S2D pad ([schematic](pix/schematics/unit_r2.svg)): a split-tail hv-PMOS pair with an
+rhigh resistor between the two sources.
+
+| device | W / L (µm), fingers | role |
+|---|---|---|
+| Ta, Tb | 5 / 6, ng 1 | the two tail halves, gate `vbp`, 5 µA each |
+| R[3:0] | rhigh 0.5 / 12.65 each, 4 in series (0.5 / 50.6 total) | source degeneration between `sa` and `sb`; the netlist names it "R = 150 kOhm" |
+| Ma (gate `gp`), Mb (gate `gn`) | 20 / 1, ng 2 each | input pair; Ma drains to `y`, Mb to `x` |
+
+Source: `units.spice`, subckt `unit_r2` (P). Its header defines the unit's function as `x += f(gp − gn)`: the unit adds
+to node `x` (and takes from node `y`) a current that is an odd, monotonic function of its gate difference, around the
+5 µA each node receives at balance.
+
+**Derivation (added here):** with the degeneration, the small-signal unit transconductance is
+`G_u = 1 / (R + 2/g_m) < 1/R ≈ 6.7 µS`, and the current cannot exceed the tail current, so `f` saturates at about
+±5 µA. The units' exact shape of `f` does not matter for the gain of either pad (sections 2 and 3); only matching does.
+Why 5 µA, L = 6 µm tails and a 150 kΩ (50.6 µm) resistor were chosen is not stated in the sources (the `d2s_mpdda`
+header records only the change "unit tails 2 × 5 µA (was 2 × 20 µA per pair)").
+
+## 2. S2D pad (`sg13cmos5l_IOPadSingle2Diff`)
+
+Function: `outp − outn = 2 (pad − vref)`, `(o
+… [35605 more characters cut]
+```
+
+## Tool results / harness — 2026-11-25 02:52:36 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 02:53:10 UTC
+
+**Tool call: `Bash`**
+
+_Apply corrections to HOW_IT_WORKS.md_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && python3 - <<'EOF'
+p='HOW_IT_WORKS.md'; s=open(p).read()
+rep=[
+("""gate at ss / −40 °C". The same README gives the bottom edge for the outputs: the fold cascode CX / CY leaves
+saturation (band edge 0.89 / 0.95 / 1.02 V of `vcm` at −40 / 27 / 125 °C with ±0.5 V of signal).""",
+"""gate at ss / −40 °C". The same README gives the bottom edge: "the S2D fold cascode CX / CY leaves saturation above the
+fold node x. It is 0.89 / 0.95 / 1.02 V at −40 / 27 / 125 °C", as an edge of the `vcm` band, which it defines for
+±0.5 V on the unit gates."""),
+("""vcm − |vin − vref|  ≈  0.39 … 0.52 V          (fold-cascode bottom edge minus the 0.5 V signal of vcm_rb's band, −40 … 125 °C)""",
+"""vcm − |vin − vref|  ≈  0.39 … 0.52 V          (vcm_rb's bottom edge minus its 0.5 V signal, −40 … 125 °C; my reading)"""),
+("""Simulated: 1.78 … 2.25 MHz schematic, 1.57 … 2.02 MHz extracted; loop unity gain ≥ 1.29 MHz, phase margin ≥ 68.7°
+at 100 pF, 42° at 300 pF (README).""",
+"""Simulated: 1.78 … 2.25 MHz schematic, 1.57 … 2.02 MHz extracted; loop unity gain ≥ 1.29 MHz; phase margin 62 … 72° at
+100 pF, 42 … 55° at 300 pF, 24 … 33° at 1 nF (README, finding 2), which is why the specified load range is 10 … 300 pF."""),
+("""- **Why the output devices are the clamp frames:** the sources record the decision (README: "case (a): OP / ON are the
+  pad's clamp frames") but not a reason beyond that; the 2026-11-03 README calls the output stage "the pad's clamp
+  frames" and the disable switches tie their gates to their sources "as in a clamp". So a disabled pad is an ESD clamp
+  pair, and an enabled pad drives with the same area.""",
+"""- **Why the output devices are the clamp frames:** the sources record the decision ("case (a): OP / ON are the pad's
+  clamp frames", `d2s_mpdda_pd.spice`) but no further reason. The same header says that disabled, OP / ON are "off, with
+  their gates tied to their sources as in a clamp": a disabled pad is a clamp pair, an enabled pad drives with the same
+  device area."""),
+("""RN1 + RN2 (RP2 = ABP's size, RN2 = ABN's). README: "I_Q ratio 82 / 2" (replica mock-up README).""",
+"""RN1 + RN2 (RP2 = ABP's size, RN2 = ABN's). The replica mock-up README: "I_Q ratio 82 / 2"."""),
+("""*Figure 3.2: what the layout changed (D2S): the extraction lowers bandwidth and slew rate by about 12 %, raises I_Q by
+5 % and the enable time by up to 94 %; DC transfer, PSRR, noise and swing move by less than 2 %.""",
+"""*Figure 3.2: what the layout changed (D2S): the extraction lowers bandwidth and slew rate by about 12 %, raises I_Q by
+5 % and the enable time by up to 94 %; gain, PSRR, THD and swing move by about 2 % or less, noise by less than 5 %."""),
+("""also moves with vicm (pad at vd = −2.52 V: 0.115 … 0.230 V at vicm 1.26 V, against 0.64 … 0.74 V at vicm 1.65 V and""",
+"""also moves with vicm (pad at vd = −2.52 V: 0.115 … 0.230 V at vicm 1.26 V, against 0.635 … 0.736 V at vicm 1.65 V and"""),
+("""The README says the PMOS mirror is in "moderate inversion for headroom at 3.0 V / ss / −40 C" (`bias_ref.spice`
+comment); other size choices are not explained.""",
+"""The `bg_core` comment in `bias_ref.spice` (P) says the PMOS mirror is in "moderate inversion for headroom at 3.0 V /
+ss / −40 C"; other size choices are not explained."""),
+]
+for a,b in rep:
+    assert a in s, a[:60]
+    s=s.replace(a,b)
+open(p,'w').write(s)
+EOF
+wc -w HOW_IT_WORKS.md
+```
+
+## Tool results / harness — 2026-11-25 02:53:10 UTC
+
+**Tool result:**
+
+```
+7316 HOW_IT_WORKS.md
+```
+
+## Assistant — 2026-11-25 02:53:28 UTC
+
+**Tool call: `Write`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pix/plots/README.md`
+
+```
+<!--
+SPDX-FileCopyrightText: 2026 Christoph Maier
+SPDX-License-Identifier: Apache-2.0
+-->
+# Plots for HOW_IT_WORKS.md
+
+Made by [`make_plots.py`](make_plots.py) from committed simulation data only (no simulation was run for them).
+PNG, 150 dpi, the plot style of [`verification/c2_gaps/dc_curves/plots`](../../../../verification/c2_gaps/dc_curves/plots)
+(same rcParams, same color per MOS corner). All data are IHP sg13cmos5l simulations. Used in
+[HOW_IT_WORKS.md](../../HOW_IT_WORKS.md).
+
+| plot | what it shows | data |
+|---|---|---|
+| [bg_core_current_vs_temp.png](bg_core_current_vs_temp.png) | `bg_core_pd` alone: output current into 0.7 V vs temperature, 5 MOS corners (color) × 3 rhigh corners (line style), 3.3 V, schematic; right: the MOS-corner effect alone, relative to tt at the same rhigh corner and temperature | [`verification/c2_gaps/slot_modes_bg/bg_core_dc.csv`](../../../../verification/c2_gaps/slot_modes_bg/bg_core_dc.csv) (view `schematic`, column `i_op_uA`) |
+| [pex_vs_schematic_s2d.png](pex_vs_schematic_s2d.png) | S2D pad: magic C-coupled PEX vs schematic per CACE quantity; bar = change of the median over all runs, whisker = range of the per-run change (runs matched by their condition columns) | design repository [`91a7da8b`](https://github.com/tatzelbrumm/sg13cmos5l_cm_ip__single2diff2single/tree/91a7da8b67ac56a26c605501146667a1fde28c32/macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/results): `macros/sg13cmos5l_IOPadSingle2Diff/verification/cace/results/sg13cmos5l_IOPadSingle2Diff/<group>.csv` and `…/sg13cmos5l_IOPadSingle2Diff_pex/<group>.csv`, groups dc, window, range, dc_ibias, ac, tran, noise, enable |
+| [pex_vs_schematic_d2s.png](pex_vs_schematic_d2s.png) | D2S pad: the same, PEX of the taped-out cell (ngspice `rshunt` = 1e12) vs the committed schematic results (which predate the layout) | schematic: design repository `91a7da8b`, `macros/sg13cmos5l_IOPadDiff2Single/verification/cace/results/sg13cmos5l_IOPadDiff2Single/<group>.csv`; PEX: [`verification/c2_gaps/d2s_pex/csv/<group>_pex_rshunt1e12.csv`](../../../../verification/c2_gaps/d2s_pex/csv/) (the numbers agree with [`d2s_pex/results.md`](../../../../verification/c2_gaps/d2s_pex/results.md)) |
+| [bias_dist_mismatch_hist.png](bias_dist_mismatch_hist.png) | `bias_dist_pd`: local-mismatch Monte Carlo of the copy ratio at 1.0 V output, 100 runs per view (schematic, magic PEX); left: all four outputs pooled, right: `iout1 − iout2` (S2D − D2S) | [`verification/c2_gaps/replica_bias/results/bias_dist/bias_dist_mc_schematic.csv`, `bias_dist_mc_magic_pex_2.csv`](../../../../verification/c2_gaps/replica_bias/results/bias_dist/) |
+| [pad_ref_rb_vcm_vref_pvt.png](pad_ref_rb_vcm_vref_pvt.png) | `pad_ref_rb`: `vcm` and `vref` vs temperature, 5 MOS corners (color) × iovdd 3.0 / 3.3 / 3.6 V (line style), 45 points, schematic | [`verification/c2_gaps/replica_bias/results/cace_schematic/vcm_dc_params.csv`, `vcm_dc_3v0_params.csv`](../../../../verification/c2_gaps/replica_bias/results/cace_schematic/) |
+
+Not plotted in the PEX comparisons: quantities whose values lie near zero, where a relative change has no meaning
+(offsets, pad-range low end, overshoot, glitches, core-ring and power-down currents). The quantity lists are `S2D_Q` and
+`D2S_Q` in `make_plots.py`.
+
+## Regenerating
+
+ʼʼʼsh
+python3 -I make_plots.py [--design-cache DIR]
+ʼʼʼ
+
+Needs Python 3 with numpy and matplotlib, and `git` with network access for the design-repository CSVs: the script
+makes a blob-less shallow clone of the design repository in `--design-cache` (default `~/.cache/slot7_make_plots`),
+fetches commit `91a7da8b` and reads the CSVs with `git show` (only those blobs are downloaded). It prints the numbers it
+plots (medians, per-run ranges, sigmas), so they can be compared with the text. Made on 2026-11-25 with matplotlib 3.11.2.
+```
+
+## Tool results / harness — 2026-11-25 02:53:28 UTC
+
+**Tool result:**
+
+```
+File created successfully at: /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pix/plots/README.md (file state is current in your context — no need to Read it back)
+```
+
+## Assistant — 2026-11-25 02:53:29 UTC
+
+**Tool call: `Bash`**
+
+_Locate Where-to-find-what table rows_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && grep -n "How this set was made; AI assistance" README.md && grep -n "^| What was verified" README.md
+```
+
+## Tool results / harness — 2026-11-25 02:53:29 UTC
+
+**Tool result:**
+
+```
+79:| How this set was made; AI assistance | [§8](#8-about-this-document-set), [log.md](log.md), [../AI_ASSISTANCE.md](../AI_ASSISTANCE.md) |
+76:| What was verified, and what is open? | [§3](#3-readiness-of-the-blocks-that-were-kicked-off), [§5](#5-verification-state), [§5a](#5a-gap-simulations-of-2026-11-23), [signoff](../../signoff/README.md) |
+```
+
+## Assistant — 2026-11-25 02:53:33 UTC
+
+**Tool call: `Edit`**
+
+file: `/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/README.md`
+
+old:
+```
+| What do the modes and the `dig_in` bits do? |
+```
+
+new:
+```
+| Why does it work, and how is it sized? | [HOW_IT_WORKS.md](HOW_IT_WORKS.md) (principles, design equations, sizing tables per block; plots: [pix/plots/](pix/plots/README.md)) |
+| What do the modes and the `dig_in` bits do? |
+```
+
+## Tool results / harness — 2026-11-25 02:53:33 UTC
+
+**Tool result:**
+
+```
+The file /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/README.md has been updated successfully.
+```
+
+## Assistant — 2026-11-25 02:53:34 UTC
+
+Now check links in the new files and render the Markdown once to see it.
+
+## Assistant — 2026-11-25 02:53:37 UTC
+
+**Tool call: `Bash`**
+
+_Check relative links and anchors_
+
+```bash
+cd /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out && python3 - <<'EOF'
+import re,os
+for f in ['HOW_IT_WORKS.md','pix/plots/README.md']:
+    d=os.path.dirname(f) or '.'
+    for m in re.findall(r'\]\(([^)#]+?)(?:#[^)]*)?\)', open(f).read()):
+        if m.startswith('http'): continue
+        p=os.path.normpath(os.path.join(d,m))
+        if not os.path.exists(p): print(f,'MISSING',m)
+print('done')
+EOF
+grep -o '](#[^)]*)' HOW_IT_WORKS.md | sort -u; grep '^## ' HOW_IT_WORKS.md; git -C /home/user/sg13cmos5l_cm_slot7 status --short
+```
+
+## Tool results / harness — 2026-11-25 02:53:37 UTC
+
+**Tool result:**
+
+```
+done
+](#1-the-common-unit-unit_r2)
+](#2-s2d-pad-sg13cmos5l_iopadsingle2diff)
+](#3-d2s-pad-sg13cmos5l_iopaddiff2single)
+](#4-replica-bias-pad_ref_rb)
+](#5-bandgap-current-reference-bg_core_pd)
+](#6-bias_dist_pd-and-the-fail-safe-enables)
+](#7-what-the-sources-do-not-say)
+## 1. The common unit `unit_r2`
+## 2. S2D pad (`sg13cmos5l_IOPadSingle2Diff`)
+## 3. D2S pad (`sg13cmos5l_IOPadDiff2Single`)
+## 4. Replica bias (`pad_ref_rb`)
+## 5. Bandgap current reference (`bg_core_pd`)
+## 6. `bias_dist_pd` and the fail-safe enables
+## 7. What the sources do not say
+ M docs/chipalooza2_as_taped_out/README.md
+?? docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md
+?? docs/chipalooza2_as_taped_out/pix/plots/
+?? verification/c2_gaps/d2s_schematic_rerun/
+```
+
+## Assistant — 2026-11-25 02:53:42 UTC
+
+**Tool call: `Bash`**
+
+_List plots folder_
+
+```bash
+ls -la /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pix/plots/; head -5 /home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/pix/plots/make_plots.py
+```
+
+## Tool results / harness — 2026-11-25 02:53:42 UTC
+
+**Tool result:**
+
+```
+total 892
+drwxr-xr-x 2 root root   4096 Nov 25 02:53 .
+drwxr-xr-x 5 root root   4096 Nov 25 02:47 ..
+-rw-r--r-- 1 root root   3834 Nov 25 02:53 README.md
+-rw-r--r-- 1 root root 140755 Nov 25 02:48 bg_core_current_vs_temp.png
+-rw-r--r-- 1 root root 107073 Nov 25 02:48 bias_dist_mismatch_hist.png
+-rw-r--r-- 1 root root  19571 Nov 25 02:48 make_plots.py
+-rw-r--r-- 1 root root 212479 Nov 25 02:48 pad_ref_rb_vcm_vref_pvt.png
+-rw-r--r-- 1 root root 223221 Nov 25 02:48 pex_vs_schematic_d2s.png
+-rw-r--r-- 1 root root 185094 Nov 25 02:48 pex_vs_schematic_s2d.png
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Christoph Maier
+# SPDX-License-Identifier: Apache-2.0
+"""Plots for HOW_IT_WORKS.md, made only from committed simulation data (no simulation is run).
+```
+
+## Assistant — 2026-11-25 02:53:53 UTC
+
+**Tool call: `SubagentHandback`**
+
+```json
+{
+ "message": "I've written `docs/chipalooza2_as_taped_out/HOW_IT_WORKS.md`, made five plots from committed data, and added the one row to the README. Nothing was committed and nothing was simulated. Every claim and number was checked against the design repo at P = 91a7da8b (pads) and S = 9052bd35 (slot blocks), or against `verification/c2_gaps`; I did not touch `ac_tran/`.\n\n**HOW_IT_WORKS.md** (about 7,300 words with tables, at or slightly over the 8-page target):\n1. **`unit_r2`:** the shared building block of both pads.\n2. **S2D:** why the matched-unit balance gives exactly 2 and a CMFB null independent of the signal. The input window is explained by two edges (top unit gate ≈ iovdd − 1.25 V, lowest output ≈ 0.4–0.5 V); I checked this against the range grid in dc_curves §4. Also the current budget (114 vs 115.5 µA simulated) and a bandwidth upper bound.\n3. **D2S:** where the ½ comes from, the class-AB loop (I_Q ≈ 82/2 × 5 µA vs 207–227 µA simulated), output devices being the clamp frames, Miller bandwidth bound. INL vs input common mode is explained by the highest unit gate, vicm + |vd|/2: 2.15 V needed at 1.65 V vs a range end of 1.85–2.15 V; 1.76 V needed at 1.26 V vs 1.89–2.20 V.\n4. **`pad_ref_rb`:** why replicas rather than a divider, then `vcm_rb`, `vref_s2d_rb`, the shared tree and bypass.\n5. **`bg_core_pd`:** the Banba equation; it follows the resistor corner (−21 / +28 %) but the MOS corner by only ≤ 0.31 %.\n6. **`bias_dist_pd` and `ls_up_fs`:** the 1:1 distribution, and the fail-safe enable (leaker, latch, starvation).\n7. **What the sources do not say.**\n\nSizing tables with file and commit for S2D, D2S, `unit_r2`, `pad_ref_rb`, `bg_core_pd`, `bias_dist_pd` and `ls_up_fs`. Derivations I added are marked \"Derivation (added here)\".\n\n**Plots** in `pix/plots/` (150 dpi, 107–223 kB, each one viewed): bandgap current vs temperature, PEX vs schematic for S2D and D2S, `bias_dist_pd` mismatch histogram, `vcm`/`vref` over PVT. `make_plots.py` regenerates them; for the S2D data and the D2S schematic CSVs it needs network access to fetch them from the design repo with `git show`. The README there lists each plot's source file.\n\n**What the sources did not support** (stated as such in the text): the reasons for most absolute sizes; how the class-AB loop reconciles the P-side ratio 41 with the N-side 34; the effect of `pad_ref_rb` running on `vdd_3v3` instead of the pads' iovdd, which its own README asks for; the rhigh sheet resistance; a matching spec for `bias_dist_pd`; why the bandgap was chosen over the Oguey–Aebischer core.\n\nThere is a `docs/` folder for the pads at 91a7da8b; neither pad macro has one.\n\nAnother job has left an untracked `verification/c2_gaps/d2s_schematic_rerun/`; it isn't mine.\n\nFiles are in `/home/user/sg13cmos5l_cm_slot7/docs/chipalooza2_as_taped_out/`:\n- `HOW_IT_WORKS.md`\n- `README.md` (one row added)\n- `pix/plots/README.md`\n- `pix/plots/make_plots.py`\n- `pix/plots/*.png`"
+}
+```
+
+## Tool results / harness — 2026-11-25 02:53:54 UTC
+
+**Tool result:**
+
+```
+{"success":true,"message":"Report delivered to your caller."}
+```
+
