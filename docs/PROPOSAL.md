@@ -160,15 +160,15 @@ ratings (the 3.3 V devices are the 5 V-class `g5v0d10v5` devices; exact rated va
 | 1 | analog supply `vdda` | | 3.0 V | 3.3 V | 3.6 V | TBC (PDK) | rules: 3.3 V analog | – |
 | 2 | digital control level | | | 1.8 V | | TBC (PDK) | rules: 1.8 V digital | – |
 | 3 | temperature | | −40 °C | 27 °C | 125 °C | | rules: ≥ 0 … 110 °C | – |
-| 4 | S2D gain `(outp−outn)/(pad−vref)` incl. mismatch | | 1.94 | 2.00 | 2.06 | | 1.9985 … 1.9993 (PVT); 1.959 … 2.038 (100 mismatch runs); margin ≈ 1 % | TBD |
-| 5 | S2D input offset incl. mismatch | tt, 27 °C | −25 mV | 0 | 25 mV | | −17.3 … 18.2 mV (mismatch) | TBD |
+| 4 | S2D gain `(outp−outn)/(pad−vref)` incl. mismatch | | 1.94 | 2.00 | 2.06 | | 1.9985 … 1.9993 (PVT); mismatch 1.958 … 2.050 (schematic), 1.959 … 2.034 (post-layout), σ 0.0167, 100 runs each (S14); margin ≈ 1 % | TBD |
+| 5 | S2D input offset incl. mismatch | tt, 27 °C | −25 mV | 0 | 25 mV | | mismatch −10.2 … 16.0 mV (schematic), −13.2 … 19.6 mV (post-layout), σ 5.3 / 6.1 mV (S14) | TBD |
 | 6 | S2D INL | pad 0 … 1 V | | 0.2 mV | 2 mV | | 0.087 … 1.069 mV | TBD |
-| 7 | S2D output common-mode error incl. mismatch | | −50 mV | 10 mV | 50 mV | | 5.0 … 18.1 mV (PVT); −19.0 … 39.9 mV (mismatch) | TBD |
+| 7 | S2D output common-mode error incl. mismatch | | −50 mV | 10 mV | 50 mV | | 5.0 … 18.1 mV (PVT); mismatch −27.3 … 47.0 mV (schematic), −17.9 … 42.0 mV (post-layout), σ 11.0 / 12.7 mV (S14) | TBD |
 | 8 | S2D input range (`vref` ≈ 0.5 V) | | 0 V | | 1.0 V | pad: TBC (ESD / pad library) | low end ≤ 0.087 V, high end ≥ 1.057 V | TBD |
 | 9 | S2D −3 dB bandwidth | | 1 MHz | 1.4 MHz | | | 1.237 … 1.666 MHz (post-layout PEX); 1.353 … 1.812 (schematic) | TBD |
 | 10 | S2D settling to 1 % | ≤ 0.5 pF | | 0.4 µs | 1 µs | | 0.222 … 0.596 µs | TBD |
 | 11 | S2D input noise density | 100 kHz | | 0.15 µV/√Hz | 0.25 µV/√Hz | | 0.142 … 0.157 µV/√Hz | TBD |
-| 12 | S2D PSRR (pad-ring supply), input-referred | 1 kHz | 60 dB | 90 dB | | | 79.1 … 113.4 dB (mismatch runs) | TBD |
+| 12 | S2D PSRR (pad-ring supply), input-referred | 1 kHz | 60 dB | 90 dB | | | 83.8 … 131.6 dB (30 mismatch runs, S14) | TBD |
 | 13 | S2D pad-ring supply current, enabled | default bias | | 116 µA | 135 µA | | 114.6 … 116.9 µA | TBD |
 | 14 | D2S gain `(pad−vref)/(vinp−vinn)` incl. mismatch | 3.3 … 3.6 V | 0.49 | 0.50 | 0.51 | | 0.4983 … 0.5000 (schematic and post-layout); mismatch 0.4888 … 0.5051, σ 0.0037 (30 runs). **Discrepancy:** this target was set on 2026-11-23 from the older committed mismatch result (0.4939 … 0.5085); the re-run on the taped-out schematic puts one of 30 samples below the min 0.49, so the IHP basis misses this target. Kept as proposed; can be widened ex post facto (e.g. to ≈ ±3σ) if the organizers prefer | TBD |
 | 15 | D2S output offset incl. mismatch | | −20 mV | 0 | 20 mV | | 0.032 … 1.74 mV (PVT); post-layout 0.044 … 1.75 mV; mismatch −14.3 … 13.9 mV, σ 6.3 mV (30 runs) | TBD |
